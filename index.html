@@ -3713,52 +3713,76 @@
 
           </section>
 
-          <!-- NEU: Achievements & Level System -->
           <!-- Gruppenvergleich -->
           <section id="group-compare" class="card" style="display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <div>
-                <h2 style="margin:0;">👥 Gruppenvergleich</h2>
-                <p style="margin:4px 0 0 0;color:var(--muted);font-size:14px;">Vergleiche Beobachtungen und Erfolge der Gruppenmitglieder</p>
+            <div style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05));padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(6,182,212,0.2);">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <div style="font-size:36px;">👥</div>
+                <div>
+                  <h2 style="margin:0;font-size:24px;">Gruppenvergleich</h2>
+                  <p style="margin:4px 0 0 0;color:var(--muted);font-size:13px;">Vergleiche Beobachtungen und Erfolge der Gruppenmitglieder</p>
+                </div>
               </div>
             </div>
 
             <!-- Tab-Navigation -->
-            <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:2px solid rgba(255,255,255,0.05);padding-bottom:8px;">
-              <button class="small-btn active" id="compareObsTab" onclick="switchCompareTab('observations')" style="background:rgba(6,182,212,0.1);">📊 Beobachtungen</button>
-              <button class="small-btn" id="compareListsTab" onclick="switchCompareTab('lists')">📋 Listen-Vergleich</button>
-              <button class="small-btn" id="compareRarityTab" onclick="switchCompareTab('rarity2026')" style="background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);">💎 Rarität-Challenge 2026</button>
-              <button class="small-btn" id="compareAchTab" onclick="switchCompareTab('achievements')">🏅 Erfolge</button>
-              <button class="small-btn" id="compareStatsTab" onclick="switchCompareTab('stats')">📈 Statistiken</button>
+            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;padding:12px;background:rgba(255,255,255,0.02);border-radius:10px;">
+              <button class="small-btn active" id="compareObsTab" onclick="switchCompareTab('observations')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+                📊 Beobachtungen
+              </button>
+              <button class="small-btn" id="compareListsTab" onclick="switchCompareTab('lists')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+                📋 Listen
+              </button>
+              <button class="small-btn" id="compareRarityTab" onclick="switchCompareTab('rarity2026')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+                💎 Raritäten
+              </button>
+              <button class="small-btn" id="compareAchTab" onclick="switchCompareTab('achievements')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+                🏅 Erfolge
+              </button>
+              <button class="small-btn" id="compareStatsTab" onclick="switchCompareTab('stats')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+                📈 Statistiken
+              </button>
             </div>
 
             <!-- Beobachtungs-Vergleich -->
             <div id="compareObservationsView">
-              <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05));">
-                <h3>🏆 Leaderboard - Beobachtungen</h3>
-                <div id="observationLeaderboard">
-                  <div style="text-align:center;padding:20px;color:var(--muted);">
-                    <div style="font-size:32px;margin-bottom:8px;">👥</div>
-                    <p style="margin:0;">Lade Gruppendaten...</p>
+              <!-- Leaderboards in Grid Layout -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:16px;margin-bottom:20px;">
+                <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.06));border-left:4px solid #06b6d4;">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                    <span style="font-size:28px;">🏆</span>
+                    <h3 style="margin:0;">Beobachtungen</h3>
+                  </div>
+                  <div id="observationLeaderboard">
+                    <div style="text-align:center;padding:20px;color:var(--muted);">
+                      <div style="font-size:32px;margin-bottom:8px;">👥</div>
+                      <p style="margin:0;">Lade Gruppendaten...</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <!-- NEU: Leaderboard für Arten -->
-              <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(168,85,247,0.1), rgba(236,72,153,0.05));">
-                <h3>🐦 Leaderboard - Arten</h3>
-                <div id="speciesLeaderboard">
-                  <div style="text-align:center;padding:20px;color:var(--muted);">
-                    <div style="font-size:32px;margin-bottom:8px;">🦅</div>
-                    <p style="margin:0;">Lade Gruppendaten...</p>
+                
+                <div class="card" style="background:linear-gradient(135deg, rgba(168,85,247,0.12), rgba(236,72,153,0.06));border-left:4px solid #a855f7;">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                    <span style="font-size:28px;">🐦</span>
+                    <h3 style="margin:0;">Arten</h3>
+                  </div>
+                  <div id="speciesLeaderboard">
+                    <div style="text-align:center;padding:20px;color:var(--muted);">
+                      <div style="font-size:32px;margin-bottom:8px;">🦅</div>
+                      <p style="margin:0;">Lade Gruppendaten...</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="card" style="margin-bottom:16px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                  <h3 style="margin:0;">🔍 Direkter Mitglieder-Vergleich</h3>
-                  <button class="small-btn" onclick="openDetailedMemberComparison()" style="background:var(--accent);">
+              <!-- Direkter Mitglieder-Vergleich -->
+              <div class="card" style="margin-bottom:20px;border-left:4px solid #22c55e;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:28px;">🔍</span>
+                    <h3 style="margin:0;">Direkter Mitglieder-Vergleich</h3>
+                  </div>
+                  <button class="small-btn" onclick="openDetailedMemberComparison()" style="background:var(--accent);padding:8px 14px;">
                     📊 Detailansicht
                   </button>
                 </div>
@@ -3767,23 +3791,30 @@
                 </div>
               </div>
 
-              <div class="card" style="margin-bottom:16px;">
-                <h3>📊 Detaillierter Vergleich</h3>
+              <!-- Detaillierter Vergleich -->
+              <div class="card" style="border-left:4px solid #06b6d4;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">📊</span>
+                  <h3 style="margin:0;">Detaillierter Vergleich</h3>
+                </div>
                 <div id="detailedObservationComparison"></div>
               </div>
             </div>
 
             <!-- Listen-Vergleich -->
             <div id="compareListsView" style="display:none;">
-              <div class="card" style="margin-bottom:16px;">
+              <div class="card" style="border-left:4px solid #7c3aed;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                   <div>
-                    <h3 style="margin:0;">📁 Vergleichs-Ordner</h3>
-                    <p style="margin:4px 0 0 0;color:var(--muted);font-size:13px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                      <span style="font-size:28px;">📁</span>
+                      <h3 style="margin:0;">Vergleichs-Ordner</h3>
+                    </div>
+                    <p style="margin:0;color:var(--muted);font-size:13px;">
                       Erstelle Ordner und lade Listen zum Vergleich ein
                     </p>
                   </div>
-                  <button class="small-btn" onclick="openCreateComparisonFolderModal()" style="background:var(--accent);color:white;">
+                  <button class="small-btn" onclick="openCreateComparisonFolderModal()" style="background:var(--accent);color:white;padding:8px 14px;font-weight:600;">
                     ➕ Ordner erstellen
                   </button>
                 </div>
@@ -3799,18 +3830,18 @@
 
             <!-- Rarität-Challenge 2026 -->
             <div id="compareRarity2026View" style="display:none;">
-              <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(234,179,8,0.15), rgba(217,119,6,0.05));border:2px solid rgba(234,179,8,0.3);">
-                <div style="text-align:center;padding:20px;">
-                  <div style="font-size:48px;margin-bottom:12px;">💎</div>
-                  <h2 style="margin:0 0 8px 0;">Rarität-Challenge <span id="rarityChallengeYearTitle">2025</span></h2>
-                  <p style="color:var(--muted);font-size:14px;margin:0;">
+              <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg, rgba(234,179,8,0.18), rgba(217,119,6,0.08));border:2px solid rgba(234,179,8,0.4);border-left:6px solid #f59e0b;">
+                <div style="text-align:center;padding:24px;">
+                  <div style="font-size:56px;margin-bottom:16px;">💎</div>
+                  <h2 style="margin:0 0 8px 0;font-size:28px;font-weight:700;">Rarität-Challenge <span id="rarityChallengeYearTitle">2025</span></h2>
+                  <p style="color:var(--soft);font-size:15px;margin:0;">
                     Wer findet die meisten seltenen Arten im ausgewählten Jahr?
                   </p>
                   
                   <!-- Jahr-Auswahl -->
-                  <div style="margin-top:16px;margin-bottom:16px;">
-                    <label style="font-size:13px;color:var(--muted);margin-right:8px;">📅 Jahr auswählen:</label>
-                    <select id="rarityChallengeYearSelect" class="input" style="padding:6px 12px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text);font-weight:600;" onchange="changeRarityChallengeYear()">
+                  <div style="margin-top:20px;margin-bottom:20px;">
+                    <label style="font-size:14px;color:var(--soft);margin-right:8px;font-weight:600;">📅 Jahr auswählen:</label>
+                    <select id="rarityChallengeYearSelect" class="input" style="padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(234,179,8,0.3);color:var(--text);font-weight:600;font-size:14px;" onchange="changeRarityChallengeYear()">
                       <option value="2022">2022</option>
                       <option value="2023">2023</option>
                       <option value="2024">2024</option>
@@ -3822,18 +3853,18 @@
                     </select>
                   </div>
                   
-                  <div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.05);border-radius:8px;text-align:left;max-width:450px;margin-left:auto;margin-right:auto;">
-                    <div style="font-weight:600;margin-bottom:8px;font-size:13px;">📊 Punktesystem:</div>
-                    <div style="font-size:13px;line-height:1.8;color:var(--soft);">
+                  <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.06);border-radius:10px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto;border:1px solid rgba(234,179,8,0.2);">
+                    <div style="font-weight:700;margin-bottom:12px;font-size:14px;color:#eab308;">📊 Punktesystem:</div>
+                    <div style="font-size:13px;line-height:2;color:var(--text);">
                       • Seltene Art: <strong style="color:#eab308;">1 Punkt</strong><br>
                       • Sehr seltene Art: <strong style="color:#f59e0b;">2 Punkte</strong><br>
                       • Seltene Art + Selffound: <strong style="color:#10b981;">3 Punkte</strong><br>
                       • Sehr seltene Art + Selffound: <strong style="color:#22c55e;">5 Punkte</strong>
                     </div>
-                    <div style="margin-top:12px;padding:8px;background:rgba(239,68,68,0.1);border-radius:6px;border-left:3px solid #ef4444;font-size:12px;color:var(--soft);">
+                    <div style="margin-top:14px;padding:10px;background:rgba(239,68,68,0.12);border-radius:8px;border-left:3px solid #ef4444;font-size:12px;color:var(--text);line-height:1.6;">
                       <strong>🚫 Anti-Duplikat-Regel (nur eigene Meldungen):</strong> Wurde eine seltene Art bereits <strong>von dir selbst</strong> in den <strong>letzten 3 Wochen</strong> im <strong>Umkreis von 3km</strong> gemeldet, bringt sie keine weiteren Punkte. So wird verhindert, dass du dieselbe überwinternde Seltenheit mehrfach zählst. Meldungen anderer Gruppenmitglieder blockieren deine Punkte nicht!
                     </div>
-                    <div style="margin-top:8px;padding:8px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid #06b6d4;font-size:12px;color:var(--muted);">
+                    <div style="margin-top:10px;padding:10px;background:rgba(6,182,212,0.08);border-radius:8px;border-left:3px solid #06b6d4;font-size:12px;color:var(--soft);line-height:1.6;">
                       <strong>💡 Beispiel:</strong> Ein Ohrentaucher (selten) gibt 1 Punkt. Als Selffound gibt er 3 Punkte!
                     </div>
                   </div>
@@ -3841,8 +3872,11 @@
               </div>
 
               <!-- Leaderboard -->
-              <div class="card" style="margin-bottom:16px;">
-                <h3>🏆 Leaderboard <span id="rarityLeaderboardYearTitle">2025</span></h3>
+              <div class="card" style="margin-bottom:20px;border-left:4px solid #eab308;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">🏆</span>
+                  <h3 style="margin:0;">Leaderboard <span id="rarityLeaderboardYearTitle">2025</span></h3>
+                </div>
                 <div id="rarityLeaderboard2026">
                   <div style="text-align:center;padding:20px;color:var(--muted);">
                     <div style="font-size:32px;margin-bottom:8px;">⏳</div>
@@ -3852,16 +3886,22 @@
               </div>
 
               <!-- Detaillierte Statistiken -->
-              <div class="card">
-                <h3>📊 Detaillierte Statistiken</h3>
+              <div class="card" style="border-left:4px solid #06b6d4;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">📊</span>
+                  <h3 style="margin:0;">Detaillierte Statistiken</h3>
+                </div>
                 <div id="rarityDetailedStats2026"></div>
               </div>
             </div>
 
             <!-- Erfolgs-Vergleich -->
             <div id="compareAchievementsView" style="display:none;">
-              <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.05));">
-                <h3>🏆 Leaderboard - Erfolge</h3>
+              <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));border-left:4px solid #7c3aed;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">🏆</span>
+                  <h3 style="margin:0;">Leaderboard - Erfolge</h3>
+                </div>
                 <div id="achievementLeaderboard">
                   <div style="text-align:center;padding:20px;color:var(--muted);">
                     <div style="font-size:32px;margin-bottom:8px;">🏅</div>
@@ -3870,32 +3910,47 @@
                 </div>
               </div>
 
-              <div class="card">
-                <h3>🎯 Erfolgs-Vergleich</h3>
+              <div class="card" style="border-left:4px solid #22c55e;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">🎯</span>
+                  <h3 style="margin:0;">Erfolgs-Vergleich</h3>
+                </div>
                 <div id="detailedAchievementComparison"></div>
               </div>
             </div>
 
             <!-- Statistik-Vergleich -->
             <div id="compareStatsView" style="display:none;">
-              <div class="card" style="margin-bottom:16px;">
-                <h3>📈 Gruppen-Statistiken im Überblick</h3>
+              <div class="card" style="margin-bottom:20px;border-left:4px solid #06b6d4;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">📈</span>
+                  <h3 style="margin:0;">Gruppen-Statistiken im Überblick</h3>
+                </div>
                 <div id="groupStatsOverview"></div>
               </div>
 
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;">
-                <div class="card">
-                  <h4 style="margin:0 0 8px 0;">🐦 Meiste einzigartige Arten</h4>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
+                <div class="card" style="border-left:4px solid #22c55e;">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="font-size:24px;">🐦</span>
+                    <h4 style="margin:0;">Meiste einzigartige Arten</h4>
+                  </div>
                   <div id="topSpeciesFinders"></div>
                 </div>
                 
-                <div class="card">
-                  <h4 style="margin:0 0 8px 0;">📸 Meiste Fotos</h4>
+                <div class="card" style="border-left:4px solid #ec4899;">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="font-size:24px;">📸</span>
+                    <h4 style="margin:0;">Meiste Fotos</h4>
+                  </div>
                   <div id="topPhotoTakers"></div>
                 </div>
                 
-                <div class="card">
-                  <h4 style="margin:0 0 8px 0;">🔥 Längste Streak</h4>
+                <div class="card" style="border-left:4px solid #f59e0b;">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="font-size:24px;">🔥</span>
+                    <h4 style="margin:0;">Längste Streak</h4>
+                  </div>
                   <div id="topStreaks"></div>
                 </div>
               </div>
@@ -17409,11 +17464,15 @@ function switchCompareTab(tab) {
   document.querySelectorAll('#group-compare .small-btn').forEach(btn => {
     btn.classList.remove('active');
     btn.style.background = '';
+    btn.style.border = '1px solid rgba(255,255,255,0.1)';
+    btn.style.transform = '';
   });
   
   if (tab === 'observations') {
     document.getElementById('compareObsTab').classList.add('active');
-    document.getElementById('compareObsTab').style.background = 'rgba(6,182,212,0.1)';
+    document.getElementById('compareObsTab').style.background = 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.1))';
+    document.getElementById('compareObsTab').style.border = '2px solid #06b6d4';
+    document.getElementById('compareObsTab').style.transform = 'scale(1.02)';
     document.getElementById('compareObservationsView').style.display = 'block';
     document.getElementById('compareListsView').style.display = 'none';
     document.getElementById('compareRarity2026View').style.display = 'none';
@@ -17421,7 +17480,9 @@ function switchCompareTab(tab) {
     document.getElementById('compareStatsView').style.display = 'none';
   } else if (tab === 'lists') {
     document.getElementById('compareListsTab').classList.add('active');
-    document.getElementById('compareListsTab').style.background = 'rgba(6,182,212,0.1)';
+    document.getElementById('compareListsTab').style.background = 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1))';
+    document.getElementById('compareListsTab').style.border = '2px solid #7c3aed';
+    document.getElementById('compareListsTab').style.transform = 'scale(1.02)';
     document.getElementById('compareObservationsView').style.display = 'none';
     document.getElementById('compareListsView').style.display = 'block';
     document.getElementById('compareRarity2026View').style.display = 'none';
@@ -17430,7 +17491,9 @@ function switchCompareTab(tab) {
     renderComparisonFolders(); // Lade Listen-Vergleich
   } else if (tab === 'rarity2026') {
     document.getElementById('compareRarityTab').classList.add('active');
-    document.getElementById('compareRarityTab').style.background = 'rgba(234,179,8,0.15)';
+    document.getElementById('compareRarityTab').style.background = 'linear-gradient(135deg, rgba(234,179,8,0.25), rgba(217,119,6,0.15))';
+    document.getElementById('compareRarityTab').style.border = '2px solid #eab308';
+    document.getElementById('compareRarityTab').style.transform = 'scale(1.02)';
     document.getElementById('compareObservationsView').style.display = 'none';
     document.getElementById('compareListsView').style.display = 'none';
     document.getElementById('compareRarity2026View').style.display = 'block';
@@ -17439,7 +17502,9 @@ function switchCompareTab(tab) {
     renderRarityChallenge2026(); // Lade Rarität-Challenge
   } else if (tab === 'achievements') {
     document.getElementById('compareAchTab').classList.add('active');
-    document.getElementById('compareAchTab').style.background = 'rgba(6,182,212,0.1)';
+    document.getElementById('compareAchTab').style.background = 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1))';
+    document.getElementById('compareAchTab').style.border = '2px solid #7c3aed';
+    document.getElementById('compareAchTab').style.transform = 'scale(1.02)';
     document.getElementById('compareObservationsView').style.display = 'none';
     document.getElementById('compareListsView').style.display = 'none';
     document.getElementById('compareRarity2026View').style.display = 'none';
@@ -17447,7 +17512,9 @@ function switchCompareTab(tab) {
     document.getElementById('compareStatsView').style.display = 'none';
   } else if (tab === 'stats') {
     document.getElementById('compareStatsTab').classList.add('active');
-    document.getElementById('compareStatsTab').style.background = 'rgba(6,182,212,0.1)';
+    document.getElementById('compareStatsTab').style.background = 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(34,197,94,0.1))';
+    document.getElementById('compareStatsTab').style.border = '2px solid #06b6d4';
+    document.getElementById('compareStatsTab').style.transform = 'scale(1.02)';
     document.getElementById('compareObservationsView').style.display = 'none';
     document.getElementById('compareListsView').style.display = 'none';
     document.getElementById('compareRarity2026View').style.display = 'none';
@@ -18051,14 +18118,15 @@ async function renderRarityChallenge2026() {
       leaderboard.forEach((entry, index) => {
         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
         const isTop3 = index < 3;
+        const isFirst = index === 0;
         
         html += `
-          <div class="card" style="background:${isTop3 ? 'linear-gradient(135deg, rgba(234,179,8,0.15), rgba(217,119,6,0.05))' : 'rgba(255,255,255,0.02)'};border-left:${isTop3 ? '4px' : '3px'} solid ${isTop3 ? '#eab308' : 'rgba(255,255,255,0.1)'};">
+          <div class="card" style="background:${isFirst ? 'linear-gradient(135deg, rgba(234,179,8,0.25), rgba(217,119,6,0.15))' : isTop3 ? 'linear-gradient(135deg, rgba(234,179,8,0.15), rgba(217,119,6,0.05))' : 'rgba(255,255,255,0.02)'};border-left:${isFirst ? '6px' : isTop3 ? '4px' : '3px'} solid ${isFirst ? '#f59e0b' : isTop3 ? '#eab308' : 'rgba(255,255,255,0.1)'};${isFirst ? 'box-shadow:0 8px 32px rgba(234,179,8,0.3);' : ''}">
             <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
               <div style="display:flex;align-items:start;gap:12px;flex:1;">
-                <div style="font-size:32px;width:40px;text-align:center;margin-top:4px;">${medal || (index + 1)}</div>
+                <div style="font-size:${isFirst ? '40px' : '32px'};width:${isFirst ? '50px' : '40px'};text-align:center;margin-top:4px;">${medal || (index + 1)}</div>
                 <div style="flex:1;">
-                  <div style="font-weight:600;font-size:16px;margin-bottom:8px;">${entry.name}</div>
+                  <div style="font-weight:${isFirst ? '700' : '600'};font-size:${isFirst ? '18px' : '16px'};margin-bottom:8px;${isFirst ? 'color:#f59e0b;' : ''}">${isFirst ? '👑 ' : ''}${entry.name}</div>
                   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px;font-size:11px;">
                     <div style="padding:4px 8px;background:rgba(234,179,8,0.15);border-radius:4px;border-left:2px solid #eab308;">
                       <div style="color:var(--muted);">Selten (1P)</div>
@@ -18262,9 +18330,9 @@ async function renderRarityChallenge2026() {
                   ` : ''}
                 </div>
               </div>
-              <div style="text-align:right;">
-                <div style="font-size:28px;font-weight:700;color:#eab308;">${entry.points}</div>
-                <div style="font-size:11px;color:var(--muted);">Punkte</div>
+              <div style="text-align:right;${isFirst ? 'padding:8px 12px;background:linear-gradient(135deg, rgba(245,158,11,0.3), rgba(234,179,8,0.2));border-radius:12px;border:2px solid #f59e0b;' : ''}">
+                <div style="font-size:${isFirst ? '42px' : '28px'};font-weight:700;color:${isFirst ? '#f59e0b' : '#eab308'};line-height:1;">${entry.points}</div>
+                <div style="font-size:${isFirst ? '13px' : '11px'};color:var(--muted);margin-top:${isFirst ? '6px' : '2px'};font-weight:${isFirst ? '600' : 'normal'};">${isFirst ? '🏆 ' : ''}Punkte</div>
               </div>
             </div>
           </div>
