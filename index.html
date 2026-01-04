@@ -193,10 +193,12 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
       z-index: 999;
       opacity: 0;
       transition: opacity 0.3s ease;
+      -webkit-backdrop-filter: blur(4px);
     }
     
     .mobile-overlay.active {
@@ -220,19 +222,70 @@
         height: 100vh;
         z-index: 1000;
         width: 280px;
+        max-width: 85vw;
         overflow-y: auto;
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+        background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
       }
       
       .sidebar.mobile-visible {
         transform: translateX(0);
       }
       
+      /* Verhindere Scrollen wenn Sidebar offen */
+      body.sidebar-open {
+        overflow: hidden;
+      }
+      
+      /* Dimme den Hauptinhalt wenn Sidebar offen */
+      .sidebar.mobile-visible ~ .mobile-overlay {
+        display: block;
+        opacity: 1;
+      }
+      
+      /* Main wird verschoben wenn Sidebar offen */
+      .app {
+        position: relative;
+      }
+      
       /* Main Content Anpassungen */
       .main {
-        padding-top: 20px;
+        padding-top: 70px; /* Mehr Platz für Hamburger-Button */
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      
+      /* Topbar kompakter und vertikal auf Mobile */
+      .topbar {
+        position: relative;
+        z-index: 1; /* Unter dem Menü */
+      }
+      
+      /* Dashboard-Bereich auf Mobile */
+      section[id="home"] {
+        margin-top: 0;
+      }
+      
+      /* Button-Container im Dashboard */
+      section[id="home"] > div:first-child .card {
+        margin-bottom: 12px;
+      }
+      
+      /* Import/Export/Gruppe Buttons Grid auf Mobile */
+      section[id="home"] > div:first-child > div:first-child {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      
+      /* Alle Buttons volle Breite auf Mobile */
+      section[id="home"] .btn,
+      section[id="home"] .small-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
       }
       
       /* App Container auf Mobile */
@@ -577,6 +630,42 @@
       #mapCard .small-btn {
         flex-shrink: 0;
         min-width: auto;
+      }
+      
+      /* Floating Action Button auf Mobile */
+      .fab-quick-add {
+        bottom: 80px; /* Höher wegen Mobile Navigation */
+        right: 16px;
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+      }
+      
+      .fab-quick-add::after {
+        display: none; /* Kein Tooltip auf Mobile */
+      }
+      
+      /* Quick Add Modal auf Mobile */
+      #quickAddModal > div {
+        width: 95% !important;
+        max-width: 95vw !important;
+        padding: 20px !important;
+      }
+      
+      #quickAddModal h3 {
+        font-size: 18px !important;
+      }
+      
+      #quickAddModal input {
+        font-size: 16px !important; /* Verhindert iOS Zoom */
+      }
+      
+      /* Toast Notifications auf Mobile */
+      .toast {
+        bottom: 90px;
+        right: 16px;
+        left: 16px;
+        font-size: 14px;
       }
     }
     
@@ -3133,6 +3222,309 @@
         transform: scale(1.05);
       }
     }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideInFromRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.9);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+    
+    /* Skeleton Loader Styles */
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.02) 0%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.02) 100%
+      );
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite;
+      border-radius: 8px;
+    }
+    
+    .skeleton-text {
+      height: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .skeleton-title {
+      height: 24px;
+      width: 60%;
+      margin-bottom: 12px;
+    }
+    
+    .skeleton-card {
+      height: 120px;
+      margin-bottom: 12px;
+    }
+    
+    /* Micro-interactions for buttons */
+    .btn,
+    .small-btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn:active,
+    .small-btn:active {
+      transform: scale(0.96);
+    }
+    
+    .btn::before,
+    .small-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn:active::before,
+    .small-btn:active::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    /* Card hover effects */
+    .card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(2,6,23,0.7);
+    }
+    
+    /* Smooth transitions for theme switching */
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    button,
+    input,
+    select,
+    textarea {
+      transition: all 0.2s ease !important;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(6,182,212,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Success/Error toast animations */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 10002;
+      animation: slideInFromRight 0.3s ease;
+    }
+    
+    .toast.success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    
+    .toast.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+    
+    .toast.info {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+    
+    /* Enhanced focus states */
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(6,182,212,0.1);
+    }
+    
+    /* Floating Action Button for Quick Add */
+    .fab-quick-add {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(6,182,212,0.4);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .fab-quick-add:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 12px 32px rgba(6,182,212,0.5);
+    }
+    
+    .fab-quick-add:active {
+      transform: scale(0.95) rotate(90deg);
+    }
+    
+    /* Tooltip for FAB */
+    .fab-quick-add::after {
+      content: 'Schnelleingabe (Strg+Q)';
+      position: absolute;
+      right: 72px;
+      background: rgba(15,23,36,0.95);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .fab-quick-add:hover::after {
+      opacity: 1;
+    }
+    
+    /* Progress bar for loading states */
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .progress-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: progress 1.5s infinite;
+    }
+    
+    @keyframes progress {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+    
+    /* Empty state illustrations */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .empty-state-icon {
+      font-size: 72px;
+      margin-bottom: 20px;
+      animation: bounceIn 0.6s ease;
+    }
+    
+    .empty-state-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    
+    .empty-state-description {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 400px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+    
+    /* Notification badge */
+    .notification-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      animation: pulse 2s infinite;
+    }
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -4109,9 +4501,10 @@
                     <h3 style="margin:0;">Beobachtungen</h3>
                   </div>
                   <div id="observationLeaderboard">
-                    <div style="text-align:center;padding:20px;color:var(--muted);">
-                      <div style="font-size:32px;margin-bottom:8px;">👥</div>
-                      <p style="margin:0;">Lade Gruppendaten...</p>
+                    <div class="skeleton-loader">
+                      <div class="skeleton skeleton-card"></div>
+                      <div class="skeleton skeleton-card"></div>
+                      <div class="skeleton skeleton-card"></div>
                     </div>
                   </div>
                 </div>
@@ -4122,9 +4515,10 @@
                     <h3 style="margin:0;">Arten</h3>
                   </div>
                   <div id="speciesLeaderboard">
-                    <div style="text-align:center;padding:20px;color:var(--muted);">
-                      <div style="font-size:32px;margin-bottom:8px;">🦅</div>
-                      <p style="margin:0;">Lade Gruppendaten...</p>
+                    <div class="skeleton-loader">
+                      <div class="skeleton skeleton-card"></div>
+                      <div class="skeleton skeleton-card"></div>
+                      <div class="skeleton skeleton-card"></div>
                     </div>
                   </div>
                 </div>
@@ -4233,9 +4627,10 @@
                   <h3 style="margin:0;">Leaderboard <span id="rarityLeaderboardYearTitle">2025</span></h3>
                 </div>
                 <div id="rarityLeaderboard2026">
-                  <div style="text-align:center;padding:20px;color:var(--muted);">
-                    <div style="font-size:32px;margin-bottom:8px;">⏳</div>
-                    <p style="margin:0;">Lade Rangliste...</p>
+                  <div class="skeleton-loader">
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
                   </div>
                 </div>
               </div>
@@ -4404,6 +4799,84 @@
         </aside>
       </div>
     </main>
+  </div>
+
+  <!-- NEU: Quick-Add Modal (Schnelleingabe) -->
+  <div id="quickAddModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.85);backdrop-filter:blur(4px);align-items:center;justify-content:center;z-index:10001;animation:fadeIn 0.2s ease;">
+    <div style="background:linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));padding:24px;border-radius:16px;width:420px;max-width:90vw;border:2px solid var(--accent);box-shadow:0 20px 60px rgba(6,182,212,0.3);animation:slideInUp 0.3s ease;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div>
+          <h3 style="margin:0;font-size:20px;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:28px;">⚡</span>
+            Schnelleingabe
+          </h3>
+          <p style="margin:4px 0 0 0;font-size:12px;color:var(--muted);">Nur das Wichtigste - schnell erfasst</p>
+        </div>
+        <button onclick="closeQuickAdd()" style="background:rgba(255,255,255,0.05);border:none;color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='var(--danger)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='var(--muted)'">✕</button>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <!-- Vogelart -->
+        <div>
+          <label style="font-size:13px;color:var(--muted);margin-bottom:6px;display:block;font-weight:600;">🐦 Vogelart *</label>
+          <input id="quickAddBird" type="text" list="quickBirdSuggestions" 
+                 style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(6,182,212,0.3);background:rgba(255,255,255,0.03);color:var(--text);font-size:15px;transition:all 0.2s;" 
+                 placeholder="z.B. Amsel"
+                 onfocus="this.style.borderColor='var(--accent)';this.style.background='rgba(6,182,212,0.05)'"
+                 onblur="this.style.borderColor='rgba(6,182,212,0.3)';this.style.background='rgba(255,255,255,0.03)'" />
+          <datalist id="quickBirdSuggestions"></datalist>
+        </div>
+        
+        <!-- Anzahl -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:13px;color:var(--muted);margin-bottom:6px;display:block;font-weight:600;">📊 Anzahl</label>
+            <input id="quickAddCount" type="number" min="1" value="1"
+                   style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(6,182,212,0.3);background:rgba(255,255,255,0.03);color:var(--text);font-size:15px;"
+                   onfocus="this.style.borderColor='var(--accent)';this.style.background='rgba(6,182,212,0.05)'"
+                   onblur="this.style.borderColor='rgba(6,182,212,0.3)';this.style.background='rgba(255,255,255,0.03)'" />
+          </div>
+          
+          <div>
+            <label style="font-size:13px;color:var(--muted);margin-bottom:6px;display:block;font-weight:600;">📅 Datum</label>
+            <input id="quickAddDate" type="date"
+                   style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(6,182,212,0.3);background:rgba(255,255,255,0.03);color:var(--text);font-size:15px;"
+                   onfocus="this.style.borderColor='var(--accent)';this.style.background='rgba(6,182,212,0.05)'"
+                   onblur="this.style.borderColor='rgba(6,182,212,0.3)';this.style.background='rgba(255,255,255,0.03)'" />
+          </div>
+        </div>
+        
+        <!-- Optional: Notiz -->
+        <div>
+          <label style="font-size:13px;color:var(--muted);margin-bottom:6px;display:block;font-weight:600;">💬 Notiz (optional)</label>
+          <input id="quickAddNote" type="text"
+                 style="width:100%;padding:12px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:var(--text);font-size:14px;"
+                 placeholder="z.B. Singend auf Dach"
+                 onfocus="this.style.borderColor='rgba(6,182,212,0.3)';this.style.background='rgba(255,255,255,0.03)'"
+                 onblur="this.style.borderColor='rgba(255,255,255,0.1)';this.style.background='rgba(255,255,255,0.02)'" />
+        </div>
+        
+        <!-- Info-Box -->
+        <div style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05));padding:12px;border-radius:10px;border-left:3px solid var(--accent);font-size:12px;color:var(--soft);">
+          <strong>💡 Tipp:</strong> Standort wird automatisch erkannt. Weitere Details kannst du später hinzufügen!
+        </div>
+        
+        <!-- Buttons -->
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button onclick="closeQuickAdd()" class="small-btn" style="flex:1;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:12px;font-size:14px;font-weight:600;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.15)'">
+            Abbrechen
+          </button>
+          <button onclick="saveQuickAdd()" class="small-btn" style="flex:2;background:linear-gradient(135deg, var(--accent), var(--accent-2));color:white;border:none;padding:12px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(6,182,212,0.3);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(6,182,212,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px rgba(6,182,212,0.3)'">
+            ⚡ Schnell speichern
+          </button>
+        </div>
+        
+        <!-- Keyboard Shortcut Hinweis -->
+        <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px;">
+          Tastenkürzel: <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;font-family:monospace;">Strg+Q</kbd>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Modal for name + date input -->
@@ -17528,7 +18001,19 @@ var loadGroupObservations=function(groupId, user){
     if(!snapshot.exists() || snapshot.numChildren() === 0){
       console.log("ℹ️ Noch keine Beobachtungen in dieser Gruppe");
       if(container){
-        container.innerHTML = '<div class="card" style="margin-top:12px;padding:20px;text-align:center;color:var(--muted);">📭 Noch keine Beobachtungen in dieser Gruppe.<br><br>Gehe zur Karte und füge die erste Beobachtung hinzu!</div>';
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🦜</div>
+            <div class="empty-state-title">Noch keine Beobachtungen</div>
+            <div class="empty-state-description">
+              Die Gruppe ist noch leer. Sei der Erste und füge eine Beobachtung hinzu! 
+              Nutze die Karte oder die Schnelleingabe (⚡ Button unten rechts).
+            </div>
+            <button onclick="openQuickAdd()" class="btn" style="background:linear-gradient(135deg, var(--accent), var(--accent-2));margin-top:8px;">
+              ⚡ Erste Beobachtung hinzufügen
+            </button>
+          </div>
+        `;
       }
       hideLoading();
       if(typeof showNotification === "function"){
@@ -22711,6 +23196,7 @@ function toggleMobileMenu() {
   if (sidebar && overlay) {
     sidebar.classList.toggle('mobile-visible');
     overlay.classList.toggle('active');
+    document.body.classList.toggle('sidebar-open');
     
     // Verhindere Scrollen wenn Menü offen ist
     if (sidebar.classList.contains('mobile-visible')) {
@@ -22728,6 +23214,7 @@ function closeMobileMenu() {
   if (sidebar && overlay) {
     sidebar.classList.remove('mobile-visible');
     overlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
   }
 }
@@ -22979,7 +23466,229 @@ if (window.innerWidth <= 700 && !localStorage.getItem('birdcount_mobile_welcome_
     }
   }, 1000);
 }
+
+// ==================== SCHNELLEINGABE (QUICK ADD) ====================
+
+function openQuickAdd() {
+  const modal = document.getElementById('quickAddModal');
+  const birdInput = document.getElementById('quickAddBird');
+  const dateInput = document.getElementById('quickAddDate');
+  const countInput = document.getElementById('quickAddCount');
+  const noteInput = document.getElementById('quickAddNote');
+  
+  // Setze heutiges Datum
+  dateInput.value = new Date().toISOString().split('T')[0];
+  
+  // Setze Anzahl auf 1
+  countInput.value = 1;
+  
+  // Leere Felder
+  birdInput.value = '';
+  noteInput.value = '';
+  
+  // Lade Vogelnamen für Autocomplete
+  populateQuickBirdSuggestions();
+  
+  // Zeige Modal mit Animation
+  modal.style.display = 'flex';
+  
+  // Focus auf Vogelart-Feld
+  setTimeout(() => birdInput.focus(), 100);
+}
+
+function closeQuickAdd() {
+  const modal = document.getElementById('quickAddModal');
+  modal.style.display = 'none';
+}
+
+function populateQuickBirdSuggestions() {
+  const datalist = document.getElementById('quickBirdSuggestions');
+  datalist.innerHTML = '';
+  
+  // Hole alle verfügbaren Vogelnamen aus der Datenbank
+  const birdNames = Object.keys(birdDatabase || {}).sort();
+  
+  birdNames.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    datalist.appendChild(option);
+  });
+}
+
+async function saveQuickAdd() {
+  const bird = document.getElementById('quickAddBird').value.trim();
+  const date = document.getElementById('quickAddDate').value;
+  const count = document.getElementById('quickAddCount').value;
+  const note = document.getElementById('quickAddNote').value.trim();
+  
+  // Validierung
+  if (!bird) {
+    showToast('Bitte gib eine Vogelart ein!', 'error');
+    document.getElementById('quickAddBird').focus();
+    return;
+  }
+  
+  if (!date) {
+    showToast('Bitte wähle ein Datum!', 'error');
+    document.getElementById('quickAddDate').focus();
+    return;
+  }
+  
+  // Zeige Loading
+  showToast('Speichere Beobachtung...', 'info');
+  
+  try {
+    // Hole aktuellen Standort (falls verfügbar)
+    let lat = null;
+    let lng = null;
+    
+    if (navigator.geolocation) {
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            timeout: 3000,
+            maximumAge: 60000
+          });
+        });
+        lat = position.coords.latitude;
+        lng = position.coords.longitude;
+      } catch (err) {
+        console.log('Standort nicht verfügbar:', err);
+      }
+    }
+    
+    // Erstelle Beobachtung
+    const observation = {
+      id: 'obs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      bird: bird,
+      date: date,
+      count: parseInt(count) || 1,
+      behavior: note || '',
+      lat: lat,
+      lng: lng,
+      timestamp: new Date().toISOString(),
+      tickable: true,
+      selffound: false
+    };
+    
+    // Speichere in Firebase
+    if (window.FBA && window.FBD && currentUser) {
+      const folderSelect = document.getElementById('folderSelect');
+      const currentFolder = folderSelect ? folderSelect.value : null;
+      
+      if (isGroupMode && currentGroupId) {
+        // Gruppen-Modus
+        const userEmailKey = currentUser.email.replace(/\./g, '_');
+        await window.FBD.ref(`groups/${currentGroupId}/observations/${userEmailKey}`).push(observation);
+      } else if (currentFolder) {
+        // Mit Ordner
+        await window.FBD.ref(`observations/${currentUser.uid}/${currentFolder}`).push(observation);
+      } else {
+        // Standard
+        await window.FBD.ref(`observations/${currentUser.uid}`).push(observation);
+      }
+      
+      // Erfolgsmeldung
+      showToast(`✅ ${bird} erfolgreich gespeichert!`, 'success');
+      
+      // Schließe Modal
+      closeQuickAdd();
+      
+      // Aktualisiere Ansicht
+      if (typeof loadObservations === 'function') {
+        loadObservations();
+      }
+      
+      // Aktualisiere Karte falls sichtbar
+      if (lat && lng && typeof addMarkerAtCoords === 'function') {
+        setTimeout(() => {
+          addMarkerAtCoords(lat, lng, bird, date, count);
+        }, 500);
+      }
+      
+    } else {
+      showToast('Nicht angemeldet! Bitte melde dich an.', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Fehler beim Speichern:', error);
+    showToast('Fehler beim Speichern! Bitte versuche es erneut.', 'error');
+  }
+}
+
+// Toast-Benachrichtigungen
+function showToast(message, type = 'info') {
+  // Entferne alte Toasts
+  const oldToasts = document.querySelectorAll('.toast');
+  oldToasts.forEach(toast => toast.remove());
+  
+  // Erstelle neuen Toast
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  
+  // Füge Icons hinzu
+  const icons = {
+    success: '✅ ',
+    error: '❌ ',
+    info: 'ℹ️ '
+  };
+  toast.textContent = (icons[type] || '') + message;
+  
+  document.body.appendChild(toast);
+  
+  // Entferne nach 3 Sekunden
+  setTimeout(() => {
+    toast.style.animation = 'fadeOut 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Keyboard Shortcut: Strg+Q für Quick Add
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'q') {
+    e.preventDefault();
+    openQuickAdd();
+  }
+  
+  // ESC um Quick Add zu schließen
+  if (e.key === 'Escape') {
+    const quickAddModal = document.getElementById('quickAddModal');
+    if (quickAddModal && quickAddModal.style.display === 'flex') {
+      closeQuickAdd();
+    }
+  }
+});
+
+// Enter-Taste im Quick Add Modal
+document.addEventListener('DOMContentLoaded', () => {
+  const quickAddModal = document.getElementById('quickAddModal');
+  if (quickAddModal) {
+    quickAddModal.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        saveQuickAdd();
+      }
+    });
+  }
+});
+
+// Fadeout Animation für Toast
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100px); }
+  }
+`;
+document.head.appendChild(style);
+
 </script>
+
+<!-- Floating Action Button für Quick Add -->
+<button class="fab-quick-add" onclick="openQuickAdd()" title="Schnelleingabe (Strg+Q)">
+  ⚡
+</button>
 
 </body>
 </html>
