@@ -12,6 +12,9 @@
   <meta name="apple-mobile-web-app-title" content="BirdCount" />
   <meta name="description" content="Professionelles Vogelbeobachtungssystem - Erfasse, verwalte und analysiere deine Vogelbeobachtungen" />
   
+  <!-- Content Security Policy (Sicherheit - deaktiviert für Entwicklung) -->
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';"> -->
+  
   <!-- Touch Icons für iOS -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230f1724'/><text y='75' font-size='70' text-anchor='middle' x='50' fill='%2306b6d4' font-family='Arial,sans-serif' font-weight='bold'>BC</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -3589,6 +3592,405 @@
       font-weight: 700;
       animation: pulse 2s infinite;
     }
+
+    /* ==================== NEUE VERBESSERUNGEN ==================== */
+    
+    /* Accessibility: Bessere Fokus-Indikatoren */
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+      transition: outline-offset 0.2s ease;
+    }
+    
+    /* Skip to main content link für Screen Reader */
+    .skip-to-main {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 10000;
+      border-radius: 0 0 8px 0;
+      font-weight: 600;
+    }
+    
+    .skip-to-main:focus {
+      top: 0;
+    }
+    
+    /* ==================== LOADING STATES ==================== */
+    .skeleton-loader {
+      padding: 20px;
+    }
+    
+    .skeleton-line {
+      height: 20px;
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.05) 25%,
+        rgba(255,255,255,0.15) 50%,
+        rgba(255,255,255,0.05) 75%
+      );
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+    
+    .skeleton-line:first-child {
+      width: 80%;
+    }
+    
+    .skeleton-line:nth-child(2) {
+      width: 60%;
+    }
+    
+    .skeleton-line:nth-child(3) {
+      width: 90%;
+    }
+    
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* ==================== EMPTY STATES ==================== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      font-size: 20px;
+      color: var(--text);
+      margin: 16px 0 8px 0;
+    }
+    
+    .empty-state p {
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    
+    .empty-state button {
+      margin-top: 16px;
+    }
+    
+    /* ==================== ERROR STATES ==================== */
+    .error-card {
+      background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05));
+      border: 2px solid var(--danger);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .error-card h3 {
+      color: var(--danger);
+      margin: 0 0 12px 0;
+      font-size: 20px;
+    }
+    
+    .error-card p {
+      color: var(--text);
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    
+    .error-card button {
+      margin: 8px 4px;
+    }
+    
+    /* ==================== SMOOTH TRANSITIONS ==================== */
+    .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+    }
+    
+    .nav button {
+      transition: all 0.2s ease;
+    }
+    
+    /* Page transitions */
+    .page-enter {
+      animation: pageSlideIn 0.3s ease forwards;
+    }
+    
+    .page-exit {
+      animation: pageSlideOut 0.3s ease forwards;
+    }
+    
+    @keyframes pageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes pageSlideOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+    }
+    
+    /* ==================== PULL TO REFRESH ==================== */
+    .pull-to-refresh {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 0 0 12px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 999;
+      transition: top 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .pull-to-refresh.active {
+      top: 0;
+    }
+    
+    /* ==================== DATE SHORTCUTS ==================== */
+    .date-shortcuts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    
+    .date-shortcuts button {
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--soft);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .date-shortcuts button:hover {
+      background: rgba(6,182,212,0.1);
+      border-color: var(--accent);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    
+    .date-shortcuts button.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: white;
+    }
+    
+    /* ==================== KEYBOARD SHORTCUTS MODAL ==================== */
+    .shortcuts-modal {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 500px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.8);
+    }
+    
+    .shortcuts-modal h2 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+      color: var(--text);
+    }
+    
+    .shortcuts-modal table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .shortcuts-modal td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    
+    .shortcuts-modal td:first-child {
+      font-family: 'Courier New', monospace;
+      background: var(--glass);
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--accent);
+      text-align: center;
+      width: 120px;
+    }
+    
+    .shortcuts-modal td:last-child {
+      color: var(--soft);
+    }
+    
+    .shortcuts-modal tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* ==================== PRIVACY BANNER ==================== */
+    .privacy-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 2px solid var(--accent);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 9999;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.6);
+      animation: slideUpBanner 0.4s ease;
+    }
+    
+    @keyframes slideUpBanner {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .privacy-banner p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text);
+      flex: 1;
+    }
+    
+    .privacy-banner a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .privacy-banner a:hover {
+      text-decoration: underline;
+    }
+    
+    .privacy-banner button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    
+    .privacy-banner button:hover {
+      background: var(--accent-2);
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 600px) {
+      .privacy-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .privacy-banner button {
+        width: 100%;
+      }
+    }
+    
+    /* ==================== IMPROVED CONTRAST FOR ACCESSIBILITY ==================== */
+    [data-theme="dark"] .muted {
+      color: #cbd5e1; /* Höherer Kontrast */
+    }
+    
+    [data-theme="light"] .muted {
+      color: #475569; /* Höherer Kontrast */
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      .card {
+        border: 2px solid var(--text);
+      }
+      
+      button {
+        border: 2px solid currentColor;
+      }
+      
+      .muted {
+        color: var(--text);
+      }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    /* Mobile Date Shortcuts anpassen */
+    @media (max-width: 768px) {
+      .date-shortcuts {
+        justify-content: center;
+      }
+      
+      .shortcuts-modal {
+        margin: 20px;
+        max-width: calc(100vw - 40px);
+      }
+      
+      .shortcuts-modal table {
+        font-size: 13px;
+      }
+      
+      .shortcuts-modal td {
+        padding: 8px;
+      }
+      
+      .shortcuts-modal td:first-child {
+        width: 80px;
+        font-size: 12px;
+      }
+    }
+    
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -3599,8 +4001,15 @@
 </head>
 <body data-theme="dark">
 
+<!-- Skip to main content (Accessibility) -->
+<a href="#main-content" class="skip-to-main">Zum Hauptinhalt springen</a>
+
 <!-- NEU: Mobile Menu Button -->
-<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+<button class="mobile-menu-btn" 
+        id="mobileMenuBtn" 
+        onclick="toggleMobileMenu()" 
+        aria-label="Menü öffnen"
+        aria-expanded="false">
   <svg viewBox="0 0 24 24" fill="none">
     <line x1="3" y1="6" x2="21" y2="6"></line>
     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -3609,7 +4018,7 @@
 </button>
 
 <!-- NEU: Mobile Overlay -->
-<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()" role="presentation"></div>
 
   <div class="app">
     <aside class="sidebar" aria-label="Navigation">
@@ -3666,7 +4075,7 @@
       </div>
     </aside>
 
-    <main class="main">
+    <main class="main" id="main-content">
       <div class="topbar">
         <div class="search card" style="max-width:760px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:0.8"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -3676,7 +4085,7 @@
           <button id="importBtn" class="btn ghost">📥 Import</button>
           <button id="exportBtn" class="btn">📤 Export</button>
           <button id="printBtn" class="btn ghost no-print">🖨️ Drucken</button>
-          <button id="helpBtn" class="btn">❓ Hilfe</button>
+          <button id="helpBtn" class="btn" onclick="showKeyboardShortcuts()" aria-label="Hilfe und Keyboard-Shortcuts anzeigen">❓ Hilfe</button>
         </div>
       </div>
 
@@ -3686,6 +4095,28 @@
           <section id="home" class="card active">
             <h2>Dashboard</h2>
             <p class="muted">Willkommen zu deinem Vogelbeobachtungs-System. Hier findest du alle wichtigen Informationen auf einen Blick.</p>
+            
+            <!-- NEU: Datums-Filter Shortcuts -->
+            <div class="date-shortcuts" role="toolbar" aria-label="Datums-Filter">
+              <button data-range="today" onclick="applyDateFilter('today')" aria-label="Heute anzeigen">
+                📅 Heute
+              </button>
+              <button data-range="yesterday" onclick="applyDateFilter('yesterday')" aria-label="Gestern anzeigen">
+                📅 Gestern
+              </button>
+              <button data-range="week" onclick="applyDateFilter('week')" aria-label="Letzte Woche anzeigen">
+                📅 Letzte Woche
+              </button>
+              <button data-range="month" onclick="applyDateFilter('month')" aria-label="Letzter Monat anzeigen">
+                📅 Letzter Monat
+              </button>
+              <button data-range="thisYear" onclick="applyDateFilter('thisYear')" aria-label="Dieses Jahr anzeigen">
+                📅 Dieses Jahr
+              </button>
+              <button data-range="all" onclick="applyDateFilter('all')" class="active" aria-label="Alle anzeigen">
+                📅 Alle
+              </button>
+            </div>
             
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-top:12px;">
               <div class="card">
@@ -16947,6 +17378,513 @@
 </style>
 
 <script>
+// ==================== OPTIMIZATIONS & NEW FEATURES ====================
+
+// Production Mode (setze auf false für keine Debug-Ausgaben)
+const DEBUG = false;
+
+// Logger mit DEBUG-Check
+function log(...args) {
+  if (DEBUG) {
+    console.log('[BirdCount]', ...args);
+  }
+}
+
+function logError(...args) {
+  console.error('[BirdCount ERROR]', ...args);
+}
+
+function logWarn(...args) {
+  console.warn('[BirdCount WARNING]', ...args);
+}
+
+// ==================== ERROR HANDLING ====================
+
+/**
+ * Zeigt eine benutzerfreundliche Fehlermeldung
+ */
+function showError(error, context, retryFn = null) {
+  logError(context, error);
+  
+  const errorHtml = `
+    <div class="error-card" role="alert">
+      <h3>⚠️ Ein Fehler ist aufgetreten</h3>
+      <p><strong>${context}</strong></p>
+      <p style="font-size:13px; color:var(--muted);">${error.message}</p>
+      <div style="margin-top:16px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        ${retryFn ? `<button class="btn" onclick="this.closest('.error-card').remove(); (${retryFn.name || 'retry'})()">🔄 Erneut versuchen</button>` : ''}
+        <button class="btn ghost" onclick="this.closest('.error-card').remove()">OK</button>
+      </div>
+    </div>
+  `;
+  
+  const main = document.querySelector('.main');
+  if (main) {
+    const errorDiv = document.createElement('div');
+    errorDiv.innerHTML = errorHtml;
+    main.insertBefore(errorDiv.firstElementChild, main.firstChild);
+  }
+}
+
+/**
+ * Async Error Handler Wrapper
+ */
+async function tryAsync(fn, errorContext, retryFn = null) {
+  try {
+    return await fn();
+  } catch (error) {
+    showError(error, errorContext, retryFn);
+    throw error;
+  }
+}
+
+// ==================== LOADING STATES ====================
+
+function showSkeleton(elementId, lines = 3) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  
+  let skeletonHtml = '<div class="skeleton-loader">';
+  for (let i = 0; i < lines; i++) {
+    skeletonHtml += '<div class="skeleton-line"></div>';
+  }
+  skeletonHtml += '</div>';
+  
+  element.innerHTML = skeletonHtml;
+}
+
+function showEmptyState(elementId, icon, title, description, actionText = null, actionFn = null) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  
+  let html = `
+    <div class="empty-state">
+      <div class="empty-icon" aria-hidden="true">${icon}</div>
+      <h3>${title}</h3>
+      <p>${description}</p>
+  `;
+  
+  if (actionText && actionFn) {
+    html += `<button class="btn" onclick="${actionFn}">${actionText}</button>`;
+  }
+  
+  html += '</div>';
+  element.innerHTML = html;
+}
+
+// ==================== THEME MANAGEMENT ====================
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  
+  if (savedTheme) {
+    document.body.setAttribute('data-theme', savedTheme);
+    log('Theme geladen:', savedTheme);
+  } else {
+    // Auto-Detection
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.setAttribute('data-theme', 'dark');
+      log('Theme automatisch: dark');
+    } else {
+      document.body.setAttribute('data-theme', 'light');
+      log('Theme automatisch: light');
+    }
+  }
+}
+
+function watchSystemTheme() {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      document.body.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      log('System-Theme geändert:', e.matches ? 'dark' : 'light');
+    }
+  });
+}
+
+// ==================== KEYBOARD SHORTCUTS ====================
+
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Ignoriere wenn in Input-Feld
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+      if (e.key !== 'Escape') return;
+    }
+    
+    // Ctrl/Cmd + Key
+    if (e.ctrlKey || e.metaKey) {
+      switch(e.key.toLowerCase()) {
+        case 'n':
+          e.preventDefault();
+          if (typeof openQuickAdd === 'function') openQuickAdd();
+          break;
+        case 'k':
+          e.preventDefault();
+          document.getElementById('globalSearch')?.focus();
+          break;
+        case 's':
+          e.preventDefault();
+          // Auto-save aktuelle Beobachtung
+          break;
+        case 'm':
+          e.preventDefault();
+          document.querySelector('.nav button[data-page="karte"]')?.click();
+          break;
+      }
+    }
+    
+    // Ohne Modifier
+    if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+      switch(e.key) {
+        case 'Escape':
+          closeAllModals();
+          break;
+        case '?':
+          if (document.activeElement.tagName !== 'INPUT') {
+            e.preventDefault();
+            showKeyboardShortcuts();
+          }
+          break;
+      }
+    }
+  });
+  
+  log('Keyboard Shortcuts initialisiert');
+}
+
+function closeAllModals() {
+  const modalIds = [
+    'quickAddModal', 'editModal', 'speciesDetailModal',
+    'weatherModal', 'newFolderModal', 'speciesGuideModal', 'fbModal'
+  ];
+  
+  modalIds.forEach(id => {
+    const modal = document.getElementById(id);
+    if (modal && modal.style.display !== 'none') {
+      modal.style.display = 'none';
+    }
+  });
+  
+  if (typeof closeQuickAdd === 'function') closeQuickAdd();
+  if (typeof closeEditModal === 'function') closeEditModal();
+  if (typeof closeMobileMenu === 'function') closeMobileMenu();
+}
+
+function showKeyboardShortcuts() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+  
+  modal.innerHTML = `
+    <div class="shortcuts-modal">
+      <h2>⌨️ Tastatur-Shortcuts</h2>
+      <table>
+        <tr><td>Ctrl+N</td><td>Neue Beobachtung (Schnelleingabe)</td></tr>
+        <tr><td>Ctrl+K</td><td>Suche fokussieren</td></tr>
+        <tr><td>Ctrl+S</td><td>Speichern</td></tr>
+        <tr><td>Ctrl+M</td><td>Karte öffnen</td></tr>
+        <tr><td>ESC</td><td>Modals/Menü schließen</td></tr>
+        <tr><td>?</td><td>Diese Hilfe anzeigen</td></tr>
+      </table>
+      <button class="btn" style="margin-top:20px;width:100%;" onclick="this.closest('div[style*=fixed]').remove()">Schließen</button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  log('Keyboard Shortcuts angezeigt');
+}
+
+// ==================== DATE UTILITIES ====================
+
+function getDateRange(range) {
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  let start = new Date(today);
+  
+  switch(range) {
+    case 'today':
+      start.setHours(0, 0, 0, 0);
+      break;
+    case 'yesterday':
+      start.setDate(today.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      today.setDate(today.getDate() - 1);
+      break;
+    case 'week':
+      start.setDate(today.getDate() - 7);
+      start.setHours(0, 0, 0, 0);
+      break;
+    case 'month':
+      start.setMonth(today.getMonth() - 1);
+      start.setHours(0, 0, 0, 0);
+      break;
+    case 'thisYear':
+      start = new Date(today.getFullYear(), 0, 1);
+      start.setHours(0, 0, 0, 0);
+      break;
+    default:
+      start.setFullYear(2000, 0, 1);
+  }
+  
+  return {
+    start: start.toISOString().split('T')[0],
+    end: today.toISOString().split('T')[0]
+  };
+}
+
+function applyDateFilter(range) {
+  const { start, end } = getDateRange(range);
+  
+  const dateFrom = document.getElementById('obsManagerDateFrom');
+  const dateTo = document.getElementById('obsManagerDateTo');
+  
+  if (dateFrom) dateFrom.value = start;
+  if (dateTo) dateTo.value = end;
+  
+  if (typeof filterObservationManager === 'function') {
+    filterObservationManager();
+  }
+  
+  document.querySelectorAll('.date-shortcuts button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  const activeBtn = document.querySelector(`.date-shortcuts button[data-range="${range}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  
+  const rangeNames = {
+    'today': 'Heute',
+    'yesterday': 'Gestern',
+    'week': 'Letzte Woche',
+    'month': 'Letzter Monat',
+    'thisYear': 'Dieses Jahr',
+    'all': 'Alle'
+  };
+  
+  showNotification(`📅 Zeige: ${rangeNames[range] || range}`, 2000);
+  log('Datums-Filter angewendet:', range);
+}
+
+// ==================== MOBILE GESTURES ====================
+
+function initPullToRefresh() {
+  let touchStartY = 0;
+  let touchEndY = 0;
+  let isPulling = false;
+  
+  const pullIndicator = document.createElement('div');
+  pullIndicator.className = 'pull-to-refresh';
+  pullIndicator.textContent = '🔄 Zum Aktualisieren ziehen';
+  document.body.appendChild(pullIndicator);
+  
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  
+  document.addEventListener('touchmove', (e) => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    touchEndY = e.touches[0].clientY;
+    
+    if (scrollTop === 0 && touchEndY > touchStartY) {
+      const pullDistance = touchEndY - touchStartY;
+      
+      if (pullDistance > 80 && !isPulling) {
+        pullIndicator.classList.add('active');
+        pullIndicator.textContent = '🔄 Loslassen zum Aktualisieren';
+      } else if (pullDistance < 80) {
+        pullIndicator.classList.remove('active');
+        pullIndicator.textContent = '🔄 Zum Aktualisieren ziehen';
+      }
+    }
+  }, { passive: true });
+  
+  document.addEventListener('touchend', async (e) => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const pullDistance = touchEndY - touchStartY;
+    
+    if (scrollTop === 0 && pullDistance > 80 && !isPulling) {
+      isPulling = true;
+      pullIndicator.textContent = '⏳ Aktualisiere...';
+      pullIndicator.classList.add('active');
+      
+      try {
+        await refreshData();
+        pullIndicator.textContent = '✅ Aktualisiert!';
+        setTimeout(() => {
+          pullIndicator.classList.remove('active');
+        }, 1000);
+      } catch (error) {
+        pullIndicator.textContent = '❌ Fehler';
+        setTimeout(() => {
+          pullIndicator.classList.remove('active');
+        }, 1000);
+      }
+      
+      isPulling = false;
+    } else {
+      pullIndicator.classList.remove('active');
+    }
+    
+    touchStartY = 0;
+    touchEndY = 0;
+  }, { passive: true });
+  
+  log('Pull-to-Refresh initialisiert');
+}
+
+async function refreshData() {
+  log('Aktualisiere Daten...');
+  
+  const promises = [];
+  
+  if (typeof renderObservationManager === 'function') {
+    promises.push(renderObservationManager());
+  }
+  
+  if (typeof updateDashboard === 'function') {
+    promises.push(updateDashboard());
+  }
+  
+  if (typeof updateChart === 'function') {
+    promises.push(updateChart());
+  }
+  
+  if (typeof updateMarkersFromData === 'function') {
+    promises.push(updateMarkersFromData());
+  }
+  
+  await Promise.all(promises);
+  log('Daten aktualisiert');
+}
+
+function initSwipeNavigation() {
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  const pages = ['home', 'beobachtungen', 'eingabe', 'diagramme', 'statistiken', 'karte', 'listen', 'arten', 'challenges', 'tools'];
+  let currentPageIndex = 0;
+  
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].clientX;
+    handleSwipe();
+  }, { passive: true });
+  
+  function handleSwipe() {
+    const diff = touchStartX - touchEndX;
+    
+    if (Math.abs(diff) < 100) return;
+    if (window.innerWidth > 700) return;
+    
+    const activeBtn = document.querySelector('.nav button.active');
+    if (activeBtn) {
+      const currentPage = activeBtn.getAttribute('data-page');
+      currentPageIndex = pages.indexOf(currentPage);
+    }
+    
+    if (diff > 0) {
+      currentPageIndex = Math.min(pages.length - 1, currentPageIndex + 1);
+    } else {
+      currentPageIndex = Math.max(0, currentPageIndex - 1);
+    }
+    
+    const nextPage = pages[currentPageIndex];
+    const nextBtn = document.querySelector(`.nav button[data-page="${nextPage}"]`);
+    if (nextBtn) {
+      nextBtn.click();
+      log('Swipe Navigation:', nextPage);
+    }
+  }
+  
+  log('Swipe Navigation initialisiert');
+}
+
+// ==================== PRIVACY BANNER ====================
+
+function showPrivacyBanner() {
+  if (localStorage.getItem('privacy_accepted')) {
+    return;
+  }
+  
+  const banner = document.createElement('div');
+  banner.className = 'privacy-banner';
+  banner.innerHTML = `
+    <p>
+      🔒 Diese App speichert Daten lokal in deinem Browser für Offline-Nutzung.
+      Keine Cookies, kein Tracking.
+    </p>
+    <button onclick="acceptPrivacy()">Verstanden</button>
+  `;
+  
+  document.body.appendChild(banner);
+  log('Privacy Banner angezeigt');
+}
+
+function acceptPrivacy() {
+  localStorage.setItem('privacy_accepted', 'true');
+  const banner = document.querySelector('.privacy-banner');
+  if (banner) {
+    banner.style.animation = 'slideUpBanner 0.3s ease reverse';
+    setTimeout(() => banner.remove(), 300);
+  }
+  log('Privacy akzeptiert');
+}
+
+// ==================== INIT ALL IMPROVEMENTS ====================
+
+document.addEventListener('DOMContentLoaded', function() {
+  log('🚀 BirdCount mit Optimierungen lädt...');
+  
+  // Theme initialisieren
+  initTheme();
+  watchSystemTheme();
+  
+  // Keyboard Shortcuts
+  initKeyboardShortcuts();
+  
+  // Mobile Features
+  if (window.innerWidth <= 700) {
+    initPullToRefresh();
+    initSwipeNavigation();
+  }
+  
+  // Privacy Banner
+  setTimeout(showPrivacyBanner, 2000);
+  
+  // Update Mobile Menu ARIA
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  if (mobileMenuBtn) {
+    const originalToggle = window.toggleMobileMenu;
+    window.toggleMobileMenu = function() {
+      if (originalToggle) originalToggle();
+      const sidebar = document.querySelector('.sidebar');
+      const isOpen = sidebar?.classList.contains('mobile-visible');
+      mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+      mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
+    };
+  }
+  
+  log('✅ Optimierungen geladen!');
+  log('💡 Tipp: Drücke "?" für Keyboard-Shortcuts');
+});
+
+// Export functions to window
+window.log = log;
+window.logError = logError;
+window.showError = showError;
+window.tryAsync = tryAsync;
+window.showSkeleton = showSkeleton;
+window.showEmptyState = showEmptyState;
+window.applyDateFilter = applyDateFilter;
+window.showKeyboardShortcuts = showKeyboardShortcuts;
+window.acceptPrivacy = acceptPrivacy;
+
+// ==================== ORIGINAL CODE BELOW ====================
+
 (function(){
 console.log("%c🔥 Firebase Start", "color: #06b6d4; font-weight: bold; font-size: 16px");
 var loadingTimeout;
@@ -18486,7 +19424,7 @@ async function renderRarityChallenge2026() {
     for (const [uid, userData] of Object.entries(groupData.userStats)) {
       const observations = userData.observations || [];
       
-      // DEBUG: Prüfe ob manuelle Flags vorhanden sind
+      // Prüfe ob manuelle Flags vorhanden sind (DEBUG)
       const manuallyBlockedCount = observations.filter(o => o.manuallyBlocked === true).length;
       const manuallyUnblockedCount = observations.filter(o => o.manuallyUnblocked === true).length;
       if (manuallyBlockedCount > 0 || manuallyUnblockedCount > 0) {
