@@ -62,7 +62,16 @@
     }
 
 
-    html,body{height:100%; margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,var(--bg),#071022); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    html,body{height:100%; margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,var(--bg),#071022); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; scroll-behavior:smooth; -webkit-overflow-scrolling:touch;}
+    
+    /* Touch-friendly improvements */
+    * {
+      -webkit-tap-highlight-color: rgba(6,182,212,0.1);
+    }
+    
+    button, a, .small-btn, .btn {
+      touch-action: manipulation;
+    }
     .app { display:flex; min-height:100vh; gap:24px; padding:28px; box-sizing:border-box; }
 
     /* Sidebar */
@@ -226,6 +235,12 @@
         padding-top: 20px;
       }
       
+      /* App Container auf Mobile */
+      .app {
+        padding: 12px;
+        gap: 16px;
+      }
+      
       /* Topbar auf Mobile */
       .topbar {
         flex-direction: column;
@@ -247,11 +262,18 @@
         min-width: 140px;
       }
       
+      /* Grid auf Mobile - immer einspaltig */
+      .grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+      }
+      
       /* Filter Buttons */
       .small-btn {
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 10px 14px;
+        font-size: 13px;
         min-height: 44px; /* Touch-friendly */
+        white-space: nowrap;
       }
       
       /* Buttons größer auf Mobile */
@@ -263,7 +285,7 @@
       
       /* Cards auf Mobile */
       .card {
-        padding: 12px;
+        padding: 14px;
       }
       
       .list-card {
@@ -272,14 +294,16 @@
       
       /* Map auf Mobile */
       #map {
-        height: 300px;
+        height: 350px;
       }
       
       /* Modals auf Mobile */
       .edit-modal-content {
         width: 95%;
+        max-width: 100%;
         max-height: 90vh;
-        margin: auto;
+        margin: 5vh auto;
+        overflow-y: auto;
       }
       
       /* Formulare auf Mobile */
@@ -291,6 +315,18 @@
       textarea {
         font-size: 16px; /* Verhindert Zoom auf iOS */
         min-height: 44px;
+        padding: 10px 12px;
+      }
+      
+      /* Form rows auf Mobile */
+      .form-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .form-row > * {
+        flex: 1 1 100% !important;
+        width: 100%;
       }
       
       /* Observation Manager auf Mobile */
@@ -317,19 +353,245 @@
       #speciesDatabase > div {
         grid-template-columns: 1fr !important;
       }
+      
+      /* GRUPPENVERGLEICH - Mobile Optimierungen */
+      
+      /* Gruppenvergleich Header kompakter */
+      #group-compare > div:first-child {
+        padding: 16px !important;
+        margin-bottom: 16px !important;
+      }
+      
+      #group-compare h2 {
+        font-size: 20px !important;
+      }
+      
+      /* Tab Navigation auf Mobile - scrollbar statt wrap */
+      #group-compare > div:nth-child(2) {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        flex-wrap: nowrap !important;
+        padding: 8px !important;
+        gap: 6px !important;
+      }
+      
+      #group-compare > div:nth-child(2)::-webkit-scrollbar {
+        height: 4px;
+      }
+      
+      #group-compare > div:nth-child(2)::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 2px;
+      }
+      
+      /* Tab Buttons kompakter auf Mobile */
+      #group-compare .small-btn {
+        flex: 0 0 auto !important;
+        min-width: 120px !important;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        white-space: nowrap;
+      }
+      
+      /* Leaderboards auf Mobile */
+      #compareObservationsView > div:first-child {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Leaderboard Einträge kompakter */
+      .card > div > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+      }
+      
+      /* Member comparison grid */
+      #memberComparisonGrid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Rarität-Challenge auf Mobile */
+      #compareRarity2026View > div:first-child {
+        padding: 16px !important;
+      }
+      
+      #compareRarity2026View h2 {
+        font-size: 22px !important;
+      }
+      
+      /* Punktesystem Box scrollbar */
+      #compareRarity2026View > div:first-child > div:last-child {
+        max-width: 100% !important;
+        overflow-x: auto;
+      }
+      
+      /* Jahr-Auswahl zentriert */
+      #compareRarity2026View select {
+        font-size: 14px !important;
+        padding: 8px 12px !important;
+      }
+      
+      /* Statistik-Karten auf Mobile */
+      #compareStatsView > div:last-child {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Stats Grid kompakter */
+      #rarityDetailedStats2026 > div:first-child {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      
+      /* Details-Buttons volle Breite */
+      button[onclick*="toggleRarityDetails"] {
+        width: 100% !important;
+        margin-top: 10px !important;
+      }
+      
+      /* Observation Card Buttons kompakter */
+      .card button.small-btn {
+        font-size: 10px !important;
+        padding: 6px 8px !important;
+        white-space: nowrap;
+      }
+      
+      /* Photo preview responsive */
+      .edit-photo-preview img,
+      .observation-popup-photo,
+      img[style*="border-radius"] {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+      
+      /* Observation Details kompakter */
+      .card[style*="border-left"] > div > div:nth-child(2) > div:nth-child(2) {
+        font-size: 11px !important;
+      }
+      
+      /* Observation Details auf Mobile */
+      .observation-species {
+        font-size: 15px !important;
+      }
+      
+      /* Marker List auf Mobile */
+      .marker-list {
+        max-height: 200px;
+      }
+      
+      /* Icons etwas kleiner auf Mobile */
+      #group-compare [style*="font-size:28px"],
+      #group-compare [style*="font-size: 28px"] {
+        font-size: 24px !important;
+      }
+      
+      #group-compare [style*="font-size:56px"],
+      #group-compare [style*="font-size: 56px"] {
+        font-size: 48px !important;
+      }
+      
+      /* Challenge Cards auf Mobile */
+      #availableChallengesGrid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Tabellen scrollbar auf Mobile */
+      table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+      }
+      
+      table thead {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      
+      table tbody {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      
+      /* Tabellenzeilen kleiner auf Mobile */
+      table td, table th {
+        padding: 8px 6px !important;
+        font-size: 12px !important;
+      }
+      
+      /* Overflow Container für Statistiken */
+      #rarityDetailedStats2026 > div:last-child,
+      #detailedObservationComparison,
+      #detailedAchievementComparison {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Canvas Container auf Mobile */
+      #canvasContainer {
+        min-height: 300px;
+        padding: 12px;
+      }
+      
+      #chartCanvas {
+        height: 280px !important;
+      }
+      
+      /* Aside (Karte & Filter) auf Mobile */
+      aside {
+        order: -1; /* Karte nach oben auf Mobile */
+        width: 100%;
+      }
+      
+      /* Filter System kompakter */
+      .filter-system .filter-group {
+        margin-bottom: 10px;
+      }
+      
+      .filter-system label {
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      
+      /* Quick Stats kompakter */
+      #quickStats {
+        font-size: 12px;
+      }
+      
+      /* Marker List Items kompakter */
+      .marker-item {
+        font-size: 12px;
+        padding: 8px;
+      }
+      
+      /* Karten-Buttons scrollbar */
+      #mapCard .form-row {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        gap: 6px;
+      }
+      
+      #mapCard .small-btn {
+        flex-shrink: 0;
+        min-width: auto;
+      }
     }
     
     /* Extra kleine Bildschirme */
     @media (max-width:400px){
       .app {
-        padding: 12px;
+        padding: 8px;
+        gap: 12px;
       }
       
       .mobile-menu-btn {
-        top: 15px;
-        left: 15px;
-        width: 45px;
-        height: 45px;
+        top: 12px;
+        left: 12px;
+        width: 44px;
+        height: 44px;
       }
       
       .brand h1 {
@@ -339,6 +601,53 @@
       .controls select,
       .controls input {
         flex: 1 1 100%;
+      }
+      
+      /* Cards noch kompakter */
+      .card {
+        padding: 10px;
+      }
+      
+      /* Buttons kompakter */
+      .small-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+      
+      /* Gruppenvergleich kompakter */
+      #group-compare h2 {
+        font-size: 18px !important;
+      }
+      
+      #group-compare h3 {
+        font-size: 16px !important;
+      }
+      
+      /* Tab Buttons noch kleiner */
+      #group-compare .small-btn {
+        min-width: 100px !important;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+      }
+      
+      /* Raritäten Challenge Titel */
+      #compareRarity2026View h2 {
+        font-size: 20px !important;
+      }
+      
+      /* Stats Grid einspaltig auf sehr kleinen Screens */
+      #rarityDetailedStats2026 > div:first-child {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Form rows einzeln */
+      .form-row {
+        gap: 6px;
+      }
+      
+      /* Map kleiner */
+      #map {
+        height: 280px;
       }
     }
 
@@ -2486,6 +2795,17 @@
       .observation-popup-photo {
         max-height: 400px;
       }
+      
+      /* Leaderboard Einträge auf Tablets */
+      .card > div > div:first-child > div:first-child {
+        font-size: 28px !important;
+        width: 36px !important;
+      }
+      
+      /* Punkte-Anzeige kompakter */
+      .card > div > div:last-child > div:first-child {
+        font-size: 32px !important;
+      }
     }
 
     @media (max-width: 480px) {
@@ -2495,6 +2815,41 @@
       
       .observation-popup-photo {
         max-height: 300px;
+      }
+      
+      /* Leaderboard Medal/Number kompakter */
+      .card > div > div:first-child > div:first-child {
+        font-size: 24px !important;
+        width: 32px !important;
+        margin-top: 2px !important;
+      }
+      
+      /* Namen und Stats untereinander statt nebeneinander */
+      .card[style*="border-left"] > div {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      
+      /* Punkte-Box volle Breite auf Mobile */
+      .card > div > div:last-child {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        text-align: left !important;
+        margin-top: 12px !important;
+        padding: 10px 12px !important;
+        border-radius: 8px !important;
+      }
+      
+      /* Punkte-Zahl kleiner auf Mobile */
+      .card > div > div:last-child > div:first-child {
+        font-size: 28px !important;
+      }
+      
+      /* Stats Grid responsive */
+      .card > div > div:nth-child(2) > div:nth-child(2) {
+        grid-template-columns: 1fr 1fr !important;
       }
     }
 
