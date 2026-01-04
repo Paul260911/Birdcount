@@ -170,6 +170,9 @@
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
+      /* WICHTIG: Stelle sicher, dass der Button immer klickbar ist */
+      pointer-events: auto;
+      touch-action: manipulation;
     }
     
     .mobile-menu-btn:active {
@@ -183,6 +186,8 @@
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
+      /* SVG sollte keine Pointer-Events blockieren */
+      pointer-events: none;
     }
     
     /* Mobile Overlay */
@@ -224,28 +229,14 @@
         width: 280px;
         max-width: 85vw;
         overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
-        pointer-events: auto;
-        touch-action: auto;
       }
       
       .sidebar.mobile-visible {
         transform: translateX(0);
-        pointer-events: auto;
-      }
-      
-      /* Nav buttons müssen klickbar sein */
-      .sidebar .nav button {
-        pointer-events: auto;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: rgba(6,182,212,0.2);
-        cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
       }
       
       /* Verhindere Scrollen wenn Sidebar offen */
@@ -269,6 +260,65 @@
         padding-top: 70px; /* Mehr Platz für Hamburger-Button */
         padding-left: 8px;
         padding-right: 8px;
+      }
+      
+      /* NEU: Verstecke Karte (aside) auf Mobile, außer wenn map-full aktiv ist */
+      .main aside {
+        display: none;
+      }
+      
+      .map-full .main aside {
+        display: block;
+      }
+      
+      /* NEU: Stelle sicher, dass Sections auf Mobile die volle Breite haben */
+      .grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* NEU: Bessere Lesbarkeit auf Mobile */
+      body {
+        font-size: 16px; /* Verhindert Auto-Zoom auf iOS */
+      }
+      
+      /* NEU: Größere Touch-Targets für Buttons */
+      button, .btn, .small-btn {
+        min-height: 44px; /* Apple's empfohlene Mindestgröße */
+        min-width: 44px;
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+      
+      /* NEU: Input-Felder größer */
+      input, select, textarea {
+        font-size: 16px; /* Verhindert Auto-Zoom auf iOS */
+        min-height: 44px;
+        padding: 10px;
+      }
+      
+      /* NEU: Navigation Buttons größer */
+      .nav button {
+        min-height: 48px;
+        font-size: 15px;
+        padding: 12px;
+      }
+      
+      /* NEU: Card Padding anpassen */
+      .card {
+        padding: 16px;
+      }
+      
+      /* NEU: Headline-Größen anpassen */
+      h1 {
+        font-size: 24px;
+      }
+      
+      h2 {
+        font-size: 20px;
+      }
+      
+      h3 {
+        font-size: 18px;
       }
       
       /* Topbar kompakter und vertikal auf Mobile */
@@ -3617,11 +3667,6 @@
     </aside>
 
     <main class="main">
-      <!-- Mobile toggle -->
-      <div id="mobileNavToggle" style="display:none;">
-        <button id="openSidebar" class="small-btn">☰ Menü</button>
-      </div>
-
       <div class="topbar">
         <div class="search card" style="max-width:760px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:0.8"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -10290,23 +10335,9 @@
     // ---------- Navigation ----------
     document.querySelectorAll('.nav button').forEach(btn => {
       btn.addEventListener('click', async () => {
-        console.log('🔘 Navigation Button geklickt:', btn.getAttribute('data-page'));
-        
         // Mobile Menü schließen wenn auf Navigation geklickt wird
         if (window.innerWidth <= 700) {
-          console.log('📱 Mobile detected - closing menu');
-          const sidebar = document.querySelector('.sidebar');
-          const overlay = document.getElementById('mobileOverlay');
-          
-          if (sidebar && overlay) {
-            sidebar.classList.remove('mobile-visible');
-            overlay.classList.remove('active');
-            document.body.classList.remove('sidebar-open');
-            document.body.style.overflow = '';
-            console.log('✅ Menu closed');
-          } else {
-            console.log('❌ Sidebar or overlay not found');
-          }
+          closeMobileMenu();
         }
         
         // Beim Wechseln der Seite temporäre Daten löschen, wenn wir nicht zur Karte gehen
@@ -23252,8 +23283,41 @@ function closeMobileMenu() {
   }
 }
 
+// NEU: Stelle sicher, dass auf Mobile die richtige Ansicht beim Laden angezeigt wird
+function initMobileView() {
+  if (window.innerWidth <= 700) {
+    // Entferne map-full Klasse beim Laden
+    document.documentElement.classList.remove('map-full');
+    
+    // Stelle sicher, dass home-Section sichtbar ist
+    const homeSection = document.getElementById('home');
+    if (homeSection) {
+      homeSection.style.display = 'block';
+    }
+    
+    // Verstecke alle anderen Sections
+    document.querySelectorAll('main section').forEach(section => {
+      if (section.id !== 'home') {
+        section.style.display = 'none';
+      }
+    });
+    
+    // Setze Home-Button als aktiv
+    document.querySelectorAll('.nav button').forEach(btn => {
+      if (btn.getAttribute('data-page') === 'home') {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+}
+
 // Schließe Menü bei Navigation
 document.addEventListener('DOMContentLoaded', function() {
+  // NEU: Initialisiere Mobile-Ansicht
+  initMobileView();
+  
   const navButtons = document.querySelectorAll('.nav button');
   navButtons.forEach(btn => {
     btn.addEventListener('click', closeMobileMenu);
@@ -23262,6 +23326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 window.toggleMobileMenu = toggleMobileMenu;
 window.closeMobileMenu = closeMobileMenu;
+window.initMobileView = initMobileView;
 // ==================== ENDE MOBILE MENU ====================
 
 
