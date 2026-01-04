@@ -10276,6 +10276,11 @@
     // ---------- Navigation ----------
     document.querySelectorAll('.nav button').forEach(btn => {
       btn.addEventListener('click', async () => {
+        // Mobile Menü schließen wenn auf Navigation geklickt wird
+        if (window.innerWidth <= 700) {
+          closeMobileMenu();
+        }
+        
         // Beim Wechseln der Seite temporäre Daten löschen, wenn wir nicht zur Karte gehen
         const page = btn.getAttribute('data-page');
         if (page !== 'karte') {
