@@ -556,17 +556,22 @@
       left: 0;
       right: 0;
       bottom: 0;
+      width: 100vw;
+      height: 100vh;
       background: rgba(0,0,0,0.8);
       backdrop-filter: blur(4px);
       z-index: 999;
       opacity: 0;
       transition: opacity 0.3s ease;
       -webkit-backdrop-filter: blur(4px);
+      cursor: pointer;
+      pointer-events: none; /* Standardmäßig nicht klickbar */
     }
     
     .mobile-overlay.active {
       display: block;
       opacity: 1;
+      pointer-events: auto; /* Wenn aktiv, dann klickbar */
     }
     
     @media (max-width:700px){
@@ -25693,24 +25698,39 @@ window.updateSystemInfo = updateSystemInfo;
 
 // ==================== MOBILE MENU FUNCTIONS ====================
 function toggleMobileMenu() {
+  console.log('🍔 toggleMobileMenu aufgerufen');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('mobileOverlay');
   
+  console.log('Sidebar Element:', sidebar);
+  console.log('Overlay Element:', overlay);
+  
   if (sidebar && overlay) {
+    const wasVisible = sidebar.classList.contains('mobile-visible');
+    console.log('War sichtbar:', wasVisible);
+    
     sidebar.classList.toggle('mobile-visible');
     overlay.classList.toggle('active');
     document.body.classList.toggle('sidebar-open');
     
+    console.log('Ist jetzt sichtbar:', sidebar.classList.contains('mobile-visible'));
+    console.log('Overlay aktiv:', overlay.classList.contains('active'));
+    
     // Verhindere Scrollen wenn Menü offen ist
     if (sidebar.classList.contains('mobile-visible')) {
       document.body.style.overflow = 'hidden';
+      console.log('Menü geöffnet - Scrollen verhindert');
     } else {
       document.body.style.overflow = '';
+      console.log('Menü geschlossen - Scrollen erlaubt');
     }
+  } else {
+    console.error('❌ Sidebar oder Overlay nicht gefunden!');
   }
 }
 
 function closeMobileMenu() {
+  console.log('❌ closeMobileMenu aufgerufen');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('mobileOverlay');
   
@@ -25719,6 +25739,9 @@ function closeMobileMenu() {
     overlay.classList.remove('active');
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
+    console.log('✅ Menü geschlossen');
+  } else {
+    console.error('❌ Sidebar oder Overlay nicht gefunden beim Schließen!');
   }
 }
 
@@ -25766,25 +25789,57 @@ function initMobileView() {
 
 // Schließe Menü bei Navigation
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('📱 Mobile Menu wird initialisiert...');
+  
   // NEU: Initialisiere Mobile-Ansicht
   initMobileView();
   
   const navButtons = document.querySelectorAll('.nav button');
   navButtons.forEach(btn => {
-    btn.addEventListener('click', closeMobileMenu);
+    btn.addEventListener('click', function() {
+      console.log('Nav-Button geklickt - Schließe Menü');
+      closeMobileMenu();
+    });
   });
   
   // NEU: Schließe Sidebar beim Resize auf Desktop
   window.addEventListener('resize', function() {
     if (window.innerWidth > 700) {
+      console.log('Resize zu Desktop - Schließe Menü');
       closeMobileMenu();
     }
   });
   
-  // NEU: Stelle sicher, dass Overlay funktioniert
+  // NEU: Stelle sicher, dass Overlay funktioniert - mit mehreren Methoden
   const overlay = document.getElementById('mobileOverlay');
   if (overlay) {
-    overlay.addEventListener('click', closeMobileMenu);
+    console.log('✅ Overlay gefunden, füge Event-Listener hinzu');
+    
+    // Methode 1: Click Event
+    overlay.addEventListener('click', function(e) {
+      console.log('🖱️ Overlay geklickt (addEventListener)');
+      e.preventDefault();
+      e.stopPropagation();
+      closeMobileMenu();
+    });
+    
+    // Methode 2: Touch Event für Mobile
+    overlay.addEventListener('touchstart', function(e) {
+      console.log('👆 Overlay touched');
+      e.preventDefault();
+      closeMobileMenu();
+    }, { passive: false });
+  } else {
+    console.error('❌ Overlay nicht gefunden!');
+  }
+  
+  // Debug: Log Sidebar-Status
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    console.log('✅ Sidebar gefunden');
+    console.log('   Klassen:', sidebar.className);
+  } else {
+    console.error('❌ Sidebar nicht gefunden!');
   }
 });
 
