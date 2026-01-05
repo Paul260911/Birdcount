@@ -473,8 +473,10 @@
       /* Desktop: Sidebar normal sichtbar */
       .sidebar {
         position: relative !important;
-        transform: none !important;
+        transform: translateX(0) !important;
         width: 280px;
+        left: auto !important;
+        height: auto !important;
       }
       
       /* Desktop: Hamburger-Button versteckt */
@@ -489,7 +491,20 @@
       
       /* Desktop: Main ohne extra Padding */
       .main {
-        padding-top: 0;
+        padding-top: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+      
+      /* Desktop: App normales Layout */
+      .app {
+        display: flex !important;
+        padding: 28px !important;
+      }
+      
+      /* Desktop: Body normal scrollbar */
+      body {
+        overflow: auto !important;
       }
     }
     
@@ -25713,6 +25728,18 @@ function initMobileView() {
     // Entferne map-full Klasse beim Laden
     document.documentElement.classList.remove('map-full');
     
+    // WICHTIG: Stelle sicher, dass Sidebar geschlossen ist
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('mobileOverlay');
+    if (sidebar) {
+      sidebar.classList.remove('mobile-visible');
+    }
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+    document.body.classList.remove('sidebar-open');
+    document.body.style.overflow = '';
+    
     // Stelle sicher, dass home-Section sichtbar ist
     const homeSection = document.getElementById('home');
     if (homeSection) {
@@ -25746,6 +25773,19 @@ document.addEventListener('DOMContentLoaded', function() {
   navButtons.forEach(btn => {
     btn.addEventListener('click', closeMobileMenu);
   });
+  
+  // NEU: Schließe Sidebar beim Resize auf Desktop
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 700) {
+      closeMobileMenu();
+    }
+  });
+  
+  // NEU: Stelle sicher, dass Overlay funktioniert
+  const overlay = document.getElementById('mobileOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', closeMobileMenu);
+  }
 });
 
 window.toggleMobileMenu = toggleMobileMenu;
