@@ -129,12 +129,13 @@
     }
     .app { display:flex; min-height:100vh; gap:24px; padding:28px; box-sizing:border-box; }
 
-    /* Sidebar */
+    /* Sidebar - Desktop Standard */
     .sidebar {
       width:280px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border-radius:16px; padding:18px; box-shadow:0 6px 24px rgba(2,6,23,0.6); flex-shrink:0;
       display:flex; flex-direction:column; gap:12px;
       border:1px solid rgba(255,255,255,0.03);
+      position: relative; /* Standard für Desktop */
     }
     .brand { display:flex; gap:12px; align-items:center; }
     .logo { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-weight:700; color:white; box-shadow:0 6px 18px rgba(12,18,30,0.6); }
@@ -468,6 +469,30 @@
     }
 
     /* Mobile Sidebar */
+    @media (min-width:701px){
+      /* Desktop: Sidebar normal sichtbar */
+      .sidebar {
+        position: relative !important;
+        transform: none !important;
+        width: 280px;
+      }
+      
+      /* Desktop: Hamburger-Button versteckt */
+      .mobile-menu-btn {
+        display: none !important;
+      }
+      
+      /* Desktop: Mobile-Overlay versteckt */
+      .mobile-overlay {
+        display: none !important;
+      }
+      
+      /* Desktop: Main ohne extra Padding */
+      .main {
+        padding-top: 0;
+      }
+    }
+    
     @media (max-width:1000px){
       .app{ padding:18px; }
       .grid{ grid-template-columns: 1fr; }
@@ -475,7 +500,7 @@
     
     /* NEU: Hamburger Menu Button */
     .mobile-menu-btn {
-      display: none;
+      display: none !important; /* Explizit auf Desktop verstecken */
       position: fixed;
       top: 20px;
       left: 20px;
@@ -532,14 +557,14 @@
     @media (max-width:700px){
       /* Mobile Menu Button anzeigen */
       .mobile-menu-btn {
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
       }
       
-      /* Sidebar als Overlay */
+      /* Sidebar als Overlay auf Mobile */
       .sidebar { 
-        position: fixed;
+        position: fixed !important;
         top: 0;
         left: 0;
         height: 100vh;
@@ -554,6 +579,8 @@
         /* Verbessertes Scrolling auf iOS */
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
+        border-radius: 0;
+        margin: 0;
       }
       
       .sidebar.mobile-visible {
