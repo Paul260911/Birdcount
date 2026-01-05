@@ -551,6 +551,9 @@
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
+        /* Verbessertes Scrolling auf iOS */
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
       }
       
       .sidebar.mobile-visible {
@@ -571,13 +574,15 @@
       /* Main wird verschoben wenn Sidebar offen */
       .app {
         position: relative;
+        padding: 8px;
+        gap: 12px;
       }
       
       /* Main Content Anpassungen */
       .main {
-        padding-top: 70px; /* Mehr Platz für Hamburger-Button */
-        padding-left: 8px;
-        padding-right: 8px;
+        padding-top: 70px;
+        padding-left: 4px;
+        padding-right: 4px;
       }
       
       /* NEU: Verstecke Karte (aside) auf Mobile, außer wenn map-full aktiv ist */
@@ -592,24 +597,25 @@
       /* NEU: Stelle sicher, dass Sections auf Mobile die volle Breite haben */
       .grid {
         grid-template-columns: 1fr !important;
+        gap: 12px;
       }
       
       /* NEU: Bessere Lesbarkeit auf Mobile */
       body {
-        font-size: 16px; /* Verhindert Auto-Zoom auf iOS */
+        font-size: 15px;
       }
       
       /* NEU: Größere Touch-Targets für Buttons */
       button, .btn, .small-btn {
-        min-height: 44px; /* Apple's empfohlene Mindestgröße */
+        min-height: 44px;
         min-width: 44px;
-        padding: 10px 16px;
+        padding: 10px 14px;
         font-size: 14px;
       }
       
       /* NEU: Input-Felder größer */
       input, select, textarea {
-        font-size: 16px; /* Verhindert Auto-Zoom auf iOS */
+        font-size: 16px;
         min-height: 44px;
         padding: 10px;
       }
@@ -623,26 +629,45 @@
       
       /* NEU: Card Padding anpassen */
       .card {
-        padding: 16px;
+        padding: 14px;
       }
       
       /* NEU: Headline-Größen anpassen */
       h1 {
-        font-size: 24px;
+        font-size: 22px;
       }
       
       h2 {
-        font-size: 20px;
+        font-size: 18px;
       }
       
       h3 {
-        font-size: 18px;
+        font-size: 16px;
       }
       
       /* Topbar kompakter und vertikal auf Mobile */
       .topbar {
         position: relative;
-        z-index: 1; /* Unter dem Menü */
+        z-index: 1;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .search {
+        width: 100%;
+      }
+      
+      .controls {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .controls select,
+      .controls input {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 120px;
+        font-size: 14px;
       }
       
       /* Dashboard-Bereich auf Mobile */
@@ -659,7 +684,7 @@
       section[id="home"] > div:first-child > div:first-child {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 10px !important;
+        gap: 8px !important;
       }
       
       /* Alle Buttons volle Breite auf Mobile */
@@ -668,33 +693,6 @@
         width: 100%;
         text-align: center;
         justify-content: center;
-      }
-      
-      /* App Container auf Mobile */
-      .app {
-        padding: 12px;
-        gap: 16px;
-      }
-      
-      /* Topbar auf Mobile */
-      .topbar {
-        flex-direction: column;
-        gap: 12px;
-      }
-      
-      .search {
-        width: 100%;
-      }
-      
-      .controls {
-        width: 100%;
-        flex-wrap: wrap;
-      }
-      
-      .controls select,
-      .controls input {
-        flex: 1 1 calc(50% - 4px);
-        min-width: 140px;
       }
       
       /* Grid auf Mobile - immer einspaltig */
@@ -1052,6 +1050,143 @@
     }
     
     /* Extra kleine Bildschirme */
+    
+    /* NEU: Spezielle Anpassungen für Portrait-Modus (Hochformat) auf Smartphones */
+    @media (max-width: 480px) and (orientation: portrait) {
+      /* Noch kompaktere Schriften im Portrait */
+      body {
+        font-size: 14px;
+      }
+      
+      h1 {
+        font-size: 20px;
+      }
+      
+      h2 {
+        font-size: 17px;
+      }
+      
+      h3 {
+        font-size: 15px;
+      }
+      
+      .brand h1 {
+        font-size: 15px;
+      }
+      
+      .brand p {
+        font-size: 11px;
+      }
+      
+      /* Kompaktere Cards */
+      .card {
+        padding: 12px;
+      }
+      
+      /* Kompaktere Buttons */
+      button, .btn, .small-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+      
+      /* Navigation noch kompakter */
+      .nav button {
+        padding: 10px;
+        font-size: 14px;
+      }
+      
+      /* App-Padding reduzieren */
+      .app {
+        padding: 6px;
+        gap: 10px;
+      }
+      
+      .main {
+        padding-top: 65px;
+      }
+      
+      /* Hamburger-Button kleiner */
+      .mobile-menu-btn {
+        width: 44px;
+        height: 44px;
+        top: 12px;
+        left: 12px;
+      }
+      
+      /* Grid-Gap reduzieren */
+      .grid {
+        gap: 10px;
+      }
+      
+      /* Topbar kompakter */
+      .topbar {
+        gap: 8px;
+      }
+      
+      /* Input-Felder kompakter aber noch touch-freundlich */
+      input, select, textarea {
+        font-size: 16px;
+        padding: 8px;
+        min-height: 42px;
+      }
+      
+      /* Logo kleiner */
+      .logo {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+      
+      /* Controls kompakter */
+      .controls select,
+      .controls input {
+        font-size: 13px;
+        padding: 8px;
+      }
+      
+      /* Formulare kompakter */
+      .form-row {
+        gap: 6px;
+      }
+      
+      /* Statistik-Karten anpassen */
+      .stat-grid {
+        gap: 8px;
+      }
+      
+      /* Beobachtungsliste kompakter */
+      .obs-list-item {
+        padding: 10px;
+        font-size: 13px;
+      }
+      
+      /* Tabellen scrollbar und kompakt */
+      table {
+        font-size: 12px;
+      }
+      
+      table th,
+      table td {
+        padding: 8px 6px;
+      }
+      
+      /* Modal-Inhalte anpassen */
+      .modal-content {
+        padding: 16px;
+        max-width: 95%;
+      }
+      
+      /* Chart-Container anpassen */
+      #chartCanvas {
+        max-height: 250px;
+      }
+      
+      /* Karten-Container */
+      #map {
+        height: 300px !important;
+      }
+    }
+    
     @media (max-width:400px){
       .app {
         padding: 8px;
@@ -5717,10 +5852,10 @@
                   <button class="small-btn" onclick="document.getElementById('importFile').click()" style="flex:1;">Daten importieren</button>
                 </div>
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-                  <input type="file" id="ornithoImportFile" accept=".txt" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">
-                  <label for="ornithoImportFile" class="small-btn" style="width:100%;background:var(--accent);display:block;text-align:center;cursor:pointer;">
+                  <input type="file" id="ornithoImportFile" accept=".txt" style="display:none;">
+                  <button class="small-btn" onclick="document.getElementById('ornithoImportFile').click()" style="width:100%;background:var(--accent);text-align:center;cursor:pointer;">
                     🦅 Ornitho.de Import
-                  </label>
+                  </button>
                   <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;">
                     Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
                     <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
@@ -15725,13 +15860,8 @@
       const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
       const textColor = isDark ? 'var(--soft)' : 'var(--muted)';
       
-      // NEU: Setze Cursor auf pointer wenn Erstbeobachtungs-Filter aktiv ist
-      // Verwende die bereits deklarierte Variable newSpeciesFilterCheckbox von oben
-      if (onlyNewSpecies) {
-        canvas.style.cursor = 'pointer';
-      } else {
-        canvas.style.cursor = 'default';
-      }
+      // NEU: Setze Cursor auf pointer - Charts sind jetzt immer klickbar
+      canvas.style.cursor = 'pointer';
       
       // Chart erstellen
       chart = new Chart(ctx, {
@@ -15747,18 +15877,16 @@
             console.log('🖱️ Chart geklickt!');
             console.log('   Active Elements:', activeElements);
             
-            // NEU: Wenn ein Element angeklickt wurde und Filter "nur neue Arten" aktiv ist
-            const filterCheckbox = document.getElementById('newSpeciesFilter');
-            const onlyNewSpecies = filterCheckbox ? filterCheckbox.checked : false;
-            
-            console.log('   Filter "nur neue Arten" aktiv:', onlyNewSpecies);
-            
-            if (activeElements.length > 0 && onlyNewSpecies) {
+            // NEU: Zeige Details für angeklickte Säule/Punkt
+            if (activeElements.length > 0) {
               const elementIndex = activeElements[0].index;
               console.log('   Element-Index:', elementIndex);
-              showFirstSightingsForLabel(elementIndex, chart);
-            } else if (activeElements.length > 0 && !onlyNewSpecies) {
-              console.log('   ℹ️ Filter "nur neue Arten" ist nicht aktiv. Details werden nur im Erstbeobachtungs-Modus angezeigt.');
+              
+              // Prüfe ob "nur neue Arten"-Filter aktiv ist
+              const filterCheckbox = document.getElementById('newSpeciesFilter');
+              const onlyNewSpecies = filterCheckbox ? filterCheckbox.checked : false;
+              
+              showObservationsForLabel(elementIndex, chart, onlyNewSpecies);
             } else {
               console.log('   ℹ️ Kein aktives Element gefunden.');
             }
@@ -27117,15 +27245,16 @@ setTimeout(() => {
   BulkEditManager.init();
 }, 1000);
 
-// ===== NEUE FUNKTIONALITÄT: Erstbeobachtungs-Details =====
+// ===== NEUE FUNKTIONALITÄT: Beobachtungs-Details beim Chart-Klick =====
 
 // Globale Variable zum Speichern der Beobachtungen pro Label
 window.chartObservationsByLabel = {};
 
-// Funktion zum Anzeigen der Erstbeobachtungen für ein bestimmtes Label
-function showFirstSightingsForLabel(labelIndex, chartInstance) {
-  console.log('🔍 showFirstSightingsForLabel aufgerufen mit Index:', labelIndex);
+// Funktion zum Anzeigen der Beobachtungen für ein bestimmtes Label
+function showObservationsForLabel(labelIndex, chartInstance, isNewSpeciesMode = false) {
+  console.log('🔍 showObservationsForLabel aufgerufen mit Index:', labelIndex);
   console.log('📊 Chart Labels:', chartInstance.data.labels);
+  console.log('🎯 Erstbeobachtungs-Modus:', isNewSpeciesMode);
   
   const label = chartInstance.data.labels[labelIndex];
   console.log('🏷️ Ausgewähltes Label:', label);
@@ -27136,33 +27265,103 @@ function showFirstSightingsForLabel(labelIndex, chartInstance) {
   
   if (observations.length === 0) {
     console.warn('⚠️ Keine Beobachtungen für dieses Label gefunden!');
-    alert(`Keine Erstbeobachtungen für "${label}" gefunden.\n\nVerfügbare Labels: ${Object.keys(window.chartObservationsByLabel).join(', ')}`);
+    alert(`Keine Beobachtungen für "${label}" gefunden.\n\nVerfügbare Labels: ${Object.keys(window.chartObservationsByLabel).join(', ')}`);
     return;
   }
   
-  // Modal öffnen
-  const modal = document.getElementById('firstSightingsDetailModal');
-  const title = document.getElementById('firstSightingsDetailTitle');
-  const subtitle = document.getElementById('firstSightingsDetailSubtitle');
-  const content = document.getElementById('firstSightingsDetailContent');
-  
-  console.log('🎯 Modal-Elemente:', {modal, title, subtitle, content});
-  
-  if (!modal || !title || !subtitle || !content) {
-    console.error('❌ Modal-Elemente nicht gefunden!');
-    alert('Fehler: Modal-Elemente wurden nicht gefunden. Bitte Seite neu laden.');
-    return;
+  // NEUE STRATEGIE: Entferne altes Modal und erstelle komplett neues
+  const oldModal = document.getElementById('chartDetailsModal');
+  if (oldModal) {
+    oldModal.remove();
   }
   
-  title.textContent = `Erstbeobachtungen: ${label}`;
-  subtitle.textContent = `${observations.length} neue Art${observations.length !== 1 ? 'en' : ''}`;
+  // Erstelle Modal-HTML als String
+  const modalHTML = `
+    <div id="chartDetailsModal" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(2, 6, 23, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 20px;
+      box-sizing: border-box;
+    ">
+      <div style="
+        background: var(--card);
+        padding: 24px;
+        border-radius: 16px;
+        max-width: 700px;
+        width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+        border: 1px solid rgba(6,182,212,0.3);
+        box-shadow: 0 20px 60px rgba(6,182,212,0.5);
+      " onclick="event.stopPropagation()">
+        <button onclick="document.getElementById('chartDetailsModal').remove()" style="
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: transparent;
+          border: none;
+          color: var(--muted);
+          cursor: pointer;
+          font-size: 28px;
+          line-height: 1;
+          padding: 4px 8px;
+          z-index: 1;
+        " onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">×</button>
+        
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 18px rgba(6,182,212,0.4);">📊</div>
+          <div style="flex: 1;">
+            <h3 style="margin: 0; font-size: 20px; color: var(--text); font-weight: 700;">
+              ${isNewSpeciesMode ? 'Erstbeobachtungen' : 'Beobachtungen'}: ${label}
+            </h3>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);">
+              ${observations.length} ${isNewSpeciesMode ? 'neue Art' : 'Beobachtung'}${observations.length !== 1 ? 'en' : ''}
+            </p>
+          </div>
+        </div>
+        
+        <div id="chartDetailsContent" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+  `;
   
-  // Content erstellen
-  content.innerHTML = '';
+  // Füge Modal zum Body hinzu
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
   
-  console.log('📝 Erstelle Content für', observations.length, 'Beobachtungen...');
+  const modal = document.getElementById('chartDetailsModal');
+  const content = document.getElementById('chartDetailsContent');
   
-  observations.forEach((obs, index) => {
+  console.log('✅ Neues Modal erstellt:', modal);
+  
+  // Schließe Modal beim Klick auf Overlay
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+  
+  // Sortiere Beobachtungen nach Datum (neueste zuerst)
+  const sortedObservations = [...observations].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB - dateA;
+  });
+  
+  console.log('📝 Erstelle Content für', sortedObservations.length, 'Beobachtungen...');
+  
+  // Erstelle Beobachtungskarten
+  sortedObservations.forEach((obs, index) => {
     const card = document.createElement('div');
     card.style.cssText = `
       background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.04));
@@ -27187,57 +27386,47 @@ function showFirstSightingsForLabel(labelIndex, chartInstance) {
     
     const emoji = getBirdEmoji(obs.bird);
     
+    // Erstelle Info-Badges
+    const badges = [];
+    if (obs.userName) badges.push(`<span style="font-size: 11px; color: var(--muted); background: rgba(6,182,212,0.1); padding: 4px 8px; border-radius: 6px; white-space: nowrap;">👤 ${obs.userName}</span>`);
+    if (obs.count && obs.count !== '1') badges.push(`<span style="font-size: 11px; color: var(--muted); background: rgba(124,58,237,0.1); padding: 4px 8px; border-radius: 6px; white-space: nowrap;">🔢 ${obs.count}×</span>`);
+    if (obs.tickable === true) badges.push(`<span style="font-size: 11px; color: #10b981; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 6px; white-space: nowrap;">✅ Tickbar</span>`);
+    if (obs.selffound === true) badges.push(`<span style="font-size: 11px; color: #ef4444; background: rgba(239,68,68,0.1); padding: 4px 8px; border-radius: 6px; white-space: nowrap;">🔍 Selffound</span>`);
+    if (isNewSpeciesMode) badges.push(`<span style="font-size: 11px; color: #06b6d4; background: rgba(6,182,212,0.15); padding: 4px 8px; border-radius: 6px; white-space: nowrap;">⭐ Erstsichtung</span>`);
+    
     card.innerHTML = `
       <div style="font-size: 32px; flex-shrink: 0;">${emoji}</div>
-      <div style="flex: 1;">
+      <div style="flex: 1; min-width: 0;">
         <div style="font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 4px;">
           ${obs.bird}
         </div>
-        <div style="font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap;">
+        <div style="font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
           <span>📅 ${formatDateForDisplay(obs.date)}</span>
+          ${obs.time ? `<span>⏰ ${obs.time}</span>` : ''}
           ${obs.location ? `<span>📍 ${obs.location}</span>` : ''}
-          ${obs.count ? `<span>🔢 ${obs.count}×</span>` : ''}
         </div>
-        ${obs.notes ? `<div style="font-size: 12px; color: var(--soft); margin-top: 6px; font-style: italic;">"${obs.notes}"</div>` : ''}
+        ${obs.behavior ? `<div style="font-size: 12px; color: var(--soft); margin-bottom: 4px;">🦅 ${obs.behavior}</div>` : ''}
+        ${obs.weather ? `<div style="font-size: 12px; color: var(--soft); margin-bottom: 4px;">🌤️ ${obs.weather}</div>` : ''}
+        ${badges.length > 0 ? `<div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">${badges.join('')}</div>` : ''}
       </div>
-      ${obs.userName ? `<div style="font-size: 11px; color: var(--muted); background: rgba(6,182,212,0.1); padding: 4px 8px; border-radius: 6px;">👤 ${obs.userName}</div>` : ''}
     `;
     
     // Klick führt zur Beobachtungsansicht
     card.onclick = (e) => {
       e.stopPropagation();
-      // Schließe das Modal
-      modal.style.display = 'none';
-      // Navigiere zur Hauptseite und zeige die Beobachtung
+      modal.remove();
       showPage('home');
-      // Scrolle zur Beobachtung oder öffne Details
-      // (könnte hier noch weiter implementiert werden)
     };
     
     content.appendChild(card);
   });
   
-  console.log('✅ Content erstellt. Zeige jetzt Modal...');
-  console.log('   Modal vor dem Anzeigen:', {
-    display: modal.style.display,
-    visibility: window.getComputedStyle(modal).visibility,
-    opacity: window.getComputedStyle(modal).opacity,
-    zIndex: window.getComputedStyle(modal).zIndex
-  });
-  
-  // Force display
-  modal.style.display = 'flex';
-  modal.style.visibility = 'visible';
-  modal.style.opacity = '1';
-  
-  console.log('   Modal nach dem Anzeigen:', {
-    display: modal.style.display,
-    visibility: window.getComputedStyle(modal).visibility,
-    opacity: window.getComputedStyle(modal).opacity,
-    zIndex: window.getComputedStyle(modal).zIndex
-  });
-  
   console.log('✅ Modal sollte jetzt sichtbar sein!');
+}
+
+// Legacy-Funktion für Rückwärtskompatibilität
+function showFirstSightingsForLabel(labelIndex, chartInstance) {
+  showObservationsForLabel(labelIndex, chartInstance, true);
 }
 
 // Hilfsfunktion um Vogel-Emoji zu bekommen
@@ -27267,12 +27456,12 @@ function getBirdEmoji(birdName) {
 </script>
 
 <!-- Modal für Erstbeobachtungs-Details -->
-<div id="firstSightingsDetailModal" class="modal-overlay">
-  <div style="background: var(--card); padding: 24px; border-radius: 16px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; border: 1px solid rgba(6,182,212,0.3); box-shadow: 0 20px 60px rgba(6,182,212,0.3);">
-    <button onclick="document.getElementById('firstSightingsDetailModal').style.display='none'" style="position: absolute; top: 12px; right: 12px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 28px; line-height: 1; padding: 4px 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">×</button>
+<div id="firstSightingsDetailModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px;" onclick="if(event.target === this) this.style.display='none'">
+  <div style="background: var(--card); padding: 24px; border-radius: 16px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; border: 1px solid rgba(6,182,212,0.3); box-shadow: 0 20px 60px rgba(6,182,212,0.3);" onclick="event.stopPropagation()">
+    <button onclick="document.getElementById('firstSightingsDetailModal').style.display='none'" style="position: absolute; top: 12px; right: 12px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 28px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">×</button>
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
       <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 18px rgba(6,182,212,0.4);">📊</div>
-      <div>
+      <div style="flex: 1;">
         <h3 id="firstSightingsDetailTitle" style="margin: 0; font-size: 20px; color: var(--text); font-weight: 700;"></h3>
         <p id="firstSightingsDetailSubtitle" style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);"></p>
       </div>
