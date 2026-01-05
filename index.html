@@ -70,10 +70,62 @@
     /* Touch-friendly improvements */
     * {
       -webkit-tap-highlight-color: rgba(6,182,212,0.1);
+      /* Eliminiere Touch-Delay komplett */
+      touch-action: manipulation;
     }
     
     button, a, .small-btn, .btn {
       touch-action: manipulation;
+      /* Sofortige Reaktion - KEINE Transitions */
+      transition: none !important;
+      user-select: none;
+      -webkit-user-select: none;
+      /* Hardware-Beschleunigung */
+      transform: translateZ(0);
+      will-change: auto; /* Nur bei Bedarf */
+      /* Anti-Aliasing */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      /* Verhindere Flackern */
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    
+    /* Instant Hover - KEINE Transition */
+    button:hover, a:hover, .small-btn:hover, .btn:hover {
+      transition: none !important;
+    }
+    
+    /* Instant Active State */
+    button:active, .btn:active, .small-btn:active {
+      transform: scale(0.97) translateZ(0);
+      transition: none !important;
+    }
+    
+    /* GPU-Beschleunigung für Cards */
+    .card {
+      transform: translateZ(0);
+      will-change: auto;
+    }
+    
+    /* Instant Navigation-Buttons */
+    .nav button {
+      transform: translateZ(0);
+      transition: none !important;
+    }
+    
+    .nav button:active {
+      transform: translateX(2px) translateZ(0);
+      transition: none !important;
+    }
+    
+    /* Instant Input Response */
+    input, select, textarea {
+      transition: none !important;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      transition: none !important;
     }
     .app { display:flex; min-height:100vh; gap:24px; padding:28px; box-sizing:border-box; }
 
@@ -133,6 +185,269 @@
     .marker-list { max-height:220px; overflow:auto; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
     .marker-item { display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(255,255,255,0.02); }
     .marker-meta { color:var(--muted); font-size:13px; }
+
+    /* === NEUE FEATURES: Tutorial, Tooltips, Enhanced Stats === */
+    
+    /* Tutorial System */
+    .tutorial-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);
+      z-index: 10000; display: flex; align-items: center; justify-content: center;
+      padding: 20px; animation: fadeIn 0.3s ease;
+    }
+    .tutorial-box {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+      max-width: 600px; width: 100%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      overflow: hidden; animation: slideUp 0.4s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .tutorial-header {
+      padding: 24px 28px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(90deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+    }
+    .tutorial-header h3 {
+      margin: 0; font-size: 22px; font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tutorial-close {
+      background: transparent; border: none; color: var(--muted);
+      font-size: 28px; cursor: pointer; width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; transition: all 0.2s ease;
+    }
+    .tutorial-close:hover {
+      background: rgba(255,255,255,0.06); color: var(--text);
+      transform: rotate(90deg);
+    }
+    .tutorial-content {
+      padding: 32px 28px; min-height: 280px;
+    }
+    .tutorial-content p {
+      font-size: 16px; line-height: 1.6; color: var(--soft);
+      margin: 0 0 20px 0;
+    }
+    .tutorial-image {
+      margin-top: 24px; text-align: center; font-size: 80px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .tutorial-footer {
+      padding: 20px 28px; border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0,0,0,0.2);
+    }
+    .tutorial-progress {
+      color: var(--muted); font-size: 14px; font-weight: 600;
+    }
+    .tutorial-buttons {
+      display: flex; gap: 10px;
+    }
+    .tutorial-highlight {
+      position: relative; z-index: 10001;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.5), 0 0 60px rgba(6, 182, 212, 0.4);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.5), 0 0 60px rgba(6, 182, 212, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(6, 182, 212, 0.3), 0 0 80px rgba(6, 182, 212, 0.6); }
+    }
+    
+    /* Tooltips */
+    .tooltip-container {
+      position: fixed; background: linear-gradient(135deg, rgba(6,182,212,0.95), rgba(124,58,237,0.95));
+      color: white; padding: 8px 12px; border-radius: 8px;
+      font-size: 13px; font-weight: 500; z-index: 10000;
+      pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      max-width: 250px; animation: tooltipFadeIn 0.2s ease;
+    }
+    @keyframes tooltipFadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Enhanced Stats */
+    .enhanced-stats-modal {
+      max-width: 1000px;
+    }
+    .stats-tabs {
+      display: flex; gap: 8px; margin-bottom: 24px;
+      border-bottom: 2px solid rgba(255,255,255,0.04);
+      overflow-x: auto; padding-bottom: 8px;
+    }
+    .stats-tab {
+      background: transparent; border: none; color: var(--muted);
+      padding: 12px 20px; border-radius: 8px 8px 0 0;
+      cursor: pointer; font-weight: 600; font-size: 14px;
+      white-space: nowrap; transition: all 0.2s ease;
+    }
+    .stats-tab:hover {
+      background: var(--glass); color: var(--text);
+    }
+    .stats-tab.active {
+      background: linear-gradient(180deg, rgba(6,182,212,0.12), transparent);
+      color: var(--text); border-bottom: 2px solid var(--accent);
+    }
+    .stats-tab-content {
+      animation: fadeInUp 0.3s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+      padding: 20px; text-align: center; transition: transform 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(6,182,212,0.2);
+    }
+    .stat-icon { font-size: 36px; margin-bottom: 12px; }
+    .stat-value {
+      font-size: 32px; font-weight: 700; color: var(--text);
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 13px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    
+    /* Bulk Edit */
+    .bulk-edit-modal { max-width: 700px; }
+    .bulk-action-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px; margin-top: 16px;
+    }
+    .bulk-action-btn {
+      background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+      padding: 20px 16px; cursor: pointer; color: var(--text);
+      font-size: 13px; font-weight: 600; text-align: center;
+      transition: all 0.2s ease; line-height: 1.4;
+    }
+    .bulk-action-btn:hover {
+      background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.15));
+      transform: translateY(-2px); box-shadow: 0 4px 12px rgba(6,182,212,0.2);
+    }
+    .bulk-action-btn.danger {
+      background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.1));
+      border-color: rgba(239,68,68,0.3);
+    }
+    .bulk-selected-list {
+      max-height: 300px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
+    }
+    .bulk-selected-item {
+      background: var(--glass); border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 8px; padding: 12px; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .obs-checkbox {
+      width: 18px; height: 18px; cursor: pointer;
+      accent-color: var(--accent); margin-right: 8px;
+    }
+    
+    /* Filter Label Hover Effects */
+    #tickableFilterLabel:hover,
+    #selffoundFilterLabel:hover,
+    #newSpeciesFilterLabel:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-1px);
+    }
+    
+    #newSpeciesFilterLabel {
+      position: relative;
+    }
+    
+    #newSpeciesFilterLabel:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(6,182,212,0.95);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      margin-bottom: 6px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    /* Milestones */
+    .milestone-card {
+      background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06));
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+      padding: 20px; display: flex; align-items: center; gap: 20px;
+      transition: all 0.2s ease; margin-bottom: 16px;
+    }
+    .milestone-card:hover {
+      transform: translateX(4px); box-shadow: 0 4px 16px rgba(6,182,212,0.15);
+    }
+    .milestone-card.achieved {
+      background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(34,197,94,0.1));
+      border-color: rgba(16,185,129,0.3);
+    }
+    .milestone-icon {
+      font-size: 48px; width: 70px; height: 70px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.04); border-radius: 50%; flex-shrink: 0;
+    }
+    .milestone-card.achieved .milestone-icon {
+      background: rgba(16,185,129,0.15);
+    }
+    .milestone-info { flex: 1; }
+    .milestone-info h4 {
+      margin: 0 0 8px 0; font-size: 16px; color: var(--text);
+    }
+    .milestone-info p {
+      margin: 0; font-size: 13px; color: var(--muted);
+    }
+    .milestone-progress {
+      font-size: 14px; color: var(--accent);
+      font-weight: 600; margin-top: 8px;
+    }
+    .milestone-card.achieved .milestone-progress {
+      color: var(--success);
+    }
+    .milestone-badge {
+      background: var(--accent); color: white;
+      padding: 4px 12px; border-radius: 12px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .milestone-card.achieved .milestone-badge {
+      background: var(--success);
+    }
+    .progress-bar-container {
+      width: 100%; height: 32px; background: rgba(0,0,0,0.3);
+      border-radius: 16px; overflow: hidden; position: relative;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .progress-bar {
+      height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 16px; transition: width 1s ease;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 12px; color: white; font-weight: 700; font-size: 14px;
+      box-shadow: 0 0 20px rgba(6,182,212,0.5);
+    }
 
     /* Diagram canvas container */
     #canvasContainer { 
@@ -3595,6 +3910,31 @@
 
     /* ==================== NEUE VERBESSERUNGEN ==================== */
     
+    /* ULTRA-PERFORMANCE MODE: Instant Response */
+    html {
+      /* Snap scroll deaktivieren für instant response */
+      scroll-behavior: auto;
+    }
+    
+    /* Verhindere Layout Shifts */
+    * {
+      /* Kein Layout-Reflow bei Hover/Focus */
+      box-sizing: border-box;
+    }
+    
+    /* Optimiere Paint Performance */
+    .card, .btn, button, .nav button {
+      /* Browser kann früher mit Rendering beginnen */
+      content-visibility: auto;
+    }
+    
+    /* Verhindere unnötige Repaints */
+    img, video {
+      /* Images blockieren nicht Layout */
+      content-visibility: auto;
+      contain-intrinsic-size: 300px 200px;
+    }
+    
     /* Accessibility: Bessere Fokus-Indikatoren */
     button:focus-visible,
     a:focus-visible,
@@ -3715,47 +4055,56 @@
     }
     
     /* ==================== SMOOTH TRANSITIONS ==================== */
+    /* PERFORMANCE MODE: Transitions deaktiviert für instant response */
+    /* WICHTIG: Falls du Animationen wieder aktivieren möchtest: */
+    /* Suche nach "transition: none !important" und ändere zu z.B. "transition: all 0.2s ease" */
+    
     .card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: none !important;
+      /* CSS Containment für bessere Performance */
+      contain: layout style paint;
     }
     
     .card:hover {
-      transform: translateY(-2px);
+      transform: translateY(-2px) translateZ(0); /* Hardware-beschleunigt */
       box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+      transition: none !important;
     }
     
     .nav button {
-      transition: all 0.2s ease;
+      transition: none !important;
+      contain: layout style paint;
     }
     
-    /* Page transitions */
+    /* Page transitions - instant für maximale Performance */
     .page-enter {
-      animation: pageSlideIn 0.3s ease forwards;
+      animation: none !important; /* Keine Animation */
+      opacity: 1 !important;
+      transform: none !important;
     }
     
     .page-exit {
-      animation: pageSlideOut 0.3s ease forwards;
+      animation: none !important;
+      display: none !important;
     }
     
-    @keyframes pageSlideIn {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    /* Performance-Optimierung für häufig animierte Elemente */
+    .mobile-menu-btn,
+    .sidebar,
+    .mobile-overlay {
+      will-change: auto;
+      transform: translateZ(0);
     }
     
-    @keyframes pageSlideOut {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateX(-20px);
+    /* Sidebar ohne Transition für instant response */
+    .sidebar {
+      transition: none !important;
+    }
+    
+    /* Mobile Sidebar Transitions deaktiviert */
+    @media (max-width: 700px) {
+      .sidebar {
+        transition: none !important;
       }
     }
     
@@ -3855,6 +4204,635 @@
     
     .shortcuts-modal tr:last-child td {
       border-bottom: none;
+    }
+    
+    /* ==================== TUTORIAL SYSTEM ==================== */
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .tutorial-box {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      animation: slideUp 0.4s ease;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .tutorial-header {
+      padding: 24px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+    }
+    
+    .tutorial-header h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tutorial-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 28px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .tutorial-close:hover {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      transform: rotate(90deg);
+    }
+    
+    .tutorial-content {
+      padding: 32px 28px;
+      min-height: 280px;
+    }
+    
+    .tutorial-content p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--soft);
+      margin: 0 0 20px 0;
+    }
+    
+    .tutorial-image {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 80px;
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .tutorial-footer {
+      padding: 20px 28px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.2);
+    }
+    
+    .tutorial-progress {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .tutorial-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .tutorial-buttons .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+    
+    .tutorial-highlight {
+      position: relative;
+      z-index: 10001;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.5), 0 0 60px rgba(6, 182, 212, 0.4);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.5), 0 0 60px rgba(6, 182, 212, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(6, 182, 212, 0.3), 0 0 80px rgba(6, 182, 212, 0.6); }
+    }
+    
+    /* ==================== TOOLTIPS ==================== */
+    .tooltip-container {
+      position: fixed;
+      background: linear-gradient(135deg, rgba(6,182,212,0.95), rgba(124,58,237,0.95));
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 10000;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      max-width: 250px;
+      animation: tooltipFadeIn 0.2s ease;
+    }
+    
+    @keyframes tooltipFadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tooltip-container::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid rgba(124,58,237,0.95);
+    }
+    
+    /* ==================== BULK EDIT ==================== */
+    .obs-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+    
+    .bulk-edit-modal {
+      max-width: 700px;
+    }
+    
+    .bulk-action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .bulk-action-btn {
+      background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px 16px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+    
+    .bulk-action-btn:hover {
+      background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.15));
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(6,182,212,0.2);
+    }
+    
+    .bulk-action-btn.danger {
+      background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(220,38,38,0.1));
+      border-color: rgba(239,68,68,0.3);
+    }
+    
+    .bulk-action-btn.danger:hover {
+      background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.2));
+    }
+    
+    .bulk-selected-list {
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .bulk-selected-item {
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .bulk-selected-item strong {
+      color: var(--text);
+    }
+    
+    .bulk-selected-item small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    
+    /* ==================== ENHANCED STATISTICS ==================== */
+    .enhanced-stats-modal {
+      max-width: 1000px;
+    }
+    
+    .stats-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid rgba(255,255,255,0.04);
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    
+    .stats-tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 12px 20px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    
+    .stats-tab:hover {
+      background: var(--glass);
+      color: var(--text);
+    }
+    
+    .stats-tab.active {
+      background: linear-gradient(180deg, rgba(6,182,212,0.12), transparent);
+      color: var(--text);
+      border-bottom: 2px solid var(--accent);
+    }
+    
+    .stats-tab-content {
+      animation: fadeInUp 0.3s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(6,182,212,0.2);
+    }
+    
+    .stat-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .chart-container {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .chart-container h3 {
+      margin: 0 0 20px 0;
+      font-size: 16px;
+      color: var(--text);
+    }
+    
+    .chart-container canvas {
+      max-height: 400px;
+    }
+    
+    .year-selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .year-selector button {
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .year-selector button:hover {
+      background: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    .year-selector span {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 100px;
+      text-align: center;
+    }
+    
+    .year-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    
+    .year-stat-card {
+      background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .year-stat-card h4 {
+      margin: 0 0 16px 0;
+      font-size: 18px;
+      color: var(--text);
+    }
+    
+    .year-stat-card p {
+      margin: 8px 0;
+      font-size: 14px;
+      color: var(--soft);
+    }
+    
+    .year-stat-card strong {
+      color: var(--accent);
+      font-size: 20px;
+    }
+    
+    .year-comparison {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    
+    .year-comparison.positive {
+      color: var(--success);
+    }
+    
+    .year-comparison.negative {
+      color: var(--danger);
+    }
+    
+    .heatmap-controls {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .heatmap-controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.04);
+      transition: all 0.2s ease;
+    }
+    
+    .heatmap-controls label:hover {
+      background: rgba(6,182,212,0.1);
+      border-color: var(--accent);
+    }
+    
+    .heatmap-controls input[type="radio"] {
+      accent-color: var(--accent);
+    }
+    
+    .heatmap-container {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+    
+    .heatmap-container canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    
+    .legend-gradient {
+      width: 200px;
+      height: 20px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, 
+        rgba(6,182,212,0.1), 
+        rgba(6,182,212,0.3), 
+        rgba(6,182,212,0.6), 
+        rgba(6,182,212,1)
+      );
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .milestones-container {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .milestone-card {
+      background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.2s ease;
+    }
+    
+    .milestone-card:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(6,182,212,0.15);
+    }
+    
+    .milestone-card.achieved {
+      background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(34,197,94,0.1));
+      border-color: rgba(16,185,129,0.3);
+    }
+    
+    .milestone-icon {
+      font-size: 48px;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .milestone-card.achieved .milestone-icon {
+      background: rgba(16,185,129,0.15);
+    }
+    
+    .milestone-info {
+      flex: 1;
+    }
+    
+    .milestone-info h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: var(--text);
+    }
+    
+    .milestone-info p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    
+    .milestone-progress {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    
+    .milestone-card.achieved .milestone-progress {
+      color: var(--success);
+    }
+    
+    .milestone-badge {
+      background: var(--accent);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .milestone-card.achieved .milestone-badge {
+      background: var(--success);
+    }
+    
+    .progress-section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    
+    .progress-section h3 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      color: var(--text);
+    }
+    
+    .progress-bar-container {
+      width: 100%;
+      height: 32px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 16px;
+      transition: width 1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 0 20px rgba(6,182,212,0.5);
+    }
+    
+    .progress-text {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--soft);
     }
     
     /* ==================== PRIVACY BANNER ==================== */
@@ -4045,8 +5023,11 @@
       </nav>
 
       <div class="actions">
-        <button class="btn" id="addFolderBtn">Neuer Ordner</button>
+        <button class="btn" id="btnEnhancedStats" onclick="EnhancedStatsManager.open()" title="Erweiterte Statistiken mit Jahresvergleichen, Heatmaps und Meilensteinen">📊 Erweiterte Stats</button>
+        <button class="btn" id="btnBulkEdit" onclick="BulkEditManager.open()" style="display: none;" title="Mehrere Beobachtungen gleichzeitig bearbeiten">📦 Mehrfachbearbeitung (<span id="bulkCountBadge">0</span>)</button>
+        <button class="btn ghost" id="addFolderBtn">Neuer Ordner</button>
         <button class="btn ghost" id="exportAllBtn">Export All</button>
+        <button class="btn ghost" onclick="TutorialManager.reset()" title="Tutorial neu starten">🎓 Tutorial</button>
       </div>
 
       <div class="feature-section">
@@ -4082,10 +5063,13 @@
           <input id="globalSearch" placeholder="Suche Vogelart, Datum, Ort oder Merkmale..." />
         </div>
         <div class="controls">
+          <button id="btnEnhancedStats" class="btn" onclick="EnhancedStatsManager.open()" title="Erweiterte Statistiken">📊 Statistiken+</button>
+          <button id="btnBulkEdit" class="btn" onclick="BulkEditManager.open()" style="display:none;" title="Mehrfachbearbeitung">📦 Bulk-Edit</button>
           <button id="importBtn" class="btn ghost">📥 Import</button>
           <button id="exportBtn" class="btn">📤 Export</button>
           <button id="printBtn" class="btn ghost no-print">🖨️ Drucken</button>
           <button id="helpBtn" class="btn" onclick="showKeyboardShortcuts()" aria-label="Hilfe und Keyboard-Shortcuts anzeigen">❓ Hilfe</button>
+          <button class="btn ghost" onclick="TutorialManager.start()" title="Tutorial neu starten">🎓</button>
         </div>
       </div>
 
@@ -4159,6 +5143,28 @@
                 <p class="muted" style="margin:4px 0 0 0;">Alle deine Beobachtungen an einem Ort</p>
               </div>
               <button class="btn" onclick="document.querySelector('.nav button[data-page=\\'eingabe\\']').click()">➕ Neue Beobachtung</button>
+            </div>
+            
+            <!-- NEU: Datums-Filter Shortcuts (gleich wie im Dashboard) -->
+            <div class="date-shortcuts" role="toolbar" aria-label="Datums-Filter" style="margin-bottom:16px;">
+              <button data-range="today" onclick="applyDateFilter('today')" aria-label="Heute anzeigen">
+                📅 Heute
+              </button>
+              <button data-range="yesterday" onclick="applyDateFilter('yesterday')" aria-label="Gestern anzeigen">
+                📅 Gestern
+              </button>
+              <button data-range="week" onclick="applyDateFilter('week')" aria-label="Letzte Woche anzeigen">
+                📅 Letzte Woche
+              </button>
+              <button data-range="month" onclick="applyDateFilter('month')" aria-label="Letzter Monat anzeigen">
+                📅 Letzter Monat
+              </button>
+              <button data-range="thisYear" onclick="applyDateFilter('thisYear')" aria-label="Dieses Jahr anzeigen">
+                📅 Dieses Jahr
+              </button>
+              <button data-range="all" onclick="applyDateFilter('all')" class="active" aria-label="Alle anzeigen">
+                📅 Alle
+              </button>
             </div>
             
             <!-- Filter und Suche -->
@@ -4388,7 +5394,7 @@
               <div id="memberCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
             </div>
             
-            <!-- Status-Filter (Tickbar/Selffound) -->
+            <!-- Status-Filter (Tickbar/Selffound/Neue Arten) -->
             <div style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid rgba(255,255,255,0.05);">
               <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                 <span style="font-weight:600;font-size:14px;">🎯 Status-Filter:</span>
@@ -4407,7 +5413,26 @@
                   <span style="font-size:13px;font-weight:600;">🔴 Nur Selffound</span>
                 </label>
                 
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 12px;background:rgba(6,182,212,0.1);border-radius:8px;border:2px solid transparent;transition:all 0.2s;" 
+                       id="newSpeciesFilterLabel"
+                       title="Zeigt pro Tag nur Arten, die an diesem Tag zum ersten Mal im gewählten Zeitraum gesehen wurden (kumulative Erstbeobachtungen)">
+                  <input type="checkbox" id="newSpeciesFilter" onchange="updateChart()" 
+                         style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);">
+                  <span style="font-size:13px;font-weight:600;">✨ Nur neue Arten (kumulativ)</span>
+                </label>
+                
                 <span style="font-size:12px;color:var(--muted);margin-left:8px;" id="statusFilterInfo"></span>
+              </div>
+              
+              <div id="newSpeciesInfo" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(6,182,212,0.05);border-left:3px solid var(--accent);border-radius:4px;">
+                <span style="font-size:12px;color:var(--soft);">
+                  ℹ️ <strong>Neue Arten (kumulativ):</strong> Zeigt für jeden Tag nur Arten an, die <strong>an diesem Tag zum ersten Mal im Zeitraum</strong> beobachtet wurden.
+                  <span id="newSpeciesCount" style="color:var(--accent);font-weight:600;"></span>
+                  <br>
+                  <span style="font-size:11px;color:var(--muted);margin-top:4px;display:inline-block;">
+                    💡 <strong>Tipp:</strong> Klicke auf eine Säule im Diagramm, um die einzelnen Erstbeobachtungen zu sehen!
+                  </span>
+                </span>
               </div>
             </div>
             
@@ -4692,10 +5717,10 @@
                   <button class="small-btn" onclick="document.getElementById('importFile').click()" style="flex:1;">Daten importieren</button>
                 </div>
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-                  <input type="file" id="ornithoImportFile" accept=".txt" style="display:none;">
-                  <button class="small-btn" onclick="document.getElementById('ornithoImportFile').click()" style="width:100%;background:var(--accent);">
+                  <input type="file" id="ornithoImportFile" accept=".txt" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">
+                  <label for="ornithoImportFile" class="small-btn" style="width:100%;background:var(--accent);display:block;text-align:center;cursor:pointer;">
                     🦅 Ornitho.de Import
-                  </button>
+                  </label>
                   <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;">
                     Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
                     <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
@@ -10764,6 +11789,13 @@
     }
     
     // ---------- Navigation ----------
+    // ==================== NAVIGATION (OPTIMIERT MIT EVENT DELEGATION) ====================
+    // Navigation wird jetzt mit Event Delegation in der DOMContentLoaded Funktion gehandhabt
+    // Siehe oben: "PERFORMANCE-OPTIMIERUNG: Event Delegation für Navigation"
+    // Das ist schneller als einzelne Event Listener auf jedem Button
+    
+    // Falls du die alte Methode bevorzugst, auskommentieren:
+    /*
     document.querySelectorAll('.nav button').forEach(btn => {
       btn.addEventListener('click', async () => {
         // Mobile Menü schließen wenn auf Navigation geklickt wird
@@ -10829,6 +11861,9 @@
         }, 220);
       });
     });
+    */ // Ende des alten Navigation-Codes (auskommentiert)
+    
+    // ==================== NAVIGATION (ENDE) ====================
 
     // Mobile sidebar toggle
     const openSidebarBtn = document.getElementById('openSidebar');
@@ -14563,15 +15598,72 @@
       // Status-Filter auslesen
       const tickableFilterCheckbox = document.getElementById('tickableFilter');
       const selffoundFilterCheckbox = document.getElementById('selffoundFilter');
+      const newSpeciesFilterCheckbox = document.getElementById('newSpeciesFilter');
       const onlyTickable = tickableFilterCheckbox ? tickableFilterCheckbox.checked : false;
       const onlySelffound = selffoundFilterCheckbox ? selffoundFilterCheckbox.checked : false;
+      const onlyNewSpecies = newSpeciesFilterCheckbox ? newSpeciesFilterCheckbox.checked : false;
       
       // Daten sammeln mit Status-Filtern
       const allObservations = await getAllObservationsWithDetails();
       // NEU: Filtere Nullmeldungen grundsätzlich aus
       let observations = allObservations.filter(obs => isValidObservation(obs));
       
-      // Wende Filter an
+      // NEU: Filter für nur neue Arten (Erstbeobachtungen im Zeitraum)
+      if (onlyNewSpecies) {
+        // Bestimme den aktuellen Zeitraum basierend auf dem Slider
+        const timeRange = parseInt(document.getElementById('timeRangeSlider').value);
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - timeRange);
+        
+        // Filtere Beobachtungen im gewählten Zeitraum
+        const observationsInRange = observations.filter(obs => {
+          const obsDate = new Date(obs.date);
+          return obsDate >= cutoffDate;
+        });
+        
+        // Sortiere Beobachtungen nach Datum (älteste zuerst)
+        observationsInRange.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        // Tracke welche Arten bereits im Zeitraum gesehen wurden
+        const seenSpeciesInRange = new Set();
+        const newSpeciesObservations = [];
+        
+        // Gehe durch alle Beobachtungen chronologisch
+        observationsInRange.forEach(obs => {
+          const bird = obs.bird;
+          
+          // Wenn Art noch nicht im Zeitraum gesehen wurde
+          if (!seenSpeciesInRange.has(bird)) {
+            seenSpeciesInRange.add(bird);
+            // Markiere diese Beobachtung als "Erstbeobachtung im Zeitraum"
+            newSpeciesObservations.push({
+              ...obs,
+              isFirstInRange: true
+            });
+          }
+          // Alle weiteren Beobachtungen dieser Art im Zeitraum werden NICHT gezählt
+        });
+        
+        // Ersetze observations mit nur den Erstbeobachtungen
+        observations = newSpeciesObservations;
+        
+        // Info-Box anzeigen
+        const newSpeciesInfo = document.getElementById('newSpeciesInfo');
+        const newSpeciesCount = document.getElementById('newSpeciesCount');
+        const uniqueNewSpecies = observations.length;
+        if (newSpeciesInfo && newSpeciesCount) {
+          newSpeciesInfo.style.display = 'block';
+          newSpeciesCount.textContent = `${uniqueNewSpecies} neue Art${uniqueNewSpecies !== 1 ? 'en' : ''} im Zeitraum (nur erste Beobachtung pro Art)`;
+        }
+      } else {
+        // Info-Box verstecken
+        const newSpeciesInfo = document.getElementById('newSpeciesInfo');
+        if (newSpeciesInfo) {
+          newSpeciesInfo.style.display = 'none';
+        }
+      }
+      
+      // Wende weitere Filter an
       if (onlyTickable) {
         observations = observations.filter(obs => obs.tickable !== false);
       }
@@ -14583,12 +15675,13 @@
       const statusFilterInfo = document.getElementById('statusFilterInfo');
       if (statusFilterInfo) {
         let filterText = '';
-        if (onlyTickable && onlySelffound) {
-          filterText = `(${observations.length} Beobachtungen: Tickbar & Selffound)`;
-        } else if (onlyTickable) {
-          filterText = `(${observations.length} Beobachtungen: Nur Tickbar)`;
-        } else if (onlySelffound) {
-          filterText = `(${observations.length} Beobachtungen: Nur Selffound)`;
+        const filters = [];
+        if (onlyNewSpecies) filters.push('Neue Arten');
+        if (onlyTickable) filters.push('Tickbar');
+        if (onlySelffound) filters.push('Selffound');
+        
+        if (filters.length > 0) {
+          filterText = `(${observations.length} Beobachtungen: ${filters.join(' & ')})`;
         } else {
           filterText = `(${observations.length} Beobachtungen)`;
         }
@@ -14598,11 +15691,15 @@
       // Update Label-Border für aktive Filter
       const tickableLabel = document.getElementById('tickableFilterLabel');
       const selffoundLabel = document.getElementById('selffoundFilterLabel');
+      const newSpeciesLabel = document.getElementById('newSpeciesFilterLabel');
       if (tickableLabel) {
         tickableLabel.style.borderColor = onlyTickable ? 'rgba(16,185,129,0.5)' : 'transparent';
       }
       if (selffoundLabel) {
         selffoundLabel.style.borderColor = onlySelffound ? 'rgba(239,68,68,0.5)' : 'transparent';
+      }
+      if (newSpeciesLabel) {
+        newSpeciesLabel.style.borderColor = onlyNewSpecies ? 'rgba(6,182,212,0.5)' : 'transparent';
       }
       
       const { labels, datasets } = getChartData(observations);
@@ -14628,6 +15725,14 @@
       const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
       const textColor = isDark ? 'var(--soft)' : 'var(--muted)';
       
+      // NEU: Setze Cursor auf pointer wenn Erstbeobachtungs-Filter aktiv ist
+      // Verwende die bereits deklarierte Variable newSpeciesFilterCheckbox von oben
+      if (onlyNewSpecies) {
+        canvas.style.cursor = 'pointer';
+      } else {
+        canvas.style.cursor = 'default';
+      }
+      
       // Chart erstellen
       chart = new Chart(ctx, {
         type: chartSettings.aggregation === 'day' ? 'bar' : 'line',
@@ -14638,6 +15743,26 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          onClick: (event, activeElements) => {
+            console.log('🖱️ Chart geklickt!');
+            console.log('   Active Elements:', activeElements);
+            
+            // NEU: Wenn ein Element angeklickt wurde und Filter "nur neue Arten" aktiv ist
+            const filterCheckbox = document.getElementById('newSpeciesFilter');
+            const onlyNewSpecies = filterCheckbox ? filterCheckbox.checked : false;
+            
+            console.log('   Filter "nur neue Arten" aktiv:', onlyNewSpecies);
+            
+            if (activeElements.length > 0 && onlyNewSpecies) {
+              const elementIndex = activeElements[0].index;
+              console.log('   Element-Index:', elementIndex);
+              showFirstSightingsForLabel(elementIndex, chart);
+            } else if (activeElements.length > 0 && !onlyNewSpecies) {
+              console.log('   ℹ️ Filter "nur neue Arten" ist nicht aktiv. Details werden nur im Erstbeobachtungs-Modus angezeigt.');
+            } else {
+              console.log('   ℹ️ Kein aktives Element gefunden.');
+            }
+          },
           plugins: {
             legend: {
               position: 'top',
@@ -14662,6 +15787,14 @@
                     label += ': ';
                   }
                   label += context.parsed.y;
+                  
+                  // NEU: Füge Hinweis hinzu wenn Erstbeobachtungen aktiv sind
+                  const filterCheckbox = document.getElementById('newSpeciesFilter');
+                  const onlyNewSpecies = filterCheckbox ? filterCheckbox.checked : false;
+                  if (onlyNewSpecies && context.parsed.y > 0) {
+                    label += ' (Klick für Details)';
+                  }
+                  
                   return label;
                 }
               }
@@ -14807,6 +15940,52 @@
           dataGroups[folderId].observations.push(obs);
         });
       }
+      
+      // NEU: Speichere Beobachtungen nach Label für Click-Handler
+      // Gruppiere alle gefilterten Beobachtungen nach ihrem Label (Tag/Woche/Monat/Jahr)
+      window.chartObservationsByLabel = {};
+      console.log('📊 Speichere Beobachtungen nach Label...');
+      console.log('   Anzahl gefilterte Beobachtungen:', filteredObs.length);
+      console.log('   Aggregation:', chartSettings.aggregation);
+      
+      filteredObs.forEach(obs => {
+        if (!obs.date) return;
+        
+        try {
+          const [year, month, day] = obs.date.split('-').map(Number);
+          const date = new Date(year, month-1, day);
+          let label = '';
+          
+          switch(chartSettings.aggregation) {
+            case 'day':
+              label = formatDateForDisplay(obs.date);
+              break;
+            case 'week':
+              const weekNumber = getWeekNumber(date);
+              label = `KW ${weekNumber} ${date.getFullYear()}`;
+              break;
+            case 'month':
+              const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+              label = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+              break;
+            case 'year':
+              label = date.getFullYear().toString();
+              break;
+            default:
+              label = formatDateForDisplay(obs.date);
+          }
+          
+          if (!window.chartObservationsByLabel[label]) {
+            window.chartObservationsByLabel[label] = [];
+          }
+          window.chartObservationsByLabel[label].push(obs);
+        } catch (e) {
+          console.error('Fehler beim Gruppieren der Beobachtungen nach Label:', obs.date, e);
+        }
+      });
+      
+      console.log('✅ Beobachtungen gespeichert. Labels:', Object.keys(window.chartObservationsByLabel));
+      console.log('   Anzahl pro Label:', Object.entries(window.chartObservationsByLabel).map(([k,v]) => `${k}: ${v.length}`).join(', '));
       
       // Für jede Gruppe eine Zeitreihe erstellen
       const datasets = [];
@@ -17646,12 +18825,14 @@ function applyDateFilter(range) {
     filterObservationManager();
   }
   
+  // Aktualisiere ALLE date-shortcuts Buttons auf allen Seiten
   document.querySelectorAll('.date-shortcuts button').forEach(btn => {
     btn.classList.remove('active');
   });
   
-  const activeBtn = document.querySelector(`.date-shortcuts button[data-range="${range}"]`);
-  if (activeBtn) activeBtn.classList.add('active');
+  document.querySelectorAll(`.date-shortcuts button[data-range="${range}"]`).forEach(btn => {
+    btn.classList.add('active');
+  });
   
   const rangeNames = {
     'today': 'Heute',
@@ -17678,6 +18859,7 @@ function initPullToRefresh() {
   pullIndicator.textContent = '🔄 Zum Aktualisieren ziehen';
   document.body.appendChild(pullIndicator);
   
+  // Passive Listeners für bessere Performance
   document.addEventListener('touchstart', (e) => {
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
@@ -17689,13 +18871,16 @@ function initPullToRefresh() {
     if (scrollTop === 0 && touchEndY > touchStartY) {
       const pullDistance = touchEndY - touchStartY;
       
-      if (pullDistance > 80 && !isPulling) {
-        pullIndicator.classList.add('active');
-        pullIndicator.textContent = '🔄 Loslassen zum Aktualisieren';
-      } else if (pullDistance < 80) {
-        pullIndicator.classList.remove('active');
-        pullIndicator.textContent = '🔄 Zum Aktualisieren ziehen';
-      }
+      // RequestAnimationFrame für flüssige Updates
+      requestAnimationFrame(() => {
+        if (pullDistance > 80 && !isPulling) {
+          pullIndicator.classList.add('active');
+          pullIndicator.textContent = '🔄 Loslassen zum Aktualisieren';
+        } else if (pullDistance < 80) {
+          pullIndicator.classList.remove('active');
+          pullIndicator.textContent = '🔄 Zum Aktualisieren ziehen';
+        }
+      });
     }
   }, { passive: true });
   
@@ -17736,48 +18921,59 @@ function initPullToRefresh() {
 async function refreshData() {
   log('Aktualisiere Daten...');
   
+  // Nutze Promise.allSettled für parallele Ausführung
   const promises = [];
   
   if (typeof renderObservationManager === 'function') {
-    promises.push(renderObservationManager());
+    promises.push(renderObservationManager().catch(err => log('Fehler beim Laden der Beobachtungen:', err)));
   }
   
   if (typeof updateDashboard === 'function') {
-    promises.push(updateDashboard());
+    promises.push(updateDashboard().catch(err => log('Fehler beim Dashboard-Update:', err)));
   }
   
   if (typeof updateChart === 'function') {
-    promises.push(updateChart());
+    promises.push(updateChart().catch(err => log('Fehler beim Chart-Update:', err)));
   }
   
   if (typeof updateMarkersFromData === 'function') {
-    promises.push(updateMarkersFromData());
+    promises.push(updateMarkersFromData().catch(err => log('Fehler beim Marker-Update:', err)));
   }
   
-  await Promise.all(promises);
+  await Promise.allSettled(promises);
   log('Daten aktualisiert');
 }
 
 function initSwipeNavigation() {
   let touchStartX = 0;
   let touchEndX = 0;
+  let touchStartTime = 0;
   
   const pages = ['home', 'beobachtungen', 'eingabe', 'diagramme', 'statistiken', 'karte', 'listen', 'arten', 'challenges', 'tools'];
   let currentPageIndex = 0;
   
+  // Passive Listeners
   document.addEventListener('touchstart', (e) => {
     touchStartX = e.touches[0].clientX;
+    touchStartTime = Date.now();
   }, { passive: true });
   
   document.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].clientX;
-    handleSwipe();
+    const touchDuration = Date.now() - touchStartTime;
+    
+    // Nur bei schnellen Swipes (< 300ms)
+    if (touchDuration < 300) {
+      handleSwipe();
+    }
   }, { passive: true });
   
   function handleSwipe() {
     const diff = touchStartX - touchEndX;
+    const absDiff = Math.abs(diff);
     
-    if (Math.abs(diff) < 100) return;
+    // Mindestens 100px und maximal 300ms
+    if (absDiff < 100) return;
     if (window.innerWidth > 700) return;
     
     const activeBtn = document.querySelector('.nav button.active');
@@ -17795,7 +18991,13 @@ function initSwipeNavigation() {
     const nextPage = pages[currentPageIndex];
     const nextBtn = document.querySelector(`.nav button[data-page="${nextPage}"]`);
     if (nextBtn) {
-      nextBtn.click();
+      // INSTANT Click ohne requestAnimationFrame
+      // Trigger pointerdown event für instant response
+      const event = new PointerEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true
+      });
+      nextBtn.dispatchEvent(event);
       log('Swipe Navigation:', nextPage);
     }
   }
@@ -17868,9 +19070,136 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
   
+  // PERFORMANCE-OPTIMIERUNG: Event Delegation für Navigation
+  const navContainer = document.querySelector('.nav');
+  if (navContainer) {
+    // Nutze pointer Events (schneller als click)
+    navContainer.addEventListener('pointerdown', function(e) {
+      const button = e.target.closest('button');
+      if (!button) return;
+      
+      // INSTANT UI-Update ohne requestAnimationFrame
+      // Mobile Menü schließen
+      if (window.innerWidth <= 700) {
+        closeMobileMenu();
+      }
+      
+      const page = button.getAttribute('data-page');
+      if (!page) return;
+      
+      // Navigation aktiv setzen - INSTANT
+      navContainer.querySelectorAll('button').forEach(b => {
+        b.classList.remove('active');
+        b.removeAttribute('aria-current');
+      });
+      button.classList.add('active');
+      button.setAttribute('aria-current', 'page');
+      
+      // Map-Full Mode für Karte - INSTANT
+      if (page === 'karte') {
+        document.documentElement.classList.add('map-full');
+      } else {
+        document.documentElement.classList.remove('map-full');
+      }
+      
+      // Sections umschalten - INSTANT ohne Animation
+      document.querySelectorAll('main section').forEach(s => {
+        if (s.id === page) {
+          s.style.display = 'block';
+          // Keine Animation mehr
+        } else {
+          s.style.display = 'none';
+        }
+      });
+      
+      log('Navigation:', page);
+      
+      // Lade Section-spezifische Daten asynchron (nicht-blockierend)
+      loadPageData(page);
+    }, { passive: true });
+  }
+  
+  // PERFORMANCE-OPTIMIERUNG: Theme-Switcher mit Event Delegation
+  const themeContainer = document.querySelector('.feature-section');
+  if (themeContainer) {
+    themeContainer.addEventListener('pointerdown', function(e) {
+      const themeBtn = e.target.closest('.theme-btn');
+      if (!themeBtn) return;
+      
+      const theme = themeBtn.getAttribute('data-theme');
+      if (!theme) return;
+      
+      // INSTANT Änderung ohne requestAnimationFrame
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      
+      // Visual Feedback - INSTANT
+      themeContainer.querySelectorAll('.theme-btn').forEach(b => b.style.opacity = '0.6');
+      themeBtn.style.opacity = '1';
+      
+      showNotification(`🎨 Theme geändert: ${theme}`, 2000);
+      log('Theme gewechselt:', theme);
+    }, { passive: true });
+  }
+  
+  // Setze initialen Theme-Button als aktiv
+  const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+  const activeThemeBtn = document.querySelector(`.theme-btn[data-theme="${currentTheme}"]`);
+  if (activeThemeBtn) activeThemeBtn.style.opacity = '1';
+  
   log('✅ Optimierungen geladen!');
   log('💡 Tipp: Drücke "?" für Keyboard-Shortcuts');
 });
+
+// Asynchrones Laden von Section-Daten (nicht-blockierend)
+async function loadPageData(page) {
+  try {
+    // Temporäre Daten löschen wenn wir nicht zur Karte gehen
+    if (page !== 'karte' && typeof tempObservationData !== 'undefined') {
+      window.tempObservationData = null;
+    }
+    
+    // Section-spezifische Logik
+    if (page === 'diagramme') {
+      if (typeof updateYearSelection === 'function') updateYearSelection();
+      if (typeof initMemberFilter === 'function') await initMemberFilter();
+      if (typeof updateChart === 'function') updateChart();
+    } else if (page === 'statistiken') {
+      if (typeof updateAdvancedStatistics === 'function') updateAdvancedStatistics();
+    } else if (page === 'beobachtungen') {
+      if (typeof renderObservationManager === 'function') await renderObservationManager();
+    } else if (page === 'eingabe') {
+      if (typeof initFolderSelect === 'function') await initFolderSelect();
+      if (typeof updateMapCoordinatesDisplay === 'function') updateMapCoordinatesDisplay();
+    } else if (page === 'listen') {
+      if (typeof loadUserLists === 'function') await loadUserLists();
+      if (typeof renderLists === 'function') await renderLists();
+    } else if (page === 'arten') {
+      if (typeof loadSpeciesDatabase === 'function') loadSpeciesDatabase();
+    } else if (page === 'tools') {
+      if (typeof updateSystemInfo === 'function') updateSystemInfo();
+    } else if (page === 'group-compare') {
+      if (typeof renderGroupComparison === 'function') await renderGroupComparison();
+    } else if (page === 'home') {
+      if (typeof updateDashboard === 'function') updateDashboard();
+    } else if (page === 'challenges') {
+      if (typeof loadChallengeProgress === 'function') await loadChallengeProgress();
+      if (typeof loadCustomChallenges === 'function') await loadCustomChallenges();
+      if (typeof updateChallengeDisplay === 'function') updateChallengeDisplay();
+      if (typeof renderChallenges === 'function') await renderChallenges();
+    }
+    
+    // Karte neu berechnen nach Größenänderung
+    setTimeout(() => {
+      if (window.mapObj && typeof window.mapObj.invalidateSize === 'function') {
+        window.mapObj.invalidateSize();
+      }
+    }, 220);
+    
+  } catch (error) {
+    logError('Fehler beim Laden der Section-Daten:', error);
+  }
+}
 
 // Export functions to window
 window.log = log;
@@ -21224,13 +22553,15 @@ async function initializeCopyToGroupTool() {
 }
 
 // Event Listener für Tools-Seite
-const originalUpdateSystemInfo = updateSystemInfo;
-updateSystemInfo = function() {
-  if (typeof originalUpdateSystemInfo === 'function') {
-    originalUpdateSystemInfo();
-  }
-  initializeCopyToGroupTool();
-};
+const originalUpdateSystemInfo = typeof updateSystemInfo !== 'undefined' ? updateSystemInfo : null;
+if (typeof updateSystemInfo !== 'undefined') {
+  updateSystemInfo = function() {
+    if (typeof originalUpdateSystemInfo === 'function') {
+      originalUpdateSystemInfo();
+    }
+    initializeCopyToGroupTool();
+  };
+}
 
 // Mache Funktionen global verfügbar
 window.openCopyToGroupModal = openCopyToGroupModal;
@@ -24719,12 +26050,1236 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// === NEUE FEATURES: JavaScript === //
+
+// Tutorial Manager
+const TutorialManager = {
+  currentStep: 0,
+  steps: [
+    {
+      title: "Willkommen bei BirdCount! 🦅",
+      text: "Herzlich willkommen! BirdCount ist dein professioneller Begleiter für Vogelbeobachtungen. Lass uns gemeinsam die wichtigsten Funktionen erkunden.",
+      image: "🎉"
+    },
+    {
+      title: "Schnelleingabe ⚡",
+      text: "Mit dem blau leuchtenden Button unten rechts (oder Strg+Q) kannst du blitzschnell neue Beobachtungen erfassen. Der Standort wird automatisch erfasst!",
+      image: "⚡",
+      highlight: ".fab-quick-add"
+    },
+    {
+      title: "Erweiterte Statistiken 📊",
+      text: "Der neue Statistiken+ Button zeigt dir detaillierte Analysen: Jahresvergleiche, Heatmaps nach Tageszeit und Monat, sowie deine persönlichen Meilensteine!",
+      image: "📊",
+      highlight: "#btnEnhancedStats"
+    },
+    {
+      title: "Mehrfachbearbeitung 📦",
+      text: "Wähle mehrere Beobachtungen aus (Checkboxen), um sie gleichzeitig zu bearbeiten: Datum ändern, Notizen hinzufügen, exportieren oder löschen!",
+      image: "📦"
+    },
+    {
+      title: "Karte & Navigation 🗺️",
+      text: "Klicke auf die Karte, um Beobachtungen hinzuzufügen. Alle deine Sichtungen werden als Marker angezeigt. Nutze die Filter für bessere Übersicht!",
+      image: "🗺️"
+    },
+    {
+      title: "Bereit zum Start! 🚀",
+      text: "Das war's! Du bist jetzt bereit, deine Vogelbeobachtungen professionell zu dokumentieren. Viel Erfolg und gute Beobachtungen!",
+      image: "🚀"
+    }
+  ],
+  
+  init() {
+    const tutorialSeen = localStorage.getItem('birdcount_tutorial_seen');
+    if (!tutorialSeen) {
+      setTimeout(() => this.start(), 2000);
+    }
+  },
+  
+  start() {
+    this.currentStep = 0;
+    this.showStep();
+    document.getElementById('tutorialOverlay').style.display = 'flex';
+  },
+  
+  showStep() {
+    const step = this.steps[this.currentStep];
+    document.getElementById('tutorialTitle').textContent = step.title;
+    document.getElementById('tutorialText').textContent = step.text;
+    document.getElementById('tutorialImage').textContent = step.image;
+    document.getElementById('tutorialProgress').textContent = `${this.currentStep + 1} / ${this.steps.length}`;
+    
+    document.getElementById('tutorialPrev').style.display = this.currentStep > 0 ? 'inline-block' : 'none';
+    document.getElementById('tutorialNext').textContent = this.currentStep < this.steps.length - 1 ? 'Weiter' : 'Fertig';
+    
+    document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+    
+    if (step.highlight) {
+      const element = document.querySelector(step.highlight);
+      if (element) {
+        element.classList.add('tutorial-highlight');
+        setTimeout(() => element.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+      }
+    }
+  },
+  
+  next() {
+    if (this.currentStep < this.steps.length - 1) {
+      this.currentStep++;
+      this.showStep();
+    } else {
+      this.complete();
+    }
+  },
+  
+  prev() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.showStep();
+    }
+  },
+  
+  skip() {
+    this.complete();
+  },
+  
+  complete() {
+    document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+    document.getElementById('tutorialOverlay').style.display = 'none';
+    localStorage.setItem('birdcount_tutorial_seen', 'true');
+    showToast('Tutorial abgeschlossen! Viel Erfolg! 🎉', 'success');
+  }
+};
+
+// Tooltip Manager
+const TooltipManager = {
+  tooltips: {
+    '.fab-quick-add': 'Schnelleingabe (Strg+Q): Füge blitzschnell eine neue Beobachtung hinzu',
+    '#btnEnhancedStats': 'Erweiterte Statistiken: Jahresvergleiche, Heatmaps und Meilensteine',
+    '#btnBulkEdit': 'Mehrfachbearbeitung: Bearbeite mehrere Beobachtungen gleichzeitig',
+    '#exportBtn': 'Exportiere alle Beobachtungen als CSV',
+    '#importBtn': 'Importiere Beobachtungen aus CSV',
+  },
+  
+  container: null,
+  
+  init() {
+    this.container = document.getElementById('tooltipContainer');
+    setTimeout(() => this.attachListeners(), 500);
+  },
+  
+  attachListeners() {
+    Object.keys(this.tooltips).forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        element.addEventListener('mouseenter', (e) => this.show(e, selector));
+        element.addEventListener('mouseleave', () => this.hide());
+      });
+    });
+  },
+  
+  show(event, selector) {
+    if (!this.container) return;
+    const text = this.tooltips[selector];
+    if (!text) return;
+    
+    this.container.textContent = text;
+    this.container.style.display = 'block';
+    
+    const rect = event.target.getBoundingClientRect();
+    const tooltipRect = this.container.getBoundingClientRect();
+    
+    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+    let top = rect.top - tooltipRect.height - 10;
+    
+    if (left < 10) left = 10;
+    if (left + tooltipRect.width > window.innerWidth - 10) {
+      left = window.innerWidth - tooltipRect.width - 10;
+    }
+    if (top < 10) top = rect.bottom + 10;
+    
+    this.container.style.left = left + 'px';
+    this.container.style.top = top + 'px';
+  },
+  
+  hide() {
+    if (this.container) {
+      setTimeout(() => this.container.style.display = 'none', 200);
+    }
+  }
+};
+
+// Bulk Edit Manager
+const BulkEditManager = {
+  selectedObservations: new Set(),
+  
+  init() {
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('obs-checkbox')) {
+        this.handleCheckbox(e.target);
+      }
+    });
+  },
+  
+  handleCheckbox(checkbox) {
+    const obsId = checkbox.dataset.obsId;
+    const obsData = checkbox.dataset.obsData;
+    
+    if (checkbox.checked) {
+      this.selectedObservations.set(obsId, JSON.parse(obsData));
+    } else {
+      this.selectedObservations.delete(obsId);
+    }
+    
+    this.updateUI();
+  },
+  
+  updateUI() {
+    const count = this.selectedObservations.size;
+    const bulkEditBtn = document.getElementById('btnBulkEdit');
+    
+    if (bulkEditBtn) {
+      if (count > 0) {
+        bulkEditBtn.textContent = `📦 Bulk-Edit (${count})`;
+        bulkEditBtn.style.display = 'inline-block';
+      } else {
+        bulkEditBtn.style.display = 'none';
+      }
+    }
+  },
+  
+  open() {
+    if (this.selectedObservations.size === 0) {
+      showToast('Bitte wähle zuerst Beobachtungen aus!', 'info');
+      return;
+    }
+    
+    document.getElementById('bulkSelectedCount').textContent = this.selectedObservations.size;
+    this.renderSelectedList();
+    document.getElementById('bulkEditModal').style.display = 'flex';
+  },
+  
+  close() {
+    document.getElementById('bulkEditModal').style.display = 'none';
+  },
+  
+  renderSelectedList() {
+    const container = document.getElementById('bulkSelectedList');
+    container.innerHTML = '';
+    
+    this.selectedObservations.forEach((obs, id) => {
+      const item = document.createElement('div');
+      item.className = 'bulk-selected-item';
+      item.innerHTML = `
+        <div>
+          <strong>${obs.bird || 'Unbekannt'}</strong><br>
+          <small style="color: var(--muted);">${obs.date || 'Kein Datum'} - ${obs.count || 1}x</small>
+        </div>
+        <button onclick="BulkEditManager.removeFromSelection('${id}')" class="small-btn" style="background: var(--danger);">✕</button>
+      `;
+      container.appendChild(item);
+    });
+  },
+  
+  removeFromSelection(obsId) {
+    this.selectedObservations.delete(obsId);
+    const checkbox = document.querySelector(`input[data-obs-id="${obsId}"]`);
+    if (checkbox) checkbox.checked = false;
+    this.renderSelectedList();
+    this.updateUI();
+    if (this.selectedObservations.size === 0) this.close();
+  },
+  
+  async changeDate() {
+    const newDate = prompt('Neues Datum (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!newDate) return;
+    
+    showToast('Datum wird geändert...', 'info');
+    
+    for (let [id, obs] of this.selectedObservations) {
+      obs.date = newDate;
+      await this.updateObservation(id, obs);
+    }
+    
+    showToast(`✅ Datum für ${this.selectedObservations.size} Beobachtungen geändert!`, 'success');
+    this.close();
+    this.clearSelection();
+    loadObservations();
+  },
+  
+  async changeLocation() {
+    const newLat = prompt('Neue Breite (Latitude):');
+    if (!newLat) return;
+    const newLng = prompt('Neue Länge (Longitude):');
+    if (!newLng) return;
+    
+    showToast('Standort wird geändert...', 'info');
+    
+    for (let [id, obs] of this.selectedObservations) {
+      obs.lat = parseFloat(newLat);
+      obs.lng = parseFloat(newLng);
+      await this.updateObservation(id, obs);
+    }
+    
+    showToast(`✅ Standort für ${this.selectedObservations.size} Beobachtungen geändert!`, 'success');
+    this.close();
+    this.clearSelection();
+    loadObservations();
+  },
+  
+  async addNote() {
+    const note = prompt('Notiz hinzufügen:');
+    if (!note) return;
+    
+    showToast('Notiz wird hinzugefügt...', 'info');
+    
+    for (let [id, obs] of this.selectedObservations) {
+      obs.behavior = obs.behavior ? obs.behavior + ' | ' + note : note;
+      await this.updateObservation(id, obs);
+    }
+    
+    showToast(`✅ Notiz zu ${this.selectedObservations.size} Beobachtungen hinzugefügt!`, 'success');
+    this.close();
+    this.clearSelection();
+    loadObservations();
+  },
+  
+  async deleteSelected() {
+    if (!confirm(`Möchtest du wirklich ${this.selectedObservations.size} Beobachtungen löschen?`)) return;
+    
+    showToast('Beobachtungen werden gelöscht...', 'info');
+    
+    for (let id of this.selectedObservations.keys()) {
+      await this.deleteObservation(id);
+    }
+    
+    showToast(`✅ ${this.selectedObservations.size} Beobachtungen gelöscht!`, 'success');
+    this.close();
+    this.clearSelection();
+    loadObservations();
+  },
+  
+  exportSelected() {
+    let csv = 'Vogelart,Datum,Anzahl,Verhalten,Latitude,Longitude\n';
+    this.selectedObservations.forEach(obs => {
+      csv += `"${obs.bird || ''}","${obs.date || ''}",${obs.count || 1},"${obs.behavior || ''}",${obs.lat || ''},${obs.lng || ''}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `birdcount_bulk_export_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    showToast('✅ Export erfolgreich!', 'success');
+  },
+  
+  async moveToFolder() {
+    const folderName = prompt('Ordnername:');
+    if (!folderName) return;
+    
+    showToast('Beobachtungen werden verschoben...', 'info');
+    
+    for (let [id, obs] of this.selectedObservations) {
+      await this.deleteObservation(id);
+      await FBD.ref(`observations/${currentUser.uid}/${folderName}`).push(obs);
+    }
+    
+    showToast(`✅ ${this.selectedObservations.size} Beobachtungen nach "${folderName}" verschoben!`, 'success');
+    this.close();
+    this.clearSelection();
+    loadObservations();
+  },
+  
+  clearSelection() {
+    this.selectedObservations.clear();
+    document.querySelectorAll('.obs-checkbox').forEach(cb => cb.checked = false);
+    this.updateUI();
+  },
+  
+  async updateObservation(id, data) {
+    if (!FBD || !currentUser) return;
+    const folderSelect = document.getElementById('folderSelect');
+    const currentFolder = folderSelect ? folderSelect.value : null;
+    const path = isGroupMode && currentGroupId
+      ? `groups/${currentGroupId}/observations/${currentUser.email.replace(/\./g, '_')}/${id}`
+      : currentFolder
+        ? `observations/${currentUser.uid}/${currentFolder}/${id}`
+        : `observations/${currentUser.uid}/${id}`;
+    await FBD.ref(path).update(data);
+  },
+  
+  async deleteObservation(id) {
+    if (!FBD || !currentUser) return;
+    const folderSelect = document.getElementById('folderSelect');
+    const currentFolder = folderSelect ? folderSelect.value : null;
+    const path = isGroupMode && currentGroupId
+      ? `groups/${currentGroupId}/observations/${currentUser.email.replace(/\./g, '_')}/${id}`
+      : currentFolder
+        ? `observations/${currentUser.uid}/${currentFolder}/${id}`
+        : `observations/${currentUser.uid}/${id}`;
+    await FBD.ref(path).remove();
+  }
+};
+
+// ==================== ENHANCED STATISTICS MANAGER ====================
+const EnhancedStatsManager = {
+  observations: [],
+  currentYear: new Date().getFullYear(),
+  charts: {},
+  
+  async open() {
+    if (!window.Chart) {
+      await this.loadChartJS();
+    }
+    await this.loadObservations();
+    document.getElementById('enhancedStatsModal').style.display = 'flex';
+    this.showTab('overview');
+  },
+  
+  async loadChartJS() {
+    return new Promise((resolve, reject) => {
+      if (window.Chart) { resolve(); return; }
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      script.onload = resolve;
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
+  },
+  
+  close() {
+    document.getElementById('enhancedStatsModal').style.display = 'none';
+    Object.values(this.charts).forEach(chart => { if (chart) chart.destroy(); });
+    this.charts = {};
+  },
+  
+  async loadObservations() {
+    if (window.FBD && currentUser) {
+      try {
+        const snapshot = await window.FBD.ref(`observations/${currentUser.uid}`).once('value');
+        const data = snapshot.val();
+        this.observations = [];
+        if (data) {
+          Object.keys(data).forEach(key => {
+            if (typeof data[key] === 'object') {
+              Object.values(data[key]).forEach(obs => {
+                if (obs && obs.bird) this.observations.push(obs);
+              });
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden:', error);
+        this.observations = [];
+      }
+    } else {
+      this.observations = window.observations || [];
+    }
+  },
+  
+  showTab(tabName) {
+    document.querySelectorAll('.stats-tab-content').forEach(tab => tab.style.display = 'none');
+    document.querySelectorAll('.stats-tab').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`statsTab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).style.display = 'block';
+    event?.target?.classList.add('active');
+    
+    switch(tabName) {
+      case 'overview': this.renderOverview(); break;
+      case 'yearly': this.renderYearlyComparison(); break;
+      case 'heatmap': this.renderHeatmap(); break;
+      case 'milestones': this.renderMilestones(); break;
+    }
+  },
+  
+  renderOverview() {
+    const totalSpecies = new Set(this.observations.map(o => o.bird)).size;
+    const totalObs = this.observations.length;
+    
+    const now = new Date();
+    const thisMonth = this.observations.filter(o => {
+      const obsDate = new Date(o.date);
+      return obsDate.getMonth() === now.getMonth() && obsDate.getFullYear() === now.getFullYear();
+    });
+    const thisMonthSpecies = new Set(thisMonth.map(o => o.bird)).size;
+    
+    const birdCounts = {};
+    this.observations.forEach(o => {
+      birdCounts[o.bird] = (birdCounts[o.bird] || 0) + (o.count || 1);
+    });
+    const topBird = Object.entries(birdCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+    
+    document.getElementById('totalSpecies').textContent = totalSpecies;
+    document.getElementById('totalObservations').textContent = totalObs;
+    document.getElementById('thisMonthSpecies').textContent = thisMonthSpecies;
+    document.getElementById('topBird').textContent = topBird;
+    
+    this.renderTopSpeciesChart(birdCounts);
+  },
+  
+  renderTopSpeciesChart(birdCounts) {
+    const canvas = document.getElementById('topSpeciesChart');
+    if (!canvas) return;
+    if (this.charts.topSpecies) this.charts.topSpecies.destroy();
+    
+    const top10 = Object.entries(birdCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const ctx = canvas.getContext('2d');
+    this.charts.topSpecies = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: top10.map(([bird]) => bird),
+        datasets: [{
+          label: 'Anzahl Beobachtungen',
+          data: top10.map(([, count]) => count),
+          backgroundColor: 'rgba(6, 182, 212, 0.6)',
+          borderColor: 'rgba(6, 182, 212, 1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+          x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+        }
+      }
+    });
+  },
+  
+  renderYearlyComparison() {
+    document.getElementById('currentYearDisplay').textContent = this.currentYear;
+    
+    const yearObs = this.observations.filter(o => new Date(o.date).getFullYear() === this.currentYear);
+    const yearSpecies = new Set(yearObs.map(o => o.bird)).size;
+    const yearCount = yearObs.length;
+    
+    document.getElementById('yearTitle').textContent = this.currentYear;
+    document.getElementById('yearSpecies').textContent = yearSpecies;
+    document.getElementById('yearObservations').textContent = yearCount;
+    
+    const lastYearObs = this.observations.filter(o => new Date(o.date).getFullYear() === this.currentYear - 1);
+    const lastYearSpecies = new Set(lastYearObs.map(o => o.bird)).size;
+    const diff = yearSpecies - lastYearSpecies;
+    const comparisonEl = document.getElementById('yearComparison');
+    
+    if (diff > 0) {
+      comparisonEl.textContent = `+${diff} Arten mehr als ${this.currentYear - 1}`;
+      comparisonEl.className = 'year-comparison positive';
+    } else if (diff < 0) {
+      comparisonEl.textContent = `${diff} Arten weniger als ${this.currentYear - 1}`;
+      comparisonEl.className = 'year-comparison negative';
+    } else {
+      comparisonEl.textContent = `Gleich viele Arten wie ${this.currentYear - 1}`;
+      comparisonEl.className = 'year-comparison';
+    }
+    
+    this.renderYearlyChart();
+  },
+  
+  renderYearlyChart() {
+    const canvas = document.getElementById('yearlyComparisonChart');
+    if (!canvas) return;
+    if (this.charts.yearly) this.charts.yearly.destroy();
+    
+    const monthData = Array(12).fill(0);
+    this.observations.forEach(o => {
+      const date = new Date(o.date);
+      if (date.getFullYear() === this.currentYear) monthData[date.getMonth()]++;
+    });
+    
+    const ctx = canvas.getContext('2d');
+    this.charts.yearly = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+        datasets: [{
+          label: 'Beobachtungen ' + this.currentYear,
+          data: monthData,
+          borderColor: 'rgba(6, 182, 212, 1)',
+          backgroundColor: 'rgba(6, 182, 212, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8' } } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+          x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+        }
+      }
+    });
+  },
+  
+  changeYear(direction) {
+    this.currentYear += direction;
+    this.renderYearlyComparison();
+  },
+  
+  renderHeatmap() {
+    const type = document.querySelector('input[name="heatmapType"]:checked')?.value || 'hour';
+    this.updateHeatmap(type);
+  },
+  
+  updateHeatmap(type) {
+    const canvas = document.getElementById('heatmapCanvas');
+    if (!canvas) return;
+    if (this.charts.heatmap) this.charts.heatmap.destroy();
+    
+    let labels, data;
+    
+    if (type === 'hour') {
+      labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+      data = Array(24).fill(0);
+      this.observations.forEach(o => {
+        if (o.timestamp) data[new Date(o.timestamp).getHours()]++;
+      });
+    } else if (type === 'month') {
+      labels = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+      data = Array(12).fill(0);
+      this.observations.forEach(o => data[new Date(o.date).getMonth()]++);
+    } else {
+      labels = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      data = Array(7).fill(0);
+      this.observations.forEach(o => data[new Date(o.date).getDay()]++);
+    }
+    
+    const ctx = canvas.getContext('2d');
+    this.charts.heatmap = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Beobachtungen',
+          data: data,
+          backgroundColor: data.map(val => {
+            const max = Math.max(...data);
+            const intensity = max > 0 ? val / max : 0;
+            return `rgba(6, 182, 212, ${0.2 + intensity * 0.8})`;
+          }),
+          borderColor: 'rgba(6, 182, 212, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+          x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+        }
+      }
+    });
+  },
+  
+  renderMilestones() {
+    const container = document.getElementById('milestonesContainer');
+    container.innerHTML = '';
+    
+    const totalSpecies = new Set(this.observations.map(o => o.bird)).size;
+    const totalObs = this.observations.length;
+    
+    const milestones = [
+      { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, achieved: totalSpecies >= 1 },
+      { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, achieved: totalSpecies >= 10 },
+      { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, achieved: totalSpecies >= 25 },
+      { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, achieved: totalSpecies >= 50 },
+      { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, achieved: totalObs >= 100 },
+      { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, achieved: totalObs >= 500 },
+      { icon: '⭐', title: 'Meister', desc: '100 Arten beobachtet', target: 100, achieved: totalSpecies >= 100 },
+      { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, achieved: totalObs >= 1000 }
+    ];
+    
+    milestones.forEach(m => {
+      const card = document.createElement('div');
+      card.className = `milestone-card ${m.achieved ? 'achieved' : ''}`;
+      const current = m.desc.includes('Arten') ? totalSpecies : totalObs;
+      const progress = Math.min(100, (current / m.target) * 100);
+      
+      card.innerHTML = `
+        <div class="milestone-icon">${m.icon}</div>
+        <div class="milestone-info">
+          <h4>${m.title}</h4>
+          <p>${m.desc}</p>
+          <div class="milestone-progress">${current} / ${m.target}</div>
+        </div>
+        <div class="milestone-badge">${m.achieved ? '✓ Erreicht' : `${progress.toFixed(0)}%`}</div>
+      `;
+      container.appendChild(card);
+    });
+    
+    const lifelistProgress = Math.min(100, (totalSpecies / 500) * 100);
+    document.getElementById('lifelistProgress').style.width = lifelistProgress + '%';
+    document.getElementById('lifelistText').textContent = `${totalSpecies} von 500 möglichen Arten in Deutschland (${lifelistProgress.toFixed(1)}%)`;
+  }
+};
+
+// ==================== TUTORIAL RESET FUNCTION ====================
+TutorialManager.reset = function() {
+  localStorage.removeItem('birdcount_tutorial_seen');
+  this.start();
+};
+
+// ==================== INITIALIZE ALL NEW FEATURES ====================
+document.addEventListener('DOMContentLoaded', () => {
+  TutorialManager.init();
+  TooltipManager.init();
+  BulkEditManager.init();
+});
+
 </script>
+
+<!-- ==================== TUTORIAL OVERLAY ==================== -->
+<div id="tutorialOverlay" class="tutorial-overlay" style="display: none;">
+  <div class="tutorial-box">
+    <div class="tutorial-header">
+      <h3 id="tutorialTitle">Willkommen bei BirdCount!</h3>
+      <button onclick="TutorialManager.skip()" class="tutorial-close">✕</button>
+    </div>
+    <div class="tutorial-content">
+      <p id="tutorialText"></p>
+      <div class="tutorial-image" id="tutorialImage"></div>
+    </div>
+    <div class="tutorial-footer">
+      <span id="tutorialProgress">1 / 5</span>
+      <div class="tutorial-buttons">
+        <button onclick="TutorialManager.skip()" class="btn ghost">Überspringen</button>
+        <button onclick="TutorialManager.prev()" id="tutorialPrev" class="btn ghost">Zurück</button>
+        <button onclick="TutorialManager.next()" id="tutorialNext" class="btn">Weiter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOOLTIP CONTAINER ==================== -->
+<div id="tooltipContainer" class="tooltip-container" style="display: none;"></div>
+
+<!-- ==================== BULK EDIT MODAL ==================== -->
+<div id="bulkEditModal" class="modal" style="display: none;">
+  <div class="modal-content bulk-edit-modal">
+    <div class="modal-header">
+      <h2>📦 Mehrfachbearbeitung</h2>
+      <button onclick="BulkEditManager.close()" class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="muted"><span id="bulkSelectedCount">0</span> Beobachtungen ausgewählt</p>
+      
+      <div class="bulk-actions">
+        <h3>Aktion wählen:</h3>
+        <div class="bulk-action-grid">
+          <button onclick="BulkEditManager.changeDate()" class="bulk-action-btn">
+            📅<br>Datum ändern
+          </button>
+          <button onclick="BulkEditManager.changeLocation()" class="bulk-action-btn">
+            📍<br>Standort ändern
+          </button>
+          <button onclick="BulkEditManager.addNote()" class="bulk-action-btn">
+            📝<br>Notiz hinzufügen
+          </button>
+          <button onclick="BulkEditManager.deleteSelected()" class="bulk-action-btn danger">
+            🗑️<br>Löschen
+          </button>
+          <button onclick="BulkEditManager.exportSelected()" class="bulk-action-btn">
+            💾<br>Exportieren
+          </button>
+          <button onclick="BulkEditManager.moveToFolder()" class="bulk-action-btn">
+            📁<br>In Ordner verschieben
+          </button>
+        </div>
+      </div>
+      
+      <div class="selected-list">
+        <h3>Ausgewählte Beobachtungen:</h3>
+        <div id="bulkSelectedList" class="bulk-selected-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ENHANCED STATISTICS MODAL ==================== -->
+<div id="enhancedStatsModal" class="modal" style="display: none;">
+  <div class="modal-content enhanced-stats-modal">
+    <div class="modal-header">
+      <h2>📊 Erweiterte Statistiken</h2>
+      <button onclick="EnhancedStatsManager.close()" class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      
+      <!-- Tab Navigation -->
+      <div class="stats-tabs">
+        <button class="stats-tab active" onclick="EnhancedStatsManager.showTab('overview')">Übersicht</button>
+        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('yearly')">Jahresvergleich</button>
+        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('heatmap')">Heatmap</button>
+        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('milestones')">Meilensteine</button>
+      </div>
+      
+      <!-- Overview Tab -->
+      <div id="statsTabOverview" class="stats-tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🦅</div>
+            <div class="stat-value" id="totalSpecies">-</div>
+            <div class="stat-label">Arten gesamt</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👁️</div>
+            <div class="stat-value" id="totalObservations">-</div>
+            <div class="stat-label">Beobachtungen</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value" id="thisMonthSpecies">-</div>
+            <div class="stat-label">Arten diesen Monat</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value" id="topBird">-</div>
+            <div class="stat-label">Häufigste Art</div>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <h3>Top 10 Arten</h3>
+          <canvas id="topSpeciesChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Yearly Comparison Tab -->
+      <div id="statsTabYearly" class="stats-tab-content" style="display: none;">
+        <div class="year-selector">
+          <button onclick="EnhancedStatsManager.changeYear(-1)">◀</button>
+          <span id="currentYearDisplay">2024</span>
+          <button onclick="EnhancedStatsManager.changeYear(1)">▶</button>
+        </div>
+        
+        <div class="chart-container">
+          <canvas id="yearlyComparisonChart"></canvas>
+        </div>
+        
+        <div class="year-stats">
+          <div class="year-stat-card">
+            <h4 id="yearTitle">2024</h4>
+            <p><strong id="yearSpecies">-</strong> Arten</p>
+            <p><strong id="yearObservations">-</strong> Beobachtungen</p>
+            <p class="year-comparison" id="yearComparison"></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Heatmap Tab -->
+      <div id="statsTabHeatmap" class="stats-tab-content" style="display: none;">
+        <div class="heatmap-controls">
+          <label>
+            <input type="radio" name="heatmapType" value="hour" checked onchange="EnhancedStatsManager.updateHeatmap()">
+            Nach Tageszeit
+          </label>
+          <label>
+            <input type="radio" name="heatmapType" value="month" onchange="EnhancedStatsManager.updateHeatmap()">
+            Nach Monat
+          </label>
+          <label>
+            <input type="radio" name="heatmapType" value="weekday" onchange="EnhancedStatsManager.updateHeatmap()">
+            Nach Wochentag
+          </label>
+        </div>
+        
+        <div class="heatmap-container">
+          <canvas id="heatmapCanvas"></canvas>
+        </div>
+        
+        <div class="heatmap-legend">
+          <span>Weniger</span>
+          <div class="legend-gradient"></div>
+          <span>Mehr</span>
+        </div>
+      </div>
+      
+      <!-- Milestones Tab -->
+      <div id="statsTabMilestones" class="stats-tab-content" style="display: none;">
+        <div class="milestones-container" id="milestonesContainer">
+          <!-- Wird dynamisch gefüllt -->
+        </div>
+        
+        <div class="progress-section">
+          <h3>Lebenslist-Fortschritt</h3>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="lifelistProgress" style="width: 0%"></div>
+          </div>
+          <p class="progress-text" id="lifelistText">-</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
 <!-- Floating Action Button für Quick Add -->
 <button class="fab-quick-add" onclick="openQuickAdd()" title="Schnelleingabe (Strg+Q)">
   ⚡
 </button>
+
+<!-- === NEUE FEATURES: Modals === -->
+
+<!-- Tutorial Overlay -->
+<div id="tutorialOverlay" class="tutorial-overlay" style="display: none;">
+  <div class="tutorial-box">
+    <div class="tutorial-header">
+      <h3 id="tutorialTitle">Willkommen bei BirdCount!</h3>
+      <button onclick="TutorialManager.skip()" class="tutorial-close">✕</button>
+    </div>
+    <div class="tutorial-content">
+      <p id="tutorialText"></p>
+      <div class="tutorial-image" id="tutorialImage"></div>
+    </div>
+    <div class="tutorial-footer">
+      <span id="tutorialProgress">1 / 6</span>
+      <div class="tutorial-buttons">
+        <button onclick="TutorialManager.skip()" class="btn ghost">Überspringen</button>
+        <button onclick="TutorialManager.prev()" id="tutorialPrev" class="btn ghost">Zurück</button>
+        <button onclick="TutorialManager.next()" id="tutorialNext" class="btn">Weiter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip Container -->
+<div id="tooltipContainer" class="tooltip-container" style="display: none;"></div>
+
+<!-- Bulk Edit Modal -->
+<div id="bulkEditModal" class="modal" style="display: none;">
+  <div class="modal-content bulk-edit-modal">
+    <div class="modal-header">
+      <h2>📦 Mehrfachbearbeitung</h2>
+      <button onclick="BulkEditManager.close()" class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="muted"><span id="bulkSelectedCount">0</span> Beobachtungen ausgewählt</p>
+      
+      <div class="bulk-actions">
+        <h3>Aktion wählen:</h3>
+        <div class="bulk-action-grid">
+          <button onclick="BulkEditManager.changeDate()" class="bulk-action-btn">
+            📅<br>Datum ändern
+          </button>
+          <button onclick="BulkEditManager.changeLocation()" class="bulk-action-btn">
+            📍<br>Standort ändern
+          </button>
+          <button onclick="BulkEditManager.addNote()" class="bulk-action-btn">
+            📝<br>Notiz hinzufügen
+          </button>
+          <button onclick="BulkEditManager.deleteSelected()" class="bulk-action-btn danger">
+            🗑️<br>Löschen
+          </button>
+          <button onclick="BulkEditManager.exportSelected()" class="bulk-action-btn">
+            💾<br>Exportieren
+          </button>
+          <button onclick="BulkEditManager.moveToFolder()" class="bulk-action-btn">
+            📁<br>In Ordner verschieben
+          </button>
+        </div>
+      </div>
+      
+      <div class="selected-list">
+        <h3>Ausgewählte Beobachtungen:</h3>
+        <div id="bulkSelectedList" class="bulk-selected-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Statistics Modal -->
+<div id="enhancedStatsModal" class="modal" style="display: none;">
+  <div class="modal-content enhanced-stats-modal">
+    <div class="modal-header">
+      <h2>📊 Erweiterte Statistiken</h2>
+      <button onclick="EnhancedStatsManager.close()" class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      
+      <!-- Tab Navigation -->
+      <div class="stats-tabs">
+        <button class="stats-tab active" onclick="EnhancedStatsManager.showTab('overview')">Übersicht</button>
+        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('yearly')">Jahresvergleich</button>
+        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('heatmap')">Heatmap</button>
+        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('milestones')">Meilensteine</button>
+      </div>
+      
+      <!-- Overview Tab -->
+      <div id="statsTabOverview" class="stats-tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🦅</div>
+            <div class="stat-value" id="totalSpecies">-</div>
+            <div class="stat-label">Arten gesamt</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👁️</div>
+            <div class="stat-value" id="totalObservations">-</div>
+            <div class="stat-label">Beobachtungen</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value" id="thisMonthSpecies">-</div>
+            <div class="stat-label">Arten diesen Monat</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value" id="topBird">-</div>
+            <div class="stat-label">Häufigste Art</div>
+          </div>
+        </div>
+        
+        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px;">
+          <h3 style="margin: 0 0 20px 0;">Top 10 Arten</h3>
+          <canvas id="topSpeciesChart" style="max-height: 400px;"></canvas>
+        </div>
+      </div>
+      
+      <!-- Yearly Comparison Tab -->
+      <div id="statsTabYearly" class="stats-tab-content" style="display: none;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 24px;">
+          <button onclick="EnhancedStatsManager.changeYear(-1)" class="btn ghost">◀</button>
+          <span id="currentYearDisplay" style="font-size: 24px; font-weight: 700; min-width: 100px; text-align: center;">2024</span>
+          <button onclick="EnhancedStatsManager.changeYear(1)" class="btn ghost">▶</button>
+        </div>
+        
+        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+          <canvas id="yearlyComparisonChart" style="max-height: 400px;"></canvas>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+          <div style="background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px;">
+            <h4 id="yearTitle" style="margin: 0 0 16px 0;">2024</h4>
+            <p style="margin: 8px 0;"><strong id="yearSpecies" style="color: var(--accent); font-size: 20px;">-</strong> Arten</p>
+            <p style="margin: 8px 0;"><strong id="yearObservations" style="color: var(--accent); font-size: 20px;">-</strong> Beobachtungen</p>
+            <p id="yearComparison" class="muted" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.04);"></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Heatmap Tab -->
+      <div id="statsTabHeatmap" class="stats-tab-content" style="display: none;">
+        <div style="display: flex; gap: 20px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
+            <input type="radio" name="heatmapType" value="hour" checked onchange="EnhancedStatsManager.updateHeatmap(this.value)">
+            Nach Tageszeit
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
+            <input type="radio" name="heatmapType" value="month" onchange="EnhancedStatsManager.updateHeatmap(this.value)">
+            Nach Monat
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
+            <input type="radio" name="heatmapType" value="weekday" onchange="EnhancedStatsManager.updateHeatmap(this.value)">
+            Nach Wochentag
+          </label>
+        </div>
+        
+        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; display: flex; justify-content: center; align-items: center; min-height: 400px;">
+          <canvas id="heatmapCanvas" style="max-width: 100%; height: auto;"></canvas>
+        </div>
+        
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; font-size: 13px; color: var(--muted);">
+          <span>Weniger</span>
+          <div style="width: 200px; height: 20px; border-radius: 10px; background: linear-gradient(90deg, rgba(6,182,212,0.1), rgba(6,182,212,0.3), rgba(6,182,212,0.6), rgba(6,182,212,1)); border: 1px solid rgba(255,255,255,0.1);"></div>
+          <span>Mehr</span>
+        </div>
+      </div>
+      
+      <!-- Milestones Tab -->
+      <div id="statsTabMilestones" class="stats-tab-content" style="display: none;">
+        <div id="milestonesContainer"></div>
+        
+        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; margin-top: 24px;">
+          <h3 style="margin: 0 0 16px 0;">Lebenslist-Fortschritt</h3>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="lifelistProgress" style="width: 0%"></div>
+          </div>
+          <p id="lifelistText" style="margin-top: 12px; text-align: center; color: var(--soft);"></p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<script>
+
+// Auto-Initialize
+setTimeout(() => {
+  TutorialManager.init();
+  TooltipManager.init();
+  BulkEditManager.init();
+}, 1000);
+
+// ===== NEUE FUNKTIONALITÄT: Erstbeobachtungs-Details =====
+
+// Globale Variable zum Speichern der Beobachtungen pro Label
+window.chartObservationsByLabel = {};
+
+// Funktion zum Anzeigen der Erstbeobachtungen für ein bestimmtes Label
+function showFirstSightingsForLabel(labelIndex, chartInstance) {
+  console.log('🔍 showFirstSightingsForLabel aufgerufen mit Index:', labelIndex);
+  console.log('📊 Chart Labels:', chartInstance.data.labels);
+  
+  const label = chartInstance.data.labels[labelIndex];
+  console.log('🏷️ Ausgewähltes Label:', label);
+  console.log('📦 Verfügbare Labels in chartObservationsByLabel:', Object.keys(window.chartObservationsByLabel));
+  
+  const observations = window.chartObservationsByLabel[label] || [];
+  console.log('🐦 Gefundene Beobachtungen:', observations.length, observations);
+  
+  if (observations.length === 0) {
+    console.warn('⚠️ Keine Beobachtungen für dieses Label gefunden!');
+    alert(`Keine Erstbeobachtungen für "${label}" gefunden.\n\nVerfügbare Labels: ${Object.keys(window.chartObservationsByLabel).join(', ')}`);
+    return;
+  }
+  
+  // Modal öffnen
+  const modal = document.getElementById('firstSightingsDetailModal');
+  const title = document.getElementById('firstSightingsDetailTitle');
+  const subtitle = document.getElementById('firstSightingsDetailSubtitle');
+  const content = document.getElementById('firstSightingsDetailContent');
+  
+  console.log('🎯 Modal-Elemente:', {modal, title, subtitle, content});
+  
+  if (!modal || !title || !subtitle || !content) {
+    console.error('❌ Modal-Elemente nicht gefunden!');
+    alert('Fehler: Modal-Elemente wurden nicht gefunden. Bitte Seite neu laden.');
+    return;
+  }
+  
+  title.textContent = `Erstbeobachtungen: ${label}`;
+  subtitle.textContent = `${observations.length} neue Art${observations.length !== 1 ? 'en' : ''}`;
+  
+  // Content erstellen
+  content.innerHTML = '';
+  
+  console.log('📝 Erstelle Content für', observations.length, 'Beobachtungen...');
+  
+  observations.forEach((obs, index) => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.04));
+      border: 1px solid rgba(6,182,212,0.2);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    `;
+    
+    card.onmouseover = () => {
+      card.style.transform = 'translateY(-2px)';
+      card.style.boxShadow = '0 6px 20px rgba(6,182,212,0.3)';
+    };
+    card.onmouseout = () => {
+      card.style.transform = 'translateY(0)';
+      card.style.boxShadow = 'none';
+    };
+    
+    const emoji = getBirdEmoji(obs.bird);
+    
+    card.innerHTML = `
+      <div style="font-size: 32px; flex-shrink: 0;">${emoji}</div>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 4px;">
+          ${obs.bird}
+        </div>
+        <div style="font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap;">
+          <span>📅 ${formatDateForDisplay(obs.date)}</span>
+          ${obs.location ? `<span>📍 ${obs.location}</span>` : ''}
+          ${obs.count ? `<span>🔢 ${obs.count}×</span>` : ''}
+        </div>
+        ${obs.notes ? `<div style="font-size: 12px; color: var(--soft); margin-top: 6px; font-style: italic;">"${obs.notes}"</div>` : ''}
+      </div>
+      ${obs.userName ? `<div style="font-size: 11px; color: var(--muted); background: rgba(6,182,212,0.1); padding: 4px 8px; border-radius: 6px;">👤 ${obs.userName}</div>` : ''}
+    `;
+    
+    // Klick führt zur Beobachtungsansicht
+    card.onclick = (e) => {
+      e.stopPropagation();
+      // Schließe das Modal
+      modal.style.display = 'none';
+      // Navigiere zur Hauptseite und zeige die Beobachtung
+      showPage('home');
+      // Scrolle zur Beobachtung oder öffne Details
+      // (könnte hier noch weiter implementiert werden)
+    };
+    
+    content.appendChild(card);
+  });
+  
+  console.log('✅ Content erstellt. Zeige jetzt Modal...');
+  console.log('   Modal vor dem Anzeigen:', {
+    display: modal.style.display,
+    visibility: window.getComputedStyle(modal).visibility,
+    opacity: window.getComputedStyle(modal).opacity,
+    zIndex: window.getComputedStyle(modal).zIndex
+  });
+  
+  // Force display
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  
+  console.log('   Modal nach dem Anzeigen:', {
+    display: modal.style.display,
+    visibility: window.getComputedStyle(modal).visibility,
+    opacity: window.getComputedStyle(modal).opacity,
+    zIndex: window.getComputedStyle(modal).zIndex
+  });
+  
+  console.log('✅ Modal sollte jetzt sichtbar sein!');
+}
+
+// Hilfsfunktion um Vogel-Emoji zu bekommen
+function getBirdEmoji(birdName) {
+  const emojiMap = {
+    'Amsel': '🐦',
+    'Blaumeise': '💙',
+    'Kohlmeise': '🖤',
+    'Rotkehlchen': '🔴',
+    'Star': '⭐',
+    'Spatz': '🐦',
+    'Haussperling': '🏠',
+    'Feldsperling': '🌾',
+    'Buchfink': '📘',
+    'Grünfink': '💚',
+    'Elster': '🔲',
+    'Eichelhäher': '🌰',
+    'Zaunkönig': '👑',
+    'Buntspecht': '🔴',
+    'Rotmilan': '🪁',
+    'Mäusebussard': '🦅',
+    'Turmfalke': '🏰'
+  };
+  return emojiMap[birdName] || '🐦';
+}
+
+</script>
+
+<!-- Modal für Erstbeobachtungs-Details -->
+<div id="firstSightingsDetailModal" class="modal-overlay">
+  <div style="background: var(--card); padding: 24px; border-radius: 16px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; border: 1px solid rgba(6,182,212,0.3); box-shadow: 0 20px 60px rgba(6,182,212,0.3);">
+    <button onclick="document.getElementById('firstSightingsDetailModal').style.display='none'" style="position: absolute; top: 12px; right: 12px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 28px; line-height: 1; padding: 4px 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">×</button>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 18px rgba(6,182,212,0.4);">📊</div>
+      <div>
+        <h3 id="firstSightingsDetailTitle" style="margin: 0; font-size: 20px; color: var(--text); font-weight: 700;"></h3>
+        <p id="firstSightingsDetailSubtitle" style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);"></p>
+      </div>
+    </div>
+    <div id="firstSightingsDetailContent" style="display: flex; flex-direction: column; gap: 10px;"></div>
+  </div>
+</div>
 
 </body>
 </html>
