@@ -5487,6 +5487,39 @@
       }
     }
     
+    /* ULTRA-AGGRESSIVE: Force ALL grids to single column on mobile */
+    @media (max-width: 700px) {
+      /* Target all divs with grid display */
+      div[style*="display:grid"],
+      div[style*="display: grid"],
+      [style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Specific IDs */
+      #memberComparisonGrid,
+      #observationLeaderboard,
+      #speciesLeaderboard,
+      #availableChallengesGrid,
+      #rarityLeaderboard2026,
+      #achievementLeaderboard,
+      #speciesDatabase,
+      #listsGrid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Any element with a class that contains 'grid' */
+      [class*="grid"] {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .comparison-grid,
+      .stats-grid,
+      .card-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -28007,6 +28040,74 @@ function getBirdEmoji(birdName) {
   };
   return emojiMap[birdName] || '🐦';
 }
+
+// MOBILE GRID FIX - Force all grids to single column on mobile
+function fixMobileGrids() {
+  const isMobile = window.innerWidth <= 700;
+  
+  if (isMobile) {
+    // Find all elements with grid display
+    const allElements = document.querySelectorAll('*');
+    
+    allElements.forEach(el => {
+      const style = window.getComputedStyle(el);
+      const inlineStyle = el.getAttribute('style') || '';
+      
+      // Check if element uses CSS Grid
+      if (style.display === 'grid' || inlineStyle.includes('display:grid') || inlineStyle.includes('display: grid')) {
+        // Force single column by setting the property directly
+        el.style.setProperty('grid-template-columns', '1fr', 'important');
+      }
+    });
+    
+    console.log('📱 Mobile grid fix applied to', document.querySelectorAll('[style*="grid"]').length, 'elements');
+  }
+}
+
+// Run on page load
+window.addEventListener('DOMContentLoaded', () => {
+  fixMobileGrids();
+  console.log('📱 Initial mobile grid fix completed');
+});
+
+// Run after a short delay to catch dynamically loaded content
+setTimeout(fixMobileGrids, 500);
+setTimeout(fixMobileGrids, 1000);
+setTimeout(fixMobileGrids, 2000);
+
+// Run on resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(fixMobileGrids, 250);
+});
+
+// Run whenever content changes (use MutationObserver)
+const observer = new MutationObserver((mutations) => {
+  if (window.innerWidth <= 700) {
+    // Only run if grids were added
+    let shouldFix = false;
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (node.nodeType === 1) { // Element node
+          const style = node.getAttribute?.('style') || '';
+          if (style.includes('grid')) {
+            shouldFix = true;
+          }
+        }
+      });
+    });
+    
+    if (shouldFix) {
+      fixMobileGrids();
+    }
+  }
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
 
 </script>
 
