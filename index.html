@@ -519,7 +519,7 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      z-index: 10001; /* HÖHER als Sidebar (z-index: 1000) und Overlay (z-index: 999) */
+      z-index: 10002 !important; /* HÖCHSTE Ebene: über Sidebar (10001) und Overlay (10000) */
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border: none;
       border-radius: 12px;
@@ -528,7 +528,7 @@
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
-      pointer-events: auto;
+      pointer-events: auto !important; /* WICHTIG: Immer klickbar */
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
@@ -592,7 +592,7 @@
       height: 100vh;
       background: rgba(0,0,0,0.8);
       backdrop-filter: blur(4px);
-      z-index: 999;
+      z-index: 10000; /* WICHTIG: Unter der Sidebar (10001) aber über allem anderen */
       opacity: 0;
       transition: opacity 0.3s ease;
       -webkit-backdrop-filter: blur(4px);
@@ -630,7 +630,7 @@
         top: 0;
         left: 0;
         height: 100vh;
-        z-index: 1000;
+        z-index: 10001 !important; /* WICHTIG: Höher als Overlay (10000) */
         width: 280px;
         max-width: 70vw;
         overflow-y: auto;
