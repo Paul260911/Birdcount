@@ -625,42 +625,22 @@
         height: 100vh;
         z-index: 1000;
         width: 280px;
-        max-width: 70vw;
+        max-width: 70vw; /* REDUZIERT von 85vw auf 70vw für besseres Hochformat */
         overflow-y: auto;
-        overflow-x: hidden; /* WICHTIG: Verhindert horizontales Scrollen */
-        transform: translateX(-105%) !important; /* -105% statt -100% = KOMPLETT versteckt */
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth fade */
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
-        /* Verbessertes Touch-Scrolling */
+        /* Verbessertes Scrolling auf iOS */
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
-        touch-action: pan-y; /* NUR vertikales Scrollen erlaubt */
         border-radius: 0;
         margin: 0;
-        padding: 12px;
-        pointer-events: none; /* Nicht klickbar wenn versteckt */
-        visibility: hidden; /* Versteckt für Screen Reader */
-        opacity: 0; /* Zusätzlich unsichtbar */
+        padding: 12px; /* Reduziert von 18px */
       }
       
       .sidebar.mobile-visible {
-        transform: translateX(0) !important; /* Sidebar wird sichtbar */
-        pointer-events: auto; /* Klickbar wenn sichtbar */
-        visibility: visible; /* Sichtbar für Screen Reader */
-        opacity: 1; /* Vollständig sichtbar */
-      }
-      
-      /* WICHTIG: Verhindere versehentliche Klicks beim Scrollen in Sidebar */
-      .sidebar button,
-      .sidebar a,
-      .sidebar .section,
-      .sidebar [onclick] {
-        touch-action: manipulation;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent;
+        transform: translateX(0);
       }
       
       /* MOBILE: Kompaktere Brand-Section */
@@ -692,11 +672,6 @@
         padding: 8px 10px;
         font-size: 14px;
         min-height: auto;
-        /* Verhindere versehentliche Klicks beim Scrollen */
-        touch-action: manipulation; /* Optimiert Touch-Events */
-        user-select: none; /* Verhindert Text-Selection beim Scrollen */
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent; /* Entfernt Flash-Effekt */
       }
       
       .sidebar .nav button span:first-child {
@@ -12152,6 +12127,72 @@
     
     // Falls du die alte Methode bevorzugst, auskommentieren:
     /*
+    document.querySelectorAll('.nav button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        // Mobile Menü schließen wenn auf Navigation geklickt wird
+        if (window.innerWidth <= 700) {
+          closeMobileMenu();
+        }
+        
+        // Beim Wechseln der Seite temporäre Daten löschen, wenn wir nicht zur Karte gehen
+        const page = btn.getAttribute('data-page');
+        if (page !== 'karte') {
+          tempObservationData = null;
+        }
+        
+        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        if (page === 'karte') {
+          document.documentElement.classList.add('map-full');
+        } else {
+          document.documentElement.classList.remove('map-full');
+        }
+
+        document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
+        const el = document.getElementById(page);
+        if (el) el.style.display = 'block';
+
+        if (page === 'diagramme') {
+          updateYearSelection();
+          await initMemberFilter(); // Mitglieder-Filter initialisieren
+          updateChart();
+        } else if (page === 'statistiken') {
+          updateAdvancedStatistics();
+        } else if (page === 'beobachtungen') {
+          await renderObservationManager();
+        } else if (page === 'eingabe') {
+          // NEU: Ordnerauswahl aktualisieren
+          await initFolderSelect();
+          // NEU: Koordinaten-Anzeige aktualisieren
+          updateMapCoordinatesDisplay();
+        } else if (page === 'listen') {
+          await loadUserLists();
+          await renderLists();
+        } else if (page === 'arten') {
+          loadSpeciesDatabase();
+        } else if (page === 'tools') {
+          updateSystemInfo();
+        } else if (page === 'group-compare') {
+          await renderGroupComparison();
+        } else if (page === 'home') {
+          updateDashboard();
+        } else if (page === 'challenges') {
+          // Challenge-Daten laden und anzeigen
+          await loadChallengeProgress();
+          await loadCustomChallenges(); // NEU: Lade benutzerdefinierte Challenges
+          updateChallengeDisplay();
+          await renderChallenges();
+        }
+
+        setTimeout(() => {
+          if (window.mapObj && typeof window.mapObj.invalidateSize === 'function') {
+            window.mapObj.invalidateSize();
+          }
+        }, 220);
+      });
+    });
+    */ // Ende des alten Navigation-Codes (auskommentiert)
     
     // ==================== NAVIGATION (ENDE) ====================
 
@@ -19353,16 +19394,17 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
   
-  // PERFORMANCE-OPTIMIERUNG: Event Delegation für Navigation
+  // PERFORMANCE-OPTIMIERUNG: Event Delegation für Navigation mit Touch-Schutz
   const navContainer = document.querySelector('.nav');
   if (navContainer) {
-    // Touch-Event-System: unterscheidet Swipe von Click
+    // Touch-Event-System: unterscheidet Swipe von echtem Click
     let touchStartY = 0;
     let touchStartX = 0;
     let touchStartTime = 0;
     let isSwiping = false;
     let touchedButton = null;
     
+    // Speichere Touch-Start-Position
     navContainer.addEventListener('touchstart', function(e) {
       const button = e.target.closest('button');
       if (!button) return;
@@ -19374,6 +19416,7 @@ document.addEventListener('DOMContentLoaded', function() {
       isSwiping = false;
     }, { passive: true });
     
+    // Erkenne Bewegung als Swipe
     navContainer.addEventListener('touchmove', function(e) {
       if (!isSwiping && touchedButton) {
         const touchCurrentY = e.touches[0].clientY;
@@ -19384,11 +19427,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Wenn mehr als 10px Bewegung → ist ein Swipe
         if (deltaY > 10 || deltaX > 10) {
           isSwiping = true;
+          console.log('🚫 Swipe erkannt - Click wird verhindert');
         }
       }
     }, { passive: true });
     
-    // Nutze click Event statt pointerdown für bessere Touch-Unterscheidung
+    // Nutze click Event (nicht pointerdown!) für bessere Touch-Unterscheidung
     navContainer.addEventListener('click', function(e) {
       const button = e.target.closest('button');
       if (!button) return;
@@ -19397,16 +19441,20 @@ document.addEventListener('DOMContentLoaded', function() {
       if (isSwiping) {
         e.preventDefault();
         e.stopPropagation();
+        console.log('❌ Click blockiert - war Swipe');
         return;
       }
       
-      // Verhindere zu schnelle Klicks (< 50ms = wahrscheinlich Scroll)
+      // Verhindere zu schnelle Klicks (< 80ms = wahrscheinlich Scroll-Start)
       const touchDuration = Date.now() - touchStartTime;
-      if (touchDuration < 50 && touchStartTime > 0) {
+      if (touchDuration < 80 && touchStartTime > 0) {
         e.preventDefault();
         e.stopPropagation();
+        console.log('❌ Click blockiert - zu schnell (<80ms)');
         return;
       }
+      
+      console.log('✅ Echter Click erkannt -', touchDuration + 'ms');
       
       // INSTANT UI-Update
       // Mobile Menü schließen
@@ -19428,19 +19476,20 @@ document.addEventListener('DOMContentLoaded', function() {
       // Map-Full Mode für Karte - INSTANT
       if (page === 'karte') {
         document.documentElement.classList.add('map-full');
+        // Karte ist im aside-Element, nicht in einer section
+        // Verstecke alle sections wenn Karte aktiv ist
+        document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
       } else {
         document.documentElement.classList.remove('map-full');
+        // Sections umschalten - INSTANT ohne Animation
+        document.querySelectorAll('main section').forEach(s => {
+          if (s.id === page) {
+            s.style.display = 'block';
+          } else {
+            s.style.display = 'none';
+          }
+        });
       }
-      
-      // Sections umschalten - INSTANT ohne Animation
-      document.querySelectorAll('main section').forEach(s => {
-        if (s.id === page) {
-          s.style.display = 'block';
-          // Keine Animation mehr
-        } else {
-          s.style.display = 'none';
-        }
-      });
       
       log('Navigation:', page);
       
@@ -25929,24 +25978,14 @@ function initMobileView() {
     // WICHTIG: Stelle sicher, dass Sidebar geschlossen ist
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('mobileOverlay');
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    
     if (sidebar) {
       sidebar.classList.remove('mobile-visible');
     }
     if (overlay) {
       overlay.classList.remove('active');
     }
-    if (menuBtn) {
-      menuBtn.classList.remove('menu-open');
-      menuBtn.setAttribute('aria-label', 'Menü öffnen');
-      menuBtn.setAttribute('aria-expanded', 'false');
-    }
-    
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
-    
-    console.log('✅ Mobile View initialisiert - Sidebar geschlossen');
     
     // Stelle sicher, dass home-Section sichtbar ist
     const homeSection = document.getElementById('home');
