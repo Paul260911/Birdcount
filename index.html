@@ -590,7 +590,7 @@
         height: 100vh;
         z-index: 1000;
         width: 280px;
-        max-width: 85vw;
+        max-width: 70vw; /* REDUZIERT von 85vw auf 70vw für besseres Hochformat */
         overflow-y: auto;
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -601,10 +601,57 @@
         overscroll-behavior: contain;
         border-radius: 0;
         margin: 0;
+        padding: 12px; /* Reduziert von 18px */
       }
       
       .sidebar.mobile-visible {
         transform: translateX(0);
+      }
+      
+      /* MOBILE: Kompaktere Brand-Section */
+      .sidebar .brand {
+        margin-bottom: 8px;
+      }
+      
+      .sidebar .brand .logo {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+      
+      .sidebar .brand h1 {
+        font-size: 14px;
+      }
+      
+      .sidebar .brand p {
+        font-size: 11px;
+      }
+      
+      /* MOBILE: Kompaktere Navigation */
+      .sidebar .nav {
+        gap: 4px;
+        margin-top: 8px;
+      }
+      
+      .sidebar .nav button {
+        padding: 8px 10px;
+        font-size: 14px;
+        min-height: auto;
+      }
+      
+      .sidebar .nav button span:first-child {
+        font-size: 18px;
+      }
+      
+      /* MOBILE: Actions kompakter */
+      .sidebar .actions {
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+      
+      .sidebar .actions .btn {
+        font-size: 12px;
+        padding: 8px 10px;
       }
       
       /* Verhindere Scrollen wenn Sidebar offen */
@@ -1240,6 +1287,39 @@
         gap: 12px;
       }
       
+      /* SIDEBAR - Extra kompakt für sehr kleine Bildschirme */
+      .sidebar {
+        max-width: 65vw !important; /* Noch schmaler auf sehr kleinen Screens */
+        padding: 10px !important;
+      }
+      
+      .sidebar .brand .logo {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+      }
+      
+      .sidebar .brand h1 {
+        font-size: 13px !important;
+      }
+      
+      .sidebar .brand p {
+        font-size: 10px !important;
+      }
+      
+      .sidebar .nav {
+        gap: 2px !important;
+      }
+      
+      .sidebar .nav button {
+        padding: 6px 8px !important;
+        font-size: 13px !important;
+      }
+      
+      .sidebar .nav button span:first-child {
+        font-size: 16px !important;
+      }
+      
       .mobile-menu-btn {
         top: 12px;
         left: 12px;
@@ -1301,6 +1381,40 @@
       /* Map kleiner */
       #map {
         height: 280px;
+      }
+    }
+    
+    /* Mobile Landscape Optimierung - Querformat */
+    @media (max-width: 900px) and (orientation: landscape) {
+      .sidebar {
+        max-width: 50vw !important; /* Im Querformat noch schmaler */
+        padding: 10px !important;
+      }
+      
+      .sidebar .brand .logo {
+        width: 32px !important;
+        height: 32px !important;
+      }
+      
+      .sidebar .brand h1 {
+        font-size: 13px !important;
+      }
+      
+      .sidebar .brand p {
+        display: none; /* Untertitel verstecken im Querformat */
+      }
+      
+      .sidebar .nav {
+        gap: 2px !important;
+      }
+      
+      .sidebar .nav button {
+        padding: 6px 8px !important;
+        font-size: 13px !important;
+      }
+      
+      .sidebar .actions {
+        margin-top: 6px !important;
       }
     }
 
