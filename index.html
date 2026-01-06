@@ -625,26 +625,42 @@
         height: 100vh;
         z-index: 1000;
         width: 280px;
-        max-width: 70vw; /* REDUZIERT von 85vw auf 70vw für besseres Hochformat */
+        max-width: 70vw;
         overflow-y: auto;
-        transform: translateX(-100%) !important; /* WICHTIG: Sidebar ist standardmäßig versteckt */
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-x: hidden; /* WICHTIG: Verhindert horizontales Scrollen */
+        transform: translateX(-105%) !important; /* -105% statt -100% = KOMPLETT versteckt */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth fade */
         box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
-        /* Verbessertes Scrolling auf iOS */
+        /* Verbessertes Touch-Scrolling */
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
+        touch-action: pan-y; /* NUR vertikales Scrollen erlaubt */
         border-radius: 0;
         margin: 0;
-        padding: 12px; /* Reduziert von 18px */
+        padding: 12px;
         pointer-events: none; /* Nicht klickbar wenn versteckt */
-        visibility: hidden; /* Zusätzlich für Screen Reader */
+        visibility: hidden; /* Versteckt für Screen Reader */
+        opacity: 0; /* Zusätzlich unsichtbar */
       }
       
       .sidebar.mobile-visible {
         transform: translateX(0) !important; /* Sidebar wird sichtbar */
         pointer-events: auto; /* Klickbar wenn sichtbar */
         visibility: visible; /* Sichtbar für Screen Reader */
+        opacity: 1; /* Vollständig sichtbar */
+      }
+      
+      /* WICHTIG: Verhindere versehentliche Klicks beim Scrollen in Sidebar */
+      .sidebar button,
+      .sidebar a,
+      .sidebar .section,
+      .sidebar [onclick] {
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
       
       /* MOBILE: Kompaktere Brand-Section */
@@ -676,6 +692,11 @@
         padding: 8px 10px;
         font-size: 14px;
         min-height: auto;
+        /* Verhindere versehentliche Klicks beim Scrollen */
+        touch-action: manipulation; /* Optimiert Touch-Events */
+        user-select: none; /* Verhindert Text-Selection beim Scrollen */
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent; /* Entfernt Flash-Effekt */
       }
       
       .sidebar .nav button span:first-child {
