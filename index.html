@@ -625,42 +625,22 @@
         height: 100vh;
         z-index: 1000;
         width: 280px;
-        max-width: 70vw;
+        max-width: 70vw; /* REDUZIERT von 85vw auf 70vw für besseres Hochformat */
         overflow-y: auto;
-        overflow-x: hidden; /* WICHTIG: Verhindert horizontales Scrollen */
-        transform: translateX(-105%) !important; /* -105% statt -100% = KOMPLETT versteckt */
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth fade */
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
-        /* Verbessertes Touch-Scrolling */
+        /* Verbessertes Scrolling auf iOS */
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
-        touch-action: pan-y; /* NUR vertikales Scrollen erlaubt */
         border-radius: 0;
         margin: 0;
-        padding: 12px;
-        pointer-events: none; /* Nicht klickbar wenn versteckt */
-        visibility: hidden; /* Versteckt für Screen Reader */
-        opacity: 0; /* Zusätzlich unsichtbar */
+        padding: 12px; /* Reduziert von 18px */
       }
       
       .sidebar.mobile-visible {
-        transform: translateX(0) !important; /* Sidebar wird sichtbar */
-        pointer-events: auto; /* Klickbar wenn sichtbar */
-        visibility: visible; /* Sichtbar für Screen Reader */
-        opacity: 1; /* Vollständig sichtbar */
-      }
-      
-      /* WICHTIG: Verhindere versehentliche Klicks beim Scrollen in Sidebar */
-      .sidebar button,
-      .sidebar a,
-      .sidebar .section,
-      .sidebar [onclick] {
-        touch-action: manipulation;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent;
+        transform: translateX(0);
       }
       
       /* MOBILE: Kompaktere Brand-Section */
@@ -692,11 +672,6 @@
         padding: 8px 10px;
         font-size: 14px;
         min-height: auto;
-        /* Verhindere versehentliche Klicks beim Scrollen */
-        touch-action: manipulation; /* Optimiert Touch-Events */
-        user-select: none; /* Verhindert Text-Selection beim Scrollen */
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent; /* Entfernt Flash-Effekt */
       }
       
       .sidebar .nav button span:first-child {
@@ -19419,15 +19394,69 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
   
-  // PERFORMANCE-OPTIMIERUNG: Event Delegation für Navigation
+  // PERFORMANCE-OPTIMIERUNG: Event Delegation für Navigation mit Touch-Schutz
   const navContainer = document.querySelector('.nav');
   if (navContainer) {
-    // Nutze pointer Events (schneller als click)
-    navContainer.addEventListener('pointerdown', function(e) {
+    // Touch-Event-System: unterscheidet Swipe von echtem Click
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let touchStartTime = 0;
+    let isSwiping = false;
+    let touchedButton = null;
+    
+    // Speichere Touch-Start-Position
+    navContainer.addEventListener('touchstart', function(e) {
       const button = e.target.closest('button');
       if (!button) return;
       
-      // INSTANT UI-Update ohne requestAnimationFrame
+      touchedButton = button;
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      touchStartTime = Date.now();
+      isSwiping = false;
+    }, { passive: true });
+    
+    // Erkenne Bewegung als Swipe
+    navContainer.addEventListener('touchmove', function(e) {
+      if (!isSwiping && touchedButton) {
+        const touchCurrentY = e.touches[0].clientY;
+        const touchCurrentX = e.touches[0].clientX;
+        const deltaY = Math.abs(touchCurrentY - touchStartY);
+        const deltaX = Math.abs(touchCurrentX - touchStartX);
+        
+        // Wenn mehr als 10px Bewegung → ist ein Swipe
+        if (deltaY > 10 || deltaX > 10) {
+          isSwiping = true;
+          console.log('🚫 Swipe erkannt - Click wird verhindert');
+        }
+      }
+    }, { passive: true });
+    
+    // Nutze click Event (nicht pointerdown!) für bessere Touch-Unterscheidung
+    navContainer.addEventListener('click', function(e) {
+      const button = e.target.closest('button');
+      if (!button) return;
+      
+      // Verhindere Click wenn es ein Swipe war
+      if (isSwiping) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('❌ Click blockiert - war Swipe');
+        return;
+      }
+      
+      // Verhindere zu schnelle Klicks (< 80ms = wahrscheinlich Scroll-Start)
+      const touchDuration = Date.now() - touchStartTime;
+      if (touchDuration < 80 && touchStartTime > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('❌ Click blockiert - zu schnell (<80ms)');
+        return;
+      }
+      
+      console.log('✅ Echter Click erkannt -', touchDuration + 'ms');
+      
+      // INSTANT UI-Update
       // Mobile Menü schließen
       if (window.innerWidth <= 700) {
         closeMobileMenu();
@@ -19447,25 +19476,26 @@ document.addEventListener('DOMContentLoaded', function() {
       // Map-Full Mode für Karte - INSTANT
       if (page === 'karte') {
         document.documentElement.classList.add('map-full');
+        // Karte ist im aside-Element, nicht in einer section
+        // Verstecke alle sections wenn Karte aktiv ist
+        document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
       } else {
         document.documentElement.classList.remove('map-full');
+        // Sections umschalten - INSTANT ohne Animation
+        document.querySelectorAll('main section').forEach(s => {
+          if (s.id === page) {
+            s.style.display = 'block';
+          } else {
+            s.style.display = 'none';
+          }
+        });
       }
-      
-      // Sections umschalten - INSTANT ohne Animation
-      document.querySelectorAll('main section').forEach(s => {
-        if (s.id === page) {
-          s.style.display = 'block';
-          // Keine Animation mehr
-        } else {
-          s.style.display = 'none';
-        }
-      });
       
       log('Navigation:', page);
       
       // Lade Section-spezifische Daten asynchron (nicht-blockierend)
       loadPageData(page);
-    }, { passive: true });
+    });
   }
   
   // PERFORMANCE-OPTIMIERUNG: Theme-Switcher mit Event Delegation
@@ -25948,24 +25978,14 @@ function initMobileView() {
     // WICHTIG: Stelle sicher, dass Sidebar geschlossen ist
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('mobileOverlay');
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    
     if (sidebar) {
       sidebar.classList.remove('mobile-visible');
     }
     if (overlay) {
       overlay.classList.remove('active');
     }
-    if (menuBtn) {
-      menuBtn.classList.remove('menu-open');
-      menuBtn.setAttribute('aria-label', 'Menü öffnen');
-      menuBtn.setAttribute('aria-expanded', 'false');
-    }
-    
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
-    
-    console.log('✅ Mobile View initialisiert - Sidebar geschlossen');
     
     // Stelle sicher, dass home-Section sichtbar ist
     const homeSection = document.getElementById('home');
