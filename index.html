@@ -26098,6 +26098,7 @@ window.updateSystemInfo = updateSystemInfo;
 
 // ==================== MOBILE MENU FUNCTIONS ====================
 function toggleMobileMenu() {
+  alert('🍔 toggleMobileMenu wurde aufgerufen!'); // DEBUG
   console.log('🍔 toggleMobileMenu aufgerufen');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('mobileOverlay');
@@ -26138,6 +26139,7 @@ function toggleMobileMenu() {
       console.log('Menü geschlossen - Scrollen erlaubt');
     }
   } else {
+    alert('❌ Elemente nicht gefunden! Sidebar:' + !!sidebar + ' Overlay:' + !!overlay + ' Button:' + !!menuBtn);
     console.error('❌ Sidebar, Overlay oder Button nicht gefunden!');
   }
 }
