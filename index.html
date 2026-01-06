@@ -933,6 +933,15 @@
         font-size: 18px !important;
       }
       
+      #group-compare > div:first-child > div {
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      
+      #group-compare > div:first-child > div > div:first-child {
+        font-size: 28px !important;
+      }
+      
       #group-compare > div:first-child .muted,
       #group-compare > div:first-child p {
         font-size: 11px !important;
@@ -946,19 +955,26 @@
         padding: 8px !important;
         gap: 6px !important;
         margin-bottom: 12px !important;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+      }
+      
+      #group-compare > div:nth-child(2)::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Opera */
       }
       
       #group-compare .small-btn {
-        min-width: 100px !important;
+        min-width: 90px !important;
         flex-shrink: 0 !important;
         padding: 8px 10px !important;
-        font-size: 12px !important;
+        font-size: 11px !important;
         white-space: nowrap !important;
       }
       
       /* Grid Layouts auf Mobile - immer 1 Spalte */
       #group-compare [style*="grid-template-columns"] {
         grid-template-columns: 1fr !important;
+        gap: 12px !important;
       }
       
       /* Leaderboard Cards kompakter */
@@ -967,20 +983,59 @@
         margin-bottom: 12px !important;
       }
       
+      #group-compare .card h2 {
+        font-size: 18px !important;
+        margin-bottom: 8px !important;
+      }
+      
       #group-compare .card h3 {
-        font-size: 16px !important;
+        font-size: 15px !important;
+        margin-bottom: 8px !important;
       }
       
       #group-compare .card h4 {
-        font-size: 14px !important;
-      }
-      
-      /* User/Member Cards im Leaderboard */
-      #group-compare .card > div > div {
-        padding: 10px !important;
         font-size: 13px !important;
       }
       
+      /* User/Member Cards im Leaderboard */
+      #group-compare .card [style*="padding:16px"] {
+        padding: 10px !important;
+      }
+      
+      /* User Card Content */
+      #group-compare .card [style*="font-size:16px"] {
+        font-size: 14px !important;
+      }
+      
+      #group-compare .card [style*="font-size:32px"] {
+        font-size: 24px !important;
+        min-width: 40px !important;
+      }
+      
+      /* Stats im User Card */
+      #group-compare .card [style*="font-size:13px"] {
+        font-size: 11px !important;
+        gap: 8px !important;
+      }
+      
+      /* Gruppen-Statistiken Overview */
+      #groupStatsOverview > div {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Detaillierter Vergleich - Balken */
+      #group-compare [style*="height:40px"],
+      #group-compare [style*="height:30px"] {
+        height: 30px !important;
+        font-size: 11px !important;
+      }
+      
+      /* Fortschrittsbalken kompakter */
+      #group-compare [style*="background:linear-gradient(90deg"] {
+        min-height: 24px !important;
+      }
+      
+
 
       /* Observation Manager auf Mobile */
       .person-accordion-header {
@@ -26069,14 +26124,24 @@ function initMobileView() {
     // WICHTIG: Stelle sicher, dass Sidebar geschlossen ist
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('mobileOverlay');
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    
     if (sidebar) {
       sidebar.classList.remove('mobile-visible');
     }
     if (overlay) {
       overlay.classList.remove('active');
     }
+    if (menuBtn) {
+      menuBtn.classList.remove('menu-open');
+      menuBtn.setAttribute('aria-label', 'Menü öffnen');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+    
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
+    
+    console.log('✅ Mobile View initialisiert - Sidebar geschlossen');
     
     // Stelle sicher, dass home-Section sichtbar ist
     const homeSection = document.getElementById('home');
