@@ -519,7 +519,7 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      z-index: 1001;
+      z-index: 1002; /* Höher als Sidebar */
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border: none;
       border-radius: 12px;
@@ -528,9 +528,20 @@
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
-      /* WICHTIG: Stelle sicher, dass der Button immer klickbar ist */
       pointer-events: auto;
       touch-action: manipulation;
+    }
+    
+    /* Wenn Sidebar offen ist, ändert sich der Button zu X */
+    .sidebar.mobile-visible ~ .mobile-menu-btn {
+      background: linear-gradient(135deg, var(--danger), #dc2626);
+      transform: rotate(0deg);
+      /* Button bleibt an gleicher Position, ändert nur Farbe */
+    }
+    
+    .mobile-menu-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(6,182,212,0.4);
     }
     
     .mobile-menu-btn:active {
@@ -541,11 +552,33 @@
       width: 24px;
       height: 24px;
       stroke: white;
-      stroke-width: 2;
+      stroke-width: 2.5;
       stroke-linecap: round;
       stroke-linejoin: round;
-      /* SVG sollte keine Pointer-Events blockieren */
       pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    
+    /* Hamburger Lines */
+    .mobile-menu-btn svg line {
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+    
+    /* Wenn geöffnet: Erste Linie wird zur oberen X-Linie */
+    .sidebar.mobile-visible ~ .mobile-menu-btn svg line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    /* Wenn geöffnet: Mittlere Linie verschwindet */
+    .sidebar.mobile-visible ~ .mobile-menu-btn svg line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    
+    /* Wenn geöffnet: Dritte Linie wird zur unteren X-Linie */
+    .sidebar.mobile-visible ~ .mobile-menu-btn svg line:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
     }
     
     /* Mobile Overlay */
@@ -572,50 +605,6 @@
       display: block;
       opacity: 1;
       pointer-events: auto; /* Wenn aktiv, dann klickbar */
-    }
-    
-    /* Mobile Close Button inside Sidebar */
-    .mobile-close-btn {
-      display: none; /* Standardmäßig versteckt auf Desktop */
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 1001;
-      background: rgba(239,68,68,0.9);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      transition: all 0.2s ease;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .mobile-close-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: white;
-      pointer-events: none;
-    }
-    
-    .mobile-close-btn:hover {
-      background: rgba(239,68,68,1);
-      transform: scale(1.1);
-    }
-    
-    .mobile-close-btn:active {
-      transform: scale(0.95);
-    }
-    
-    @media (max-width:700px){
-      /* Zeige Close Button nur auf Mobile */
-      .mobile-close-btn {
-        display: flex !important;
-      }
     }
     
     @media (max-width:700px){
@@ -5340,14 +5329,6 @@
 
   <div class="app">
     <aside class="sidebar" aria-label="Navigation">
-      <!-- NEU: Mobile Close Button -->
-      <button class="mobile-close-btn" onclick="closeMobileMenu()" aria-label="Menü schließen">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-      
       <div class="brand">
         <div class="logo">BC</div>
         <div>
@@ -25867,6 +25848,7 @@ function toggleMobileMenu() {
   console.log('🍔 toggleMobileMenu aufgerufen');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('mobileOverlay');
+  const menuBtn = document.getElementById('mobileMenuBtn');
   
   console.log('Sidebar Element:', sidebar);
   console.log('Overlay Element:', overlay);
@@ -25878,6 +25860,17 @@ function toggleMobileMenu() {
     sidebar.classList.toggle('mobile-visible');
     overlay.classList.toggle('active');
     document.body.classList.toggle('sidebar-open');
+    
+    // Update Button Aria-Label
+    if (menuBtn) {
+      if (sidebar.classList.contains('mobile-visible')) {
+        menuBtn.setAttribute('aria-label', 'Menü schließen');
+        menuBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        menuBtn.setAttribute('aria-label', 'Menü öffnen');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
     
     console.log('Ist jetzt sichtbar:', sidebar.classList.contains('mobile-visible'));
     console.log('Overlay aktiv:', overlay.classList.contains('active'));
@@ -25899,12 +25892,20 @@ function closeMobileMenu() {
   console.log('❌ closeMobileMenu aufgerufen');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('mobileOverlay');
+  const menuBtn = document.getElementById('mobileMenuBtn');
   
   if (sidebar && overlay) {
     sidebar.classList.remove('mobile-visible');
     overlay.classList.remove('active');
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
+    
+    // Update Button Aria-Label
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-label', 'Menü öffnen');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+    
     console.log('✅ Menü geschlossen');
   } else {
     console.error('❌ Sidebar oder Overlay nicht gefunden beim Schließen!');
