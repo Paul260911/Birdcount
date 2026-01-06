@@ -2199,6 +2199,13 @@
       gap: 16px;
       margin-top: 16px;
     }
+    
+    /* Mobile-specific grid layout for member comparison */
+    #memberComparisonGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: 12px;
+    }
     .member-card {
       background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
       border: 1px solid rgba(255,255,255,0.04);
@@ -5456,6 +5463,28 @@
         max-width: calc(100vw - 200px);
         text-align: right;
       }
+      
+      /* Force single column for member comparison grid */
+      #memberComparisonGrid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .comparison-grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      /* Force all inline grids with auto-fit/auto-fill to single column on very narrow screens */
+      [style*="grid-template-columns"][style*="auto-fit"],
+      [style*="grid-template-columns"][style*="auto-fill"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    
+    /* Also force single column on slightly wider mobile devices in portrait */
+    @media (max-width: 700px) {
+      #memberComparisonGrid {
+        grid-template-columns: 1fr !important;
+      }
     }
     
   </style>
@@ -6539,7 +6568,7 @@
                     📊 Detailansicht
                   </button>
                 </div>
-                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 280px),1fr));gap:12px;">
+                <div id="memberComparisonGrid" style="display:grid;gap:12px;">
                   <p style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px;">Lade Daten...</p>
                 </div>
               </div>
