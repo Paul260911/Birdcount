@@ -519,7 +519,7 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      z-index: 1002; /* Höher als Sidebar */
+      z-index: 10001; /* HÖHER als Sidebar (z-index: 1000) und Overlay (z-index: 999) */
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border: none;
       border-radius: 12px;
@@ -530,13 +530,12 @@
       transition: all 0.3s ease;
       pointer-events: auto;
       touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     
     /* Wenn Sidebar offen ist, ändert sich der Button zu X */
-    .sidebar.mobile-visible ~ .mobile-menu-btn {
+    .mobile-menu-btn.menu-open {
       background: linear-gradient(135deg, var(--danger), #dc2626);
-      transform: rotate(0deg);
-      /* Button bleibt an gleicher Position, ändert nur Farbe */
     }
     
     .mobile-menu-btn:hover {
@@ -566,18 +565,18 @@
     }
     
     /* Wenn geöffnet: Erste Linie wird zur oberen X-Linie */
-    .sidebar.mobile-visible ~ .mobile-menu-btn svg line:nth-child(1) {
+    .mobile-menu-btn.menu-open svg line:nth-child(1) {
       transform: rotate(45deg) translate(5px, 5px);
     }
     
     /* Wenn geöffnet: Mittlere Linie verschwindet */
-    .sidebar.mobile-visible ~ .mobile-menu-btn svg line:nth-child(2) {
+    .mobile-menu-btn.menu-open svg line:nth-child(2) {
       opacity: 0;
       transform: scaleX(0);
     }
     
     /* Wenn geöffnet: Dritte Linie wird zur unteren X-Linie */
-    .sidebar.mobile-visible ~ .mobile-menu-btn svg line:nth-child(3) {
+    .mobile-menu-btn.menu-open svg line:nth-child(3) {
       transform: rotate(-45deg) translate(5px, -5px);
     }
     
@@ -613,6 +612,9 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
+        /* Sicherstellen dass Button immer klickbar ist */
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       
       /* Sidebar als Overlay auf Mobile */
@@ -625,7 +627,7 @@
         width: 280px;
         max-width: 70vw; /* REDUZIERT von 85vw auf 70vw für besseres Hochformat */
         overflow-y: auto;
-        transform: translateX(-100%);
+        transform: translateX(-100%) !important; /* WICHTIG: Sidebar ist standardmäßig versteckt */
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
@@ -635,10 +637,14 @@
         border-radius: 0;
         margin: 0;
         padding: 12px; /* Reduziert von 18px */
+        pointer-events: none; /* Nicht klickbar wenn versteckt */
+        visibility: hidden; /* Zusätzlich für Screen Reader */
       }
       
       .sidebar.mobile-visible {
-        transform: translateX(0);
+        transform: translateX(0) !important; /* Sidebar wird sichtbar */
+        pointer-events: auto; /* Klickbar wenn sichtbar */
+        visibility: visible; /* Sichtbar für Screen Reader */
       }
       
       /* MOBILE: Kompaktere Brand-Section */
@@ -25852,28 +25858,29 @@ function toggleMobileMenu() {
   
   console.log('Sidebar Element:', sidebar);
   console.log('Overlay Element:', overlay);
+  console.log('Menu Button:', menuBtn);
   
-  if (sidebar && overlay) {
+  if (sidebar && overlay && menuBtn) {
     const wasVisible = sidebar.classList.contains('mobile-visible');
     console.log('War sichtbar:', wasVisible);
     
     sidebar.classList.toggle('mobile-visible');
     overlay.classList.toggle('active');
     document.body.classList.toggle('sidebar-open');
+    menuBtn.classList.toggle('menu-open'); // NEU: Klasse auf Button selbst
     
     // Update Button Aria-Label
-    if (menuBtn) {
-      if (sidebar.classList.contains('mobile-visible')) {
-        menuBtn.setAttribute('aria-label', 'Menü schließen');
-        menuBtn.setAttribute('aria-expanded', 'true');
-      } else {
-        menuBtn.setAttribute('aria-label', 'Menü öffnen');
-        menuBtn.setAttribute('aria-expanded', 'false');
-      }
+    if (sidebar.classList.contains('mobile-visible')) {
+      menuBtn.setAttribute('aria-label', 'Menü schließen');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      menuBtn.setAttribute('aria-label', 'Menü öffnen');
+      menuBtn.setAttribute('aria-expanded', 'false');
     }
     
     console.log('Ist jetzt sichtbar:', sidebar.classList.contains('mobile-visible'));
     console.log('Overlay aktiv:', overlay.classList.contains('active'));
+    console.log('Button menu-open:', menuBtn.classList.contains('menu-open'));
     
     // Verhindere Scrollen wenn Menü offen ist
     if (sidebar.classList.contains('mobile-visible')) {
@@ -25884,7 +25891,7 @@ function toggleMobileMenu() {
       console.log('Menü geschlossen - Scrollen erlaubt');
     }
   } else {
-    console.error('❌ Sidebar oder Overlay nicht gefunden!');
+    console.error('❌ Sidebar, Overlay oder Button nicht gefunden!');
   }
 }
 
@@ -25894,21 +25901,20 @@ function closeMobileMenu() {
   const overlay = document.getElementById('mobileOverlay');
   const menuBtn = document.getElementById('mobileMenuBtn');
   
-  if (sidebar && overlay) {
+  if (sidebar && overlay && menuBtn) {
     sidebar.classList.remove('mobile-visible');
     overlay.classList.remove('active');
     document.body.classList.remove('sidebar-open');
+    menuBtn.classList.remove('menu-open'); // NEU: Klasse entfernen
     document.body.style.overflow = '';
     
     // Update Button Aria-Label
-    if (menuBtn) {
-      menuBtn.setAttribute('aria-label', 'Menü öffnen');
-      menuBtn.setAttribute('aria-expanded', 'false');
-    }
+    menuBtn.setAttribute('aria-label', 'Menü öffnen');
+    menuBtn.setAttribute('aria-expanded', 'false');
     
     console.log('✅ Menü geschlossen');
   } else {
-    console.error('❌ Sidebar oder Overlay nicht gefunden beim Schließen!');
+    console.error('❌ Sidebar, Overlay oder Button nicht gefunden beim Schließen!');
   }
 }
 
@@ -25921,14 +25927,24 @@ function initMobileView() {
     // WICHTIG: Stelle sicher, dass Sidebar geschlossen ist
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('mobileOverlay');
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    
     if (sidebar) {
       sidebar.classList.remove('mobile-visible');
     }
     if (overlay) {
       overlay.classList.remove('active');
     }
+    if (menuBtn) {
+      menuBtn.classList.remove('menu-open');
+      menuBtn.setAttribute('aria-label', 'Menü öffnen');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+    
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
+    
+    console.log('✅ Mobile View initialisiert - Sidebar geschlossen');
     
     // Stelle sicher, dass home-Section sichtbar ist
     const homeSection = document.getElementById('home');
