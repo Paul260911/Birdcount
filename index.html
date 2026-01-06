@@ -2159,6 +2159,32 @@
       border: 1px solid rgba(255,255,255,0.06);
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
+    
+    @media (max-width: 480px) {
+      .comparison-modal {
+        padding: 10px;
+      }
+      
+      .comparison-container {
+        padding: 16px;
+        border-radius: 12px;
+        max-height: 95vh;
+      }
+      
+      .comparison-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      .comparison-header h2 {
+        font-size: 20px !important;
+      }
+      
+      .comparison-header p {
+        font-size: 13px !important;
+      }
+    }
     .comparison-header {
       display: flex;
       justify-content: space-between;
@@ -2169,7 +2195,7 @@
     }
     .comparison-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
       gap: 16px;
       margin-top: 16px;
     }
@@ -2178,6 +2204,8 @@
       border: 1px solid rgba(255,255,255,0.04);
       border-radius: 12px;
       padding: 16px;
+      min-width: 0; /* Allow card to shrink below content width */
+      overflow: hidden; /* Prevent content overflow */
     }
     .member-header {
       display: flex;
@@ -2219,6 +2247,9 @@
     .stat-value {
       font-weight: 600;
       font-size: 16px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
     }
     
     /* XP Badge */
@@ -5391,6 +5422,42 @@
       }
     }
     
+    /* Enhanced mobile portrait mode optimizations */
+    @media (max-width: 480px) {
+      .member-card {
+        padding: 12px;
+      }
+      
+      .member-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      
+      .stat-value {
+        font-size: 14px;
+      }
+      
+      .stat-label {
+        font-size: 12px;
+      }
+      
+      .comparison-stats {
+        gap: 6px;
+      }
+      
+      .stat-row {
+        padding: 6px 8px;
+      }
+      
+      /* Make top species text wrap better on narrow screens */
+      .stat-row .stat-value {
+        font-size: 12px;
+        max-width: calc(100vw - 200px);
+        text-align: right;
+      }
+    }
+    
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -6472,7 +6539,7 @@
                     📊 Detailansicht
                   </button>
                 </div>
-                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 280px),1fr));gap:12px;">
                   <p style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px;">Lade Daten...</p>
                 </div>
               </div>
@@ -22260,7 +22327,7 @@ async function renderDetailedObservationComparison(groupData) {
   
   let html = `
     <div style="margin-bottom:16px;padding:12px;background:rgba(6,182,212,0.05);border-radius:8px;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;text-align:center;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 120px),1fr));gap:12px;text-align:center;">
         <div>
           <div style="font-size:24px;font-weight:700;color:var(--accent);">${users.length}</div>
           <div style="font-size:12px;color:var(--muted);">Mitglieder</div>
@@ -22363,7 +22430,7 @@ async function renderMemberComparisonGrid(groupData) {
           ${mostCommonSpecies ? `
             <div class="stat-row">
               <span class="stat-label">⭐ Top-Art</span>
-              <span class="stat-value" style="font-size:13px;">${mostCommonSpecies[0]} (${mostCommonSpecies[1]}x)</span>
+              <span class="stat-value" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${mostCommonSpecies[0]} (${mostCommonSpecies[1]}x)</span>
             </div>
           ` : ''}
         </div>
@@ -22436,11 +22503,11 @@ async function openDetailedMemberComparison() {
             <div class="member-avatar" style="width:56px;height:56px;font-size:24px;">
               ${user.userName.charAt(0).toUpperCase()}
             </div>
-            <div style="flex:1;">
+            <div style="flex:1;min-width:0;">
               <div style="font-weight:700;font-size:17px;">
                 ${user.userName}${isCurrentUser ? ' <span style="color:var(--accent);font-size:12px;">(Du)</span>' : ''}
               </div>
-              <div style="font-size:13px;color:var(--muted);margin-top:2px;">
+              <div style="font-size:13px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                 ${user.userEmail}
               </div>
             </div>
@@ -22478,9 +22545,9 @@ async function openDetailedMemberComparison() {
                 ${topSpecies.map((species, idx) => {
                   const rarity = getRarityStyle(species[0]);
                   return `
-                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                      <span class="${rarity.rarityClass}">${rarity.rarityIcon}${idx + 1}. ${species[0]}</span>
-                      <span style="font-weight:600;color:var(--accent);">${species[1]}x</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:8px;">
+                      <span class="${rarity.rarityClass}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rarity.rarityIcon}${idx + 1}. ${species[0]}</span>
+                      <span style="font-weight:600;color:var(--accent);flex-shrink:0;">${species[1]}x</span>
                     </div>
                   `;
                 }).join('')}
