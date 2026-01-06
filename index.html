@@ -574,6 +574,50 @@
       pointer-events: auto; /* Wenn aktiv, dann klickbar */
     }
     
+    /* Mobile Close Button inside Sidebar */
+    .mobile-close-btn {
+      display: none; /* Standardmäßig versteckt auf Desktop */
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1001;
+      background: rgba(239,68,68,0.9);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .mobile-close-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      pointer-events: none;
+    }
+    
+    .mobile-close-btn:hover {
+      background: rgba(239,68,68,1);
+      transform: scale(1.1);
+    }
+    
+    .mobile-close-btn:active {
+      transform: scale(0.95);
+    }
+    
+    @media (max-width:700px){
+      /* Zeige Close Button nur auf Mobile */
+      .mobile-close-btn {
+        display: flex !important;
+      }
+    }
+    
     @media (max-width:700px){
       /* Mobile Menu Button anzeigen */
       .mobile-menu-btn {
@@ -5296,6 +5340,14 @@
 
   <div class="app">
     <aside class="sidebar" aria-label="Navigation">
+      <!-- NEU: Mobile Close Button -->
+      <button class="mobile-close-btn" onclick="closeMobileMenu()" aria-label="Menü schließen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
       <div class="brand">
         <div class="logo">BC</div>
         <div>
@@ -25952,6 +26004,28 @@ document.addEventListener('DOMContentLoaded', function() {
   if (sidebar) {
     console.log('✅ Sidebar gefunden');
     console.log('   Klassen:', sidebar.className);
+    
+    // NEU: Swipe-Geste zum Schließen
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    sidebar.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    sidebar.addEventListener('touchend', function(e) {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      const swipeDistance = touchEndX - touchStartX;
+      // Wenn nach links gewischt (mindestens 50px), schließe Sidebar
+      if (swipeDistance < -50 && sidebar.classList.contains('mobile-visible')) {
+        console.log('👈 Nach links gewischt - Schließe Menü');
+        closeMobileMenu();
+      }
+    }
   } else {
     console.error('❌ Sidebar nicht gefunden!');
   }
