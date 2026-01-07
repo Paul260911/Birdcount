@@ -8353,6 +8353,7 @@
       <div class="list-detail-actions">
         <button class="small-btn" onclick="editCurrentList()">✏️ Bearbeiten</button>
         <button class="small-btn" onclick="exportCurrentList()">📤 Export</button>
+        <button class="small-btn" onclick="manualSyncSharedLists()" id="syncSharedListsBtn" style="background:var(--success);" title="Aktualisiert alle deine geteilten Listen im Gruppenvergleich">🔄 Listen sync</button>
         <button class="small-btn" onclick="deleteCurrentList()" style="background:var(--danger);">🗑️ Löschen</button>
       </div>
     </div>
@@ -26501,10 +26502,13 @@ window.clearAllSpeciesFilters = clearAllSpeciesFilters;
 // ==================== TICKABLE & SELFFOUND TOGGLE FUNKTIONEN ====================
 
 // Toggle Tickable Status
-async function toggleTickable(observationId) {
+async function toggleTickable(observationId, forcePersonalMode = false) {
   try {
-    // Prüfe ob im Gruppenmodus
-    const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+    // NEU: Prüfe explizit ob wir in einer privaten Listen-Ansicht sind
+    const isInPrivateListView = document.getElementById('listDetailView')?.style.display === 'block';
+    
+    // NEU: Prüfe ob im Gruppenmodus UND nicht in privater Listen-Ansicht
+    const isGroupMode = !forcePersonalMode && !isInPrivateListView && window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
     
     if (isGroupMode) {
       // NEU: Prüfe ob Firebase verfügbar ist
@@ -26581,12 +26585,15 @@ async function toggleTickable(observationId) {
       }
       
     } else {
-      // IndexedDB-Modus (persönliche Beobachtungen)
+      // IndexedDB-Modus (persönliche Beobachtungen) - NEU: Auch für private Listen!
+      console.log('🔍 Toggle Tickable in IndexedDB-Modus für ID:', observationId);
       const observations = await getAllFromIndexedDB('observations');
       const obs = observations.find(o => o.id === observationId);
       
       if (!obs) {
         showNotification('Beobachtung nicht gefunden', 3000);
+        console.error('⚠️ Beobachtung nicht in IndexedDB gefunden:', observationId);
+        console.log('   Verfügbare Beobachtungen:', observations.length);
         return;
       }
       
@@ -26596,52 +26603,53 @@ async function toggleTickable(observationId) {
       
       await saveToIndexedDB('observations', obs);
       
-      // Nur visuelles Update ohne komplettes Neuladen
+      // Visuelles Update
       updateToggleButtonVisuals(observationId, 'tickable', obs.tickable);
-      
-      // Statistiken im Hintergrund aktualisieren
-      setTimeout(() => {
-        if (typeof updateAdvancedStatistics === 'function') {
-          updateAdvancedStatistics();
-        }
-        if (typeof updateChart === 'function') {
-          updateChart();
-        }
-      }, 100);
       
       showNotification(
         obs.tickable ? '✅ Als tickbar markiert' : '❌ Als nicht tickbar markiert',
         2000
       );
+      
+      // NEU: Aktualisiere Listen-Ansicht wenn offen
+      if (isInPrivateListView && currentListId) {
+        console.log('🔄 Aktualisiere Listen-Ansicht...');
+        // Kurze Verzögerung damit die Änderung gespeichert ist
+        setTimeout(() => {
+          openListDetail(currentListId, window.currentListViewMode || 'observations');
+        }, 300);
+      }
+      
+      // NEU: Synchronisiere geteilte Listen nach Toggle-Änderung
+      if (typeof syncSharedListsAfterNewObservation === 'function') {
+        console.log('🔄 Starte automatische Listen-Synchronisation...');
+        setTimeout(() => {
+          syncSharedListsAfterNewObservation().catch(err => {
+            console.warn('⚠️ Listen-Sync fehlgeschlagen:', err);
+          });
+        }, 500);
+      }
+      
+      // Aktualisiere Challenge falls auf der Seite
+      if (document.getElementById('compareRarity2026View') && 
+          document.getElementById('compareRarity2026View').style.display !== 'none') {
+        setTimeout(() => renderRarityChallenge2026(), 500);
+      }
     }
-    
-    // Listen-Ansicht aktualisieren (falls offen)
-    if (currentListId && document.getElementById('listDetailView').style.display === 'block') {
-      setTimeout(() => {
-        openListDetail(currentListId);
-      }, 100);
-    }
-    
-    // Beobachtungen-Manager aktualisieren (falls offen)
-    if (document.getElementById('beobachtungen') && document.getElementById('beobachtungen').style.display !== 'none') {
-      setTimeout(() => {
-        if (typeof renderObservationManager === 'function') {
-          renderObservationManager();
-        }
-      }, 100);
-    }
-    
   } catch (error) {
     console.error('Fehler beim Toggle Tickable:', error);
-    showNotification('❌ Fehler beim Aktualisieren: ' + error.message, 3000);
+    showNotification('❌ Fehler: ' + error.message, 3000);
   }
 }
 
 // Toggle Selffound Status
-async function toggleSelffound(observationId) {
+async function toggleSelffound(observationId, forcePersonalMode = false) {
   try {
-    // Prüfe ob im Gruppenmodus
-    const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+    // NEU: Prüfe explizit ob wir in einer privaten Listen-Ansicht sind
+    const isInPrivateListView = document.getElementById('listDetailView')?.style.display === 'block';
+    
+    // NEU: Prüfe ob im Gruppenmodus UND nicht in privater Listen-Ansicht
+    const isGroupMode = !forcePersonalMode && !isInPrivateListView && window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
     
     if (isGroupMode) {
       // NEU: Prüfe ob Firebase verfügbar ist
@@ -26718,13 +26726,15 @@ async function toggleSelffound(observationId) {
       }
       
     } else {
-      // IndexedDB-Modus (persönliche Beobachtungen)
+      // IndexedDB-Modus (persönliche Beobachtungen) - NEU: Auch für private Listen!
+      console.log('🔍 Toggle Selffound in IndexedDB-Modus für ID:', observationId);
       const observations = await getAllFromIndexedDB('observations');
       const obs = observations.find(o => o.id === observationId);
       
       if (!obs) {
         showNotification('Beobachtung nicht gefunden', 3000);
-        console.error('Beobachtung nicht in IndexedDB gefunden:', observationId);
+        console.error('⚠️ Beobachtung nicht in IndexedDB gefunden:', observationId);
+        console.log('   Verfügbare Beobachtungen:', observations.length);
         return;
       }
       
@@ -26743,11 +26753,12 @@ async function toggleSelffound(observationId) {
       );
     }
     
-    // Listen-Ansicht aktualisieren (falls offen)
-    if (currentListId && document.getElementById('listDetailView').style.display === 'block') {
+    // Listen-Ansicht aktualisieren (falls offen) - NEU: Mit richtigem View Mode
+    if (currentListId && isInPrivateListView) {
+      console.log('🔄 Aktualisiere Listen-Ansicht...');
       setTimeout(() => {
-        openListDetail(currentListId);
-      }, 100);
+        openListDetail(currentListId, window.currentListViewMode || 'observations');
+      }, 300);
     }
     
     // Beobachtungen-Manager aktualisieren (falls offen)
@@ -26757,6 +26768,16 @@ async function toggleSelffound(observationId) {
           renderObservationManager();
         }
       }, 100);
+    }
+    
+    // NEU: Synchronisiere geteilte Listen nach Toggle-Änderung (nur im persönlichen Modus)
+    if (!isGroupMode && typeof syncSharedListsAfterNewObservation === 'function') {
+      console.log('🔄 Starte automatische Listen-Synchronisation...');
+      setTimeout(() => {
+        syncSharedListsAfterNewObservation().catch(err => {
+          console.warn('⚠️ Listen-Sync fehlgeschlagen:', err);
+        });
+      }, 500);
     }
     
   } catch (error) {
