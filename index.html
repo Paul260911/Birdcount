@@ -628,11 +628,10 @@
         max-width: 70vw;
         overflow-y: auto;
         overflow-x: hidden; /* WICHTIG: Verhindert horizontales Scrollen */
-        transform: translateX(-110%) !important; /* -110% für 100% sicher versteckt */
+        transform: translateX(-105%) !important; /* -105% statt -100% = KOMPLETT versteckt */
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Shadow auch animieren */
-        box-shadow: none; /* Kein Shadow wenn versteckt */
+                    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth fade */
+        box-shadow: 4px 0 24px rgba(0,0,0,0.6);
         background: linear-gradient(180deg, var(--card), rgba(11,18,32,0.98));
         /* Verbessertes Touch-Scrolling */
         -webkit-overflow-scrolling: touch;
@@ -651,7 +650,6 @@
         pointer-events: auto; /* Klickbar wenn sichtbar */
         visibility: visible; /* Sichtbar für Screen Reader */
         opacity: 1; /* Vollständig sichtbar */
-        box-shadow: 4px 0 24px rgba(0,0,0,0.6); /* Shadow nur wenn sichtbar */
       }
       
       /* WICHTIG: Verhindere versehentliche Klicks beim Scrollen in Sidebar */
@@ -918,70 +916,6 @@
         width: 100%;
       }
       
-      /* GRUPPENVERGLEICH auf Mobile optimieren */
-      #group-compare {
-        padding: 8px !important;
-      }
-      
-      /* Header kompakter */
-      #group-compare > div:first-child {
-        padding: 12px !important;
-        margin-bottom: 12px !important;
-      }
-      
-      #group-compare > div:first-child h2 {
-        font-size: 18px !important;
-      }
-      
-      #group-compare > div:first-child .muted,
-      #group-compare > div:first-child p {
-        font-size: 11px !important;
-      }
-      
-      /* Tab-Buttons auf Mobile - einzeilig scrollbar */
-      #group-compare > div:nth-child(2) {
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 8px !important;
-        gap: 6px !important;
-        margin-bottom: 12px !important;
-      }
-      
-      #group-compare .small-btn {
-        min-width: 100px !important;
-        flex-shrink: 0 !important;
-        padding: 8px 10px !important;
-        font-size: 12px !important;
-        white-space: nowrap !important;
-      }
-      
-      /* Grid Layouts auf Mobile - immer 1 Spalte */
-      #group-compare [style*="grid-template-columns"] {
-        grid-template-columns: 1fr !important;
-      }
-      
-      /* Leaderboard Cards kompakter */
-      #group-compare .card {
-        padding: 12px !important;
-        margin-bottom: 12px !important;
-      }
-      
-      #group-compare .card h3 {
-        font-size: 16px !important;
-      }
-      
-      #group-compare .card h4 {
-        font-size: 14px !important;
-      }
-      
-      /* User/Member Cards im Leaderboard */
-      #group-compare .card > div > div {
-        padding: 10px !important;
-        font-size: 13px !important;
-      }
-      
-
       /* Observation Manager auf Mobile */
       .person-accordion-header {
         padding: 12px;
@@ -2159,32 +2093,6 @@
       border: 1px solid rgba(255,255,255,0.06);
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
-    
-    @media (max-width: 480px) {
-      .comparison-modal {
-        padding: 10px;
-      }
-      
-      .comparison-container {
-        padding: 16px;
-        border-radius: 12px;
-        max-height: 95vh;
-      }
-      
-      .comparison-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      
-      .comparison-header h2 {
-        font-size: 20px !important;
-      }
-      
-      .comparison-header p {
-        font-size: 13px !important;
-      }
-    }
     .comparison-header {
       display: flex;
       justify-content: space-between;
@@ -2195,24 +2103,15 @@
     }
     .comparison-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 16px;
       margin-top: 16px;
-    }
-    
-    /* Mobile-specific grid layout for member comparison */
-    #memberComparisonGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-      gap: 12px;
     }
     .member-card {
       background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
       border: 1px solid rgba(255,255,255,0.04);
       border-radius: 12px;
       padding: 16px;
-      min-width: 0; /* Allow card to shrink below content width */
-      overflow: hidden; /* Prevent content overflow */
     }
     .member-header {
       display: flex;
@@ -2254,9 +2153,6 @@
     .stat-value {
       font-weight: 600;
       font-size: 16px;
-      word-break: break-word;
-      overflow-wrap: break-word;
-      max-width: 100%;
     }
     
     /* XP Badge */
@@ -5429,97 +5325,6 @@
       }
     }
     
-    /* Enhanced mobile portrait mode optimizations */
-    @media (max-width: 480px) {
-      .member-card {
-        padding: 12px;
-      }
-      
-      .member-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-      }
-      
-      .stat-value {
-        font-size: 14px;
-      }
-      
-      .stat-label {
-        font-size: 12px;
-      }
-      
-      .comparison-stats {
-        gap: 6px;
-      }
-      
-      .stat-row {
-        padding: 6px 8px;
-      }
-      
-      /* Make top species text wrap better on narrow screens */
-      .stat-row .stat-value {
-        font-size: 12px;
-        max-width: calc(100vw - 200px);
-        text-align: right;
-      }
-      
-      /* Force single column for member comparison grid */
-      #memberComparisonGrid {
-        grid-template-columns: 1fr !important;
-      }
-      
-      .comparison-grid {
-        grid-template-columns: 1fr !important;
-      }
-      
-      /* Force all inline grids with auto-fit/auto-fill to single column on very narrow screens */
-      [style*="grid-template-columns"][style*="auto-fit"],
-      [style*="grid-template-columns"][style*="auto-fill"] {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    
-    /* Also force single column on slightly wider mobile devices in portrait */
-    @media (max-width: 700px) {
-      #memberComparisonGrid {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    
-    /* ULTRA-AGGRESSIVE: Force ALL grids to single column on mobile */
-    @media (max-width: 700px) {
-      /* Target all divs with grid display */
-      div[style*="display:grid"],
-      div[style*="display: grid"],
-      [style*="grid-template-columns"] {
-        grid-template-columns: 1fr !important;
-      }
-      
-      /* Specific IDs */
-      #memberComparisonGrid,
-      #observationLeaderboard,
-      #speciesLeaderboard,
-      #availableChallengesGrid,
-      #rarityLeaderboard2026,
-      #achievementLeaderboard,
-      #speciesDatabase,
-      #listsGrid {
-        grid-template-columns: 1fr !important;
-      }
-      
-      /* Any element with a class that contains 'grid' */
-      [class*="grid"] {
-        grid-template-columns: 1fr !important;
-      }
-      
-      .comparison-grid,
-      .stats-grid,
-      .card-grid {
-        grid-template-columns: 1fr !important;
-      }
-    }
-    
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -6115,7 +5920,7 @@
             
             <div class="feature-section" style="margin-top:32px;">
               <h3 style="margin-top:0;">💡 Verwendungsbeispiele</h3>
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr));gap:16px;margin-top:16px;">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:16px;margin-top:16px;">
                 <div class="card">
                   <h4 style="margin:0 0 8px 0;">🦅 Seltene Arten</h4>
                   <p style="font-size:13px;color:var(--muted);margin:0;">Erstelle eine Liste für seltene oder geschützte Vogelarten in deiner Region.</p>
@@ -6235,7 +6040,7 @@
           <section id="tools" class="card" style="display:none;">
             <h2>Werkzeuge & Einstellungen</h2>
             
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 250px), 1fr));gap:16px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:16px;">
               <!-- In Gruppe kopieren -->
               <div class="card" id="copyToGroupTool">
                 <h3>👥 In Gruppe kopieren</h3>
@@ -6359,7 +6164,7 @@
             <!-- XP & Level Display -->
             <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05));">
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div>
+                <div style="flex:1;">
                   <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
                     <div style="font-size:32px;">⭐</div>
                     <div>
@@ -6386,8 +6191,25 @@
                   <div class="xp-badge">+10 XP</div>
                 </div>
               </div>
+              
+              <!-- Challenge Stats -->
+              <div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));gap:8px;">
+                <div style="text-align:center;padding:8px;background:rgba(6,182,212,0.1);border-radius:6px;">
+                  <div style="font-size:18px;font-weight:700;color:#06b6d4;" id="completedChallengesCount">0</div>
+                  <div style="font-size:11px;color:var(--muted);">Abgeschlossen</div>
+                </div>
+                <div style="text-align:center;padding:8px;background:rgba(245,158,11,0.1);border-radius:6px;">
+                  <div style="font-size:18px;font-weight:700;color:#f59e0b;" id="activeChallengesCount">0</div>
+                  <div style="font-size:11px;color:var(--muted);">Aktiv</div>
+                </div>
+                <div style="text-align:center;padding:8px;background:rgba(124,58,237,0.1);border-radius:6px;">
+                  <div style="font-size:18px;font-weight:700;color:#7c3aed;" id="totalXPEarned">0</div>
+                  <div style="font-size:11px;color:var(--muted);">Gesamt XP</div>
+                </div>
+              </div>
+              
               <div style="margin-top:12px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px;font-size:12px;color:var(--muted);">
-                💡 Verdiene XP durch neue Beobachtungen und steige im Level auf!
+                💡 Verdiene XP durch neue Beobachtungen und Challenge-Abschlüsse!
               </div>
             </div>
             
@@ -6395,6 +6217,28 @@
               <p style="color:var(--muted);font-size:14px;">
                 Setze dir Ziele und verfolge deinen Fortschritt! Challenges helfen dir, mehr Vögel zu entdecken und deine Beobachtungsfähigkeiten zu verbessern.
               </p>
+            </div>
+
+            <!-- Difficulty Filter -->
+            <div class="card" style="margin-bottom:16px;">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span style="font-size:13px;font-weight:600;color:var(--muted);">Filter:</span>
+                <button class="small-btn challenge-filter-btn active" data-difficulty="all" onclick="filterChallengesByDifficulty('all')">
+                  🎯 Alle
+                </button>
+                <button class="small-btn challenge-filter-btn" data-difficulty="easy" onclick="filterChallengesByDifficulty('easy')">
+                  🟢 Einfach
+                </button>
+                <button class="small-btn challenge-filter-btn" data-difficulty="medium" onclick="filterChallengesByDifficulty('medium')">
+                  🟡 Mittel
+                </button>
+                <button class="small-btn challenge-filter-btn" data-difficulty="hard" onclick="filterChallengesByDifficulty('hard')">
+                  🟠 Schwer
+                </button>
+                <button class="small-btn challenge-filter-btn" data-difficulty="expert" onclick="filterChallengesByDifficulty('expert')">
+                  🔴 Experte
+                </button>
+              </div>
             </div>
 
             <!-- Aktive Challenges -->
@@ -6417,95 +6261,1280 @@
                   ➕ Eigene Challenge
                 </button>
               </div>
-              <div id="availableChallengesGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));gap:12px;margin-top:12px;">
+              <div id="availableChallengesGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;margin-top:12px;">
                 
-                <!-- Challenge: Arten-Sammler -->
-                <div class="card" style="background:rgba(6,182,212,0.05);border-left:3px solid #06b6d4;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">🐦</span>
-                    <strong>Arten-Sammler</strong>
+                <!-- 🟢 EINFACHE CHALLENGES -->
+                
+                <!-- Challenge: Erste Schritte -->
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🐣</span>
+                      <strong>Erste Schritte</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
                   </div>
                   <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
-                    Beobachte 10 verschiedene Vogelarten
+                    Erstelle deine erste Vogelbeobachtung
                   </p>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:var(--muted);">🏅 Bronze</span>
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +50 XP</span>
+                    <button class="small-btn" onclick="startChallenge('first_steps')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Arten-Einsteiger -->
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🐦</span>
+                      <strong>Arten-Einsteiger</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte 5 verschiedene Vogelarten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +75 XP</span>
+                    <button class="small-btn" onclick="startChallenge('species_beginner')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Fleißig Beobachten -->
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📝</span>
+                      <strong>Fleißig Beobachten</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Erfasse 10 Beobachtungen
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +100 XP</span>
+                    <button class="small-btn" onclick="startChallenge('active_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Fotograf -->
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📷</span>
+                      <strong>Fotograf</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Füge 5 Fotos zu Beobachtungen hinzu
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +80 XP</span>
+                    <button class="small-btn" onclick="startChallenge('photographer')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- 🟡 MITTLERE CHALLENGES -->
+
+                <!-- Challenge: Arten-Sammler -->
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🦅</span>
+                      <strong>Arten-Sammler</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte 25 verschiedene Vogelarten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +200 XP</span>
                     <button class="small-btn" onclick="startChallenge('species_collector')">Starten</button>
                   </div>
                 </div>
 
                 <!-- Challenge: Fleißiger Beobachter -->
-                <div class="card" style="background:rgba(124,58,237,0.05);border-left:3px solid #7c3aed;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">📊</span>
-                    <strong>Fleißiger Beobachter</strong>
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📊</span>
+                      <strong>Fleißiger Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
                   </div>
                   <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
                     Erfasse 50 Beobachtungen
                   </p>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:var(--muted);">🏅 Silber</span>
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +250 XP</span>
                     <button class="small-btn" onclick="startChallenge('diligent_observer')">Starten</button>
                   </div>
                 </div>
 
                 <!-- Challenge: Früher Vogel -->
-                <div class="card" style="background:rgba(234,179,8,0.05);border-left:3px solid #eab308;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">🌅</span>
-                    <strong>Früher Vogel</strong>
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌅</span>
+                      <strong>Früher Vogel</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
                   </div>
                   <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
-                    Beobachte vor 7:00 Uhr morgens
+                    Beobachte 10x vor 7:00 Uhr morgens
                   </p>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:var(--muted);">🏅 Bronze</span>
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +180 XP</span>
                     <button class="small-btn" onclick="startChallenge('early_bird')">Starten</button>
                   </div>
                 </div>
 
+                <!-- Challenge: Nachteulen-Beobachter -->
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌙</span>
+                      <strong>Nachteulen-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte 5 nachtaktive Vogelarten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +220 XP</span>
+                    <button class="small-btn" onclick="startChallenge('night_owl')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Foto-Dokumentar -->
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📸</span>
+                      <strong>Foto-Dokumentar</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Füge 25 Beobachtungen mit Fotos hinzu
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +200 XP</span>
+                    <button class="small-btn" onclick="startChallenge('photo_documentarian')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Wetter-Trotzer -->
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌧️</span>
+                      <strong>Wetter-Trotzer</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte bei 5 verschiedenen Wetterbedingungen
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +175 XP</span>
+                    <button class="small-btn" onclick="startChallenge('weather_warrior')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- 🟠 SCHWERE CHALLENGES -->
+
+                <!-- Challenge: Arten-Meister -->
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🦜</span>
+                      <strong>Arten-Meister</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte 50 verschiedene Vogelarten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +400 XP</span>
+                    <button class="small-btn" onclick="startChallenge('species_master')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Marathon-Beobachter -->
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🏃</span>
+                      <strong>Marathon-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Erfasse 100 Beobachtungen
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +500 XP</span>
+                    <button class="small-btn" onclick="startChallenge('marathon_observer')">Starten</button>
+                  </div>
+                </div>
+
                 <!-- Challenge: Wochenend-Explorer -->
-                <div class="card" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">🗓️</span>
-                    <strong>Wochenend-Explorer</strong>
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🗓️</span>
+                      <strong>Wochenend-Explorer</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
                   </div>
                   <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
                     Beobachte an 4 Wochenenden hintereinander
                   </p>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:var(--muted);">🏅 Gold</span>
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +350 XP</span>
                     <button class="small-btn" onclick="startChallenge('weekend_explorer')">Starten</button>
                   </div>
                 </div>
 
                 <!-- Challenge: Diversitäts-Champion -->
-                <div class="card" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">🌈</span>
-                    <strong>Diversitäts-Champion</strong>
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌈</span>
+                      <strong>Diversitäts-Champion</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
                   </div>
                   <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
-                    Beobachte Vögel aus 5 verschiedenen Familien
+                    Beobachte Vögel aus 10 verschiedenen Familien
                   </p>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:var(--muted);">🏅 Platin</span>
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +450 XP</span>
                     <button class="small-btn" onclick="startChallenge('diversity_champion')">Starten</button>
                   </div>
                 </div>
 
-                <!-- Challenge: Foto-Dokumentar -->
-                <div class="card" style="background:rgba(236,72,153,0.05);border-left:3px solid #ec4899;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">📸</span>
-                    <strong>Foto-Dokumentar</strong>
+                <!-- Challenge: Selffound-Jäger -->
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🔍</span>
+                      <strong>Selffound-Jäger</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
                   </div>
                   <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
-                    Füge 20 Beobachtungen mit Fotos hinzu
+                    Markiere 25 Beobachtungen als Selffound
                   </p>
                   <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:var(--muted);">🏅 Silber</span>
-                    <button class="small-btn" onclick="startChallenge('photo_documentarian')">Starten</button>
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +380 XP</span>
+                    <button class="small-btn" onclick="startChallenge('selffound_hunter')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Jahreszeiten-Beobachter -->
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🍂</span>
+                      <strong>Jahreszeiten-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte in allen 4 Jahreszeiten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +420 XP</span>
+                    <button class="small-btn" onclick="startChallenge('season_watcher')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- 🔴 EXPERTEN-CHALLENGES -->
+
+                <!-- Challenge: Arten-Legende -->
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">👑</span>
+                      <strong>Arten-Legende</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte 100 verschiedene Vogelarten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +1000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('species_legend')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Ultra-Marathon -->
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">💪</span>
+                      <strong>Ultra-Marathon</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Erfasse 500 Beobachtungen
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +1500 XP</span>
+                    <button class="small-btn" onclick="startChallenge('ultra_marathon')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Raritäten-Jäger -->
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">💎</span>
+                      <strong>Raritäten-Jäger</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte 10 seltene oder sehr seltene Arten
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +800 XP</span>
+                    <button class="small-btn" onclick="startChallenge('rarity_hunter')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Perfektionist -->
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">✨</span>
+                      <strong>Perfektionist</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    50 Beobachtungen mit Foto, Verhalten UND Wetter
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +900 XP</span>
+                    <button class="small-btn" onclick="startChallenge('perfectionist')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Jeden-Tag-Beobachter -->
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📅</span>
+                      <strong>Jeden-Tag-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Beobachte an 30 aufeinanderfolgenden Tagen
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +1200 XP</span>
+                    <button class="small-btn" onclick="startChallenge('daily_streak')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- Challenge: Großmeister -->
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(139,92,246,0.05);border-left:3px solid #8b5cf6;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🏆</span>
+                      <strong>Großmeister</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+                    Schließe 20 andere Challenges ab
+                  </p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#8b5cf6;font-weight:600;">🎁 +2000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('grandmaster')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- ========================================= -->
+                <!-- 🟢 NEUE EINFACHE CHALLENGES -->
+                <!-- ========================================= -->
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌅</span>
+                      <strong>Morgen-Entdecker</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 3 Vögel vor 9:00 Uhr morgens</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +75 XP</span>
+                    <button class="small-btn" onclick="startChallenge('morning_explorer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📆</span>
+                      <strong>Wochenend-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Erfasse 5 Beobachtungen an einem Wochenende</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +60 XP</span>
+                    <button class="small-btn" onclick="startChallenge('weekend_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📸</span>
+                      <strong>Foto-Amateur</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Füge 3 Fotos zu deinen Beobachtungen hinzu</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +70 XP</span>
+                    <button class="small-btn" onclick="startChallenge('photo_amateur')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📝</span>
+                      <strong>Notizen-Sammler</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Schreibe Notizen zu 5 verschiedenen Beobachtungen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +65 XP</span>
+                    <button class="small-btn" onclick="startChallenge('notes_collector')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🪑</span>
+                      <strong>Parkbank-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte am selben Ort an 3 verschiedenen Tagen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +80 XP</span>
+                    <button class="small-btn" onclick="startChallenge('park_bench_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌱</span>
+                      <strong>Neugieriger Anfänger</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte deine ersten 3 verschiedenen Vogelarten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +55 XP</span>
+                    <button class="small-btn" onclick="startChallenge('curious_beginner')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🏡</span>
+                      <strong>Balkon-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Erfasse 5 Vögel von zu Hause aus</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +60 XP</span>
+                    <button class="small-btn" onclick="startChallenge('balcony_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">☕</span>
+                      <strong>Mittags-Pause</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 3 Vögel zwischen 11:00 und 14:00 Uhr</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +50 XP</span>
+                    <button class="small-btn" onclick="startChallenge('lunch_break')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🚶</span>
+                      <strong>Spaziergang-Entdecker</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte während eines Spaziergangs 4 verschiedene Arten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +65 XP</span>
+                    <button class="small-btn" onclick="startChallenge('walk_explorer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🦆</span>
+                      <strong>Wasser-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 3 Wasservögel (Enten, Schwäne, Reiher)</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +70 XP</span>
+                    <button class="small-btn" onclick="startChallenge('water_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🎶</span>
+                      <strong>Singvogel-Fan</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 5 verschiedene Singvögel</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +75 XP</span>
+                    <button class="small-btn" onclick="startChallenge('songbird_fan')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="easy" style="background:rgba(34,197,94,0.05);border-left:3px solid #22c55e;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🦅</span>
+                      <strong>Greifvogel-Spotter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟢 Einfach</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte deinen ersten Greifvogel</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#22c55e;font-weight:600;">🎁 +80 XP</span>
+                    <button class="small-btn" onclick="startChallenge('raptor_spotter')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- ========================================= -->
+                <!-- 🟡 NEUE MITTLERE CHALLENGES -->
+                <!-- ========================================= -->
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🍂</span>
+                      <strong>Jahreszeiten-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 5 Arten in jeder Jahreszeit</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +300 XP</span>
+                    <button class="small-btn" onclick="startChallenge('seasonal_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">☁️</span>
+                      <strong>Wetter-Dokumentar</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Dokumentiere das Wetter bei 30 Beobachtungen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +200 XP</span>
+                    <button class="small-btn" onclick="startChallenge('weather_documenter')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🔬</span>
+                      <strong>Verhaltens-Forscher</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beschreibe das Verhalten bei 25 Beobachtungen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +250 XP</span>
+                    <button class="small-btn" onclick="startChallenge('behavior_researcher')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🏙️</span>
+                      <strong>Stadtgebiet-Entdecker</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte an 10 verschiedenen Stadtorten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +220 XP</span>
+                    <button class="small-btn" onclick="startChallenge('urban_explorer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌙</span>
+                      <strong>Nachtaktiv</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 5 Vögel nach 19:00 Uhr</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +280 XP</span>
+                    <button class="small-btn" onclick="startChallenge('nocturnal')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">👥</span>
+                      <strong>Gruppen-Dynamik</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 15× Gruppen von 5+ Vögeln</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +240 XP</span>
+                    <button class="small-btn" onclick="startChallenge('group_dynamics')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📷</span>
+                      <strong>Foto-Profi</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Füge 20 hochwertige Fotos hinzu</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +260 XP</span>
+                    <button class="small-btn" onclick="startChallenge('photo_pro')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌄</span>
+                      <strong>Frühaufsteher</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 20 Vögel vor 7:00 Uhr</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +230 XP</span>
+                    <button class="small-btn" onclick="startChallenge('early_bird')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌆</span>
+                      <strong>Abenddämmerung</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 15 Vögel zwischen 18:00 und 20:00</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +210 XP</span>
+                    <button class="small-btn" onclick="startChallenge('dusk_watcher')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌦️</span>
+                      <strong>Alle-Wetter-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Je 5 Vögel bei Sonne, Regen und Bewölkung</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +250 XP</span>
+                    <button class="small-btn" onclick="startChallenge('all_weather')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌲</span>
+                      <strong>Wald-Entdecker</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 15 verschiedene Waldvogelarten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +270 XP</span>
+                    <button class="small-btn" onclick="startChallenge('forest_explorer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌾</span>
+                      <strong>Wiesen-Forscher</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 12 Arten auf Wiesen/Feldern</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +240 XP</span>
+                    <button class="small-btn" onclick="startChallenge('meadow_researcher')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">💧</span>
+                      <strong>Gewässer-Spezialist</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 20 verschiedene Wasservögel</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +290 XP</span>
+                    <button class="small-btn" onclick="startChallenge('water_specialist')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🦅</span>
+                      <strong>Greifvogel-Kenner</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 8 verschiedene Greifvogelarten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +310 XP</span>
+                    <button class="small-btn" onclick="startChallenge('raptor_expert')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="medium" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🪵</span>
+                      <strong>Specht-Sammler</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟡 Mittel</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte 5 verschiedene Spechtarten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f59e0b;font-weight:600;">🎁 +260 XP</span>
+                    <button class="small-btn" onclick="startChallenge('woodpecker_collector')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- ========================================= -->
+                <!-- 🟠 NEUE SCHWERE CHALLENGES -->
+                <!-- ========================================= -->
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🛫</span>
+                      <strong>Migrations-Beobachter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Dokumentiere 15 Zugvogelarten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +500 XP</span>
+                    <button class="small-btn" onclick="startChallenge('migration_observer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🏞️</span>
+                      <strong>Lebensraum-Spezialist</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Je 10 Arten in Wald, Wiese, Wasser, Stadt</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +600 XP</span>
+                    <button class="small-btn" onclick="startChallenge('habitat_specialist')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🎵</span>
+                      <strong>Gesangs-Experte</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Identifiziere 25 Vögel nur durch Gesang</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +550 XP</span>
+                    <button class="small-btn" onclick="startChallenge('song_expert')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🥚</span>
+                      <strong>Brutzeit-Dokumentar</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Dokumentiere 20 Brutverhalten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +580 XP</span>
+                    <button class="small-btn" onclick="startChallenge('breeding_documenter')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">⛈️</span>
+                      <strong>Wetter-Extremist</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte bei allen Wetterlagen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +520 XP</span>
+                    <button class="small-btn" onclick="startChallenge('weather_extremist')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">⏰</span>
+                      <strong>Tages-Rhythmus</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">An einem Tag: Morgen, Mittag, Abend je 5 Arten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +450 XP</span>
+                    <button class="small-btn" onclick="startChallenge('daily_rhythm')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🎨</span>
+                      <strong>Farben-Sammler</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Beobachte Vögel mit allen Hauptfarben</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +480 XP</span>
+                    <button class="small-btn" onclick="startChallenge('color_collector')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🍁</span>
+                      <strong>Vier-Jahreszeiten-Meister</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">20 Arten pro Jahreszeit beobachten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +650 XP</span>
+                    <button class="small-btn" onclick="startChallenge('four_seasons_master')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌓</span>
+                      <strong>Nacht-und-Tag</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">10 Nachtvögel und 30 Tagvögel</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +580 XP</span>
+                    <button class="small-btn" onclick="startChallenge('night_and_day')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">💙</span>
+                      <strong>Meisen-Experte</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Alle 8 deutschen Meisenarten beobachten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +530 XP</span>
+                    <button class="small-btn" onclick="startChallenge('tit_expert')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🐦</span>
+                      <strong>Finken-Familie</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">10 verschiedene Finkenarten beobachten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +490 XP</span>
+                    <button class="small-btn" onclick="startChallenge('finch_family')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌊</span>
+                      <strong>Möwen-Kenner</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">8 verschiedene Möwenarten identifizieren</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +560 XP</span>
+                    <button class="small-btn" onclick="startChallenge('gull_expert')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">👃</span>
+                      <strong>Schnabel-Formen</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">10 verschiedene Schnabeltypen dokumentieren</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +540 XP</span>
+                    <button class="small-btn" onclick="startChallenge('beak_shapes')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="hard" style="background:rgba(249,115,22,0.05);border-left:3px solid #f97316;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">✈️</span>
+                      <strong>Flug-Muster</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(249,115,22,0.15);color:#f97316;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🟠 Schwer</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">25 verschiedene Flugverhalten dokumentieren</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#f97316;font-weight:600;">🎁 +510 XP</span>
+                    <button class="small-btn" onclick="startChallenge('flight_patterns')">Starten</button>
+                  </div>
+                </div>
+
+                <!-- ========================================= -->
+                <!-- 🔴 NEUE EXPERTEN CHALLENGES -->
+                <!-- ========================================= -->
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📚</span>
+                      <strong>Enzyklopädie</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">100 Arten mit vollständigen Profilen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +2500 XP</span>
+                    <button class="small-btn" onclick="startChallenge('encyclopedia')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📖</span>
+                      <strong>Jahres-Chronist</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Jeden Monat 10 verschiedene Arten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +1800 XP</span>
+                    <button class="small-btn" onclick="startChallenge('year_chronicler')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌍</span>
+                      <strong>Kontinental-Forscher</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Vögel in 20 verschiedenen Ländern</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +3000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('continental_explorer')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📸</span>
+                      <strong>Photographen-Meister</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">200 hochqualitative Fotos hinzufügen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +2200 XP</span>
+                    <button class="small-btn" onclick="startChallenge('photographer_master')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">💯</span>
+                      <strong>Vollständigkeits-Fanatiker</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">100 Beobachtungen mit ALLEN Feldern</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +2800 XP</span>
+                    <button class="small-btn" onclick="startChallenge('completeness_fanatic')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">📅</span>
+                      <strong>Langzeit-Verpflichtung</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">100 Tage Streak aufbauen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +3500 XP</span>
+                    <button class="small-btn" onclick="startChallenge('longterm_commitment')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🎯</span>
+                      <strong>Extreme-Sammler</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">1000 Beobachtungen insgesamt</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +5000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('extreme_collector')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(139,92,246,0.05);border-left:3px solid #8b5cf6;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌟</span>
+                      <strong>Community-Champion</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">100 geteilte Beobachtungen + Level 50</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#8b5cf6;font-weight:600;">🎁 +4000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('community_champion')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🗺️</span>
+                      <strong>Biogeografische Zonen</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Je 30 Arten in 4 Naturräumen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +3200 XP</span>
+                    <button class="small-btn" onclick="startChallenge('biogeographic_zones')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">👨‍👩‍👧‍👦</span>
+                      <strong>Alle-Familien</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Eine Art aus 50 Vogelfamilien</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +4500 XP</span>
+                    <button class="small-btn" onclick="startChallenge('all_families')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🧭</span>
+                      <strong>Wander-Chronist</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">50 Zugvogelarten mit Zugdaten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +2900 XP</span>
+                    <button class="small-btn" onclick="startChallenge('migration_chronicler')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🎙️</span>
+                      <strong>Audio-Archivar</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">100 Vögel nur durch Gesang identifizieren</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +3600 XP</span>
+                    <button class="small-btn" onclick="startChallenge('audio_archivist')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🪹</span>
+                      <strong>Nest-Dokumentar</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">50 Nistplätze mit Brutverhalten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +2600 XP</span>
+                    <button class="small-btn" onclick="startChallenge('nest_documenter')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🔬</span>
+                      <strong>Wissenschaftler</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">200 wissenschaftliche Dokumentationen</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#ef4444;font-weight:600;">🎁 +4200 XP</span>
+                    <button class="small-btn" onclick="startChallenge('scientist')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(139,92,246,0.05);border-left:3px solid #8b5cf6;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">♾️</span>
+                      <strong>Lebenszeit-Projekt</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">500 Arten über 3 Jahre</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#8b5cf6;font-weight:600;">🎁 +10000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('lifetime_project')">Starten</button>
+                  </div>
+                </div>
+
+                <div class="challenge-card card" data-difficulty="expert" style="background:rgba(139,92,246,0.05);border-left:3px solid #8b5cf6;">
+                  <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-size:24px;">🌐</span>
+                      <strong>Globaler Botschafter</strong>
+                    </div>
+                    <span class="difficulty-badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">🔴 Experte</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Vögel auf allen 7 Kontinenten</p>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#8b5cf6;font-weight:600;">🎁 +8000 XP</span>
+                    <button class="small-btn" onclick="startChallenge('global_ambassador')">Starten</button>
                   </div>
                 </div>
 
@@ -6560,7 +7589,7 @@
             <!-- Beobachtungs-Vergleich -->
             <div id="compareObservationsView">
               <!-- Leaderboards in Grid Layout -->
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr));gap:16px;margin-bottom:20px;">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:16px;margin-bottom:20px;">
                 <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.06));border-left:4px solid #06b6d4;">
                   <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
                     <span style="font-size:28px;">🏆</span>
@@ -6601,7 +7630,7 @@
                     📊 Detailansicht
                   </button>
                 </div>
-                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:1fr;gap:12px;">
+                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
                   <p style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px;">Lade Daten...</p>
                 </div>
               </div>
@@ -6745,7 +7774,7 @@
                 <div id="groupStatsOverview"></div>
               </div>
 
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));gap:16px;">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
                 <div class="card" style="border-left:4px solid #22c55e;">
                   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
                     <span style="font-size:24px;">🐦</span>
@@ -6787,6 +7816,7 @@
             <p style="margin:0 0 12px 0; font-size:13px; color:var(--muted);">Klicke auf die Karte, um einen Vogel zu melden.</p>
             <div id="map" style="margin:12px 0;"></div>
             <div class="form-row" style="margin:12px 0;">
+              <button id="heatmapToggleMap" class="small-btn" style="background:linear-gradient(135deg, #ef4444, #f97316);color:white;" onclick="toggleHeatmap()">🔥 Heatmap</button>
               <button id="toggleMarkersLock" class="small-btn" style="background:var(--danger);" onclick="toggleMarkersLock()">🔒 Marker gesperrt</button>
               <button id="toggleDragMode" class="small-btn" style="background:var(--accent);">Verschieben: An</button>
               <button id="clearMarkers" class="small-btn">Alle löschen</button>
@@ -7731,6 +8761,14 @@
     const XP_PER_OBSERVATION = 10;
     const XP_PER_LEVEL = 100;
     
+    // Bonus-XP für seltene Arten
+    const RARITY_XP_BONUS = {
+      'Häufig': 0,           // Keine Extra-XP
+      'Mittel': 0,           // Keine Extra-XP  
+      'Selten': 25,          // +25 XP Bonus
+      'Sehr selten': 50      // +50 XP Bonus
+    };
+    
     // XP-System Funktionen
     async function loadChallengeProgress() {
       try {
@@ -7763,15 +8801,33 @@
       }
     }
     
-    function showXPNotification(xp) {
+    function showXPNotification(xp, rarityBonus = 0, rarity = null) {
       const notification = document.createElement('div');
       notification.className = 'xp-notification';
+      
+      let bonusHTML = '';
+      if (rarityBonus > 0 && rarity) {
+        const rarityColors = {
+          'Selten': '#f59e0b',
+          'Sehr selten': '#ef4444'
+        };
+        const rarityColor = rarityColors[rarity] || '#06b6d4';
+        bonusHTML = `
+          <div style="margin-top:6px;padding:6px 10px;background:rgba(245,158,11,0.15);border-radius:6px;border-left:3px solid ${rarityColor};">
+            <div style="font-size:12px;color:${rarityColor};font-weight:600;">
+              🌟 ${rarity} Art: +${rarityBonus} Bonus-XP!
+            </div>
+          </div>
+        `;
+      }
+      
       notification.innerHTML = `
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="font-size:28px;">⭐</div>
-          <div>
+          <div style="flex:1;">
             <div style="font-size:16px;margin-bottom:4px;">+${xp} XP erhalten!</div>
             <div style="font-size:13px;opacity:0.9;">Level ${challengeLevel} • ${challengeXP}/${XP_PER_LEVEL * challengeLevel} XP</div>
+            ${bonusHTML}
           </div>
         </div>
       `;
@@ -7779,7 +8835,7 @@
       
       setTimeout(() => {
         notification.remove();
-      }, 3000);
+      }, rarityBonus > 0 ? 4000 : 3000);
     }
     
     function showLevelUpNotification(newLevel) {
@@ -7802,20 +8858,35 @@
       }, 4000);
     }
     
-    async function awardXPForNewObservation() {
+    async function awardXPForNewObservation(rarity = null) {
       try {
         console.log("🎯 ========== XP-VERGABE GESTARTET ==========");
         console.log("   Aktueller Stand vor XP-Vergabe - Level:", challengeLevel, "XP:", challengeXP);
+        console.log("   Seltenheit der beobachteten Art:", rarity || 'nicht angegeben');
         
-        const xpGained = XP_PER_OBSERVATION;
+        // Basis-XP
+        let xpGained = XP_PER_OBSERVATION;
+        
+        // Bonus-XP für seltene Arten
+        let rarityBonus = 0;
+        if (rarity && RARITY_XP_BONUS[rarity]) {
+          rarityBonus = RARITY_XP_BONUS[rarity];
+          xpGained += rarityBonus;
+          console.log("   🌟 Seltenheits-Bonus:", rarityBonus, "XP für", rarity, "Art");
+        }
+        
         challengeXP += xpGained;
         
-        console.log("   XP erhalten:", xpGained);
+        console.log("   XP erhalten:", xpGained, rarityBonus > 0 ? `(${XP_PER_OBSERVATION} Basis + ${rarityBonus} Bonus)` : '');
         console.log("   Neuer XP-Stand:", challengeXP);
         
-        // Zeige sofort eine Benachrichtigung
+        // Zeige Benachrichtigung mit Bonus-Info
+        let xpMessage = `⭐ +${xpGained} XP erhalten!`;
+        if (rarityBonus > 0) {
+          xpMessage = `⭐ +${xpGained} XP erhalten!\n🌟 Bonus: ${rarity} Art (+${rarityBonus} XP)`;
+        }
         console.log("   Zeige XP-Benachrichtigung...");
-        showNotification(`⭐ +${xpGained} XP erhalten!`, 2000);
+        showNotification(xpMessage, 3000);
         
         // Prüfe Level-Up
         const xpNeeded = XP_PER_LEVEL * challengeLevel;
@@ -7828,11 +8899,11 @@
           showLevelUpNotification(challengeLevel);
           await saveChallengeProgress();
           setTimeout(() => {
-            showXPNotification(xpGained);
+            showXPNotification(xpGained, rarityBonus, rarity);
           }, 1500);
         } else {
           console.log("   Noch kein Level-Up");
-          showXPNotification(xpGained);
+          showXPNotification(xpGained, rarityBonus, rarity);
           await saveChallengeProgress();
         }
         
@@ -7873,71 +8944,1002 @@
         const progress = (challengeXP / xpNeeded) * 100;
         progressBar.style.width = Math.min(100, progress) + '%';
       }
+      
+      // Update Stats-Zähler
+      updateChallengeStats();
+    }
+    
+    async function updateChallengeStats() {
+      try {
+        const completedChallenges = await loadCompletedChallenges();
+        const activeChallenges = await loadActiveChallenges();
+        
+        // Berechne Gesamt-XP (von Beobachtungen + abgeschlossenen Challenges)
+        const allObservations = await getAllFromIndexedDB('observations');
+        const validObservations = allObservations.filter(o => isValidObservation(o));
+        const observationXP = validObservations.length * XP_PER_OBSERVATION;
+        
+        let challengeCompletionXP = 0;
+        for (const completed of completedChallenges) {
+          const challenge = CHALLENGES[completed.id];
+          if (challenge && challenge.xp) {
+            challengeCompletionXP += challenge.xp;
+          }
+        }
+        
+        const totalXP = observationXP + challengeCompletionXP;
+        
+        // Update UI
+        const completedCount = document.getElementById('completedChallengesCount');
+        const activeCount = document.getElementById('activeChallengesCount');
+        const totalXPDisplay = document.getElementById('totalXPEarned');
+        
+        if (completedCount) completedCount.textContent = completedChallenges.length;
+        if (activeCount) activeCount.textContent = activeChallenges.length;
+        if (totalXPDisplay) totalXPDisplay.textContent = totalXP;
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren der Challenge-Stats:', error);
+      }
+    }
+    
+    // NEU: Berechne XP von allen existierenden Beobachtungen
+    async function recalculateAllXP() {
+      try {
+        console.log("🔄 ========== NEUBERECHNUNG ALLER XP ==========");
+        
+        // Hole alle Beobachtungen
+        const allObservations = await getAllFromIndexedDB('observations');
+        const validObservations = allObservations.filter(o => isValidObservation(o));
+        
+        console.log(`📊 Gefunden: ${validObservations.length} gültige Beobachtungen`);
+        
+        // Berechne XP von Beobachtungen
+        const observationXP = validObservations.length * XP_PER_OBSERVATION;
+        console.log(`🐦 XP von Beobachtungen: ${observationXP} (${validObservations.length} × ${XP_PER_OBSERVATION})`);
+        
+        // Hole abgeschlossene Challenges
+        const completedChallenges = await loadCompletedChallenges();
+        console.log(`🏆 Abgeschlossene Challenges: ${completedChallenges.length}`);
+        
+        // Berechne XP von Challenges
+        let challengeXP = 0;
+        for (const completed of completedChallenges) {
+          const challenge = CHALLENGES[completed.id];
+          if (challenge && challenge.xp) {
+            challengeXP += challenge.xp;
+            console.log(`   ✅ ${challenge.name}: +${challenge.xp} XP`);
+          }
+        }
+        console.log(`🏆 XP von Challenges: ${challengeXP}`);
+        
+        // Gesamt-XP
+        const totalXP = observationXP + challengeXP;
+        console.log(`💎 GESAMT-XP: ${totalXP}`);
+        
+        // Berechne Level basierend auf Gesamt-XP
+        let calculatedLevel = 1;
+        let remainingXP = totalXP;
+        
+        while (remainingXP >= XP_PER_LEVEL * calculatedLevel) {
+          remainingXP -= XP_PER_LEVEL * calculatedLevel;
+          calculatedLevel++;
+        }
+        
+        console.log(`📈 Berechnetes Level: ${calculatedLevel}`);
+        console.log(`⭐ Übrige XP: ${remainingXP}/${XP_PER_LEVEL * calculatedLevel}`);
+        
+        // Aktualisiere globale Variablen
+        challengeLevel = calculatedLevel;
+        window.challengeXP = remainingXP; // Setze die global variable
+        
+        // Speichere
+        await saveChallengeProgress();
+        
+        // Update Display
+        updateChallengeDisplay();
+        
+        console.log("✅ ========== NEUBERECHNUNG ABGESCHLOSSEN ==========");
+        
+        return {
+          totalXP: totalXP,
+          observationXP: observationXP,
+          challengeXP: challengeXP,
+          level: calculatedLevel,
+          remainingXP: remainingXP
+        };
+      } catch (error) {
+        console.error('❌ Fehler bei XP-Neuberechnung:', error);
+        return null;
+      }
     }
     
     // ============ Challenge-System ============
     
     // Challenge-Definitionen
     const CHALLENGES = {
+      // 🟢 EINFACHE CHALLENGES (50-100 XP)
+      first_steps: {
+        id: 'first_steps',
+        name: 'Erste Schritte',
+        description: 'Erstelle deine erste Vogelbeobachtung',
+        icon: '🐣',
+        difficulty: 'easy',
+        xp: 50,
+        goal: 1,
+        type: 'observation_count',
+        color: '#22c55e'
+      },
+      species_beginner: {
+        id: 'species_beginner',
+        name: 'Arten-Einsteiger',
+        description: 'Beobachte 5 verschiedene Vogelarten',
+        icon: '🐦',
+        difficulty: 'easy',
+        xp: 75,
+        goal: 5,
+        type: 'species_count',
+        color: '#22c55e'
+      },
+      active_observer: {
+        id: 'active_observer',
+        name: 'Fleißig Beobachten',
+        description: 'Erfasse 10 Beobachtungen',
+        icon: '📝',
+        difficulty: 'easy',
+        xp: 100,
+        goal: 10,
+        type: 'observation_count',
+        color: '#22c55e'
+      },
+      photographer: {
+        id: 'photographer',
+        name: 'Fotograf',
+        description: 'Füge 5 Fotos zu Beobachtungen hinzu',
+        icon: '📷',
+        difficulty: 'easy',
+        xp: 80,
+        goal: 5,
+        type: 'photo_count',
+        color: '#22c55e'
+      },
+      
+      // 🟡 MITTLERE CHALLENGES (150-250 XP)
       species_collector: {
         id: 'species_collector',
         name: 'Arten-Sammler',
-        description: 'Beobachte 10 verschiedene Vogelarten',
-        icon: '🐦',
-        tier: 'Bronze',
-        goal: 10,
+        description: 'Beobachte 25 verschiedene Vogelarten',
+        icon: '🦅',
+        difficulty: 'medium',
+        xp: 200,
+        goal: 25,
         type: 'species_count',
-        color: '#06b6d4'
+        color: '#f59e0b'
       },
       diligent_observer: {
         id: 'diligent_observer',
         name: 'Fleißiger Beobachter',
         description: 'Erfasse 50 Beobachtungen',
         icon: '📊',
-        tier: 'Silber',
+        difficulty: 'medium',
+        xp: 250,
         goal: 50,
         type: 'observation_count',
-        color: '#7c3aed'
+        color: '#f59e0b'
       },
       early_bird: {
         id: 'early_bird',
         name: 'Früher Vogel',
-        description: 'Beobachte vor 7:00 Uhr morgens',
+        description: 'Beobachte 10x vor 7:00 Uhr morgens',
         icon: '🌅',
-        tier: 'Bronze',
-        goal: 1,
+        difficulty: 'medium',
+        xp: 180,
+        goal: 10,
         type: 'early_morning',
-        color: '#eab308'
+        color: '#f59e0b'
+      },
+      night_owl: {
+        id: 'night_owl',
+        name: 'Nachteulen-Beobachter',
+        description: 'Beobachte 5 nachtaktive Vogelarten',
+        icon: '🌙',
+        difficulty: 'medium',
+        xp: 220,
+        goal: 5,
+        type: 'nocturnal_species',
+        color: '#f59e0b'
+      },
+      photo_documentarian: {
+        id: 'photo_documentarian',
+        name: 'Foto-Dokumentar',
+        description: 'Füge 25 Beobachtungen mit Fotos hinzu',
+        icon: '📸',
+        difficulty: 'medium',
+        xp: 200,
+        goal: 25,
+        type: 'photo_count',
+        color: '#f59e0b'
+      },
+      weather_warrior: {
+        id: 'weather_warrior',
+        name: 'Wetter-Trotzer',
+        description: 'Beobachte bei 5 verschiedenen Wetterbedingungen',
+        icon: '🌧️',
+        difficulty: 'medium',
+        xp: 175,
+        goal: 5,
+        type: 'weather_diversity',
+        color: '#f59e0b'
+      },
+      
+      // 🟠 SCHWERE CHALLENGES (350-500 XP)
+      species_master: {
+        id: 'species_master',
+        name: 'Arten-Meister',
+        description: 'Beobachte 50 verschiedene Vogelarten',
+        icon: '🦜',
+        difficulty: 'hard',
+        xp: 400,
+        goal: 50,
+        type: 'species_count',
+        color: '#f97316'
+      },
+      marathon_observer: {
+        id: 'marathon_observer',
+        name: 'Marathon-Beobachter',
+        description: 'Erfasse 100 Beobachtungen',
+        icon: '🏃',
+        difficulty: 'hard',
+        xp: 500,
+        goal: 100,
+        type: 'observation_count',
+        color: '#f97316'
       },
       weekend_explorer: {
         id: 'weekend_explorer',
         name: 'Wochenend-Explorer',
         description: 'Beobachte an 4 Wochenenden hintereinander',
         icon: '🗓️',
-        tier: 'Gold',
+        difficulty: 'hard',
+        xp: 350,
         goal: 4,
         type: 'weekend_streak',
-        color: '#ef4444'
+        color: '#f97316'
       },
       diversity_champion: {
         id: 'diversity_champion',
         name: 'Diversitäts-Champion',
-        description: 'Beobachte Vögel aus 5 verschiedenen Familien',
+        description: 'Beobachte Vögel aus 10 verschiedenen Familien',
         icon: '🌈',
-        tier: 'Platin',
-        goal: 5,
+        difficulty: 'hard',
+        xp: 450,
+        goal: 10,
         type: 'bird_families',
+        color: '#f97316'
+      },
+      selffound_hunter: {
+        id: 'selffound_hunter',
+        name: 'Selffound-Jäger',
+        description: 'Markiere 25 Beobachtungen als Selffound',
+        icon: '🔍',
+        difficulty: 'hard',
+        xp: 380,
+        goal: 25,
+        type: 'selffound_count',
+        color: '#f97316'
+      },
+      season_watcher: {
+        id: 'season_watcher',
+        name: 'Jahreszeiten-Beobachter',
+        description: 'Beobachte in allen 4 Jahreszeiten',
+        icon: '🍂',
+        difficulty: 'hard',
+        xp: 420,
+        goal: 4,
+        type: 'season_diversity',
+        color: '#f97316'
+      },
+      
+      // 🔴 EXPERTEN-CHALLENGES (800-2000 XP)
+      species_legend: {
+        id: 'species_legend',
+        name: 'Arten-Legende',
+        description: 'Beobachte 100 verschiedene Vogelarten',
+        icon: '👑',
+        difficulty: 'expert',
+        xp: 1000,
+        goal: 100,
+        type: 'species_count',
+        color: '#ef4444'
+      },
+      ultra_marathon: {
+        id: 'ultra_marathon',
+        name: 'Ultra-Marathon',
+        description: 'Erfasse 500 Beobachtungen',
+        icon: '💪',
+        difficulty: 'expert',
+        xp: 1500,
+        goal: 500,
+        type: 'observation_count',
+        color: '#ef4444'
+      },
+      rarity_hunter: {
+        id: 'rarity_hunter',
+        name: 'Raritäten-Jäger',
+        description: 'Beobachte 10 seltene oder sehr seltene Arten',
+        icon: '💎',
+        difficulty: 'expert',
+        xp: 800,
+        goal: 10,
+        type: 'rare_species_count',
+        color: '#ef4444'
+      },
+      perfectionist: {
+        id: 'perfectionist',
+        name: 'Perfektionist',
+        description: '50 Beobachtungen mit Foto, Verhalten UND Wetter',
+        icon: '✨',
+        difficulty: 'expert',
+        xp: 900,
+        goal: 50,
+        type: 'complete_observations',
+        color: '#ef4444'
+      },
+      daily_streak: {
+        id: 'daily_streak',
+        name: 'Jeden-Tag-Beobachter',
+        description: 'Beobachte an 30 aufeinanderfolgenden Tagen',
+        icon: '📅',
+        difficulty: 'expert',
+        xp: 1200,
+        goal: 30,
+        type: 'daily_streak',
+        color: '#ef4444'
+      },
+      grandmaster: {
+        id: 'grandmaster',
+        name: 'Großmeister',
+        description: 'Schließe 20 andere Challenges ab',
+        icon: '🏆',
+        difficulty: 'expert',
+        xp: 2000,
+        goal: 20,
+        type: 'challenges_completed',
+        color: '#8b5cf6'
+      },
+      
+      // ========== NEUE EINFACHE CHALLENGES ==========
+      morning_explorer: {
+        id: 'morning_explorer',
+        name: 'Morgen-Entdecker',
+        description: 'Beobachte 3 Vögel vor 9:00 Uhr morgens',
+        icon: '🌅',
+        difficulty: 'easy',
+        xp: 75,
+        goal: 3,
+        type: 'early_morning',
         color: '#22c55e'
       },
-      photo_documentarian: {
-        id: 'photo_documentarian',
-        name: 'Foto-Dokumentar',
-        description: 'Füge 20 Beobachtungen mit Fotos hinzu',
+      weekend_observer: {
+        id: 'weekend_observer',
+        name: 'Wochenend-Beobachter',
+        description: 'Erfasse 5 Beobachtungen an einem Wochenende',
+        icon: '📆',
+        difficulty: 'easy',
+        xp: 60,
+        goal: 5,
+        type: 'weekend_observations',
+        color: '#22c55e'
+      },
+      photo_amateur: {
+        id: 'photo_amateur',
+        name: 'Foto-Amateur',
+        description: 'Füge 3 Fotos zu deinen Beobachtungen hinzu',
         icon: '📸',
-        tier: 'Silber',
+        difficulty: 'easy',
+        xp: 70,
+        goal: 3,
+        type: 'photo_count',
+        color: '#22c55e'
+      },
+      notes_collector: {
+        id: 'notes_collector',
+        name: 'Notizen-Sammler',
+        description: 'Schreibe Notizen zu 5 verschiedenen Beobachtungen',
+        icon: '📝',
+        difficulty: 'easy',
+        xp: 65,
+        goal: 5,
+        type: 'notes_count',
+        color: '#22c55e'
+      },
+      park_bench_observer: {
+        id: 'park_bench_observer',
+        name: 'Parkbank-Beobachter',
+        description: 'Beobachte am selben Ort an 3 verschiedenen Tagen',
+        icon: '🪑',
+        difficulty: 'easy',
+        xp: 80,
+        goal: 3,
+        type: 'location_streak',
+        color: '#22c55e'
+      },
+      curious_beginner: {
+        id: 'curious_beginner',
+        name: 'Neugieriger Anfänger',
+        description: 'Beobachte deine ersten 3 verschiedenen Vogelarten',
+        icon: '🌱',
+        difficulty: 'easy',
+        xp: 55,
+        goal: 3,
+        type: 'species_count',
+        color: '#22c55e'
+      },
+      balcony_observer: {
+        id: 'balcony_observer',
+        name: 'Balkon-Beobachter',
+        description: 'Erfasse 5 Vögel von zu Hause aus',
+        icon: '🏡',
+        difficulty: 'easy',
+        xp: 60,
+        goal: 5,
+        type: 'home_observations',
+        color: '#22c55e'
+      },
+      lunch_break: {
+        id: 'lunch_break',
+        name: 'Mittags-Pause',
+        description: 'Beobachte 3 Vögel zwischen 11:00 und 14:00 Uhr',
+        icon: '☕',
+        difficulty: 'easy',
+        xp: 50,
+        goal: 3,
+        type: 'midday_observations',
+        color: '#22c55e'
+      },
+      walk_explorer: {
+        id: 'walk_explorer',
+        name: 'Spaziergang-Entdecker',
+        description: 'Beobachte während eines Spaziergangs 4 verschiedene Arten',
+        icon: '🚶',
+        difficulty: 'easy',
+        xp: 65,
+        goal: 4,
+        type: 'species_count',
+        color: '#22c55e'
+      },
+      water_observer: {
+        id: 'water_observer',
+        name: 'Wasser-Beobachter',
+        description: 'Beobachte 3 Wasservögel',
+        icon: '🦆',
+        difficulty: 'easy',
+        xp: 70,
+        goal: 3,
+        type: 'water_birds',
+        color: '#22c55e'
+      },
+      songbird_fan: {
+        id: 'songbird_fan',
+        name: 'Singvogel-Fan',
+        description: 'Beobachte 5 verschiedene Singvögel',
+        icon: '🎶',
+        difficulty: 'easy',
+        xp: 75,
+        goal: 5,
+        type: 'songbirds',
+        color: '#22c55e'
+      },
+      raptor_spotter: {
+        id: 'raptor_spotter',
+        name: 'Greifvogel-Spotter',
+        description: 'Beobachte deinen ersten Greifvogel',
+        icon: '🦅',
+        difficulty: 'easy',
+        xp: 80,
+        goal: 1,
+        type: 'raptors',
+        color: '#22c55e'
+      },
+      
+      // ========== NEUE MITTLERE CHALLENGES ==========
+      seasonal_observer: {
+        id: 'seasonal_observer',
+        name: 'Jahreszeiten-Beobachter',
+        description: 'Beobachte 5 Arten in jeder Jahreszeit',
+        icon: '🍂',
+        difficulty: 'medium',
+        xp: 300,
+        goal: 20,
+        type: 'seasonal_diversity',
+        color: '#f59e0b'
+      },
+      weather_documenter: {
+        id: 'weather_documenter',
+        name: 'Wetter-Dokumentar',
+        description: 'Dokumentiere das Wetter bei 30 Beobachtungen',
+        icon: '☁️',
+        difficulty: 'medium',
+        xp: 200,
+        goal: 30,
+        type: 'weather_documented',
+        color: '#f59e0b'
+      },
+      behavior_researcher: {
+        id: 'behavior_researcher',
+        name: 'Verhaltens-Forscher',
+        description: 'Beschreibe das Verhalten bei 25 Beobachtungen',
+        icon: '🔬',
+        difficulty: 'medium',
+        xp: 250,
+        goal: 25,
+        type: 'behavior_documented',
+        color: '#f59e0b'
+      },
+      urban_explorer: {
+        id: 'urban_explorer',
+        name: 'Stadtgebiet-Entdecker',
+        description: 'Beobachte an 10 verschiedenen Stadtorten',
+        icon: '🏙️',
+        difficulty: 'medium',
+        xp: 220,
+        goal: 10,
+        type: 'location_count',
+        color: '#f59e0b'
+      },
+      nocturnal: {
+        id: 'nocturnal',
+        name: 'Nachtaktiv',
+        description: 'Beobachte 5 Vögel nach 19:00 Uhr',
+        icon: '🌙',
+        difficulty: 'medium',
+        xp: 280,
+        goal: 5,
+        type: 'late_evening',
+        color: '#f59e0b'
+      },
+      group_dynamics: {
+        id: 'group_dynamics',
+        name: 'Gruppen-Dynamik',
+        description: 'Beobachte 15× Gruppen von 5+ Vögeln',
+        icon: '👥',
+        difficulty: 'medium',
+        xp: 240,
+        goal: 15,
+        type: 'group_observations',
+        color: '#f59e0b'
+      },
+      photo_pro: {
+        id: 'photo_pro',
+        name: 'Foto-Profi',
+        description: 'Füge 20 hochwertige Fotos hinzu',
+        icon: '📷',
+        difficulty: 'medium',
+        xp: 260,
         goal: 20,
         type: 'photo_count',
-        color: '#ec4899'
+        color: '#f59e0b'
+      },
+      early_riser: {
+        id: 'early_riser',
+        name: 'Frühaufsteher',
+        description: 'Beobachte 20 Vögel vor 7:00 Uhr',
+        icon: '🌄',
+        difficulty: 'medium',
+        xp: 230,
+        goal: 20,
+        type: 'early_morning',
+        color: '#f59e0b'
+      },
+      dusk_watcher: {
+        id: 'dusk_watcher',
+        name: 'Abenddämmerung',
+        description: 'Beobachte 15 Vögel zwischen 18:00 und 20:00',
+        icon: '🌆',
+        difficulty: 'medium',
+        xp: 210,
+        goal: 15,
+        type: 'evening_observations',
+        color: '#f59e0b'
+      },
+      all_weather: {
+        id: 'all_weather',
+        name: 'Alle-Wetter-Beobachter',
+        description: 'Je 5 Vögel bei Sonne, Regen und Bewölkung',
+        icon: '🌦️',
+        difficulty: 'medium',
+        xp: 250,
+        goal: 15,
+        type: 'weather_diversity',
+        color: '#f59e0b'
+      },
+      forest_explorer: {
+        id: 'forest_explorer',
+        name: 'Wald-Entdecker',
+        description: 'Beobachte 15 verschiedene Waldvogelarten',
+        icon: '🌲',
+        difficulty: 'medium',
+        xp: 270,
+        goal: 15,
+        type: 'forest_birds',
+        color: '#f59e0b'
+      },
+      meadow_researcher: {
+        id: 'meadow_researcher',
+        name: 'Wiesen-Forscher',
+        description: 'Beobachte 12 Arten auf Wiesen/Feldern',
+        icon: '🌾',
+        difficulty: 'medium',
+        xp: 240,
+        goal: 12,
+        type: 'meadow_birds',
+        color: '#f59e0b'
+      },
+      water_specialist: {
+        id: 'water_specialist',
+        name: 'Gewässer-Spezialist',
+        description: 'Beobachte 20 verschiedene Wasservögel',
+        icon: '💧',
+        difficulty: 'medium',
+        xp: 290,
+        goal: 20,
+        type: 'water_birds',
+        color: '#f59e0b'
+      },
+      raptor_expert: {
+        id: 'raptor_expert',
+        name: 'Greifvogel-Kenner',
+        description: 'Beobachte 8 verschiedene Greifvogelarten',
+        icon: '🦅',
+        difficulty: 'medium',
+        xp: 310,
+        goal: 8,
+        type: 'raptors',
+        color: '#f59e0b'
+      },
+      woodpecker_collector: {
+        id: 'woodpecker_collector',
+        name: 'Specht-Sammler',
+        description: 'Beobachte 5 verschiedene Spechtarten',
+        icon: '🪵',
+        difficulty: 'medium',
+        xp: 260,
+        goal: 5,
+        type: 'woodpeckers',
+        color: '#f59e0b'
+      },
+      
+      // ========== NEUE SCHWERE CHALLENGES ==========
+      migration_observer: {
+        id: 'migration_observer',
+        name: 'Migrations-Beobachter',
+        description: 'Dokumentiere 15 Zugvogelarten',
+        icon: '🛫',
+        difficulty: 'hard',
+        xp: 500,
+        goal: 15,
+        type: 'migratory_birds',
+        color: '#f97316'
+      },
+      habitat_specialist: {
+        id: 'habitat_specialist',
+        name: 'Lebensraum-Spezialist',
+        description: 'Je 10 Arten in Wald, Wiese, Wasser, Stadt',
+        icon: '🏞️',
+        difficulty: 'hard',
+        xp: 600,
+        goal: 40,
+        type: 'habitat_diversity',
+        color: '#f97316'
+      },
+      song_expert: {
+        id: 'song_expert',
+        name: 'Gesangs-Experte',
+        description: 'Identifiziere 25 Vögel nur durch Gesang',
+        icon: '🎵',
+        difficulty: 'hard',
+        xp: 550,
+        goal: 25,
+        type: 'song_identification',
+        color: '#f97316'
+      },
+      breeding_documenter: {
+        id: 'breeding_documenter',
+        name: 'Brutzeit-Dokumentar',
+        description: 'Dokumentiere 20 Brutverhalten',
+        icon: '🥚',
+        difficulty: 'hard',
+        xp: 580,
+        goal: 20,
+        type: 'breeding_behavior',
+        color: '#f97316'
+      },
+      weather_extremist: {
+        id: 'weather_extremist',
+        name: 'Wetter-Extremist',
+        description: 'Beobachte bei allen Wetterlagen',
+        icon: '⛈️',
+        difficulty: 'hard',
+        xp: 520,
+        goal: 10,
+        type: 'weather_diversity',
+        color: '#f97316'
+      },
+      daily_rhythm: {
+        id: 'daily_rhythm',
+        name: 'Tages-Rhythmus',
+        description: 'An einem Tag: Morgen, Mittag, Abend je 5 Arten',
+        icon: '⏰',
+        difficulty: 'hard',
+        xp: 450,
+        goal: 15,
+        type: 'daily_coverage',
+        color: '#f97316'
+      },
+      color_collector: {
+        id: 'color_collector',
+        name: 'Farben-Sammler',
+        description: 'Beobachte Vögel mit allen Hauptfarben',
+        icon: '🎨',
+        difficulty: 'hard',
+        xp: 480,
+        goal: 10,
+        type: 'color_diversity',
+        color: '#f97316'
+      },
+      four_seasons_master: {
+        id: 'four_seasons_master',
+        name: 'Vier-Jahreszeiten-Meister',
+        description: '20 Arten pro Jahreszeit',
+        icon: '🍁',
+        difficulty: 'hard',
+        xp: 650,
+        goal: 80,
+        type: 'seasonal_diversity',
+        color: '#f97316'
+      },
+      night_and_day: {
+        id: 'night_and_day',
+        name: 'Nacht-und-Tag',
+        description: '10 Nachtvögel und 30 Tagvögel',
+        icon: '🌓',
+        difficulty: 'hard',
+        xp: 580,
+        goal: 40,
+        type: 'time_diversity',
+        color: '#f97316'
+      },
+      tit_expert: {
+        id: 'tit_expert',
+        name: 'Meisen-Experte',
+        description: 'Alle 8 deutschen Meisenarten',
+        icon: '💙',
+        difficulty: 'hard',
+        xp: 530,
+        goal: 8,
+        type: 'tit_species',
+        color: '#f97316'
+      },
+      finch_family: {
+        id: 'finch_family',
+        name: 'Finken-Familie',
+        description: '10 verschiedene Finkenarten',
+        icon: '🐦',
+        difficulty: 'hard',
+        xp: 490,
+        goal: 10,
+        type: 'finch_species',
+        color: '#f97316'
+      },
+      gull_expert: {
+        id: 'gull_expert',
+        name: 'Möwen-Kenner',
+        description: '8 verschiedene Möwenarten',
+        icon: '🌊',
+        difficulty: 'hard',
+        xp: 560,
+        goal: 8,
+        type: 'gull_species',
+        color: '#f97316'
+      },
+      beak_shapes: {
+        id: 'beak_shapes',
+        name: 'Schnabel-Formen',
+        description: '10 verschiedene Schnabeltypen',
+        icon: '👃',
+        difficulty: 'hard',
+        xp: 540,
+        goal: 10,
+        type: 'beak_diversity',
+        color: '#f97316'
+      },
+      flight_patterns: {
+        id: 'flight_patterns',
+        name: 'Flug-Muster',
+        description: '25 verschiedene Flugverhalten',
+        icon: '✈️',
+        difficulty: 'hard',
+        xp: 510,
+        goal: 25,
+        type: 'flight_behavior',
+        color: '#f97316'
+      },
+      
+      // ========== NEUE EXPERTEN CHALLENGES ==========
+      encyclopedia: {
+        id: 'encyclopedia',
+        name: 'Enzyklopädie',
+        description: '100 Arten mit vollständigen Profilen',
+        icon: '📚',
+        difficulty: 'expert',
+        xp: 2500,
+        goal: 100,
+        type: 'complete_profiles',
+        color: '#ef4444'
+      },
+      year_chronicler: {
+        id: 'year_chronicler',
+        name: 'Jahres-Chronist',
+        description: 'Jeden Monat 10 verschiedene Arten',
+        icon: '📖',
+        difficulty: 'expert',
+        xp: 1800,
+        goal: 120,
+        type: 'monthly_diversity',
+        color: '#ef4444'
+      },
+      continental_explorer: {
+        id: 'continental_explorer',
+        name: 'Kontinental-Forscher',
+        description: 'Vögel in 20 verschiedenen Ländern',
+        icon: '🌍',
+        difficulty: 'expert',
+        xp: 3000,
+        goal: 20,
+        type: 'country_diversity',
+        color: '#ef4444'
+      },
+      photographer_master: {
+        id: 'photographer_master',
+        name: 'Photographen-Meister',
+        description: '200 hochqualitative Fotos',
+        icon: '📸',
+        difficulty: 'expert',
+        xp: 2200,
+        goal: 200,
+        type: 'photo_count',
+        color: '#ef4444'
+      },
+      completeness_fanatic: {
+        id: 'completeness_fanatic',
+        name: 'Vollständigkeits-Fanatiker',
+        description: '100 Beobachtungen mit ALLEN Feldern',
+        icon: '💯',
+        difficulty: 'expert',
+        xp: 2800,
+        goal: 100,
+        type: 'complete_observations',
+        color: '#ef4444'
+      },
+      longterm_commitment: {
+        id: 'longterm_commitment',
+        name: 'Langzeit-Verpflichtung',
+        description: '100 Tage Streak',
+        icon: '📅',
+        difficulty: 'expert',
+        xp: 3500,
+        goal: 100,
+        type: 'daily_streak',
+        color: '#ef4444'
+      },
+      extreme_collector: {
+        id: 'extreme_collector',
+        name: 'Extreme-Sammler',
+        description: '1000 Beobachtungen insgesamt',
+        icon: '🎯',
+        difficulty: 'expert',
+        xp: 5000,
+        goal: 1000,
+        type: 'observation_count',
+        color: '#ef4444'
+      },
+      community_champion: {
+        id: 'community_champion',
+        name: 'Community-Champion',
+        description: '100 geteilte Beobachtungen + Level 50',
+        icon: '🌟',
+        difficulty: 'expert',
+        xp: 4000,
+        goal: 100,
+        type: 'community_shares',
+        color: '#8b5cf6'
+      },
+      biogeographic_zones: {
+        id: 'biogeographic_zones',
+        name: 'Biogeografische Zonen',
+        description: 'Je 30 Arten in 4 Naturräumen',
+        icon: '🗺️',
+        difficulty: 'expert',
+        xp: 3200,
+        goal: 120,
+        type: 'biogeographic_diversity',
+        color: '#ef4444'
+      },
+      all_families: {
+        id: 'all_families',
+        name: 'Alle-Familien',
+        description: 'Eine Art aus 50 Vogelfamilien',
+        icon: '👨‍👩‍👧‍👦',
+        difficulty: 'expert',
+        xp: 4500,
+        goal: 50,
+        type: 'family_diversity',
+        color: '#ef4444'
+      },
+      migration_chronicler: {
+        id: 'migration_chronicler',
+        name: 'Wander-Chronist',
+        description: '50 Zugvogelarten mit Zugdaten',
+        icon: '🧭',
+        difficulty: 'expert',
+        xp: 2900,
+        goal: 50,
+        type: 'migratory_birds',
+        color: '#ef4444'
+      },
+      audio_archivist: {
+        id: 'audio_archivist',
+        name: 'Audio-Archivar',
+        description: '100 Vögel nur durch Gesang identifizieren',
+        icon: '🎙️',
+        difficulty: 'expert',
+        xp: 3600,
+        goal: 100,
+        type: 'song_identification',
+        color: '#ef4444'
+      },
+      nest_documenter: {
+        id: 'nest_documenter',
+        name: 'Nest-Dokumentar',
+        description: '50 Nistplätze mit Brutverhalten',
+        icon: '🪹',
+        difficulty: 'expert',
+        xp: 2600,
+        goal: 50,
+        type: 'nesting_sites',
+        color: '#ef4444'
+      },
+      scientist: {
+        id: 'scientist',
+        name: 'Wissenschaftler',
+        description: '200 wissenschaftliche Dokumentationen',
+        icon: '🔬',
+        difficulty: 'expert',
+        xp: 4200,
+        goal: 200,
+        type: 'scientific_observations',
+        color: '#ef4444'
+      },
+      lifetime_project: {
+        id: 'lifetime_project',
+        name: 'Lebenszeit-Projekt',
+        description: '500 Arten über 3 Jahre',
+        icon: '♾️',
+        difficulty: 'expert',
+        xp: 10000,
+        goal: 500,
+        type: 'species_count',
+        color: '#8b5cf6'
+      },
+      global_ambassador: {
+        id: 'global_ambassador',
+        name: 'Globaler Botschafter',
+        description: 'Vögel auf allen 7 Kontinenten',
+        icon: '🌐',
+        difficulty: 'expert',
+        xp: 8000,
+        goal: 7,
+        type: 'continent_diversity',
+        color: '#8b5cf6'
       }
     };
     
@@ -8042,6 +10044,48 @@
       
       await renderChallenges();
     }
+    
+    // Filter Challenges nach Schwierigkeitsgrad
+    function filterChallengesByDifficulty(difficulty) {
+      // Update Filter-Buttons
+      document.querySelectorAll('.challenge-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.fontWeight = '';
+      });
+      
+      const activeBtn = document.querySelector(`.challenge-filter-btn[data-difficulty="${difficulty}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = 'var(--accent)';
+        activeBtn.style.color = 'white';
+        activeBtn.style.fontWeight = '600';
+      }
+      
+      // Filter Challenge-Cards
+      const challenges = document.querySelectorAll('.challenge-card');
+      challenges.forEach(card => {
+        if (difficulty === 'all') {
+          card.style.display = '';
+        } else {
+          const cardDifficulty = card.getAttribute('data-difficulty');
+          card.style.display = cardDifficulty === difficulty ? '' : 'none';
+        }
+      });
+      
+      // Speichere ausgewählten Filter
+      localStorage.setItem('challengeFilter', difficulty);
+    }
+    
+    // Lade letzten Filter beim Start
+    function loadChallengeFilter() {
+      const savedFilter = localStorage.getItem('challengeFilter') || 'all';
+      filterChallengesByDifficulty(savedFilter);
+    }
+    
+    // Globale Funktionen
+    window.filterChallengesByDifficulty = filterChallengesByDifficulty;
     
     // Challenge-Fortschritt prüfen
     async function checkChallengeProgress() {
@@ -8182,6 +10226,68 @@
             const families = new Set(observations.map(obs => obs.bird));
             progress = Math.min(families.size, challenge.goal);
             break;
+            
+          case 'nocturnal_species':
+            // Liste nachtaktiver Vogelarten (kann erweitert werden)
+            const nocturnalBirds = ['eule', 'kauz', 'nachtreiher', 'nachtigall', 'nachtschwalbe', 'ziegenmelker'];
+            progress = observations.filter(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              return nocturnalBirds.some(bird => birdLower.includes(bird));
+            }).length;
+            break;
+            
+          case 'weather_diversity':
+            const uniqueWeatherTypes = new Set(
+              observations
+                .filter(obs => obs.weather)
+                .map(obs => obs.weather)
+            );
+            progress = uniqueWeatherTypes.size;
+            break;
+            
+          case 'selffound_count':
+            // Zähle Beobachtungen die als "selffound" markiert sind
+            progress = observations.filter(obs => obs.selffound === true).length;
+            break;
+            
+          case 'season_diversity':
+            // Zähle verschiedene Jahreszeiten (basierend auf Monaten)
+            const seasons = new Set();
+            observations.forEach(obs => {
+              if (obs.date) {
+                const month = new Date(obs.date).getMonth() + 1;
+                if (month >= 3 && month <= 5) seasons.add('spring');
+                else if (month >= 6 && month <= 8) seasons.add('summer');
+                else if (month >= 9 && month <= 11) seasons.add('fall');
+                else seasons.add('winter');
+              }
+            });
+            progress = seasons.size;
+            break;
+            
+          case 'rare_species_count':
+            // Zähle verschiedene seltene/sehr seltene Arten
+            const rareSpecies = new Set();
+            observations.forEach(obs => {
+              const rarity = (obs.rarity || '').toLowerCase();
+              if (rarity === 'selten' || rarity === 'sehr selten') {
+                rareSpecies.add(obs.bird);
+              }
+            });
+            progress = rareSpecies.size;
+            break;
+            
+          case 'complete_observations':
+            // Beobachtungen mit Foto, Verhalten UND Wetter
+            progress = observations.filter(obs => 
+              obs.photo && obs.behavior && obs.weather
+            ).length;
+            break;
+            
+          case 'challenges_completed':
+            // Zähle abgeschlossene Challenges
+            progress = completedChallenges.length;
+            break;
         }
         
         activeChallenge.progress = progress;
@@ -8196,12 +10302,30 @@
           });
           newlyCompleted.push(challenge);
           
-          // Vergebe Bonus-XP wenn vorhanden
-          if (challenge.xpReward && challenge.xpReward > 0) {
-            challengeXP += challenge.xpReward;
+          // NEU: Vergebe Challenge-XP (verwende 'xp' property)
+          if (challenge.xp && challenge.xp > 0) {
+            const xpGained = challenge.xp;
+            challengeXP += xpGained;
+            
+            console.log(`🏆 Challenge abgeschlossen: ${challenge.name} - +${xpGained} XP`);
+            
+            // Prüfe Level-Up
+            const xpNeeded = XP_PER_LEVEL * challengeLevel;
+            
+            while (challengeXP >= xpNeeded) {
+              challengeLevel++;
+              challengeXP = challengeXP - xpNeeded;
+              console.log(`🎉 LEVEL UP! Neues Level: ${challengeLevel}`);
+              showLevelUpNotification(challengeLevel);
+            }
+            
             await saveChallengeProgress();
             updateChallengeDisplay();
-            showNotification(`🎁 Bonus: +${challenge.xpReward} XP für Challenge-Abschluss!`, 3000);
+            
+            // Zeige XP-Benachrichtigung nach kurzer Verzögerung
+            setTimeout(() => {
+              showNotification(`🎁 Challenge Belohnung: +${xpGained} XP!`, 3000);
+            }, 1500);
           }
         }
       }
@@ -8233,7 +10357,7 @@
           <div>
             <div style="font-size:18px;font-weight:700;margin-bottom:4px;">Challenge abgeschlossen! 🎉</div>
             <div style="font-size:14px;opacity:0.95;">${challenge.name}</div>
-            <div style="font-size:12px;opacity:0.8;margin-top:2px;">🏅 ${challenge.tier}</div>
+            ${challenge.xp ? `<div style="font-size:13px;opacity:0.9;margin-top:4px;color:#fbbf24;">🎁 +${challenge.xp} XP</div>` : ''}
           </div>
         </div>
       `;
@@ -8422,7 +10546,7 @@
         }
         
         html += `
-          <div class="card" style="background:rgba(${isCustom ? '124,58,237' : '255,255,255'},0.05);border-left:3px solid ${challenge.color};${isNew ? 'animation: slideInUp 0.4s ease-out;' : ''}position:relative;">
+          <div class="card" style="background:rgba(${isCustom ? '124,58,237' : '255,255,255'},0.05);border-left:3px solid ${challenge.color};${isNew ? 'animation: slideInUp 0.4s ease-out;' : ''}position:relative;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;" onclick="showChallengeDetails('${challenge.id}')" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(6,182,212,0.2)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
             ${isCustom ? '<div style="position:absolute;top:8px;right:8px;background:var(--accent-2);color:white;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;">CUSTOM</div>' : ''}
             ${isNew ? '<div style="position:absolute;top:8px;left:8px;background:#10b981;color:white;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;animation: pulse 1s ease-in-out 3;">✨ NEU</div>' : ''}
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -8435,7 +10559,7 @@
             ${goalText}
             <div style="display:flex;justify-content:space-between;align-items:center;${goalText ? 'margin-top:12px;' : ''}">
               <span style="font-size:12px;color:var(--muted);">🏅 ${challenge.tier}</span>
-              <button class="small-btn" onclick="startChallenge('${challenge.id}')">Starten</button>
+              <button class="small-btn" onclick="event.stopPropagation();startChallenge('${challenge.id}')">Starten</button>
             </div>
             ${challenge.xpReward && challenge.xpReward > 0 ? `
               <div style="margin-top:8px;padding:6px;background:rgba(245,158,11,0.1);border-radius:6px;text-align:center;">
@@ -8450,6 +10574,183 @@
     }
     
     // ============ Challenge Creator Funktionen ============
+    
+    // Challenge Details anzeigen
+    function showChallengeDetails(challengeId) {
+      const challenge = CHALLENGES[challengeId];
+      if (!challenge) {
+        console.error('Challenge nicht gefunden:', challengeId);
+        return;
+      }
+      
+      // Schwierigkeitsgrad-Text und Farbe
+      const difficultyInfo = {
+        'easy': { text: '🟢 Einfach', color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
+        'medium': { text: '🟡 Mittel', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+        'hard': { text: '🟠 Schwer', color: '#f97316', bg: 'rgba(249,115,22,0.1)' },
+        'expert': { text: '🔴 Experte', color: '#ef4444', bg: 'rgba(239,68,68,0.1)' }
+      };
+      
+      const diff = difficultyInfo[challenge.difficulty] || difficultyInfo['easy'];
+      
+      // Typ-Beschreibung
+      const typeDescriptions = {
+        'observation_count': 'Erfasse eine bestimmte Anzahl an Beobachtungen',
+        'species_count': 'Beobachte verschiedene Vogelarten',
+        'photo_count': 'Füge Fotos zu deinen Beobachtungen hinzu',
+        'early_morning': 'Beobachte Vögel in den frühen Morgenstunden',
+        'late_evening': 'Beobachte Vögel am späten Abend',
+        'weekend_observations': 'Beobachte Vögel am Wochenende',
+        'notes_count': 'Füge Notizen zu deinen Beobachtungen hinzu',
+        'location_streak': 'Beobachte am selben Ort über mehrere Tage',
+        'home_observations': 'Beobachte Vögel von zu Hause aus',
+        'midday_observations': 'Beobachte Vögel zur Mittagszeit',
+        'water_birds': 'Beobachte Wasservögel',
+        'songbirds': 'Beobachte Singvögel',
+        'raptors': 'Beobachte Greifvögel',
+        'seasonal_diversity': 'Beobachte Vögel in verschiedenen Jahreszeiten',
+        'weather_documented': 'Dokumentiere die Wetterbedingungen',
+        'behavior_documented': 'Dokumentiere das Vogelverhalten',
+        'location_count': 'Beobachte an verschiedenen Orten',
+        'group_observations': 'Beobachte Vogelgruppen',
+        'evening_observations': 'Beobachte Vögel am Abend',
+        'weather_diversity': 'Beobachte bei verschiedenen Wetterbedingungen',
+        'forest_birds': 'Beobachte Waldvögel',
+        'meadow_birds': 'Beobachte Wiesenvögel',
+        'woodpeckers': 'Beobachte Spechte',
+        'migratory_birds': 'Beobachte Zugvögel',
+        'habitat_diversity': 'Beobachte in verschiedenen Lebensräumen',
+        'song_identification': 'Identifiziere Vögel am Gesang',
+        'breeding_behavior': 'Dokumentiere Brutverhalten',
+        'daily_coverage': 'Beobachte zu verschiedenen Tageszeiten',
+        'color_diversity': 'Beobachte Vögel mit verschiedenen Farben',
+        'time_diversity': 'Beobachte tag- und nachtaktive Vögel',
+        'tit_species': 'Beobachte verschiedene Meisenarten',
+        'finch_species': 'Beobachte verschiedene Finkenarten',
+        'gull_species': 'Beobachte verschiedene Möwenarten',
+        'beak_diversity': 'Beobachte Vögel mit verschiedenen Schnabelformen',
+        'flight_behavior': 'Dokumentiere verschiedene Flugverhalten',
+        'complete_profiles': 'Erstelle vollständige Artprofile',
+        'monthly_diversity': 'Beobachte jeden Monat verschiedene Arten',
+        'country_diversity': 'Beobachte in verschiedenen Ländern',
+        'complete_observations': 'Fülle alle Felder bei Beobachtungen aus',
+        'daily_streak': 'Beobachte über mehrere Tage hinweg',
+        'community_shares': 'Teile Beobachtungen mit der Community',
+        'biogeographic_diversity': 'Beobachte in verschiedenen Naturräumen',
+        'family_diversity': 'Beobachte Arten aus verschiedenen Familien',
+        'nesting_sites': 'Dokumentiere Nistplätze',
+        'scientific_observations': 'Erstelle wissenschaftliche Dokumentationen',
+        'continent_diversity': 'Beobachte auf verschiedenen Kontinenten',
+        'challenges_completed': 'Schließe andere Challenges ab'
+      };
+      
+      const typeDesc = typeDescriptions[challenge.type] || 'Erfülle die Challenge-Bedingungen';
+      
+      // Modal erstellen
+      const modalHTML = `
+        <div id="challengeDetailsModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,6,23,0.95);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;backdrop-filter:blur(8px);" onclick="if(event.target === this) this.remove()">
+          <div style="background:linear-gradient(180deg, ${diff.bg}, var(--card));padding:32px;border-radius:20px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:2px solid ${diff.color};box-shadow:0 20px 60px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
+            
+            <!-- Close Button -->
+            <button onclick="document.getElementById('challengeDetailsModal').remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:var(--text);cursor:pointer;font-size:24px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.transform='rotate(90deg)';" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='rotate(0deg)';">×</button>
+            
+            <!-- Header -->
+            <div style="text-align:center;margin-bottom:32px;">
+              <div style="font-size:72px;margin-bottom:16px;">${challenge.icon}</div>
+              <h2 style="margin:0 0 8px 0;font-size:28px;color:var(--text);">${challenge.name}</h2>
+              <div style="display:inline-block;background:${diff.bg};color:${diff.color};padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid ${diff.color};">
+                ${diff.text}
+              </div>
+            </div>
+            
+            <!-- Description -->
+            <div style="background:rgba(255,255,255,0.03);padding:20px;border-radius:12px;margin-bottom:24px;border-left:4px solid ${challenge.color};">
+              <h3 style="margin:0 0 12px 0;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;">
+                📋 Beschreibung
+              </h3>
+              <p style="margin:0;font-size:15px;color:var(--soft);line-height:1.6;">
+                ${challenge.description}
+              </p>
+            </div>
+            
+            <!-- Details Grid -->
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px;">
+              
+              <!-- Ziel -->
+              <div style="background:rgba(6,182,212,0.1);padding:16px;border-radius:12px;border:1px solid rgba(6,182,212,0.3);">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">🎯 Ziel</div>
+                <div style="font-size:24px;font-weight:700;color:#06b6d4;">${challenge.goal}</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">${typeDesc}</div>
+              </div>
+              
+              <!-- XP Belohnung -->
+              <div style="background:rgba(245,158,11,0.1);padding:16px;border-radius:12px;border:1px solid rgba(245,158,11,0.3);">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">🎁 Belohnung</div>
+                <div style="font-size:24px;font-weight:700;color:#f59e0b;">+${challenge.xp} XP</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">Erfahrungspunkte</div>
+              </div>
+              
+            </div>
+            
+            <!-- Challenge Typ -->
+            <div style="background:rgba(124,58,237,0.1);padding:16px;border-radius:12px;margin-bottom:24px;border:1px solid rgba(124,58,237,0.3);">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🏷️ Challenge-Typ</div>
+              <div style="font-size:14px;color:var(--text);font-weight:500;">${typeDesc}</div>
+            </div>
+            
+            <!-- Tipps -->
+            <div style="background:rgba(16,185,129,0.1);padding:16px;border-radius:12px;margin-bottom:24px;border-left:4px solid #10b981;">
+              <div style="font-size:14px;color:var(--text);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                💡 Tipps zum Abschließen
+              </div>
+              <ul style="margin:0;padding-left:20px;color:var(--soft);font-size:13px;line-height:1.8;">
+                ${getTipsForChallenge(challenge)}
+              </ul>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display:flex;gap:12px;">
+              <button onclick="document.getElementById('challengeDetailsModal').remove()" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+                Schließen
+              </button>
+              <button onclick="document.getElementById('challengeDetailsModal').remove();startChallenge('${challenge.id}')" style="flex:2;background:linear-gradient(135deg,${challenge.color},${adjustColor(challenge.color,-20)});border:none;color:white;padding:14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;box-shadow:0 4px 12px ${challenge.color}40;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px ${challenge.color}60';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px ${challenge.color}40';">
+                🚀 Challenge starten
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      `;
+      
+      // Modal zum Body hinzufügen
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    
+    // Hilfsfunktion für Challenge-spezifische Tipps
+    function getTipsForChallenge(challenge) {
+      const tipsByType = {
+        'observation_count': '<li>Erstelle regelmäßig neue Beobachtungen</li><li>Nutze verschiedene Tageszeiten</li><li>Dokumentiere auch häufige Arten</li>',
+        'species_count': '<li>Besuche verschiedene Lebensräume</li><li>Nutze Bestimmungsbücher oder Apps</li><li>Achte auf Zugvögel in der jeweiligen Saison</li>',
+        'photo_count': '<li>Nutze gutes Licht (morgens/abends)</li><li>Hab Geduld und bewege dich langsam</li><li>Verwende Zoom oder ein Fernglas</li>',
+        'early_morning': '<li>Vögel sind in den frühen Morgenstunden besonders aktiv</li><li>Stelle deinen Wecker früh</li><li>Belohne dich mit einem schönen Sonnenaufgang</li>',
+        'weather_diversity': '<li>Beobachte auch bei schlechtem Wetter</li><li>Verschiedene Arten sind bei unterschiedlichem Wetter aktiv</li><li>Achte auf passende Kleidung</li>',
+        'daily_streak': '<li>Mache es zu einer täglichen Gewohnheit</li><li>Auch eine kurze Beobachtung zählt</li><li>Beobachte vom Fenster aus, wenn du nicht raus kannst</li>',
+        'raptors': '<li>Schaue in den Himmel nach kreisenden Vögeln</li><li>Offene Landschaften sind ideal</li><li>Frühe Morgenstunden sind optimal</li>',
+        'water_birds': '<li>Besuche Seen, Flüsse oder Teiche</li><li>Wasservögel sind oft weniger scheu</li><li>Nutze ein Fernglas für bessere Beobachtungen</li>'
+      };
+      
+      return tipsByType[challenge.type] || '<li>Arbeite kontinuierlich an der Challenge</li><li>Dokumentiere deine Fortschritte</li><li>Hab Geduld und Spaß dabei</li>';
+    }
+    
+    // Hilfsfunktion zum Anpassen der Farbe
+    function adjustColor(color, amount) {
+      const clamp = (num) => Math.min(Math.max(num, 0), 255);
+      const num = parseInt(color.replace('#', ''), 16);
+      const r = clamp((num >> 16) + amount);
+      const g = clamp(((num >> 8) & 0x00FF) + amount);
+      const b = clamp((num & 0x0000FF) + amount);
+      return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+    }
     
     let selectedIcon = '🎯';
     let selectedColor = '#06b6d4';
@@ -8812,6 +11113,9 @@
       }
       
       try {
+        // NEU: Prüfe ob aktueller User ein Admin ist
+        const isAdmin = await isCurrentUserGroupAdmin();
+        
         const snapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders`).once('value');
         const folders = snapshot.val();
         
@@ -8839,23 +11143,27 @@
           
           if (folder.lists) {
             for (const [listId, list] of Object.entries(folder.lists)) {
-              const obsCount = list.observations ? list.observations.length : 0;
-              const speciesSet = new Set(list.observations?.map(obs => obs.bird) || []);
+              // NEU: Nur tickable Beobachtungen zählen (konsistent mit addListToComparisonFolder)
+              const tickableObs = (list.observations || []).filter(obs => obs.tickable !== false);
+              const obsCount = tickableObs.length;
+              const speciesSet = new Set(tickableObs.map(obs => obs.bird));
               
               totalObservations += obsCount;
               speciesSet.forEach(s => totalSpecies.add(s));
               
               listStats.push({
+                listId: listId, // NEU: Speichere listId direkt im Objekt
                 name: list.listName,
                 userName: list.userName,
+                userId: list.userId, // NEU: Speichere auch userId
                 observations: obsCount,
                 species: speciesSet.size
               });
             }
           }
           
-          // Finde Gewinner
-          const mostObservations = listStats.sort((a, b) => b.observations - a.observations)[0];
+          // Finde Gewinner - WICHTIG: Kopien erstellen, um Original nicht zu verändern
+          const mostObservations = [...listStats].sort((a, b) => b.observations - a.observations)[0];
           const mostSpecies = [...listStats].sort((a, b) => b.species - a.species)[0];
           
           html += `
@@ -8882,14 +11190,15 @@
               ${listsCount > 0 ? `
                 <div class="list-comparison-grid">
                   ${listStats.map((stat, index) => {
-                    const isWinnerObs = mostObservations && stat.name === mostObservations.name;
-                    const isWinnerSpecies = mostSpecies && stat.name === mostSpecies.name;
+                    // NEU: Vergleiche über listId statt name für zuverlässige Gewinner-Erkennung
+                    const isWinnerObs = mostObservations && stat.listId === mostObservations.listId;
+                    const isWinnerSpecies = mostSpecies && stat.listId === mostSpecies.listId;
                     const isWinner = isWinnerObs || isWinnerSpecies;
                     
-                    // Finde die listId für diese Statistik
-                    const listId = Object.keys(folder.lists)[index];
+                    // NEU: Verwende die gespeicherte listId aus dem stat-Objekt
+                    const listId = stat.listId;
                     const list = folder.lists[listId];
-                    const isListOwner = window.FBA.currentUser && list.userId === window.FBA.currentUser.uid;
+                    const isListOwner = window.FBA.currentUser && stat.userId === window.FBA.currentUser.uid;
                     
                     return `
                       <div class="compared-list-card ${isWinner ? 'winner' : ''}" style="position:relative;">
@@ -8910,11 +11219,11 @@
                                 style="width:100%;margin-top:12px;background:var(--accent);">
                           👁️ Details ansehen
                         </button>
-                        ${isListOwner ? `
+                        ${isListOwner || isAdmin ? `
                           <button class="small-btn" onclick="deleteListFromComparisonFolder('${folderId}', '${listId}')" 
                                   style="width:100%;margin-top:8px;background:var(--danger);font-size:11px;" 
-                                  title="Liste aus Ordner entfernen">
-                            🗑️ Löschen
+                                  title="${isListOwner ? 'Liste aus Ordner entfernen' : '🔐 Als Admin löschen'}">
+                            ${isListOwner ? '🗑️' : '🔐'} Löschen${isListOwner ? '' : ' (Admin)'}
                           </button>
                         ` : ''}
                       </div>
@@ -8978,7 +11287,7 @@
         // Lade persönliche Beobachtungen für Statistiken
         const observations = await getPersonalObservationsWithDetails();
         
-        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));gap:12px;">';
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;">';
         
         for (const list of lists) {
           // Berechne Statistiken für diese Liste
@@ -9080,7 +11389,10 @@
       try {
         const groupId = window.currentSelectedGroup;
         
-        // Prüfe ob der aktuelle User der Besitzer der Liste ist
+        // NEU: Prüfe ob der aktuelle User ein Admin ist
+        const isAdmin = await isCurrentUserGroupAdmin();
+        
+        // Prüfe ob der aktuelle User der Besitzer der Liste ist ODER Admin
         const listSnapshot = await window.FBD.ref(`groups/${groupId}/comparisonFolders/${folderId}/lists/${listId}`).once('value');
         const listData = listSnapshot.val();
         
@@ -9089,15 +11401,18 @@
           return;
         }
         
-        if (listData.userId !== window.FBA.currentUser.uid) {
-          showNotification('❌ Du kannst nur deine eigenen Listen löschen', 3000);
+        const isOwner = listData.userId === window.FBA.currentUser.uid;
+        
+        if (!isOwner && !isAdmin) {
+          showNotification('❌ Du kannst nur deine eigenen Listen löschen (oder als Admin alle Listen)', 3000);
           return;
         }
         
         // Lösche Liste aus Firebase
         await window.FBD.ref(`groups/${groupId}/comparisonFolders/${folderId}/lists/${listId}`).remove();
         
-        showNotification(`✅ Liste "${listData.listName}" entfernt`, 3000);
+        const deletedBy = isOwner ? '' : ' (als Admin)';
+        showNotification(`✅ Liste "${listData.listName}" entfernt${deletedBy}`, 3000);
         
         // Aktualisiere Ansicht
         await renderComparisonFolders();
@@ -11337,8 +13652,8 @@
           var ref = await window.FBD.ref("groups/" + selectedGroup + "/observations").push(cleanedObservation);
           console.log("✅ In Firebase gespeichert! Key:", ref.key);
           
-          // NEU: Vergebe XP für neue Beobachtung
-          await awardXPForNewObservation();
+          // NEU: Vergebe XP für neue Beobachtung (mit Seltenheits-Bonus)
+          await awardXPForNewObservation(observation.rarity);
           
           // Eingabefelder zurücksetzen
           resetInputFields();
@@ -11403,8 +13718,8 @@
         // In IndexedDB speichern
         await saveNewObservationToDB(newObservation);
         
-        // NEU: Vergebe XP für neue Beobachtung
-        await awardXPForNewObservation();
+        // NEU: Vergebe XP für neue Beobachtung (mit Seltenheits-Bonus)
+        await awardXPForNewObservation(newObservation.manualRarity);
         
         // UI aktualisieren
         await loadData();
@@ -13935,7 +16250,7 @@
           </div>
         </div>
         
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%, 300px),1fr));gap:12px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
       `;
       
       sortedSpecies.forEach((species, index) => {
@@ -15097,8 +17412,8 @@
             var ref = await window.FBD.ref("groups/" + selectedGroup + "/observations").push(cleanedObservation);
             console.log("✅ In Firebase gespeichert! Key:", ref.key);
             
-            // NEU: Vergebe XP für neue Beobachtung
-            await awardXPForNewObservation();
+            // NEU: Vergebe XP für neue Beobachtung (mit Seltenheits-Bonus)
+            await awardXPForNewObservation(observation.rarity);
             
             showNotification(`✅ "${birdName}" in Gruppe gespeichert!`, 3000);
             
@@ -15180,8 +17495,8 @@
         // In IndexedDB speichern
         await saveNewObservationToDB(newObservation);
         
-        // NEU: Vergebe XP für neue Beobachtung
-        await awardXPForNewObservation();
+        // NEU: Vergebe XP für neue Beobachtung (mit Seltenheits-Bonus)
+        await awardXPForNewObservation(newObservation.rarity);
         
         // UI aktualisieren
         await loadData();
@@ -15596,6 +17911,7 @@
     async function toggleHeatmap() {
       const btn = document.getElementById('heatmapToggle');
       const btnTools = document.getElementById('heatmapToggleTools');
+      const btnMap = document.getElementById('heatmapToggleMap');
       
       if (heatmapLayer) {
         // Heatmap deaktivieren
@@ -15627,6 +17943,10 @@
         
         if (btn) btn.textContent = '🔥 Heatmap: Aus';
         if (btnTools) btnTools.textContent = '🔥 Heatmap: Aus';
+        if (btnMap) {
+          btnMap.textContent = '🔥 Heatmap';
+          btnMap.style.background = 'linear-gradient(135deg, #ef4444, #f97316)';
+        }
         showNotification('Heatmap deaktiviert - Marker angezeigt', 2000);
         
       } else {
@@ -15639,32 +17959,75 @@
             return;
           }
           
-          // Erstelle Heatmap-Daten (Lat, Lng, Intensität)
-          const heatData = observations
+          // Erstelle Heatmap-Daten mit tatsächlicher Intensität basierend auf Beobachtungsdichte
+          // Gruppiere Beobachtungen nach Koordinaten und zähle sie
+          const locationMap = new Map();
+          
+          observations
             .filter(obs => obs.lat && obs.lng)
-            .map(obs => [
-              parseFloat(obs.lat),
-              parseFloat(obs.lng),
-              0.5 // Intensität
-            ]);
+            .forEach(obs => {
+              const lat = parseFloat(obs.lat).toFixed(4); // Runde auf 4 Dezimalstellen für Gruppierung
+              const lng = parseFloat(obs.lng).toFixed(4);
+              const key = `${lat},${lng}`;
+              
+              if (!locationMap.has(key)) {
+                locationMap.set(key, {
+                  lat: parseFloat(obs.lat),
+                  lng: parseFloat(obs.lng),
+                  count: 0,
+                  totalBirds: 0
+                });
+              }
+              
+              const location = locationMap.get(key);
+              location.count += 1; // Anzahl der Beobachtungen
+              location.totalBirds += parseInt(obs.count || 1); // Anzahl der Vögel
+            });
+          
+          // Finde maximale Anzahl für Normalisierung
+          let maxCount = 0;
+          locationMap.forEach(loc => {
+            maxCount = Math.max(maxCount, loc.count);
+          });
+          
+          console.log('📊 Heatmap-Statistik:');
+          console.log('   Einzigartige Orte:', locationMap.size);
+          console.log('   Maximale Beobachtungen an einem Ort:', maxCount);
+          
+          // Erstelle Heatmap-Daten mit dynamischer Intensität
+          const heatData = Array.from(locationMap.values()).map(loc => {
+            // Berechne Intensität basierend auf Anzahl der Beobachtungen
+            // Logarithmische Skalierung für bessere Darstellung
+            let intensity = Math.log(loc.count + 1) / Math.log(maxCount + 1);
+            
+            // Minimum-Intensität von 0.3 für Sichtbarkeit, Maximum 1.0
+            intensity = Math.max(0.3, Math.min(1.0, intensity * 1.2));
+            
+            console.log(`   Ort (${loc.lat.toFixed(2)}, ${loc.lng.toFixed(2)}): ${loc.count} Beobachtungen, ${loc.totalBirds} Vögel, Intensität: ${intensity.toFixed(2)}`);
+            
+            return [loc.lat, loc.lng, intensity];
+          });
           
           if (heatData.length === 0) {
             showNotification('⚠️ Keine Koordinaten für Heatmap', 3000);
             return;
           }
           
-          console.log('Erstelle Heatmap mit', heatData.length, 'Punkten');
+          console.log('🔥 Erstelle Heatmap mit', heatData.length, 'Punkten (von', observations.length, 'Beobachtungen)');
           
-          // Erstelle Heatmap-Layer
+          // Erstelle Heatmap-Layer mit verbesserter Sichtbarkeit
           heatmapLayer = L.heatLayer(heatData, {
-            radius: 25,
-            blur: 15,
-            maxZoom: 17,
-            max: 1.0,
-            gradient: {
-              0.0: '#3b82f6',
-              0.5: '#f59e0b',
-              1.0: '#ef4444'
+            radius: 35,              // Erhöht von 25 auf 35 für größere Punkte
+            blur: 20,                // Erhöht von 15 auf 20 für bessere Übergänge
+            maxZoom: 18,             // Erhöht von 17 auf 18
+            minOpacity: 0.5,         // NEU: Minimale Deckkraft (macht es beim Rauszoomen sichtbarer)
+            max: 1.0,                // Nutze volle Intensitätsskala (da wir jetzt dynamische Werte haben)
+            gradient: {              // Intensivere Farbverläufe
+              0.0: '#3b82f6',        // Blau (wenige Beobachtungen)
+              0.3: '#06b6d4',        // Cyan
+              0.5: '#f59e0b',        // Orange (mittlere Dichte)
+              0.7: '#f97316',        // Dunkel-Orange
+              1.0: '#ef4444'         // Rot (hohe Dichte)
             }
           });
           
@@ -15678,6 +18041,10 @@
           
           if (btn) btn.textContent = '🔥 Heatmap: An';
           if (btnTools) btnTools.textContent = '🔥 Heatmap: An';
+          if (btnMap) {
+            btnMap.textContent = '✅ Heatmap An';
+            btnMap.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+          }
           showNotification('Heatmap aktiviert - Marker ausgeblendet', 2000);
           
         } catch (error) {
@@ -17717,6 +20084,12 @@
           const success = await importDatabase(data);
           if (success) {
             await loadData();
+            
+            // NEU: Berechne XP nach Import neu
+            if (typeof recalculateAllXP === 'function') {
+              await recalculateAllXP();
+            }
+            
             showNotification('Daten erfolgreich importiert!', 3000);
           } else {
             showNotification('Import fehlgeschlagen!', 3000);
@@ -18498,6 +20871,14 @@
         
         showNotification(message, 5000);
         console.log(`📊 Import-Statistik: ${importCount} neu, ${duplicateCount} Duplikate, ${invalidSkipped} ungültig, ${photoCount} Fotos`);
+        
+        // NEU: Berechne XP nach Import neu
+        if (!isGroupMode && typeof recalculateAllXP === 'function') {
+          console.log('🔄 Berechne XP nach Ornitho-Import neu...');
+          setTimeout(async () => {
+            await recalculateAllXP();
+          }, 1000);
+        }
         
         // Cleanup
         delete window.photoImportCount;
@@ -19784,6 +22165,8 @@ async function loadPageData(page) {
     } else if (page === 'challenges') {
       if (typeof loadChallengeProgress === 'function') await loadChallengeProgress();
       if (typeof loadCustomChallenges === 'function') await loadCustomChallenges();
+      // NEU: Berechne XP beim Laden der Challenges-Seite neu
+      if (typeof recalculateAllXP === 'function') await recalculateAllXP();
       if (typeof updateChallengeDisplay === 'function') updateChallengeDisplay();
       if (typeof renderChallenges === 'function') await renderChallenges();
     }
@@ -21382,6 +23765,13 @@ async function renderRarityChallenge2026() {
         
         const normalizedRarity = (rarity || '').toLowerCase();
         if (normalizedRarity === 'selten' || normalizedRarity === 'sehr selten') {
+          // NEU: Überspringe manuell blockierte Beobachtungen komplett
+          // Sie dürfen nicht in allRareObservations aufgenommen werden
+          if (obs.manuallyBlocked === true) {
+            console.log(`   ⏭️ Blockierte Beobachtung wird NICHT in allRareObservations aufgenommen: ${obs.bird} von ${userData.userName} (${obs.date})`);
+            return;
+          }
+          
           allRareObservations.push({
             ...obs,
             userId: uid,
@@ -22389,7 +24779,7 @@ async function renderDetailedObservationComparison(groupData) {
   
   let html = `
     <div style="margin-bottom:16px;padding:12px;background:rgba(6,182,212,0.05);border-radius:8px;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%, 120px),1fr));gap:12px;text-align:center;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;text-align:center;">
         <div>
           <div style="font-size:24px;font-weight:700;color:var(--accent);">${users.length}</div>
           <div style="font-size:12px;color:var(--muted);">Mitglieder</div>
@@ -22492,7 +24882,7 @@ async function renderMemberComparisonGrid(groupData) {
           ${mostCommonSpecies ? `
             <div class="stat-row">
               <span class="stat-label">⭐ Top-Art</span>
-              <span class="stat-value" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${mostCommonSpecies[0]} (${mostCommonSpecies[1]}x)</span>
+              <span class="stat-value" style="font-size:13px;">${mostCommonSpecies[0]} (${mostCommonSpecies[1]}x)</span>
             </div>
           ` : ''}
         </div>
@@ -22565,11 +24955,11 @@ async function openDetailedMemberComparison() {
             <div class="member-avatar" style="width:56px;height:56px;font-size:24px;">
               ${user.userName.charAt(0).toUpperCase()}
             </div>
-            <div style="flex:1;min-width:0;">
+            <div style="flex:1;">
               <div style="font-weight:700;font-size:17px;">
                 ${user.userName}${isCurrentUser ? ' <span style="color:var(--accent);font-size:12px;">(Du)</span>' : ''}
               </div>
-              <div style="font-size:13px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              <div style="font-size:13px;color:var(--muted);margin-top:2px;">
                 ${user.userEmail}
               </div>
             </div>
@@ -22607,9 +24997,9 @@ async function openDetailedMemberComparison() {
                 ${topSpecies.map((species, idx) => {
                   const rarity = getRarityStyle(species[0]);
                   return `
-                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:8px;">
-                      <span class="${rarity.rarityClass}" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rarity.rarityIcon}${idx + 1}. ${species[0]}</span>
-                      <span style="font-weight:600;color:var(--accent);flex-shrink:0;">${species[1]}x</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+                      <span class="${rarity.rarityClass}">${rarity.rarityIcon}${idx + 1}. ${species[0]}</span>
+                      <span style="font-weight:600;color:var(--accent);">${species[1]}x</span>
                     </div>
                   `;
                 }).join('')}
@@ -23295,7 +25685,7 @@ async function loadSpeciesDatabase() {
   // Alle Arten aus der Datenbank
   const allSpecies = Object.keys(birdDatabase).sort();
   
-  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(min(100%, 280px), 1fr));gap:12px;">';
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;">';
   
   allSpecies.forEach(speciesName => {
     const species = birdDatabase[speciesName];
@@ -23883,7 +26273,7 @@ async function filterSpecies(filter) {
   filteredSpecies.sort();
   
   // HTML generieren (gleicher Code wie in loadSpeciesDatabase)
-  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(min(100%, 280px), 1fr));gap:12px;">';
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;">';
   
   filteredSpecies.forEach(speciesName => {
     const species = birdDatabase[speciesName];
@@ -27769,7 +30159,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <canvas id="yearlyComparisonChart" style="max-height: 400px;"></canvas>
         </div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
           <div style="background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px;">
             <h4 id="yearTitle" style="margin: 0 0 16px 0;">2024</h4>
             <p style="margin: 8px 0;"><strong id="yearSpecies" style="color: var(--accent); font-size: 20px;">-</strong> Arten</p>
@@ -28040,74 +30430,6 @@ function getBirdEmoji(birdName) {
   };
   return emojiMap[birdName] || '🐦';
 }
-
-// MOBILE GRID FIX - Force all grids to single column on mobile
-function fixMobileGrids() {
-  const isMobile = window.innerWidth <= 700;
-  
-  if (isMobile) {
-    // Find all elements with grid display
-    const allElements = document.querySelectorAll('*');
-    
-    allElements.forEach(el => {
-      const style = window.getComputedStyle(el);
-      const inlineStyle = el.getAttribute('style') || '';
-      
-      // Check if element uses CSS Grid
-      if (style.display === 'grid' || inlineStyle.includes('display:grid') || inlineStyle.includes('display: grid')) {
-        // Force single column by setting the property directly
-        el.style.setProperty('grid-template-columns', '1fr', 'important');
-      }
-    });
-    
-    console.log('📱 Mobile grid fix applied to', document.querySelectorAll('[style*="grid"]').length, 'elements');
-  }
-}
-
-// Run on page load
-window.addEventListener('DOMContentLoaded', () => {
-  fixMobileGrids();
-  console.log('📱 Initial mobile grid fix completed');
-});
-
-// Run after a short delay to catch dynamically loaded content
-setTimeout(fixMobileGrids, 500);
-setTimeout(fixMobileGrids, 1000);
-setTimeout(fixMobileGrids, 2000);
-
-// Run on resize
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(fixMobileGrids, 250);
-});
-
-// Run whenever content changes (use MutationObserver)
-const observer = new MutationObserver((mutations) => {
-  if (window.innerWidth <= 700) {
-    // Only run if grids were added
-    let shouldFix = false;
-    mutations.forEach(mutation => {
-      mutation.addedNodes.forEach(node => {
-        if (node.nodeType === 1) { // Element node
-          const style = node.getAttribute?.('style') || '';
-          if (style.includes('grid')) {
-            shouldFix = true;
-          }
-        }
-      });
-    });
-    
-    if (shouldFix) {
-      fixMobileGrids();
-    }
-  }
-});
-
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
 
 </script>
 
