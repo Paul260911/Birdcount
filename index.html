@@ -7755,6 +7755,25 @@
                 </div>
               </div>
 
+              <!-- NEU: Wettbewerbs-Dashboard -->
+              <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg, rgba(34,197,94,0.12), rgba(16,185,129,0.06));border-left:4px solid #10b981;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:28px;">🏅</span>
+                    <h3 style="margin:0;">Aktuelle Challenges</h3>
+                  </div>
+                  <button class="small-btn" id="editChallengesBtn" onclick="openAdvancedChallengeSettings()" style="background:linear-gradient(135deg, var(--accent), var(--accent-2));color:white;padding:10px 16px;font-weight:600;display:none;" title="Challenge-Ziele und -Typen anpassen">
+                    ⚙️ Challenges bearbeiten
+                  </button>
+                </div>
+                <div id="challengesDashboard">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <div style="font-size:32px;margin-bottom:8px;">⏳</div>
+                    <p style="margin:0;">Lade Challenges...</p>
+                  </div>
+                </div>
+              </div>
+
               <div class="card" style="border-left:4px solid #22c55e;">
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
                   <span style="font-size:28px;">🎯</span>
@@ -8334,6 +8353,236 @@
         <button class="small-btn" onclick="finishPolygonDrawing()" style="background: var(--success);">
           ✓ Polygon fertigstellen
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEU: Challenge-Einstellungen Modal (nur für Admins) -->
+  <div id="challengeSettingsModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width:500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🎯 Challenge-Ziele anpassen</h2>
+        <button class="small-btn" onclick="closeChallengeSettings()" style="position:absolute;top:32px;right:32px;">✕</button>
+      </div>
+      
+      <div style="padding:20px;">
+        <div style="margin-bottom:20px;padding:12px;background:rgba(124,58,237,0.1);border-left:4px solid #7c3aed;border-radius:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:18px;">👑</span>
+            <strong>Admin-Funktion</strong>
+          </div>
+          <div style="font-size:12px;color:var(--muted);">
+            Als Gruppen-Admin kannst du die Challenge-Ziele für alle Mitglieder anpassen.
+          </div>
+        </div>
+
+        <form id="challengeSettingsForm" onsubmit="saveChallengeSettings(event)">
+          <!-- Wochenchallenge -->
+          <div class="card" style="margin-bottom:16px;border-left:4px solid #10b981;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:24px;">📅</span>
+              <h4 style="margin:0;">Wochenchallenge</h4>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px;">
+                Ziel (Anzahl verschiedener Arten):
+              </label>
+              <input type="number" id="weekChallengeGoal" min="1" max="500" value="50" 
+                     style="width:100%;padding:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);">
+            </div>
+            <div style="font-size:11px;color:var(--muted);">
+              Standard: 50 Arten | Empfohlen: 10-100 Arten
+            </div>
+          </div>
+
+          <!-- Monats-Challenge -->
+          <div class="card" style="margin-bottom:16px;border-left:4px solid #06b6d4;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:24px;">🌙</span>
+              <h4 style="margin:0;">Monats-Challenge</h4>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px;">
+                Ziel (Anzahl verschiedener Arten):
+              </label>
+              <input type="number" id="monthChallengeGoal" min="1" max="500" value="100" 
+                     style="width:100%;padding:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);">
+            </div>
+            <div style="font-size:11px;color:var(--muted);">
+              Standard: 100 Arten | Empfohlen: 30-150 Arten
+            </div>
+          </div>
+
+          <!-- Jahres-Challenge -->
+          <div class="card" style="margin-bottom:16px;border-left:4px solid #8b5cf6;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:24px;">🎯</span>
+              <h4 style="margin:0;">Jahres-Challenge</h4>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px;">
+                Ziel (Anzahl verschiedener Arten):
+              </label>
+              <input type="number" id="yearChallengeGoal" min="1" max="1000" value="300" 
+                     style="width:100%;padding:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);">
+            </div>
+            <div style="font-size:11px;color:var(--muted);">
+              Standard: 300 Arten | Empfohlen: 100-500 Arten
+            </div>
+          </div>
+
+          <div class="modal-footer" style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+            <button type="button" class="btn ghost" onclick="closeChallengeSettings()">Abbrechen</button>
+            <button type="submit" class="btn" style="background:var(--success);">
+              💾 Ziele speichern
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEU: Erweitertes Challenge-Einstellungs-Modal (mit Challenge-Typen) -->
+  <div id="advancedChallengeSettingsModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+      <div class="modal-header">
+        <h2 class="modal-title">🎯 Challenge-Einstellungen</h2>
+        <button class="small-btn" onclick="closeAdvancedChallengeSettings()" style="position:absolute;top:32px;right:32px;">✕</button>
+      </div>
+      
+      <div style="padding:20px;">
+        <div style="margin-bottom:20px;padding:16px;background:rgba(124,58,237,0.1);border-left:4px solid #7c3aed;border-radius:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:18px;">👑</span>
+            <strong>Admin-Funktion</strong>
+          </div>
+          <div style="font-size:12px;color:var(--muted);">
+            Als Gruppen-Admin kannst du sowohl die Challenge-Ziele als auch die Challenge-Typen für alle Mitglieder anpassen.
+          </div>
+        </div>
+
+        <form id="advancedChallengeSettingsForm" onsubmit="saveAdvancedChallengeSettings(event)">
+          <!-- Wochenchallenge -->
+          <div class="card" style="margin-bottom:16px;border-left:4px solid #10b981;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+              <span style="font-size:24px;">📅</span>
+              <h4 style="margin:0;">Wochenchallenge</h4>
+            </div>
+            
+            <div style="margin-bottom:12px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;">
+                Challenge-Typ:
+              </label>
+              <select id="weekChallengeType" style="width:100%;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:14px;">
+                <option value="species">🐦 Verschiedene Arten</option>
+                <option value="observations">📊 Beobachtungen</option>
+                <option value="locations">📍 Verschiedene Standorte</option>
+                <option value="photos">📸 Fotos</option>
+                <option value="tickable">✅ Tickbare Beobachtungen</option>
+                <option value="selffound">🔍 Selbst gefundene Vögel</option>
+              </select>
+            </div>
+            
+            <div style="margin-bottom:8px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;">
+                Ziel-Anzahl:
+              </label>
+              <input type="number" id="weekChallengeGoalAdv" min="1" max="500" value="50" 
+                     style="width:100%;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:14px;">
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:8px;">
+              Standard: 50 | Empfohlen: 10-100
+            </div>
+          </div>
+
+          <!-- Monats-Challenge -->
+          <div class="card" style="margin-bottom:16px;border-left:4px solid #06b6d4;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+              <span style="font-size:24px;">🌙</span>
+              <h4 style="margin:0;">Monats-Challenge</h4>
+            </div>
+            
+            <div style="margin-bottom:12px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;">
+                Challenge-Typ:
+              </label>
+              <select id="monthChallengeType" style="width:100%;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:14px;">
+                <option value="species">🐦 Verschiedene Arten</option>
+                <option value="observations">📊 Beobachtungen</option>
+                <option value="locations">📍 Verschiedene Standorte</option>
+                <option value="photos">📸 Fotos</option>
+                <option value="tickable">✅ Tickbare Beobachtungen</option>
+                <option value="selffound">🔍 Selbst gefundene Vögel</option>
+              </select>
+            </div>
+            
+            <div style="margin-bottom:8px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;">
+                Ziel-Anzahl:
+              </label>
+              <input type="number" id="monthChallengeGoalAdv" min="1" max="500" value="100" 
+                     style="width:100%;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:14px;">
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:8px;">
+              Standard: 100 | Empfohlen: 30-150
+            </div>
+          </div>
+
+          <!-- Jahres-Challenge -->
+          <div class="card" style="margin-bottom:16px;border-left:4px solid #8b5cf6;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+              <span style="font-size:24px;">🎯</span>
+              <h4 style="margin:0;">Jahres-Challenge</h4>
+            </div>
+            
+            <div style="margin-bottom:12px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;">
+                Challenge-Typ:
+              </label>
+              <select id="yearChallengeType" style="width:100%;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:14px;">
+                <option value="species">🐦 Verschiedene Arten</option>
+                <option value="observations">📊 Beobachtungen</option>
+                <option value="locations">📍 Verschiedene Standorte</option>
+                <option value="photos">📸 Fotos</option>
+                <option value="tickable">✅ Tickbare Beobachtungen</option>
+                <option value="selffound">🔍 Selbst gefundene Vögel</option>
+              </select>
+            </div>
+            
+            <div style="margin-bottom:8px;">
+              <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600;">
+                Ziel-Anzahl:
+              </label>
+              <input type="number" id="yearChallengeGoalAdv" min="1" max="1000" value="300" 
+                     style="width:100%;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text);font-size:14px;">
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:8px;">
+              Standard: 300 | Empfohlen: 100-500
+            </div>
+          </div>
+
+          <!-- Info-Box -->
+          <div style="margin-top:20px;padding:14px;background:rgba(6,182,212,0.08);border-left:4px solid #06b6d4;border-radius:8px;">
+            <div style="font-weight:600;margin-bottom:8px;font-size:13px;display:flex;align-items:center;gap:6px;">
+              <span>💡</span> Challenge-Typen erklärt:
+            </div>
+            <div style="font-size:11px;color:var(--soft);line-height:1.8;">
+              <strong>🐦 Arten:</strong> Zählt verschiedene Vogelarten<br>
+              <strong>📊 Beobachtungen:</strong> Zählt alle Beobachtungen<br>
+              <strong>📍 Standorte:</strong> Zählt verschiedene Beobachtungsorte<br>
+              <strong>📸 Fotos:</strong> Zählt Beobachtungen mit Foto<br>
+              <strong>✅ Tickbar:</strong> Zählt tickbare Beobachtungen<br>
+              <strong>🔍 Selffound:</strong> Zählt selbst gefundene Vögel
+            </div>
+          </div>
+
+          <div class="modal-footer" style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+            <button type="button" class="btn ghost" onclick="closeAdvancedChallengeSettings()">Abbrechen</button>
+            <button type="submit" class="btn" style="background:var(--success);">
+              💾 Einstellungen speichern
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -11027,7 +11276,27 @@
     
     // NEU: Benutzernamen-Verwaltung für privaten Modus
     function getPrivateUserName() {
-      return localStorage.getItem('birdcount_private_username') || 'Mein Name';
+      // 1. Prüfe localStorage
+      const storedName = localStorage.getItem('birdcount_private_username');
+      if (storedName && storedName !== 'Mein Name') {
+        return storedName;
+      }
+      
+      // 2. Wenn angemeldet, nutze Firebase-Name
+      if (window.FBA?.currentUser) {
+        if (window.FBA.currentUser.displayName) {
+          return window.FBA.currentUser.displayName;
+        }
+        if (window.FBA.currentUser.email) {
+          // Erstelle Name aus E-Mail (vor dem @)
+          const emailName = window.FBA.currentUser.email.split('@')[0];
+          // Kapitalisiere ersten Buchstaben
+          return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+        }
+      }
+      
+      // 3. Fallback
+      return 'Mein Name';
     }
     
     function setPrivateUserName(name) {
@@ -11219,11 +11488,6 @@
                         <button class="small-btn" onclick="viewComparisonListDetails('${folderId}', '${listId}')" 
                                 style="width:100%;margin-top:12px;background:var(--accent);">
                           👁️ Details ansehen
-                        </button>
-                        <button class="small-btn" onclick="copyComparisonListToPrivate('${folderId}', '${listId}')" 
-                                style="width:100%;margin-top:8px;background:var(--success);font-size:11px;" 
-                                title="Liste zu 'Meine Listen' kopieren">
-                          📥 Zu Meine Listen
                         </button>
                         ${isListOwner || isAdmin ? `
                           <button class="small-btn" onclick="deleteListFromComparisonFolder('${folderId}', '${listId}')" 
@@ -11433,77 +11697,6 @@
     window.deleteListFromComparisonFolder = deleteListFromComparisonFolder;
     
     // NEU: Kopiere Liste vom Gruppenvergleich zu privaten Listen
-    async function copyComparisonListToPrivate(folderId, listId) {
-      if (!window.FBA || !window.FBA.currentUser) {
-        showNotification('❌ Nicht angemeldet', 3000);
-        return;
-      }
-      
-      try {
-        const groupId = window.currentSelectedGroup;
-        
-        // Lade Liste aus Firebase
-        const listSnapshot = await window.FBD.ref(`groups/${groupId}/comparisonFolders/${folderId}/lists/${listId}`).once('value');
-        const comparisonList = listSnapshot.val();
-        
-        if (!comparisonList) {
-          showNotification('❌ Liste nicht gefunden', 3000);
-          return;
-        }
-        
-        console.log('📥 Kopiere Liste zu privaten Listen:', comparisonList.listName);
-        
-        // Erstelle neue private Liste mit den Daten
-        const newPrivateList = {
-          id: 'list_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-          name: comparisonList.listName + ' (Kopie)',
-          description: comparisonList.listDescription || 'Kopiert aus Gruppenvergleich',
-          color: comparisonList.listColor || colorPalette[0],
-          tags: comparisonList.listTags || [],
-          species: [], // Wird später gefüllt
-          families: [],
-          excludeTickable: false,
-          excludeNonTickable: false,
-          excludeSelffound: false,
-          excludeNonSelffound: false,
-          dateRange: null,
-          locationFilter: null,
-          createdAt: new Date().toISOString()
-        };
-        
-        // Extrahiere eindeutige Arten aus den Beobachtungen der Vergleichsliste
-        const observations = comparisonList.observations || [];
-        const uniqueSpecies = [...new Set(observations.map(obs => obs.bird))];
-        
-        console.log(`   ${observations.length} Beobachtungen, ${uniqueSpecies.length} einzigartige Arten`);
-        
-        newPrivateList.species = uniqueSpecies;
-        
-        // Speichere die neue Liste in IndexedDB
-        await saveToIndexedDB('lists', newPrivateList);
-        
-        console.log('✅ Liste in IndexedDB gespeichert:', newPrivateList.id);
-        
-        // Aktualisiere die Listen-Anzeige wenn wir auf der Listen-Seite sind
-        if (typeof renderUserLists === 'function') {
-          await renderUserLists();
-        }
-        
-        showNotification(`✅ Liste "${comparisonList.listName}" zu deinen privaten Listen kopiert!`, 3000);
-        
-        // Frage ob der Nutzer zur Listen-Seite wechseln möchte
-        if (confirm('Liste erfolgreich kopiert!\n\nMöchtest du zu "Meine Listen" wechseln?')) {
-          showPage('lists');
-        }
-        
-      } catch (error) {
-        console.error('Fehler beim Kopieren der Liste:', error);
-        showNotification('❌ Fehler beim Kopieren: ' + error.message, 3000);
-      }
-    }
-    
-    // Globale Funktion verfügbar machen
-    window.copyComparisonListToPrivate = copyComparisonListToPrivate;
     
     // NEU: Synchronisiere geteilte Listen nach neuer Beobachtung
     async function syncSharedListsAfterNewObservation() {
@@ -18720,7 +18913,7 @@
       // Theme-basierte Farben
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-      const textColor = isDark ? 'var(--soft)' : 'var(--muted)';
+      const textColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)';
       
       // NEU: Setze Cursor auf pointer - Charts sind jetzt immer klickbar
       canvas.style.cursor = 'pointer';
@@ -20506,6 +20699,7 @@
                 observations: [],
                 species: new Set(),
                 photosCount: 0,
+                selffoundsCount: 0,
                 totalCount: 0
               };
             }
@@ -20522,6 +20716,7 @@
             userStats[userId].observations.push(obsWithId);
             userStats[userId].species.add(obs.bird);
             if (obs.photo) userStats[userId].photosCount++;
+            if (obs.selffound) userStats[userId].selffoundsCount++;
             userStats[userId].totalCount++;
           });
           
@@ -24730,6 +24925,12 @@ async function renderGroupComparison() {
     // Rendere Erfolgs-Leaderboard
     await renderAchievementLeaderboard(groupData);
     
+    // NEU: Rendere Challenges Dashboard
+    await renderChallengesDashboard(groupData);
+    
+    // Rendere detaillierten Erfolgs-Vergleich
+    await renderDetailedAchievementComparison(groupData);
+    
     // Rendere Statistik-Vergleich
     await renderStatsComparison(groupData);
     
@@ -25107,13 +25308,97 @@ async function openDetailedMemberComparison() {
 async function renderAchievementLeaderboard(groupData) {
   const container = document.getElementById('achievementLeaderboard');
   
-  // Für jetzt zeigen wir eine Platzhalter-Nachricht
-  // In einer vollständigen Implementierung würden wir die Achievements aus Firebase laden
+  if (!groupData.userStats || Object.keys(groupData.userStats).length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--muted);">
+        <div style="font-size:32px;margin-bottom:8px;">🏅</div>
+        <p style="margin:0;">Noch keine Daten verfügbar</p>
+        <p style="font-size:12px;margin-top:4px;">Beobachtungen hinzufügen um Ranglisten zu sehen!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const users = Object.values(groupData.userStats);
+  
+  // Helper function to create leaderboard entry
+  const createLeaderboardEntry = (user, rank, value, unit) => {
+    const stars = rank === 0 ? '⭐⭐⭐' : rank === 1 ? '⭐⭐' : '⭐';
+    const medal = rank === 0 ? '🥇' : rank === 1 ? '🥈' : '🥉';
+    
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:8px;border-left:3px solid ${rank === 0 ? '#fbbf24' : rank === 1 ? '#94a3b8' : '#d97706'};">
+        <div style="font-size:24px;min-width:32px;text-align:center;">${medal}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:2px;">${user.userName}</div>
+          <div style="font-size:12px;color:var(--muted);">${value} ${unit}</div>
+        </div>
+        <div style="font-size:16px;">${stars}</div>
+      </div>
+    `;
+  };
+  
+  // Category 1: Meiste Arten
+  const topSpecies = [...users].sort((a, b) => b.speciesCount - a.speciesCount).slice(0, 3);
+  const speciesHTML = topSpecies.map((user, i) => 
+    createLeaderboardEntry(user, i, user.speciesCount, 'Arten')
+  ).join('');
+  
+  // Category 2: Meiste Beobachtungen
+  const topObservations = [...users].sort((a, b) => b.totalCount - a.totalCount).slice(0, 3);
+  const obsHTML = topObservations.map((user, i) => 
+    createLeaderboardEntry(user, i, user.totalCount, 'Beobachtungen')
+  ).join('');
+  
+  // Category 3: Meiste Selffounds
+  const topSelffounds = [...users].sort((a, b) => (b.selffoundsCount || 0) - (a.selffoundsCount || 0)).slice(0, 3);
+  const selffoundHTML = topSelffounds.map((user, i) => 
+    createLeaderboardEntry(user, i, user.selffoundsCount || 0, 'Selffounds')
+  ).join('');
+  
+  // Category 4: Meiste Fotos
+  const topPhotos = [...users].sort((a, b) => b.photosCount - a.photosCount).slice(0, 3);
+  const photosHTML = topPhotos.map((user, i) => 
+    createLeaderboardEntry(user, i, user.photosCount, 'Fotos')
+  ).join('');
+  
   container.innerHTML = `
-    <div style="text-align:center;padding:20px;color:var(--muted);">
-      <div style="font-size:32px;margin-bottom:8px;">🏅</div>
-      <p style="margin:0;">Erfolgs-Vergleich</p>
-      <p style="font-size:12px;margin-top:4px;">Erfolge werden lokal gespeichert und können derzeit nicht gruppenweit verglichen werden.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;">
+      <!-- Artenvielfalt -->
+      <div class="card" style="border-left:4px solid #22c55e;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="font-size:28px;">🐦</span>
+          <h3 style="margin:0;">Artenvielfalt</h3>
+        </div>
+        ${speciesHTML || '<p style="color:var(--muted);font-size:12px;">Keine Daten</p>'}
+      </div>
+      
+      <!-- Fleißigste Beobachter -->
+      <div class="card" style="border-left:4px solid #3b82f6;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="font-size:28px;">📊</span>
+          <h3 style="margin:0;">Fleißigste Beobachter</h3>
+        </div>
+        ${obsHTML || '<p style="color:var(--muted);font-size:12px;">Keine Daten</p>'}
+      </div>
+      
+      <!-- Selffound Champions -->
+      <div class="card" style="border-left:4px solid #ef4444;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="font-size:28px;">🔴</span>
+          <h3 style="margin:0;">Selffound Champions</h3>
+        </div>
+        ${selffoundHTML || '<p style="color:var(--muted);font-size:12px;">Keine Daten</p>'}
+      </div>
+      
+      <!-- Foto-Meister -->
+      <div class="card" style="border-left:4px solid #ec4899;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+          <span style="font-size:28px;">📸</span>
+          <h3 style="margin:0;">Foto-Meister</h3>
+        </div>
+        ${photosHTML || '<p style="color:var(--muted);font-size:12px;">Keine Daten</p>'}
+      </div>
     </div>
   `;
 }
@@ -25122,12 +25407,608 @@ async function renderAchievementLeaderboard(groupData) {
 async function renderDetailedAchievementComparison(groupData) {
   const container = document.getElementById('detailedAchievementComparison');
   
-  container.innerHTML = `
-    <div style="padding:20px;text-align:center;color:var(--muted);">
-      <p>Diese Funktion wird in einer zukünftigen Version verfügbar sein.</p>
-      <p style="font-size:12px;margin-top:8px;">Tipp: Erfolge sind aktuell nur lokal in deinem Browser gespeichert.</p>
+  if (!groupData.userStats || Object.keys(groupData.userStats).length === 0) {
+    container.innerHTML = `
+      <div style="padding:20px;text-align:center;color:var(--muted);">
+        <p>Noch keine Daten verfügbar</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const users = Object.values(groupData.userStats);
+  
+  // Calculate additional stats
+  const userStatsExtended = users.map(user => {
+    const uniqueLocations = user.observations ? 
+      new Set(user.observations.filter(o => o.lat && o.lng).map(o => `${o.lat},${o.lng}`)).size : 0;
+    
+    // Calculate streak (simplified - would need better implementation)
+    let longestStreak = 0;
+    if (user.observations && user.observations.length > 0) {
+      const dates = [...new Set(user.observations.map(o => o.date))].sort();
+      let currentStreak = 1;
+      let maxStreak = 1;
+      
+      for (let i = 1; i < dates.length; i++) {
+        const prevDate = new Date(dates[i - 1]);
+        const currDate = new Date(dates[i]);
+        const diffDays = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          currentStreak++;
+          maxStreak = Math.max(maxStreak, currentStreak);
+        } else {
+          currentStreak = 1;
+        }
+      }
+      longestStreak = maxStreak;
+    }
+    
+    // Count observations this month
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisMonthCount = user.observations ? 
+      user.observations.filter(o => new Date(o.date) >= thisMonthStart).length : 0;
+    
+    return {
+      ...user,
+      uniqueLocations,
+      longestStreak,
+      thisMonthCount
+    };
+  });
+  
+  // Create detailed comparison table
+  const sortedBySpecies = [...userStatsExtended].sort((a, b) => b.speciesCount - a.speciesCount);
+  
+  let html = `
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.05);border-bottom:2px solid rgba(255,255,255,0.1);">
+            <th style="padding:12px;text-align:left;font-weight:600;">Rang</th>
+            <th style="padding:12px;text-align:left;font-weight:600;">Name</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">🐦 Arten</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">📊 Beob.</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">🔴 Selffounds</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">📸 Fotos</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">🗺️ Orte</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">🔥 Streak</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">📅 Diesen Monat</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+  
+  sortedBySpecies.forEach((user, index) => {
+    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1);
+    const bgColor = index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+    
+    html += `
+      <tr style="background:${bgColor};border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:12px;text-align:center;font-size:18px;">${medal}</td>
+        <td style="padding:12px;font-weight:600;">${user.userName}</td>
+        <td style="padding:12px;text-align:center;">${user.speciesCount}</td>
+        <td style="padding:12px;text-align:center;">${user.totalCount}</td>
+        <td style="padding:12px;text-align:center;">${user.selffoundsCount || 0}</td>
+        <td style="padding:12px;text-align:center;">${user.photosCount}</td>
+        <td style="padding:12px;text-align:center;">${user.uniqueLocations}</td>
+        <td style="padding:12px;text-align:center;">${user.longestStreak} Tage</td>
+        <td style="padding:12px;text-align:center;">${user.thisMonthCount}</td>
+      </tr>
+    `;
+  });
+  
+  html += `
+        </tbody>
+      </table>
+    </div>
+    
+    <div style="margin-top:24px;padding:16px;background:rgba(6,182,212,0.1);border-left:4px solid #06b6d4;border-radius:8px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:20px;">💡</span>
+        <strong>Legende:</strong>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:8px;font-size:12px;color:var(--muted);">
+        <div>🐦 Arten = Einzigartige beobachtete Arten</div>
+        <div>📊 Beob. = Gesamtzahl Beobachtungen</div>
+        <div>🔴 Selffounds = Als Selffound markiert</div>
+        <div>📸 Fotos = Beobachtungen mit Foto</div>
+        <div>🗺️ Orte = Verschiedene Standorte</div>
+        <div>🔥 Streak = Längste Beobachtungsserie (Tage)</div>
+        <div>📅 Diesen Monat = Beobachtungen im aktuellen Monat</div>
+      </div>
     </div>
   `;
+  
+  container.innerHTML = html;
+}
+
+// NEU: Rendere Challenges Dashboard
+async function renderChallengesDashboard(groupData) {
+  const container = document.getElementById('challengesDashboard');
+  
+  if (!groupData.userStats || Object.keys(groupData.userStats).length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--muted);">
+        <div style="font-size:32px;margin-bottom:8px;">🎯</div>
+        <p style="margin:0;">Noch keine Daten verfügbar</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const users = Object.values(groupData.userStats);
+  const now = new Date();
+  
+  // NEU: Lade Challenge-Ziele aus Firebase (mit Defaults)
+  const challengeGoals = groupData.groupInfo.challengeGoals || {
+    week: 50,
+    month: 100,
+    year: 300
+  };
+  
+  // NEU: Lade Challenge-Typen aus Firebase (mit Defaults)
+  const challengeTypes = groupData.groupInfo.challengeTypes || {
+    week: 'species',
+    month: 'species',
+    year: 'species'
+  };
+  
+  // Challenge-Typ Beschreibungen
+  const challengeTypeLabels = {
+    species: { unit: 'Arten', desc: 'verschiedene Arten beobachten' },
+    observations: { unit: 'Beobachtungen', desc: 'Beobachtungen erfassen' },
+    locations: { unit: 'Standorte', desc: 'verschiedene Standorte besuchen' },
+    photos: { unit: 'Fotos', desc: 'Fotos machen' },
+    tickable: { unit: 'Tickbar', desc: 'tickbare Beobachtungen' },
+    selffound: { unit: 'Selffound', desc: 'selbst gefundene Vögel' }
+  };
+  
+  // Prüfe ob aktueller User Admin ist
+  const isAdmin = groupData.groupInfo.members && 
+                  window.FBA?.currentUser && 
+                  groupData.groupInfo.members[window.FBA.currentUser.uid]?.isAdmin === true;
+  
+  // Zeige/Verstecke Edit-Button basierend auf Admin-Status
+  const editBtn = document.getElementById('editChallengesBtn');
+  if (editBtn) {
+    editBtn.style.display = isAdmin ? 'block' : 'none';
+  }
+  
+  // Helper: Berechne Zeitraum-Daten
+  const calculatePeriodData = (user, startDate) => {
+    const periodObs = user.observations.filter(o => new Date(o.date) >= startDate);
+    const periodSpecies = new Set(periodObs.map(o => o.bird));
+    return {
+      observations: periodObs.length,
+      species: periodSpecies.size
+    };
+  };
+  
+  // Challenge 1: Wochenchallenge
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay()); // Montag dieser Woche
+  weekStart.setHours(0, 0, 0, 0);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 7);
+  const daysLeftWeek = Math.ceil((weekEnd - now) / (1000 * 60 * 60 * 24));
+  
+  const weekGoal = challengeGoals.week;
+  const weekType = challengeTypes.week;
+  const weekLabel = challengeTypeLabels[weekType] || challengeTypeLabels.species;
+  
+  const weekUsers = users.map(user => {
+    const periodObs = user.observations.filter(o => new Date(o.date) >= weekStart);
+    let progress = 0;
+    
+    switch(weekType) {
+      case 'species':
+        progress = new Set(periodObs.map(o => o.bird)).size;
+        break;
+      case 'observations':
+        progress = periodObs.length;
+        break;
+      case 'locations':
+        progress = new Set(periodObs.filter(o => o.lat && o.lng).map(o => `${o.lat},${o.lng}`)).size;
+        break;
+      case 'photos':
+        progress = periodObs.filter(o => o.photo).length;
+        break;
+      case 'tickable':
+        progress = periodObs.filter(o => o.tickable === true).length;
+        break;
+      case 'selffound':
+        progress = periodObs.filter(o => o.selffound === true).length;
+        break;
+    }
+    
+    return {
+      userName: user.userName,
+      progress: progress,
+      percentage: Math.min((progress / weekGoal) * 100, 100)
+    };
+  }).sort((a, b) => b.progress - a.progress);
+  
+  // Challenge 2: Monats-Challenge
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const daysLeftMonth = Math.ceil((monthEnd - now) / (1000 * 60 * 60 * 24));
+  
+  const monthGoal = challengeGoals.month;
+  const monthType = challengeTypes.month;
+  const monthLabel = challengeTypeLabels[monthType] || challengeTypeLabels.locations;
+  
+  const monthUsers = users.map(user => {
+    const periodObs = user.observations.filter(o => new Date(o.date) >= monthStart);
+    let progress = 0;
+    
+    switch(monthType) {
+      case 'species':
+        progress = new Set(periodObs.map(o => o.bird)).size;
+        break;
+      case 'observations':
+        progress = periodObs.length;
+        break;
+      case 'locations':
+        progress = new Set(periodObs.filter(o => o.lat && o.lng).map(o => `${o.lat},${o.lng}`)).size;
+        break;
+      case 'photos':
+        progress = periodObs.filter(o => o.photo).length;
+        break;
+      case 'tickable':
+        progress = periodObs.filter(o => o.tickable === true).length;
+        break;
+      case 'selffound':
+        progress = periodObs.filter(o => o.selffound === true).length;
+        break;
+    }
+    
+    return {
+      userName: user.userName,
+      progress: progress,
+      percentage: Math.min((progress / monthGoal) * 100, 100)
+    };
+  }).sort((a, b) => b.progress - a.progress);
+  
+  // Challenge 3: Jahres-Challenge
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const yearEnd = new Date(now.getFullYear(), 11, 31);
+  const daysLeftYear = Math.ceil((yearEnd - now) / (1000 * 60 * 60 * 24));
+  
+  const yearGoal = challengeGoals.year;
+  const yearType = challengeTypes.year;
+  const yearLabel = challengeTypeLabels[yearType] || challengeTypeLabels.species;
+  
+  const yearUsers = users.map(user => {
+    const periodObs = user.observations.filter(o => new Date(o.date) >= yearStart);
+    let progress = 0;
+    
+    switch(yearType) {
+      case 'species':
+        progress = new Set(periodObs.map(o => o.bird)).size;
+        break;
+      case 'observations':
+        progress = periodObs.length;
+        break;
+      case 'locations':
+        progress = new Set(periodObs.filter(o => o.lat && o.lng).map(o => `${o.lat},${o.lng}`)).size;
+        break;
+      case 'photos':
+        progress = periodObs.filter(o => o.photo).length;
+        break;
+      case 'tickable':
+        progress = periodObs.filter(o => o.tickable === true).length;
+        break;
+      case 'selffound':
+        progress = periodObs.filter(o => o.selffound === true).length;
+        break;
+    }
+    
+    return {
+      userName: user.userName,
+      progress: progress,
+      percentage: Math.min((progress / yearGoal) * 100, 100)
+    };
+  }).sort((a, b) => b.progress - a.progress);
+  
+  // Helper: Erstelle Challenge-Karte
+  const createChallengeCard = (icon, title, timeLeft, goal, users, unit) => {
+    const usersHTML = users.slice(0, 3).map((user, i) => {
+      const barColor = i === 0 ? '#10b981' : i === 1 ? '#06b6d4' : '#8b5cf6';
+      const isComplete = user.progress >= goal;
+      
+      return `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:13px;font-weight:600;">
+              ${i + 1}. ${user.userName}
+              ${isComplete ? '✅' : ''}
+            </span>
+            <span style="font-size:12px;color:var(--muted);">
+              ${user.progress}/${goal} ${unit}
+            </span>
+          </div>
+          <div style="width:100%;height:8px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;">
+            <div style="width:${user.percentage}%;height:100%;background:${barColor};transition:width 0.3s ease;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    return `
+      <div class="card" style="border-left:4px solid #10b981;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:24px;">${icon}</span>
+            <h4 style="margin:0;">${title}</h4>
+          </div>
+          <div style="font-size:11px;color:var(--muted);text-align:right;">
+            <div>noch ${timeLeft} Tage</div>
+          </div>
+        </div>
+        <div style="padding:12px;background:rgba(16,185,129,0.05);border-radius:8px;margin-bottom:12px;">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Ziel:</div>
+          <div style="font-size:16px;font-weight:600;">${goal} ${unit}</div>
+        </div>
+        ${usersHTML}
+        ${users.length > 3 ? `
+          <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted);">
+            +${users.length - 3} weitere Teilnehmer
+          </div>
+        ` : ''}
+      </div>
+    `;
+  };
+  
+  const html = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;">
+      ${createChallengeCard(
+        '📅',
+        'Wochenchallenge',
+        daysLeftWeek,
+        weekGoal,
+        weekUsers,
+        weekLabel.unit
+      )}
+      ${createChallengeCard(
+        '🌙',
+        'Monats-Challenge',
+        daysLeftMonth,
+        monthGoal,
+        monthUsers,
+        monthLabel.unit
+      )}
+      ${createChallengeCard(
+        '🎯',
+        'Jahres-Challenge',
+        daysLeftYear,
+        yearGoal,
+        yearUsers,
+        yearLabel.unit
+      )}
+    </div>
+    
+    <div style="margin-top:24px;padding:16px;background:rgba(16,185,129,0.1);border-left:4px solid #10b981;border-radius:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:20px;">💡</span>
+          <strong>Challenge-Info:</strong>
+        </div>
+        ${isAdmin ? `
+          <button class="small-btn" onclick="openAdvancedChallengeSettings()" style="background:linear-gradient(135deg, var(--accent), var(--accent-2));color:white;font-size:12px;padding:8px 16px;font-weight:600;white-space:nowrap;" title="Als Admin kannst du die Challenge-Ziele und -Typen anpassen">
+            ⚙️ Challenges bearbeiten
+          </button>
+        ` : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:8px;font-size:12px;color:var(--muted);">
+        <div>📅 <strong>Woche:</strong> ${weekGoal} ${weekLabel.desc}</div>
+        <div>🌙 <strong>Monat:</strong> ${monthGoal} ${monthLabel.desc}</div>
+        <div>🎯 <strong>Jahr:</strong> ${yearGoal} ${yearLabel.desc}</div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted);">
+        Challenges werden automatisch jede Woche/Monat/Jahr zurückgesetzt.
+        ${isAdmin ? '<br><strong>👑 Du bist Admin:</strong> Klicke oben auf "Challenges bearbeiten" um die Challenge-Ziele für die Gruppe anzupassen.' : ''}
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// NEU: Challenge-Einstellungen öffnen (nur für Admins)
+async function openChallengeSettings() {
+  if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    showNotification('⚠️ Nur in Gruppen verfügbar', 2000);
+    return;
+  }
+  
+  // Lade aktuelle Ziele aus Firebase
+  const groupRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}`);
+  const snapshot = await window.FBD.get(groupRef);
+  
+  if (!snapshot.exists()) {
+    showNotification('❌ Gruppendaten nicht gefunden', 2000);
+    return;
+  }
+  
+  const groupData = snapshot.val();
+  const challengeGoals = groupData.challengeGoals || {
+    week: 50,
+    month: 100,
+    year: 300
+  };
+  
+  // Fülle Formular mit aktuellen Werten
+  document.getElementById('weekChallengeGoal').value = challengeGoals.week;
+  document.getElementById('monthChallengeGoal').value = challengeGoals.month;
+  document.getElementById('yearChallengeGoal').value = challengeGoals.year;
+  
+  // Zeige Modal
+  document.getElementById('challengeSettingsModal').style.display = 'flex';
+}
+
+// NEU: Erweiterte Challenge-Einstellungen öffnen (mit mehr Optionen)
+async function openAdvancedChallengeSettings() {
+  if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    showNotification('⚠️ Nur in Gruppen verfügbar', 2000);
+    return;
+  }
+  
+  // Lade aktuelle Ziele und Typen aus Firebase
+  const groupRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}`);
+  const snapshot = await window.FBD.get(groupRef);
+  
+  if (!snapshot.exists()) {
+    showNotification('❌ Gruppendaten nicht gefunden', 2000);
+    return;
+  }
+  
+  const groupData = snapshot.val();
+  const challengeGoals = groupData.challengeGoals || {
+    week: 50,
+    month: 100,
+    year: 300
+  };
+  
+  const challengeTypes = groupData.challengeTypes || {
+    week: 'species',
+    month: 'species',
+    year: 'species'
+  };
+  
+  // Fülle Formular mit aktuellen Werten
+  document.getElementById('weekChallengeGoalAdv').value = challengeGoals.week;
+  document.getElementById('weekChallengeType').value = challengeTypes.week;
+  
+  document.getElementById('monthChallengeGoalAdv').value = challengeGoals.month;
+  document.getElementById('monthChallengeType').value = challengeTypes.month;
+  
+  document.getElementById('yearChallengeGoalAdv').value = challengeGoals.year;
+  document.getElementById('yearChallengeType').value = challengeTypes.year;
+  
+  // Zeige Modal
+  document.getElementById('advancedChallengeSettingsModal').style.display = 'flex';
+}
+
+// Erweiterte Challenge-Einstellungen schließen
+function closeAdvancedChallengeSettings() {
+  document.getElementById('advancedChallengeSettingsModal').style.display = 'none';
+}
+
+// Erweiterte Challenge-Einstellungen speichern
+async function saveAdvancedChallengeSettings(event) {
+  event.preventDefault();
+  
+  if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    showNotification('⚠️ Nur in Gruppen verfügbar', 2000);
+    return;
+  }
+  
+  // Hole Werte aus Formular
+  const weekGoal = parseInt(document.getElementById('weekChallengeGoalAdv').value);
+  const weekType = document.getElementById('weekChallengeType').value;
+  
+  const monthGoal = parseInt(document.getElementById('monthChallengeGoalAdv').value);
+  const monthType = document.getElementById('monthChallengeType').value;
+  
+  const yearGoal = parseInt(document.getElementById('yearChallengeGoalAdv').value);
+  const yearType = document.getElementById('yearChallengeType').value;
+  
+  // Validierung
+  if (weekGoal < 1 || weekGoal > 500) {
+    showNotification('⚠️ Wochenziel muss zwischen 1 und 500 sein', 2000);
+    return;
+  }
+  if (monthGoal < 1 || monthGoal > 500) {
+    showNotification('⚠️ Monatsziel muss zwischen 1 und 500 sein', 2000);
+    return;
+  }
+  if (yearGoal < 1 || yearGoal > 1000) {
+    showNotification('⚠️ Jahresziel muss zwischen 1 und 1000 sein', 2000);
+    return;
+  }
+  
+  try {
+    // Speichere Ziele in Firebase
+    const goalsRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}/challengeGoals`);
+    await window.FBD.set(goalsRef, {
+      week: weekGoal,
+      month: monthGoal,
+      year: yearGoal
+    });
+    
+    // Speichere Typen in Firebase
+    const typesRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}/challengeTypes`);
+    await window.FBD.set(typesRef, {
+      week: weekType,
+      month: monthType,
+      year: yearType
+    });
+    
+    showNotification('✅ Challenge-Einstellungen gespeichert!', 3000);
+    closeAdvancedChallengeSettings();
+    
+    // Lade Gruppenvergleich neu
+    await loadGroupComparison();
+  } catch (error) {
+    console.error('Fehler beim Speichern:', error);
+    showNotification('❌ Fehler beim Speichern', 2000);
+  }
+}
+
+// Challenge-Einstellungen schließen
+function closeChallengeSettings() {
+  document.getElementById('challengeSettingsModal').style.display = 'none';
+}
+
+// Challenge-Einstellungen speichern
+async function saveChallengeSettings(event) {
+  event.preventDefault();
+  
+  if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    showNotification('⚠️ Nur in Gruppen verfügbar', 2000);
+    return;
+  }
+  
+  // Hole Werte aus Formular
+  const weekGoal = parseInt(document.getElementById('weekChallengeGoal').value);
+  const monthGoal = parseInt(document.getElementById('monthChallengeGoal').value);
+  const yearGoal = parseInt(document.getElementById('yearChallengeGoal').value);
+  
+  // Validierung
+  if (weekGoal < 1 || weekGoal > 500) {
+    showNotification('⚠️ Wochenziel muss zwischen 1 und 500 sein', 2000);
+    return;
+  }
+  if (monthGoal < 1 || monthGoal > 200) {
+    showNotification('⚠️ Monatsziel muss zwischen 1 und 200 sein', 2000);
+    return;
+  }
+  if (yearGoal < 1 || yearGoal > 1000) {
+    showNotification('⚠️ Jahresziel muss zwischen 1 und 1000 sein', 2000);
+    return;
+  }
+  
+  try {
+    // Speichere in Firebase
+    const groupRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}/challengeGoals`);
+    await window.FBD.set(groupRef, {
+      week: weekGoal,
+      month: monthGoal,
+      year: yearGoal
+    });
+    
+    showNotification('✅ Challenge-Ziele gespeichert!', 3000);
+    closeChallengeSettings();
+    
+    // Lade Gruppenvergleich neu
+    await loadGroupComparison();
+  } catch (error) {
+    console.error('Fehler beim Speichern:', error);
+    showNotification('❌ Fehler beim Speichern', 2000);
+  }
 }
 
 // Rendere Statistik-Vergleich
@@ -25333,7 +26214,7 @@ async function loadObservationsForSelection() {
     const groupedByPerson = new Map();
     observations.forEach(obs => {
       const userId = obs.userId || obs.createdBy || 'personal';
-      const userName = obs.userName || obs.userEmail || 'Meine Beobachtungen';
+      const userName = obs.userName || obs.userEmail || getPrivateUserName();
       
       if (!groupedByPerson.has(userId)) {
         groupedByPerson.set(userId, {
@@ -29747,8 +30628,8 @@ const EnhancedStatsManager = {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
-          x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+          y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+          x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { display: false } }
         }
       }
     });
@@ -29812,10 +30693,10 @@ const EnhancedStatsManager = {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: '#94a3b8' } } },
+        plugins: { legend: { labels: { color: 'rgba(255, 255, 255, 0.7)' } } },
         scales: {
-          y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
-          x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+          y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+          x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { display: false } }
         }
       }
     });
@@ -29876,8 +30757,8 @@ const EnhancedStatsManager = {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
-          x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+          y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+          x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { display: false } }
         }
       }
     });
