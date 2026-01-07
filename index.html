@@ -11219,6 +11219,11 @@
                                 style="width:100%;margin-top:12px;background:var(--accent);">
                           👁️ Details ansehen
                         </button>
+                        <button class="small-btn" onclick="copyComparisonListToPrivate('${folderId}', '${listId}')" 
+                                style="width:100%;margin-top:8px;background:var(--success);font-size:11px;" 
+                                title="Liste zu 'Meine Listen' kopieren">
+                          📥 Zu Meine Listen
+                        </button>
                         ${isListOwner || isAdmin ? `
                           <button class="small-btn" onclick="deleteListFromComparisonFolder('${folderId}', '${listId}')" 
                                   style="width:100%;margin-top:8px;background:var(--danger);font-size:11px;" 
@@ -11425,6 +11430,79 @@
     
     // Globale Funktion verfügbar machen
     window.deleteListFromComparisonFolder = deleteListFromComparisonFolder;
+    
+    // NEU: Kopiere Liste vom Gruppenvergleich zu privaten Listen
+    async function copyComparisonListToPrivate(folderId, listId) {
+      if (!window.FBA || !window.FBA.currentUser) {
+        showNotification('❌ Nicht angemeldet', 3000);
+        return;
+      }
+      
+      try {
+        const groupId = window.currentSelectedGroup;
+        
+        // Lade Liste aus Firebase
+        const listSnapshot = await window.FBD.ref(`groups/${groupId}/comparisonFolders/${folderId}/lists/${listId}`).once('value');
+        const comparisonList = listSnapshot.val();
+        
+        if (!comparisonList) {
+          showNotification('❌ Liste nicht gefunden', 3000);
+          return;
+        }
+        
+        console.log('📥 Kopiere Liste zu privaten Listen:', comparisonList.listName);
+        
+        // Erstelle neue private Liste mit den Daten
+        const newPrivateList = {
+          id: 'list_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          name: comparisonList.listName + ' (Kopie)',
+          description: comparisonList.listDescription || 'Kopiert aus Gruppenvergleich',
+          color: comparisonList.listColor || colorPalette[0],
+          tags: comparisonList.listTags || [],
+          species: [], // Wird später gefüllt
+          families: [],
+          excludeTickable: false,
+          excludeNonTickable: false,
+          excludeSelffound: false,
+          excludeNonSelffound: false,
+          dateRange: null,
+          locationFilter: null,
+          createdAt: new Date().toISOString()
+        };
+        
+        // Extrahiere eindeutige Arten aus den Beobachtungen der Vergleichsliste
+        const observations = comparisonList.observations || [];
+        const uniqueSpecies = [...new Set(observations.map(obs => obs.bird))];
+        
+        console.log(`   ${observations.length} Beobachtungen, ${uniqueSpecies.length} einzigartige Arten`);
+        
+        newPrivateList.species = uniqueSpecies;
+        
+        // Speichere die neue Liste in IndexedDB
+        await saveToIndexedDB('lists', newPrivateList);
+        
+        console.log('✅ Liste in IndexedDB gespeichert:', newPrivateList.id);
+        
+        // Aktualisiere die Listen-Anzeige wenn wir auf der Listen-Seite sind
+        if (typeof renderUserLists === 'function') {
+          await renderUserLists();
+        }
+        
+        showNotification(`✅ Liste "${comparisonList.listName}" zu deinen privaten Listen kopiert!`, 3000);
+        
+        // Frage ob der Nutzer zur Listen-Seite wechseln möchte
+        if (confirm('Liste erfolgreich kopiert!\n\nMöchtest du zu "Meine Listen" wechseln?')) {
+          showPage('lists');
+        }
+        
+      } catch (error) {
+        console.error('Fehler beim Kopieren der Liste:', error);
+        showNotification('❌ Fehler beim Kopieren: ' + error.message, 3000);
+      }
+    }
+    
+    // Globale Funktion verfügbar machen
+    window.copyComparisonListToPrivate = copyComparisonListToPrivate;
     
     // NEU: Synchronisiere geteilte Listen nach neuer Beobachtung
     async function syncSharedListsAfterNewObservation() {
@@ -22203,29 +22281,6 @@ var waitFB=function(){return new Promise(function(r){if(typeof firebase!=="undef
 var init=function(){
   console.log("1️⃣ Warte auf Firebase SDK...");
   
-  // ========== NEU: Storage Quota Management ==========
-  // Prüfe verfügbaren Speicher
-  if (navigator.storage && navigator.storage.estimate) {
-    navigator.storage.estimate().then(estimate => {
-      const usedMB = (estimate.usage / 1024 / 1024).toFixed(2);
-      const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2);
-      const percentUsed = ((estimate.usage / estimate.quota) * 100).toFixed(1);
-      console.log(`📊 Speicher: ${usedMB}MB / ${quotaMB}MB (${percentUsed}% genutzt)`);
-      
-      // Warnung bei >80% Speichernutzung
-      if (percentUsed > 80) {
-        console.warn('⚠️ Speicher fast voll! Bereinigung empfohlen.');
-        if (percentUsed > 95) {
-          if (confirm('⚠️ Dein Browser-Speicher ist fast voll ('+percentUsed+'%)!\n\nDies kann zu Synchronisierungsproblemen führen.\n\nMöchtest du alte Daten bereinigen?')) {
-            cleanupOldData();
-          }
-        }
-      }
-    }).catch(err => {
-      console.log('Storage API nicht verfügbar:', err);
-    });
-  }
-  
   // Initialisiere globale Variable für aktuelle Gruppe
   window.currentSelectedGroup = localStorage.getItem("selectedGroup") || "personal";
   console.log("💾 window.currentSelectedGroup initialisiert:", window.currentSelectedGroup);
@@ -22268,101 +22323,16 @@ var init=function(){
       });
       window.FBA=firebase.auth();
       window.FBD=firebase.database();
-      
-      // ========== NEU: Explizite Auth Persistence ==========
-      // LOCAL = bleibt angemeldet auch nach Browser-Neustart
-      // SESSION = nur für diese Browser-Session
-      // NONE = nur während Seitenladezeit
-      console.log("🔐 Setze Auth Persistence auf LOCAL...");
-      window.FBA.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-          console.log("✅ Persistence auf LOCAL gesetzt");
-        })
-        .catch((error) => {
-          console.warn("⚠️ Persistence Fehler:", error.message);
-          // Fallback: versuche SESSION
-          return window.FBA.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-        })
-        .then(() => {
-          console.log("✅ Fallback auf SESSION Persistence");
-        })
-        .catch((error) => {
-          console.error("❌ Keine Persistence möglich:", error);
-        });
-      
       console.log("3️⃣ Firebase initialisiert!");
       console.log("   - Auth:", window.FBA ? "✅" : "❌");
       console.log("   - Database:", window.FBD ? "✅" : "❌");
       
-      // ========== NEU: Verbessertes Connection Monitoring ==========
-      let wasOffline = false;
-      let reconnectAttempts = 0;
-      const maxReconnectAttempts = 5;
-      
+      // Test Database Connection
       window.FBD.ref('.info/connected').on('value', function(snap) {
-        const isConnected = snap.val() === true;
-        
-        if (isConnected) {
+        if (snap.val() === true) {
           console.log("4️⃣ 🟢 Database Verbindung: ONLINE");
-          
-          // War offline? Dann Daten neu laden
-          if (wasOffline) {
-            console.log("🔄 Wiederverbunden! Lade Daten neu...");
-            if (typeof showNotification === "function") {
-              showNotification("🟢 Verbindung wiederhergestellt!");
-            }
-            
-            // Lade aktuelle Gruppendaten neu
-            if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal') {
-              setTimeout(() => {
-                const select = document.getElementById("fbGroupSelect");
-                if (select) {
-                  const event = new Event('change');
-                  select.dispatchEvent(event);
-                }
-              }, 500);
-            }
-            
-            wasOffline = false;
-            reconnectAttempts = 0;
-          }
         } else {
           console.log("4️⃣ 🔴 Database Verbindung: OFFLINE");
-          wasOffline = true;
-          
-          if (typeof showNotification === "function") {
-            showNotification("🔴 Offline - Änderungen werden beim Reconnect synchronisiert", 3000);
-          }
-          
-          // Versuche Reconnect (mit exponential backoff)
-          if (reconnectAttempts < maxReconnectAttempts) {
-            reconnectAttempts++;
-            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-            console.log(`🔄 Reconnect-Versuch ${reconnectAttempts}/${maxReconnectAttempts} in ${delay/1000}s...`);
-            
-            setTimeout(() => {
-              window.FBD.goOnline();
-            }, delay);
-          }
-        }
-      });
-      
-      // ========== NEU: Auth State Persistence Monitoring ==========
-      window.FBA.onIdTokenChanged(function(user) {
-        if (user) {
-          // Token refresh - stille Erneuerung
-          user.getIdToken(true).then((token) => {
-            console.log("🔑 Auth Token erneuert");
-          }).catch((error) => {
-            console.warn("⚠️ Token Refresh Fehler:", error);
-            // Bei Token-Problemen: Neu anmelden
-            if (error.code === 'auth/network-request-failed') {
-              console.log("📡 Netzwerk-Problem - warte auf Verbindung...");
-            } else if (error.code === 'auth/user-token-expired') {
-              console.log("🔄 Token abgelaufen - versuche erneute Anmeldung...");
-              // Automatische Wiederanmeldung wird durch onAuthStateChanged behandelt
-            }
-          });
         }
       });
       
@@ -22376,52 +22346,6 @@ var init=function(){
     alert("Firebase SDK konnte nicht geladen werden")
   })
 };
-
-// ========== NEU: Storage Cleanup Funktion ==========
-function cleanupOldData() {
-  console.log("🧹 Starte Datenbereinigung...");
-  
-  // Lösche alte localStorage Daten
-  try {
-    const keysToKeep = ['selectedGroup', 'theme', 'selectedTheme', 'privacy_accepted', 'indexedDB_migrated', 'birdcount_private_username', 'mapLayer'];
-    const allKeys = Object.keys(localStorage);
-    
-    allKeys.forEach(key => {
-      if (!keysToKeep.includes(key)) {
-        localStorage.removeItem(key);
-        console.log("🗑️ Gelöscht:", key);
-      }
-    });
-    
-    console.log("✅ localStorage bereinigt");
-  } catch (err) {
-    console.error("Fehler beim Bereinigen:", err);
-  }
-  
-  // Optional: Alte IndexedDB-Einträge bereinigen (älter als 1 Jahr)
-  if (db) {
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    
-    const transaction = db.transaction(['observations'], 'readwrite');
-    const store = transaction.objectStore('observations');
-    const index = store.index('date');
-    const range = IDBKeyRange.upperBound(oneYearAgo.toISOString());
-    
-    index.openCursor(range).onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
-        console.log("🗑️ Lösche alte Beobachtung:", cursor.value.id);
-        cursor.delete();
-        cursor.continue();
-      }
-    };
-  }
-  
-  if (typeof showNotification === "function") {
-    showNotification("✅ Speicher bereinigt!");
-  }
-}
 
 var injectUI=function(){
   console.log("5️⃣ Injiziere UI...");
@@ -22555,77 +22479,10 @@ var setupEvents=function(){
   window.FBA.onAuthStateChanged(function(u){
     if(u){
       console.log("8️⃣ Auth State: Angemeldet als", u.email);
-      console.log("   UID:", u.uid);
-      console.log("   Display Name:", u.displayName);
-      console.log("   Email Verified:", u.emailVerified);
-      
-      // ========== NEU: Prüfe Token-Gültigkeit ==========
-      u.getIdToken(false).then((token) => {
-        console.log("✅ Auth Token gültig");
-        hideModal();
-        hideLoading();
-        updateUI(u);
-        
-        if(typeof showNotification==="function"){
-          showNotification("✅ Cloud-Sync aktiv!")
-        }
-      }).catch((error) => {
-        console.warn("⚠️ Auth Token Problem:", error);
-        
-        // Versuche Token zu erneuern
-        u.getIdToken(true).then((newToken) => {
-          console.log("✅ Token erfolgreich erneuert");
-          hideModal();
-          hideLoading();
-          updateUI(u);
-          
-          if(typeof showNotification==="function"){
-            showNotification("✅ Cloud-Sync aktiv!")
-          }
-        }).catch((renewError) => {
-          console.error("❌ Token Renewal fehlgeschlagen:", renewError);
-          
-          // Kritischer Fehler - Benutzer muss sich neu anmelden
-          if (typeof showNotification === "function") {
-            showNotification("⚠️ Sitzung abgelaufen - Bitte neu anmelden", 5000);
-          }
-          
-          // Logout und zeige Login-Dialog
-          window.FBA.signOut().then(() => {
-            console.log("🔓 Automatischer Logout wegen Token-Problem");
-            setTimeout(() => {
-              document.getElementById('fbModal').style.display = 'flex';
-            }, 1000);
-          });
-        });
-      });
-      
-      // ========== NEU: Speichere letzte erfolgreiche Anmeldung ==========
-      localStorage.setItem('lastLoginTime', Date.now());
-      localStorage.setItem('lastLoginEmail', u.email);
-      
+      hideModal();hideLoading();updateUI(u);
+      if(typeof showNotification==="function"){showNotification("✅ Cloud-Sync aktiv!")}
     }else{
       console.log("8️⃣ Auth State: Abgemeldet");
-      
-      // ========== NEU: Prüfe ob unerwarteter Logout ==========
-      const lastLoginTime = localStorage.getItem('lastLoginTime');
-      if (lastLoginTime) {
-        const timeSinceLogin = Date.now() - parseInt(lastLoginTime);
-        const hoursSinceLogin = timeSinceLogin / (1000 * 60 * 60);
-        
-        // Wenn Logout innerhalb von 24h nach Login: könnte Problem sein
-        if (hoursSinceLogin < 24) {
-          console.warn("⚠️ Unerwarteter Logout nach", hoursSinceLogin.toFixed(1), "Stunden");
-          
-          if (typeof showNotification === "function") {
-            showNotification("⚠️ Sitzung verloren - Bitte neu anmelden", 4000);
-          }
-        }
-      }
-      
-      // Lösche Login-Zeit
-      localStorage.removeItem('lastLoginTime');
-      
       var w=document.getElementById("fbWidget");
       var g=document.getElementById("fbGroups");
       if(w)w.classList.remove("show");
@@ -22762,89 +22619,63 @@ var setupEvents=function(){
       }
       console.log("   User:", u.email);
       
-      // ========== NEU: Prüfe Verbindung vor Beitritt ==========
-      window.FBD.ref('.info/connected').once('value').then(function(connSnap) {
-        if (!connSnap.val()) {
-          console.warn("⚠️ Keine Verbindung zur Database");
-          if (confirm("⚠️ Keine Verbindung zur Datenbank!\n\nMöchtest du es erneut versuchen?")) {
-            // Versuche Reconnect
-            window.FBD.goOnline();
-            setTimeout(() => {
-              joinBtn.click(); // Rekursiver Aufruf nach Reconnect-Versuch
-            }, 2000);
-          }
-          return;
-        }
+      var groupId=prompt("Gib die Gruppen-ID ein:\n\n(Die ID erhältst du vom Gruppen-Admin)");
+      if(!groupId){
+        console.log("   Abgebrochen - keine ID");
+        return;
+      }
+      
+      // Bereinige die Eingabe
+      groupId = groupId.trim();
+      console.log("   Gruppen-ID:", groupId);
+      console.log("   ID-Länge:", groupId.length);
+      
+      showLoading("Trete Gruppe bei...");
+      
+      // Prüfe ob Gruppe existiert
+      console.log("🔍 Prüfe Gruppe in Firebase:", "groups/" + groupId);
+      window.FBD.ref("groups/"+groupId).once("value").then(function(snapshot){
+        console.log("📊 Snapshot erhalten, exists:", snapshot.exists());
         
-        var groupId=prompt("Gib die Gruppen-ID ein:\n\n(Die ID erhältst du vom Gruppen-Admin)");
-        if(!groupId){
-          console.log("   Abgebrochen - keine ID");
-          return;
-        }
-        
-        // Bereinige die Eingabe
-        groupId = groupId.trim();
-        console.log("   Gruppen-ID:", groupId);
-        console.log("   ID-Länge:", groupId.length);
-        
-        showLoading("Trete Gruppe bei...");
-        
-        // ========== NEU: Timeout für Gruppen-Suche ==========
-        const searchTimeout = setTimeout(() => {
-          console.error("❌ Timeout bei Gruppen-Suche");
+        if(!snapshot.exists()){
+          console.error("❌ Gruppe existiert nicht!");
+          console.log("   Mögliche Ursachen:");
+          console.log("   1. Falsche Gruppen-ID");
+          console.log("   2. Gruppe wurde gelöscht");
+          console.log("   3. Keine Leseberechtigung (Security Rules)");
           hideLoading();
-          if (confirm("⏱️ Timeout!\n\nDie Gruppe konnte nicht gefunden werden.\nMöchtest du es erneut versuchen?")) {
-            joinBtn.click();
-          }
-        }, 15000);
+          alert("❌ Gruppe nicht gefunden!\n\nMögliche Gründe:\n• Falsche Gruppen-ID\n• Keine Berechtigung\n\nBitte prüfe:\n1. Die vollständige ID kopiert?\n2. Firebase Security Rules korrekt?");
+          return;
+        }
         
-        // Prüfe ob Gruppe existiert
-        console.log("🔍 Prüfe Gruppe in Firebase:", "groups/" + groupId);
-        window.FBD.ref("groups/"+groupId).once("value").then(function(snapshot){
-          clearTimeout(searchTimeout);
-          console.log("📊 Snapshot erhalten, exists:", snapshot.exists());
+        var groupData = snapshot.val();
+        console.log("   Gruppe gefunden:", groupData.name);
+        console.log("   Aktuelle Members:", groupData.members ? Object.keys(groupData.members) : "keine");
+        
+        // Prüfe ob User bereits Mitglied ist
+        if(groupData.members && groupData.members[u.uid]){
+          console.log("   ℹ️ User ist bereits Mitglied");
+          hideLoading();
+          alert("ℹ️ Du bist bereits Mitglied dieser Gruppe!");
+          return;
+        }
+        
+        // Füge User zur Gruppe hinzu
+        var memberData = {
+          role: "member",
+          name: u.displayName || u.email.split("@")[0],
+          joinedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        console.log("💾 Schreibe Member-Daten:", "groups/"+groupId+"/members/"+u.uid);
+        console.log("   Daten:", JSON.stringify(memberData, null, 2));
+        
+        window.FBD.ref("groups/"+groupId+"/members/"+u.uid).set(memberData).then(function(){
+          console.log("✅ Erfolgreich beigetreten!");
           
-          if(!snapshot.exists()){
-            console.error("❌ Gruppe existiert nicht!");
-            console.log("   Mögliche Ursachen:");
-            console.log("   1. Falsche Gruppen-ID");
-            console.log("   2. Gruppe wurde gelöscht");
-            console.log("   3. Keine Leseberechtigung (Security Rules)");
-            hideLoading();
-            alert("❌ Gruppe nicht gefunden!\n\nMögliche Gründe:\n• Falsche Gruppen-ID\n• Keine Berechtigung\n\nBitte prüfe:\n1. Die vollständige ID kopiert?\n2. Firebase Security Rules korrekt?");
-            return;
-          }
-          
-          var groupData = snapshot.val();
-          console.log("   Gruppe gefunden:", groupData.name);
-          console.log("   Aktuelle Members:", groupData.members ? Object.keys(groupData.members) : "keine");
-          
-          // Prüfe ob User bereits Mitglied ist
-          if(groupData.members && groupData.members[u.uid]){
-            console.log("   ℹ️ User ist bereits Mitglied");
-            hideLoading();
-            alert("ℹ️ Du bist bereits Mitglied dieser Gruppe!");
-            return;
-          }
-          
-          // Füge User zur Gruppe hinzu
-          var memberData = {
-            role: "member",
-            name: u.displayName || u.email.split("@")[0],
-            joinedAt: firebase.database.ServerValue.TIMESTAMP
-          };
-          
-          console.log("💾 Schreibe Member-Daten:", "groups/"+groupId+"/members/"+u.uid);
-          console.log("   Daten:", JSON.stringify(memberData, null, 2));
-          
-          // ========== NEU: Retry-Logic für Member-Add ==========
-          const tryAddMember = (attempt = 1, maxAttempts = 3) => {
-            window.FBD.ref("groups/"+groupId+"/members/"+u.uid).set(memberData).then(function(){
-              console.log("✅ Erfolgreich beigetreten!");
-              
-              // Füge die Gruppe sofort manuell zur Auswahl hinzu
-              var select = document.getElementById("fbGroupSelect");
-              if(select){
+          // Füge die Gruppe sofort manuell zur Auswahl hinzu
+          var select = document.getElementById("fbGroupSelect");
+          if(select){
             // Prüfe ob Gruppe nicht schon da ist
             var exists = false;
             for(var i = 0; i < select.options.length; i++){
@@ -22878,35 +22709,19 @@ var setupEvents=function(){
           
           // Gruppen werden automatisch durch den Listener aktualisiert
         }).catch(function(e){
-          console.error("❌ Fehler beim Beitreten (Versuch "+attempt+"/"+maxAttempts+"):", e);
+          console.error("❌ Fehler beim Beitreten:", e);
           console.log("   Error Code:", e.code);
           console.log("   Error Message:", e.message);
-          
-          // ========== NEU: Retry bei bestimmten Fehlern ==========
-          if (attempt < maxAttempts && (e.code === 'auth/network-request-failed' || e.code === 'UNAVAILABLE')) {
-            console.log("🔄 Versuche erneut in 2 Sekunden...");
-            setTimeout(() => {
-              tryAddMember(attempt + 1, maxAttempts);
-            }, 2000);
-            return;
-          }
-          
           hideLoading();
           
           var msg = "❌ Fehler beim Beitreten:\n\n" + e.message;
           
           if(e.code === "PERMISSION_DENIED"){
             msg += "\n\n🔒 PERMISSION_DENIED!\n\nDie Firebase Security Rules blockieren den Zugriff.\n\nLösung in Firebase Console:\n1. Realtime Database → Rules\n2. Ersetze mit:\n\n{\n  \"rules\": {\n    \"groups\": {\n      \"$groupId\": {\n        \".read\": \"auth != null\",\n        \".write\": \"auth != null\"\n      }\n    }\n  }\n}";
-          } else if (attempt >= maxAttempts) {
-            msg += "\n\n⚠️ Maximale Anzahl an Versuchen erreicht.";
           }
           
           alert(msg);
         });
-      };
-      
-      // Starte ersten Versuch
-      tryAddMember();
         
       }).catch(function(e){
         console.error("❌ Fehler beim Laden der Gruppe:", e);
@@ -30713,145 +30528,3 @@ function getBirdEmoji(birdName) {
 
 </body>
 </html>
-<!-- ========== NEU: Diagnose-Tool für Browser-Probleme ========== -->
-<script>
-// Füge Diagnose-Funktion zum globalen Scope hinzu
-window.runDiagnostics = function() {
-  console.log("🔍 ========== DIAGNOSE START ==========");
-  
-  // 1. Storage-Informationen
-  console.log("
-📦 STORAGE INFO:");
-  if (navigator.storage && navigator.storage.estimate) {
-    navigator.storage.estimate().then(estimate => {
-      const usedMB = (estimate.usage / 1024 / 1024).toFixed(2);
-      const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2);
-      const percentUsed = ((estimate.usage / estimate.quota) * 100).toFixed(1);
-      console.log(`   Benutzt: ${usedMB}MB / ${quotaMB}MB (${percentUsed}%)`);
-      
-      if (percentUsed > 80) {
-        console.warn("   ⚠️ WARNUNG: Speicher über 80% voll!");
-      }
-    });
-  } else {
-    console.log("   Storage API nicht verfügbar");
-  }
-  
-  // 2. LocalStorage-Check
-  console.log("
-🗄️ LOCALSTORAGE:");
-  try {
-    const keys = Object.keys(localStorage);
-    console.log(`   Anzahl Einträge: ${keys.length}`);
-    console.log("   Keys:", keys);
-    console.log("   Aktuelle Gruppe:", localStorage.getItem('selectedGroup'));
-    console.log("   Letzter Login:", localStorage.getItem('lastLoginEmail'));
-  } catch (e) {
-    console.error("   ❌ Fehler:", e);
-  }
-  
-  // 3. IndexedDB-Check
-  console.log("
-💾 INDEXEDDB:");
-  if (window.db) {
-    console.log("   ✅ Verbindung aktiv");
-    console.log("   DB Name:", db.name);
-    console.log("   Version:", db.version);
-    console.log("   Object Stores:", Array.from(db.objectStoreNames));
-  } else {
-    console.log("   ❌ Keine Verbindung");
-  }
-  
-  // 4. Firebase-Check
-  console.log("
-🔥 FIREBASE:");
-  console.log("   Auth verfügbar:", !!window.FBA);
-  console.log("   Database verfügbar:", !!window.FBD);
-  if (window.FBA && window.FBA.currentUser) {
-    console.log("   ✅ Angemeldet als:", window.FBA.currentUser.email);
-    console.log("   UID:", window.FBA.currentUser.uid);
-    console.log("   Display Name:", window.FBA.currentUser.displayName);
-  } else {
-    console.log("   ❌ Nicht angemeldet");
-  }
-  
-  // 5. Verbindungsstatus
-  if (window.FBD) {
-    window.FBD.ref('.info/connected').once('value').then(snap => {
-      console.log("   Verbindung:", snap.val() ? "🟢 ONLINE" : "🔴 OFFLINE");
-    });
-  }
-  
-  // 6. Browser-Info
-  console.log("
-🌐 BROWSER:");
-  console.log("   User Agent:", navigator.userAgent);
-  console.log("   Cookies aktiviert:", navigator.cookieEnabled);
-  console.log("   Online:", navigator.onLine);
-  
-  // 7. Third-Party Cookies Check
-  console.log("
-🍪 THIRD-PARTY COOKIES:");
-  if (document.cookie) {
-    console.log("   First-Party Cookies: ✅ Funktionieren");
-  } else {
-    console.warn("   ⚠️ Cookies scheinen blockiert zu sein");
-  }
-  
-  console.log("
-🔍 ========== DIAGNOSE ENDE ==========");
-  console.log("💡 EMPFEHLUNGEN:");
-  
-  if (navigator.storage) {
-    navigator.storage.estimate().then(estimate => {
-      const percentUsed = ((estimate.usage / estimate.quota) * 100).toFixed(1);
-      if (percentUsed > 80) {
-        console.log("   📌 Speicher bereinigen: window.cleanupOldData()");
-      }
-      if (!window.FBA || !window.FBA.currentUser) {
-        console.log("   📌 Erneut anmelden für Firebase-Sync");
-      }
-      if (!navigator.cookieEnabled) {
-        console.log("   📌 Cookies in Browser-Einstellungen aktivieren");
-      }
-    });
-  }
-};
-
-// Automatische Diagnose bei Problemen
-if (window.FBA) {
-  window.FBA.onAuthStateChanged(function(user) {
-    if (!user) {
-      const lastLogin = localStorage.getItem('lastLoginTime');
-      if (lastLogin) {
-        const hoursSince = (Date.now() - parseInt(lastLogin)) / (1000 * 60 * 60);
-        if (hoursSince < 1) {
-          console.warn("⚠️ Unerwarteter Logout! Führe Diagnose aus:");
-          setTimeout(() => window.runDiagnostics(), 1000);
-        }
-      }
-    }
-  });
-}
-</script>
-
-<!-- ========== NEU: Keyboard-Shortcuts für Diagnose ========== -->
-<script>
-document.addEventListener('keydown', function(e) {
-  // Ctrl+Shift+D = Diagnose
-  if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-    e.preventDefault();
-    console.clear();
-    window.runDiagnostics();
-    alert("🔍 Diagnose läuft...\n\nÖffne die Konsole (F12) für Details!");
-  }
-  
-  // Ctrl+Shift+C = Cleanup
-  if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-    e.preventDefault();
-    if (confirm("🧹 Speicher bereinigen?\n\nDies löscht alte/unnötige Daten.\nDeine Beobachtungen bleiben erhalten!")) {
-      cleanupOldData();
-    }
-  }
-});
-</script>
