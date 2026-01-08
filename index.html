@@ -276,6 +276,16 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
+    /* Toast Animations */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(100px); }
+    }
+    
     /* Enhanced Stats */
     .enhanced-stats-modal {
       max-width: 1000px;
@@ -5384,6 +5394,7 @@
         <button class="btn ghost" id="addFolderBtn">Neuer Ordner</button>
         <button class="btn ghost" id="exportAllBtn">Export All</button>
         <button class="btn ghost" onclick="TutorialManager.reset()" title="Tutorial neu starten">🎓 Tutorial</button>
+        <button class="btn" onclick="deleteAllObservations()" style="background:var(--danger);margin-top:8px;width:100%;" title="Alle deine Beobachtungen löschen (mit Sicherheitsabfrage)">🗑️ Alle löschen</button>
       </div>
 
       <div class="feature-section">
@@ -5554,6 +5565,7 @@
                 <button class="small-btn obs-filter-btn" onclick="setObsManagerFilter('very-rare')">Sehr selten</button>
                 <button class="small-btn obs-filter-btn" onclick="setObsManagerFilter('selffound')">Selffound 🔴</button>
                 <button class="small-btn obs-filter-btn" onclick="setObsManagerFilter('tickable')">Tickbar ✓</button>
+                <button class="small-btn obs-filter-btn" onclick="setObsManagerFilter('non-tickable')" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);">Nicht tickbar ⊘</button>
                 <button class="small-btn obs-filter-btn" onclick="setObsManagerFilter('with-photo')">Mit Foto 📸</button>
               </div>
               
@@ -7619,6 +7631,26 @@
                 </div>
               </div>
 
+              <!-- NEU: Exklusive Arten Leaderboard -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));border-left:4px solid #7c3aed;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <span style="font-size:28px;">⭐</span>
+                  <div>
+                    <h3 style="margin:0;">Exklusive Arten</h3>
+                    <p style="margin:4px 0 0 0;font-size:12px;color:var(--muted);">
+                      Arten, die nur ein Mitglied gesehen hat
+                    </p>
+                  </div>
+                </div>
+                <div id="uniqueSpeciesLeaderboard">
+                  <div class="skeleton-loader">
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                    <div class="skeleton skeleton-card"></div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Direkter Mitglieder-Vergleich -->
               <div class="card" style="margin-bottom:20px;border-left:4px solid #22c55e;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -7658,9 +7690,14 @@
                       Erstelle Ordner und lade Listen zum Vergleich ein
                     </p>
                   </div>
-                  <button class="small-btn" onclick="openCreateComparisonFolderModal()" style="background:var(--accent);color:white;padding:8px 14px;font-weight:600;">
-                    ➕ Ordner erstellen
-                  </button>
+                  <div style="display:flex;gap:8px;">
+                    <button class="small-btn" onclick="syncPrivateListsManually()" style="background:var(--accent-2);color:white;padding:8px 14px;font-weight:600;" title="Synchronisiere deine privaten Listen mit allen Gruppen">
+                      🔄 Listen synchronisieren
+                    </button>
+                    <button class="small-btn" onclick="openCreateComparisonFolderModal()" style="background:var(--accent);color:white;padding:8px 14px;font-weight:600;">
+                      ➕ Ordner erstellen
+                    </button>
+                  </div>
                 </div>
                 <div id="comparisonFoldersList">
                   <div style="text-align:center;padding:40px 20px;color:var(--muted);">
@@ -11238,6 +11275,23 @@
     let folderColors = {};
     let userLists = []; // Array für benutzerdefinierte Listen
     
+    // NEU: Arten, die automatisch als nicht-tickbar markiert werden sollen
+    const AUTO_NON_TICKABLE_SPECIES = [
+      'Großmöwe, unbestimmt',
+      'Silber- / Mittelmeer- / Steppenmöwe',
+      'Stockente, fehlfarben, bastard'
+    ];
+    
+    // Hilfsfunktion: Prüfe ob Art automatisch nicht-tickbar sein soll
+    function isAutoNonTickableSpecies(birdName) {
+      if (!birdName) return false;
+      const normalized = birdName.trim();
+      return AUTO_NON_TICKABLE_SPECIES.some(species => 
+        normalized === species || 
+        normalized.toLowerCase() === species.toLowerCase()
+      );
+    }
+    
     // NEU: User-Farben für Gruppen-Marker
     let userColors = {};
     let userColorIndex = 0;
@@ -11618,6 +11672,9 @@
         const allObservations = await getPersonalObservationsWithDetails();
         const filteredObservations = await filterObservationsByList(allObservations, list);
         
+        // WICHTIG: Übertrage ALLE Beobachtungen (auch nicht-tickbare), damit sie überall sichtbar sind
+        console.log(`📊 Liste "${list.name}": ${filteredObservations.length} Beobachtungen (inkl. nicht-tickbare)`);
+        
         const user = window.FBA.currentUser;
         
         // Bereite Listendaten für Firebase vor
@@ -11630,14 +11687,15 @@
           userId: user.uid,
           userName: user.displayName || user.email.split('@')[0],
           userEmail: user.email,
-          observations: filteredObservations, // Die gefilterten Beobachtungen
+          observations: filteredObservations, // ALLE Beobachtungen (inkl. nicht-tickbare)
           addedAt: firebase.database.ServerValue.TIMESTAMP
         };
         
         // Füge Liste zum Ordner hinzu
         await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders/${currentComparisonFolderId}/lists`).push(listData);
         
-        showNotification(`✅ Liste "${list.name}" mit ${filteredObservations.length} Beobachtungen hinzugefügt!`, 3000);
+        const tickableCount = filteredObservations.filter(obs => obs.tickable !== false).length;
+        showNotification(`✅ Liste "${list.name}" mit ${filteredObservations.length} Beobachtungen hinzugefügt (${tickableCount} tickbar)!`, 3000);
         closeAddListToFolderModal();
         await renderComparisonFolders();
         
@@ -11777,7 +11835,11 @@
               
               // Filtere Beobachtungen neu
               const filteredObservations = await filterObservationsByList(allObservations, originalList);
-              console.log(`            📊 Gefiltert: ${filteredObservations.length} Beobachtungen (vorher: ${listData.observations?.length || 0})`);
+              
+              // WICHTIG: Übertrage ALLE Beobachtungen (inkl. nicht-tickbare)
+              const tickableCount = filteredObservations.filter(obs => obs.tickable !== false).length;
+              
+              console.log(`            📊 ${filteredObservations.length} Beobachtungen (${tickableCount} tickbar, vorher: ${listData.observations?.length || 0})`);
               
               // Aktualisiere in Firebase
               const listRef = window.FBD.ref(`groups/${groupKey}/comparisonFolders/${folderId}/lists/${listFirebaseId}/observations`);
@@ -11804,6 +11866,184 @@
     
     // Globale Funktion verfügbar machen
     window.syncSharedListsAfterNewObservation = syncSharedListsAfterNewObservation;
+    
+    // NEU: Bereinige alle existierenden Listen im Gruppenvergleich von nicht-tickbaren Beobachtungen
+    async function cleanupComparisonFoldersTickableOnly() {
+      if (!window.FBA || !window.FBA.currentUser) {
+        showNotification('❌ Du musst angemeldet sein', 3000);
+        return;
+      }
+      
+      try {
+        console.log('🧹 Starte Bereinigung: Entferne nicht-tickbare Beobachtungen aus Gruppenvergleich...');
+        
+        const userId = window.FBA.currentUser.uid;
+        let cleanedLists = 0;
+        let removedObservations = 0;
+        
+        // Durchsuche alle Gruppen
+        const groupsSnapshot = await window.FBD.ref('groups').once('value');
+        if (!groupsSnapshot.exists()) {
+          console.log('   Keine Gruppen gefunden');
+          return;
+        }
+        
+        const groups = groupsSnapshot.val();
+        
+        for (const [groupKey, groupData] of Object.entries(groups)) {
+          // Prüfe ob Benutzer Mitglied ist
+          if (!groupData.members) continue;
+          const isMember = Object.values(groupData.members).some(member => 
+            member.uid === userId || member.id === userId
+          );
+          
+          if (!isMember) continue;
+          
+          console.log(`   📁 Bereinige Gruppe: ${groupData.name || groupKey}`);
+          
+          if (!groupData.comparisonFolders) continue;
+          
+          // Durchsuche alle Vergleichs-Ordner
+          for (const [folderId, folder] of Object.entries(groupData.comparisonFolders)) {
+            if (!folder.lists) continue;
+            
+            console.log(`      📂 Ordner: ${folder.name || folderId}`);
+            
+            // Durchsuche alle Listen
+            for (const [listFirebaseId, listData] of Object.entries(folder.lists)) {
+              // Nur eigene Listen bereinigen
+              if (listData.userId !== userId) continue;
+              
+              const originalCount = (listData.observations || []).length;
+              
+              // Filtere nur tickbare Beobachtungen
+              const tickableObservations = (listData.observations || []).filter(obs => obs.tickable !== false);
+              const newCount = tickableObservations.length;
+              
+              if (originalCount !== newCount) {
+                console.log(`         📋 "${listData.listName}": ${originalCount} → ${newCount} Beobachtungen`);
+                
+                // Aktualisiere Liste in Firebase
+                await window.FBD.ref(`groups/${groupKey}/comparisonFolders/${folderId}/lists/${listFirebaseId}/observations`).set(tickableObservations);
+                
+                cleanedLists++;
+                removedObservations += (originalCount - newCount);
+              }
+            }
+          }
+        }
+        
+        console.log(`✅ Bereinigung abgeschlossen: ${cleanedLists} Listen bereinigt, ${removedObservations} nicht-tickbare Beobachtungen entfernt`);
+        
+        if (cleanedLists > 0) {
+          showNotification(`✅ ${cleanedLists} Liste(n) bereinigt, ${removedObservations} nicht-tickbare Beobachtung(en) entfernt`, 5000);
+          
+          // Aktualisiere Ansicht
+          if (typeof renderComparisonFolders === 'function') {
+            await renderComparisonFolders();
+          }
+        } else {
+          showNotification('✓ Alle Listen bereits sauber - keine nicht-tickbaren Beobachtungen gefunden', 3000);
+        }
+        
+      } catch (error) {
+        console.error('Fehler bei Bereinigung:', error);
+        showNotification('❌ Fehler bei Bereinigung: ' + error.message, 3000);
+      }
+    }
+    
+    // Globale Funktion verfügbar machen
+    window.cleanupComparisonFoldersTickableOnly = cleanupComparisonFoldersTickableOnly;
+    
+    // NEU: Debug-Funktion um tickable-Status zu überprüfen
+    async function debugComparisonListsTickableStatus() {
+      if (!window.FBA || !window.FBA.currentUser) {
+        console.log('❌ Nicht angemeldet');
+        return;
+      }
+      
+      if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+        console.log('❌ Keine Gruppe ausgewählt');
+        return;
+      }
+      
+      try {
+        console.log('🔍 Debug: Überprüfe tickable-Status in Listen...');
+        console.log('═══════════════════════════════════════════════════');
+        
+        const userId = window.FBA.currentUser.uid;
+        const groupId = window.currentSelectedGroup;
+        
+        const snapshot = await window.FBD.ref(`groups/${groupId}/comparisonFolders`).once('value');
+        const folders = snapshot.val();
+        
+        if (!folders) {
+          console.log('Keine Ordner gefunden');
+          return;
+        }
+        
+        for (const [folderId, folder] of Object.entries(folders)) {
+          console.log(`\n📁 ORDNER: ${folder.name || folderId}`);
+          console.log('───────────────────────────────────────────────────');
+          
+          if (!folder.lists) continue;
+          
+          for (const [listId, list] of Object.entries(folder.lists)) {
+            // Nur eigene Listen
+            if (list.userId !== userId) continue;
+            
+            const observations = list.observations || [];
+            const tickableObs = observations.filter(obs => obs.tickable !== false);
+            const nonTickableObs = observations.filter(obs => obs.tickable === false);
+            
+            console.log(`\n  📋 Liste: ${list.listName}`);
+            console.log(`     Gesamt: ${observations.length} Beobachtungen`);
+            console.log(`     Tickbar: ${tickableObs.length}`);
+            console.log(`     Nicht-tickbar: ${nonTickableObs.length}`);
+            
+            // Zähle Arten
+            const allSpecies = new Set();
+            const tickableSpecies = new Set();
+            const nonTickableSpecies = new Set();
+            
+            observations.forEach(obs => {
+              const normalized = normalizeBirdName(obs.bird);
+              if (normalized) allSpecies.add(normalized);
+            });
+            
+            tickableObs.forEach(obs => {
+              const normalized = normalizeBirdName(obs.bird);
+              if (normalized) tickableSpecies.add(normalized);
+            });
+            
+            nonTickableObs.forEach(obs => {
+              const normalized = normalizeBirdName(obs.bird);
+              if (normalized) nonTickableSpecies.add(normalized);
+            });
+            
+            console.log(`     Arten gesamt: ${allSpecies.size}`);
+            console.log(`     Arten tickbar: ${tickableSpecies.size}`);
+            console.log(`     Arten nicht-tickbar: ${nonTickableSpecies.size}`);
+            
+            if (nonTickableObs.length > 0) {
+              console.log(`\n     ⚠️ Nicht-tickbare Beobachtungen:`);
+              nonTickableObs.forEach(obs => {
+                console.log(`        - ${obs.bird} (${obs.date})`);
+              });
+            }
+          }
+        }
+        
+        console.log('\n═══════════════════════════════════════════════════');
+        console.log('✅ Debug abgeschlossen');
+        
+      } catch (error) {
+        console.error('Fehler beim Debug:', error);
+      }
+    }
+    
+    // Globale Funktion verfügbar machen
+    window.debugComparisonListsTickableStatus = debugComparisonListsTickableStatus;
     
     // NEU: Manuelle Synchronisation mit Benutzer-Feedback
     async function manualSyncSharedLists() {
@@ -11881,7 +12121,11 @@
               
               // Filtere Beobachtungen neu
               const filteredObservations = await filterObservationsByList(allObservations, originalList);
-              console.log(`            📊 ${filteredObservations.length} Beobachtungen (vorher: ${listData.observations?.length || 0})`);
+              
+              // WICHTIG: Übertrage ALLE Beobachtungen (inkl. nicht-tickbare)
+              const tickableCount = filteredObservations.filter(obs => obs.tickable !== false).length;
+              
+              console.log(`            📊 ${filteredObservations.length} Beobachtungen (${tickableCount} tickbar, vorher: ${listData.observations?.length || 0})`);
               
               // Aktualisiere in Firebase
               const listRef = window.FBD.ref(`groups/${groupKey}/comparisonFolders/${folderId}/lists/${listFirebaseId}/observations`);
@@ -13587,10 +13831,155 @@
         list.updatedAt = new Date().toISOString();
         
         await saveToIndexedDB('lists', list);
+        
+        // NEU: Automatische bidirektionale Synchronisation
+        await syncListBetweenModes(list);
+        
         return list.id;
       } catch (error) {
         console.error('Fehler beim Speichern der Liste:', error);
         throw error;
+      }
+    }
+    
+    // NEU: Bidirektionale Listen-Synchronisation
+    async function syncListBetweenModes(list) {
+      try {
+        // Prüfe ob Firebase verfügbar ist
+        if (!window.FBA || !window.FBA.currentUser) {
+          console.log('📋 Sync übersprungen: Nicht angemeldet');
+          return;
+        }
+        
+        const userId = window.FBA.currentUser.uid;
+        console.log(`🔄 Synchronisiere Liste "${list.name}" zwischen Modi...`);
+        
+        // Wenn wir im privaten Modus sind, synchronisiere in alle Gruppen
+        if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+          // Lade alle Gruppen des Benutzers
+          const groupsSnapshot = await window.FBD.ref('groups').once('value');
+          if (groupsSnapshot.exists()) {
+            const groups = groupsSnapshot.val();
+            
+            for (const [groupKey, groupData] of Object.entries(groups)) {
+              // Prüfe ob Benutzer Mitglied ist
+              if (!groupData.members) continue;
+              const isMember = Object.values(groupData.members).some(member => 
+                member.uid === userId || member.id === userId
+              );
+              
+              if (isMember) {
+                console.log(`  ✓ Synchronisiere in Gruppe: ${groupData.name || groupKey}`);
+                
+                // Erstelle oder aktualisiere Liste im Gruppenvergleich
+                if (!groupData.comparisonFolders) {
+                  await window.FBD.ref(`groups/${groupKey}/comparisonFolders`).set({});
+                }
+                
+                // Suche oder erstelle einen Ordner für den Benutzer
+                const userFolderKey = `user_${userId}`;
+                const userFolderPath = `groups/${groupKey}/comparisonFolders/${userFolderKey}`;
+                
+                const userFolderSnapshot = await window.FBD.ref(userFolderPath).once('value');
+                if (!userFolderSnapshot.exists()) {
+                  await window.FBD.ref(userFolderPath).set({
+                    name: `${window.FBA.currentUser.email || 'Meine'} Listen`,
+                    userId: userId,
+                    createdAt: new Date().toISOString()
+                  });
+                }
+                
+                // Speichere die Liste in diesem Ordner
+                // WICHTIG: Übertrage ALLE Beobachtungen (inkl. nicht-tickbare)
+                const allObservations = list.observations || [];
+                
+                const listData = {
+                  listId: list.id,
+                  listName: list.name,
+                  description: list.description || '',
+                  userId: userId,
+                  userName: window.FBA.currentUser.email || window.FBA.currentUser.displayName || 'Unbekannt',
+                  filters: list.filters || {},
+                  observationMode: list.observationMode || 'all',
+                  timeRange: list.timeRange || { from: null, to: null },
+                  observations: allObservations, // ALLE Beobachtungen (inkl. nicht-tickbare)
+                  updatedAt: new Date().toISOString(),
+                  syncedFromPrivate: true
+                };
+                
+                await window.FBD.ref(`${userFolderPath}/lists/${list.id}`).set(listData);
+                
+                const tickableCount = allObservations.filter(obs => obs.tickable !== false).length;
+                console.log(`    ✓ Liste in Gruppe ${groupData.name || groupKey} gespeichert (${allObservations.length} Beobachtungen, ${tickableCount} tickbar)`);
+              }
+            }
+          }
+        } else {
+          // Wenn wir im Gruppenmodus sind, synchronisiere zurück zum privaten Modus
+          console.log('  ✓ Synchronisiere vom Gruppenmodus zum privaten Modus');
+          
+          // Die Liste ist bereits in IndexedDB gespeichert durch saveToIndexedDB oben
+          // Wir müssen nur sicherstellen, dass sie auch in anderen Gruppen aktualisiert wird
+          const groupsSnapshot = await window.FBD.ref('groups').once('value');
+          if (groupsSnapshot.exists()) {
+            const groups = groupsSnapshot.val();
+            
+            for (const [groupKey, groupData] of Object.entries(groups)) {
+              // Überspringe die aktuelle Gruppe
+              if (groupKey === window.currentSelectedGroup) continue;
+              
+              // Prüfe ob Benutzer Mitglied ist
+              if (!groupData.members) continue;
+              const isMember = Object.values(groupData.members).some(member => 
+                member.uid === userId || member.id === userId
+              );
+              
+              if (isMember) {
+                console.log(`  ✓ Aktualisiere in weiterer Gruppe: ${groupData.name || groupKey}`);
+                
+                // Suche nach der Liste in dieser Gruppe
+                if (groupData.comparisonFolders) {
+                  for (const [folderId, folderData] of Object.entries(groupData.comparisonFolders)) {
+                    if (folderData.lists && folderData.lists[list.id]) {
+                      // Liste gefunden, aktualisiere sie
+                      // WICHTIG: Übertrage ALLE Beobachtungen (inkl. nicht-tickbare)
+                      const allObservations = list.observations || [];
+                      
+                      const listData = {
+                        listId: list.id,
+                        listName: list.name,
+                        description: list.description || '',
+                        userId: userId,
+                        userName: window.FBA.currentUser.email || window.FBA.currentUser.displayName || 'Unbekannt',
+                        filters: list.filters || {},
+                        observationMode: list.observationMode || 'all',
+                        timeRange: list.timeRange || { from: null, to: null },
+                        observations: allObservations, // ALLE Beobachtungen (inkl. nicht-tickbare)
+                        updatedAt: new Date().toISOString(),
+                        syncedFromGroup: true
+                      };
+                      
+                      await window.FBD.ref(`groups/${groupKey}/comparisonFolders/${folderId}/lists/${list.id}`).set(listData);
+                      
+                      const tickableCount = allObservations.filter(obs => obs.tickable !== false).length;
+                      console.log(`    ✓ Liste in Gruppe ${groupData.name || groupKey} aktualisiert (${allObservations.length} Beobachtungen, ${tickableCount} tickbar)`);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        console.log(`✅ Liste "${list.name}" erfolgreich synchronisiert`);
+        
+        // Zeige Benachrichtigung nur wenn tatsächlich synchronisiert wurde
+        const groupsSnapshot = await window.FBD.ref('groups').once('value');
+        if (groupsSnapshot.exists()) {
+          showNotification(`🔄 Liste "${list.name}" synchronisiert`, 2000);
+        }
+      } catch (error) {
+        console.error('Fehler bei bidirektionaler Synchronisation:', error);
       }
     }
     
@@ -15166,11 +15555,14 @@
             '';
           
           html += `
-            <div class="observation-card" onclick="showObservationDetail('${obs.id}')">
+            <div class="observation-card" onclick="showObservationDetail('${obs.id}')" style="${obs.tickable === false ? 'opacity:0.7;background:rgba(239,68,68,0.03);border-left:3px solid var(--danger);' : ''}">
               <div class="observation-header">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div>
-                    <div class="observation-species ${getRarityStyle(obs.bird, obs.manualRarity).rarityClass}">${getRarityStyle(obs.bird, obs.manualRarity).rarityIcon}${obs.bird}</div>
+                    <div class="observation-species ${getRarityStyle(obs.bird, obs.manualRarity).rarityClass}">
+                      ${getRarityStyle(obs.bird, obs.manualRarity).rarityIcon}${obs.bird}
+                      ${obs.tickable === false ? '<span style="color:var(--danger);font-size:11px;margin-left:8px;">(⊘ nicht gezählt)</span>' : ''}
+                    </div>
                     <div class="observation-scientific">${speciesInfo.scientific || ''}</div>
                   </div>
                   <button class="small-btn" onclick="event.stopPropagation(); openQuickRarityEditor('${obs.id}', '${obs.bird}')" 
@@ -15207,7 +15599,7 @@
                     <div class="obs-toggle tickable ${obs.tickable !== false ? 'active' : ''}" 
                          onclick="event.stopPropagation(); toggleTickable('${obs.id}')"
                          title="${obs.tickable !== false ? 'Tickbar' : 'Nicht tickbar'}">
-                      ${obs.tickable !== false ? '✓' : ''}
+                      ${obs.tickable !== false ? '✓' : '⊘'}
                     </div>
                     <div class="obs-toggle selffound ${obs.selffound ? 'active' : ''}" 
                          onclick="event.stopPropagation(); toggleSelffound('${obs.id}')"
@@ -15298,11 +15690,14 @@
           '';
         
         html += `
-          <div class="observation-card" onclick="showObservationDetail('${obs.id}')">
+          <div class="observation-card" onclick="showObservationDetail('${obs.id}')" style="${obs.tickable === false ? 'opacity:0.7;background:rgba(239,68,68,0.03);border-left:3px solid var(--danger);' : ''}">
             <div class="observation-header">
               <div style="display:flex;align-items:center;gap:8px;">
                 <div>
-                  <div class="observation-species ${getRarityStyle(obs.bird, obs.manualRarity).rarityClass}">${getRarityStyle(obs.bird, obs.manualRarity).rarityIcon}${obs.bird}</div>
+                  <div class="observation-species ${getRarityStyle(obs.bird, obs.manualRarity).rarityClass}">
+                    ${getRarityStyle(obs.bird, obs.manualRarity).rarityIcon}${obs.bird}
+                    ${obs.tickable === false ? '<span style="color:var(--danger);font-size:11px;margin-left:8px;">(⊘ nicht gezählt)</span>' : ''}
+                  </div>
                   <div class="observation-scientific">${speciesInfo.scientific || ''}</div>
                 </div>
                 <button class="small-btn" onclick="event.stopPropagation(); openQuickRarityEditor('${obs.id}', '${obs.bird}')" 
@@ -15339,7 +15734,7 @@
                   <div class="obs-toggle tickable ${obs.tickable !== false ? 'active' : ''}" 
                        onclick="event.stopPropagation(); toggleTickable('${obs.id}')"
                        title="${obs.tickable !== false ? 'Tickbar' : 'Nicht tickbar'}">
-                    ${obs.tickable !== false ? '✓' : ''}
+                    ${obs.tickable !== false ? '✓' : '⊘'}
                   </div>
                   <div class="obs-toggle selffound ${obs.selffound ? 'active' : ''}" 
                        onclick="event.stopPropagation(); toggleSelffound('${obs.id}')"
@@ -16152,8 +16547,25 @@
     
     async function calculateListStats(list) {
       try {
-        // Verwende IMMER persönliche Beobachtungen für Listen
-        const observations = await getPersonalObservationsWithDetails();
+        let observations;
+        
+        // WICHTIG: Im Gruppenmodus nutze die Beobachtungen des aktuellen Benutzers aus der Gruppe
+        if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal' && window.FBA?.currentUser) {
+          const groupData = await loadGroupData();
+          const currentUserId = window.FBA.currentUser.uid;
+          const userStats = groupData.userStats[currentUserId];
+          
+          if (userStats && userStats.observations) {
+            observations = userStats.observations;
+          } else {
+            console.warn('Keine Gruppen-Beobachtungen für aktuellen Benutzer gefunden');
+            observations = [];
+          }
+        } else {
+          // Im persönlichen Modus verwende lokale Daten
+          observations = await getPersonalObservationsWithDetails();
+        }
+        
         const filteredObs = await filterObservationsByList(observations, list);
         
         // Zähle nur tickbare Arten für speciesCount
@@ -16471,9 +16883,35 @@
         }
       }
       
-      // Beobachtungen laden - verwende IMMER persönliche Beobachtungen für Listen
-      const observations = await getPersonalObservationsWithDetails();
+      // Beobachtungen laden - im Gruppenmodus Gruppendaten verwenden
+      let observations;
+      
+      if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal' && window.FBA?.currentUser) {
+        // Im Gruppenmodus: Hole Beobachtungen des aktuellen Benutzers aus der Gruppe
+        const groupData = await loadGroupData();
+        const currentUserId = window.FBA.currentUser.uid;
+        const userStats = groupData.userStats[currentUserId];
+        
+        if (userStats && userStats.observations) {
+          observations = userStats.observations;
+        } else {
+          console.warn('Keine Gruppen-Beobachtungen für aktuellen Benutzer gefunden');
+          observations = [];
+        }
+      } else {
+        // Im persönlichen Modus: Verwende lokale Beobachtungen
+        observations = await getPersonalObservationsWithDetails();
+      }
+      
       const filteredObs = await filterObservationsByList(observations, list);
+      
+      // WICHTIG: Sortiere Beobachtungen nach Datum (neueste zuerst) für konsistente Reihenfolge
+      filteredObs.sort((a, b) => {
+        const dateCompare = new Date(b.date) - new Date(a.date);
+        if (dateCompare !== 0) return dateCompare;
+        // Bei gleichem Datum: nach Vogelnamen sortieren für Stabilität
+        return a.bird.localeCompare(b.bird);
+      });
       
       const obsContainer = document.getElementById('listObservations');
       if (filteredObs.length === 0) {
@@ -16690,8 +17128,13 @@
     function renderObservationsView(filteredObs, list, container) {
         let html = '';
         
+        // Debug: Zeige alle Beobachtungen mit ihrem tickable-Status
+        console.log('🔍 renderObservationsView - Alle Beobachtungen:', filteredObs.length);
+        console.log('   Davon nicht-tickbar:', filteredObs.filter(o => o.tickable === false).length);
+        
         // Statistiken anzeigen - nur tickbare Arten zählen
         const tickableObs = filteredObs.filter(o => o.tickable !== false);
+        const nonTickableObs = filteredObs.filter(o => o.tickable === false);
         const stats = {
           total: filteredObs.length, // Alle Beobachtungen
           species: countUniqueSpecies(tickableObs), // Nur tickbare Arten (normalisiert)
@@ -16718,13 +17161,33 @@
           </div>
         `;
         
+        // NEU: Info-Card für nicht-tickbare Beobachtungen
+        if (nonTickableObs.length > 0) {
+          html += `
+            <div class="card" style="margin-bottom: 20px; background: rgba(239,68,68,0.08); border-left: 4px solid var(--danger);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                  <h4 style="margin: 0 0 8px 0; color: var(--danger);">⊘ Nicht-tickbare Beobachtungen</h4>
+                  <p style="margin: 0; font-size: 13px; color: var(--muted);">
+                    Diese Liste enthält ${nonTickableObs.length} Beobachtung${nonTickableObs.length !== 1 ? 'en' : ''}, ${nonTickableObs.length !== 1 ? 'die' : 'die'} als nicht tickbar markiert ${nonTickableObs.length !== 1 ? 'sind' : 'ist'}. 
+                    Diese ${nonTickableObs.length !== 1 ? 'zählen' : 'zählt'} nicht in die Artenzählung ein, ${nonTickableObs.length !== 1 ? 'werden' : 'wird'} aber in der Liste angezeigt.
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
         filteredObs.forEach((obs, index) => {
           const speciesInfo = birdDatabase[obs.bird] || {};
           const rarity = getRarityStyle(obs.bird, obs.manualRarity);
+          const isNonTickable = obs.tickable === false;
+          
           html += `
-            <div class="observation-row">
+            <div class="observation-row" style="${isNonTickable ? 'opacity:0.6;background:rgba(239,68,68,0.05);border-left:3px solid var(--danger);' : ''}">
               <div class="observation-species ${rarity.rarityClass}">
                 ${rarity.rarityIcon}${obs.bird}
+                ${isNonTickable ? '<span style="color:var(--danger);font-size:12px;margin-left:8px;">(nicht als Art gezählt)</span>' : ''}
                 <div class="observation-scientific">${speciesInfo.scientific || ''}</div>
               </div>
               <div class="observation-date">${formatDateForDisplay(obs.date)}</div>
@@ -16734,7 +17197,7 @@
                   <div class="obs-toggle tickable ${obs.tickable !== false ? 'active' : ''}" 
                        onclick="event.stopPropagation(); toggleTickable('${obs.id}')"
                        title="${obs.tickable !== false ? 'Tickbar' : 'Nicht tickbar'}">
-                    ${obs.tickable !== false ? '✓' : ''}
+                    ${obs.tickable !== false ? '✓' : '⊘'}
                   </div>
                   <div class="obs-toggle selffound ${obs.selffound ? 'active' : ''}" 
                        onclick="event.stopPropagation(); toggleSelffound('${obs.id}')"
@@ -17688,6 +18151,7 @@
             behavior: '',
             weather: '',
             rarity: manualRarity || (birdDatabase[birdName] ? birdDatabase[birdName].status : null),  // Automatisch aus DB lesen
+            tickable: !isAutoNonTickableSpecies(birdName), // NEU: Automatisch nicht-tickbar für bestimmte Arten
             userId: user.uid,
             userName: userName,
             userEmail: user.email,
@@ -17780,6 +18244,7 @@
           weather: '',
           userName: getUserNameForObservation(), // NEU: Benutzername hinzufügen
           rarity: manualRarity || (birdDatabase[birdName] ? birdDatabase[birdName].status : null),  // Automatisch aus DB lesen
+          tickable: !isAutoNonTickableSpecies(birdName), // NEU: Automatisch nicht-tickbar für bestimmte Arten
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
@@ -20684,6 +21149,35 @@
     }
     
     // ---------- Hilfsfunktion: Lade Gruppendaten ----------
+    // NEU: Berechne für jeden Benutzer die Arten, die NUR er gesehen hat
+    function calculateUniqueSpeciesPerUser(userStats) {
+      const users = Object.values(userStats);
+      
+      // Erstelle eine Map: Art -> Array von UserIds, die diese Art gesehen haben
+      const speciesSeenBy = {};
+      
+      users.forEach(user => {
+        user.species.forEach(species => {
+          if (!speciesSeenBy[species]) {
+            speciesSeenBy[species] = [];
+          }
+          speciesSeenBy[species].push(user.userId);
+        });
+      });
+      
+      // Für jeden Benutzer: Finde Arten, die NUR er gesehen hat
+      users.forEach(user => {
+        const uniqueSpecies = user.species.filter(species => {
+          return speciesSeenBy[species].length === 1 && speciesSeenBy[species][0] === user.userId;
+        });
+        
+        user.uniqueSpeciesCount = uniqueSpecies.length;
+        user.uniqueSpeciesList = uniqueSpecies;
+      });
+      
+      console.log('✅ Exklusive Arten berechnet');
+    }
+    
     async function loadGroupData() {
       return new Promise((resolve, reject) => {
         const groupId = window.currentSelectedGroup;
@@ -20702,8 +21196,13 @@
           const members = data.members || {}; // Aktuelle Gruppenmitglieder
           
           Object.entries(observations).forEach(([obsId, obs]) => {
-            // WICHTIG: Filtere nicht-tickbare Arten heraus
-            if (obs.tickable === false) return;
+            // HINWEIS: Wir filtern NICHT nach tickable hier, damit alle Beobachtungen sichtbar bleiben
+            // Nur die Artenzählung wird später bei der Anzeige angepasst
+            
+            // Debug-Log für nicht-tickbare Beobachtungen
+            if (obs.tickable === false) {
+              console.log('✅ Lade nicht-tickbare Beobachtung:', obs.bird, 'ID:', obsId);
+            }
             
             const userId = obs.userId || 'unknown';
             
@@ -20736,10 +21235,12 @@
             
             userStats[userId].observations.push(obsWithId);
             
-            // Verwende normalisierte Vogelnamen für Set
-            const normalizedBirdName = normalizeBirdName(obs.bird);
-            if (normalizedBirdName) {
-              userStats[userId].species.add(normalizedBirdName);
+            // Verwende normalisierte Vogelnamen für Set - NUR für tickbare Arten
+            if (obs.tickable !== false) {
+              const normalizedBirdName = normalizeBirdName(obs.bird);
+              if (normalizedBirdName) {
+                userStats[userId].species.add(normalizedBirdName);
+              }
             }
             
             if (obs.photo) userStats[userId].photosCount++;
@@ -20752,6 +21253,9 @@
             user.speciesCount = user.species.size;
             user.species = Array.from(user.species);
           });
+          
+          // NEU: Berechne exklusive Arten für jeden Benutzer
+          calculateUniqueSpeciesPerUser(userStats);
           
           resolve({
             groupInfo: {
@@ -20778,6 +21282,11 @@
         
         // NEU: Prüfe ob im Gruppenmodus
         const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+        
+        // NEU: Prüfe ob eine Zielgruppe für den Import ausgewählt wurde (im privaten Modus)
+        const targetGroupId = window.ornithoImportTargetGroup || null;
+        const shouldAlsoImportToGroup = !isGroupMode && targetGroupId;
+        
         let currentUserEmail = null;
         let groupId = null;
         
@@ -20795,6 +21304,23 @@
             console.error('Fehler beim Abrufen des Benutzers:', error);
             showNotification('❌ Fehler: ' + error.message, 3000);
             return;
+          }
+        } else if (shouldAlsoImportToGroup) {
+          // Im privaten Modus, aber Import auch in Gruppe
+          try {
+            const user = window.FBA.currentUser;
+            if (!user || !user.email) {
+              showNotification('❌ Nicht angemeldet - Import nur lokal', 3000);
+              window.ornithoImportTargetGroup = null; // Setze zurück
+            } else {
+              currentUserEmail = user.email;
+              groupId = targetGroupId;
+              console.log('Importiere Ornitho-Daten lokal UND in Gruppe:', groupId, 'für Benutzer:', currentUserEmail);
+            }
+          } catch (error) {
+            console.error('Fehler beim Abrufen des Benutzers:', error);
+            showNotification('⚠️ Gruppenimport nicht möglich - importiere nur lokal', 3000);
+            window.ornithoImportTargetGroup = null;
           }
         }
         
@@ -20894,7 +21420,27 @@
             existingObsMap.set(key, true);
           });
           
-          console.log(`📊 Prüfe auf Duplikate gegen ${existingObservations.length} existierende Beobachtungen`);
+          console.log(`📊 Prüfe auf Duplikate gegen ${existingObservations.length} existierende lokale Beobachtungen`);
+          
+          // Wenn auch in Gruppe importiert wird, prüfe auch dort auf Duplikate
+          if (shouldAlsoImportToGroup && groupId) {
+            showNotification('Prüfe Gruppen-Duplikate...', 1000);
+            const groupObsRef = window.FBD.ref(`groups/${groupId}/observations`);
+            const snapshot = await groupObsRef.once('value');
+            
+            if (snapshot.exists()) {
+              const obsData = snapshot.val();
+              const groupObs = Object.values(obsData).filter(obs => obs.tickable !== false);
+              
+              // Füge Gruppen-Beobachtungen zur Hash-Map hinzu
+              groupObs.forEach(obs => {
+                const key = `${obs.bird}|${obs.date}|${parseFloat(obs.lat).toFixed(4)}|${parseFloat(obs.lng).toFixed(4)}`;
+                existingObsMap.set(key, true);
+              });
+              
+              console.log(`📊 Prüfe zusätzlich auf Duplikate gegen ${groupObs.length} existierende Gruppen-Beobachtungen`);
+            }
+          }
         }
         
         // Parse Beobachtungen (ab Zeile 2, Zeile 1 ist deutscher Header)
@@ -21018,26 +21564,39 @@
           // Füge zur Hash-Map hinzu, damit spätere Duplikate erkannt werden
           existingObsMap.set(obsKey, true);
           
-          // NEU: Speichere abhängig vom Modus (IndexedDB oder Firebase)
-          if (isGroupMode) {
-            // Firebase-Modus: Sammle für Batch-Update
+          // NEU: Speichere abhängig vom Modus (IndexedDB oder Firebase oder beides)
+          if (isGroupMode || shouldAlsoImportToGroup) {
+            // Firebase-Modus: Sammle für Batch-Update (entweder reiner Gruppenmodus oder zusätzlicher Gruppenimport)
             const user = window.FBA.currentUser;
-            observation.createdBy = currentUserEmail;
-            observation.userId = user.uid;
-            observation.userName = user.displayName || currentUserEmail.split('@')[0];
-            observation.userEmail = currentUserEmail;
             
-            // Speichere für später (wird am Ende als Batch gespeichert)
-            if (!window.batchObservations) window.batchObservations = [];
-            if (!window.batchRarities) window.batchRarities = [];
-            
-            window.batchObservations.push(observation);
-            
-            // Merke Raritäten für später
-            if (observation.rarity && (observation.rarity === 'selten' || observation.rarity === 'sehr selten')) {
-              window.batchRarities.push(observation);
+            if (user) {
+              // Erstelle separate Observation für Gruppe
+              const groupObservation = {...observation};
+              groupObservation.createdBy = currentUserEmail;
+              groupObservation.userId = user.uid;
+              groupObservation.userName = user.displayName || currentUserEmail.split('@')[0];
+              groupObservation.userEmail = currentUserEmail;
+              
+              // Entferne Ordner-Info für Gruppenimport
+              delete groupObservation.folderId;
+              delete groupObservation.folderName;
+              delete groupObservation.folderColor;
+              
+              // Speichere für später (wird am Ende als Batch gespeichert)
+              if (!window.batchObservations) window.batchObservations = [];
+              if (!window.batchRarities) window.batchRarities = [];
+              
+              window.batchObservations.push(groupObservation);
+              
+              // Merke Raritäten für später
+              if (groupObservation.rarity && (groupObservation.rarity === 'selten' || groupObservation.rarity === 'sehr selten')) {
+                window.batchRarities.push(groupObservation);
+              }
             }
-          } else {
+          }
+          
+          // Im privaten Modus (oder wenn zusätzlich zur Gruppe importiert wird): Speichere auch lokal
+          if (!isGroupMode) {
             // Lokaler Modus: Speichere direkt in IndexedDB
             await saveToIndexedDB('observations', observation);
           }
@@ -21051,7 +21610,7 @@
         }
         
         // NEU: Speichere alle Firebase-Beobachtungen in Chunks (für bessere Performance)
-        if (isGroupMode && window.batchObservations && window.batchObservations.length > 0) {
+        if ((isGroupMode || shouldAlsoImportToGroup) && window.batchObservations && window.batchObservations.length > 0) {
           const totalObservations = window.batchObservations.length;
           const CHUNK_SIZE = 50; // Speichere 50 Beobachtungen pro Batch
           const totalChunks = Math.ceil(totalObservations / CHUNK_SIZE);
@@ -21156,7 +21715,9 @@
         }
         
         if (isGroupMode) {
-          message += ` für ${currentUserEmail}`;
+          message += ` in Gruppe`;
+        } else if (shouldAlsoImportToGroup && groupId) {
+          message += ` (lokal + Gruppe)`;
         }
         
         if (duplicateCount > 0) {
@@ -21172,6 +21733,9 @@
         
         showNotification(message, 5000);
         console.log(`📊 Import-Statistik: ${importCount} neu, ${duplicateCount} Duplikate, ${invalidSkipped} ungültig, ${photoCount} Fotos`);
+        if (shouldAlsoImportToGroup) {
+          console.log(`📤 Daten wurden lokal UND in Gruppe importiert`);
+        }
         
         // NEU: Berechne XP nach Import neu
         if (!isGroupMode && typeof recalculateAllXP === 'function') {
@@ -21229,8 +21793,8 @@
           }
         }
         
-        // NEU: Frage nach Gruppen-Import (nur im privaten Modus)
-        if (!isGroupMode && importCount > 0) {
+        // NEU: Frage nach Gruppen-Import (nur im privaten Modus ohne bereits ausgewählte Gruppe)
+        if (!isGroupMode && !shouldAlsoImportToGroup && importCount > 0) {
           // Verzögere den Dialog, damit die Erfolgsmeldung sichtbar ist
           setTimeout(() => {
             showGroupImportDialog(file, existingObservations.slice(-importCount));
@@ -21239,6 +21803,7 @@
         
         // Cleanup Import-Optionen
         delete window.ornithoImportSelffound;
+        delete window.ornithoImportTargetGroup;
         
       } catch (error) {
         console.error('Ornitho.de Import fehlgeschlagen:', error);
@@ -21248,6 +21813,7 @@
         delete window.batchObservations;
         delete window.batchRarities;
         delete window.ornithoImportSelffound;
+        delete window.ornithoImportTargetGroup;
       }
     }
     
@@ -21267,7 +21833,33 @@
     });
     
     // NEU: Zeige Import-Optionen Dialog
-    function showOrnithoImportOptions(file, isGroupMode) {
+    async function showOrnithoImportOptions(file, isGroupMode) {
+      // Lade verfügbare Gruppen wenn im privaten Modus
+      let availableGroups = [];
+      if (!isGroupMode && window.FBA && window.FBA.currentUser) {
+        try {
+          const snapshot = await window.FBD.ref('groups').once('value');
+          const groups = snapshot.val();
+          
+          if (groups) {
+            Object.keys(groups).forEach(groupId => {
+              const group = groups[groupId];
+              const userId = window.FBA.currentUser.uid;
+              
+              // Prüfe ob User Mitglied ist
+              if (group.members && group.members[userId]) {
+                availableGroups.push({
+                  id: groupId,
+                  name: group.name || 'Unbenannte Gruppe'
+                });
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Fehler beim Laden der Gruppen:', error);
+        }
+      }
+      
       const dialogHtml = `
         <div id="ornithoImportDialog" style="
           position: fixed;
@@ -21299,6 +21891,28 @@
               </div>
             `}
           </div>
+          
+          ${!isGroupMode && availableGroups.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+              <h4 style="margin: 0 0 12px 0; color: var(--text); font-size: 14px;">📤 Zusätzlich in Gruppe importieren:</h4>
+              <select id="ornithoTargetGroupSelect" style="
+                width: 100%;
+                padding: 10px;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px;
+                color: var(--text);
+                font-size: 14px;
+                cursor: pointer;
+              ">
+                <option value="">Keine Gruppe (nur lokal speichern)</option>
+                ${availableGroups.map(group => `<option value="${group.id}">${group.name}</option>`).join('')}
+              </select>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 8px; padding: 8px; background: rgba(6,182,212,0.1); border-radius: 6px;">
+                💡 <strong>Tipp:</strong> Wähle eine Gruppe aus, um die Daten zusätzlich zu deinem lokalen Import auch in der Gruppe zu speichern.
+              </div>
+            </div>
+          ` : ''}
           
           <div style="margin-bottom: 20px;">
             <h4 style="margin: 0 0 12px 0; color: var(--text); font-size: 14px;">Import-Optionen:</h4>
@@ -21390,8 +22004,13 @@
       const selffoundOption = document.getElementById('ornithoSelffoundOption').checked;
       const { file, isGroupMode } = window.pendingOrnithoImport;
       
-      // Speichere Option für Import-Funktion
+      // Hole ausgewählte Gruppe (falls vorhanden)
+      const targetGroupSelect = document.getElementById('ornithoTargetGroupSelect');
+      const targetGroupId = targetGroupSelect ? targetGroupSelect.value : null;
+      
+      // Speichere Optionen für Import-Funktion
       window.ornithoImportSelffound = selffoundOption;
+      window.ornithoImportTargetGroup = targetGroupId;
       
       closeOrnithoImportDialog();
       
@@ -23324,6 +23943,20 @@ var updateUI=function(u){
           legendContainer.style.display = 'none';
         }
         
+        // NEU: Synchronisiere Listen beim Wechsel in den privaten Modus
+        setTimeout(() => {
+          if (typeof syncSharedListsAfterNewObservation === 'function') {
+            syncSharedListsAfterNewObservation().catch(err => {
+              console.error('Fehler bei Listen-Synchronisation:', err);
+            });
+          }
+          
+          // NEU: Synchronisiere auch tickable-Stati
+          syncAllTickableStates('toPrivate').catch(err => {
+            console.error('Fehler bei tickable-Synchronisation:', err);
+          });
+        }, 1000);
+        
         // Aktualisiere Charts und Statistiken
         console.log("📊 Aktualisiere Charts für persönliche Daten...");
         if(typeof updateChart === "function"){
@@ -23348,6 +23981,20 @@ var updateUI=function(u){
         
         // Lade Gruppendaten aus Firebase
         loadGroupObservations(selectedGroup, u);
+        
+        // NEU: Synchronisiere Listen beim Wechsel in den Gruppenmodus
+        setTimeout(() => {
+          if (typeof syncSharedListsAfterNewObservation === 'function') {
+            syncSharedListsAfterNewObservation().catch(err => {
+              console.error('Fehler bei Listen-Synchronisation:', err);
+            });
+          }
+          
+          // NEU: Synchronisiere auch tickable-Stati
+          syncAllTickableStates('toGroup').catch(err => {
+            console.error('Fehler bei tickable-Synchronisation:', err);
+          });
+        }, 1500);
         
         // Aktualisiere Charts und Statistiken mit Gruppendaten
         console.log("📊 Aktualisiere Charts für Gruppendaten...");
@@ -23593,6 +24240,199 @@ var showLoading=function(text){
   document.getElementById("fbLoading").classList.add("show")
 };
 var hideLoading=function(){document.getElementById("fbLoading").classList.remove("show")};
+
+// Automatische Synchronisierung privater Listen in Gruppen-Vergleich
+async function autoSyncPrivateListsToGroup() {
+  try {
+    const groups = await window.storage.list('group:', true);
+    if (!groups || !groups.keys || groups.keys.length === 0) {
+      console.log('Keine Gruppen vorhanden - keine Synchronisierung erforderlich');
+      return;
+    }
+    
+    const currentUser = await window.storage.get('currentUser');
+    if (!currentUser || !currentUser.value) {
+      console.log('Kein Benutzer angemeldet - Synchronisierung übersprungen');
+      return;
+    }
+    
+    const userData = JSON.parse(currentUser.value);
+    const userId = userData.id;
+    const userName = userData.name;
+    
+    // Lade alle privaten Listen des Benutzers
+    const privateLists = await window.storage.list(`list:${userId}:`);
+    if (!privateLists || !privateLists.keys || privateLists.keys.length === 0) {
+      console.log('Keine privaten Listen zum Synchronisieren');
+      return;
+    }
+    
+    console.log(`🔄 Synchronisiere ${privateLists.keys.length} private Listen in Gruppen...`);
+    
+    for (const groupKey of groups.keys) {
+      try {
+        const groupResult = await window.storage.get(groupKey, true);
+        if (!groupResult) continue;
+        
+        const group = JSON.parse(groupResult.value);
+        
+        // Prüfe ob Benutzer Mitglied der Gruppe ist
+        if (!group.members || !group.members.some(m => m.id === userId)) {
+          continue;
+        }
+        
+        console.log(`📊 Synchronisiere in Gruppe: ${group.name}`);
+        
+        // Synchronisiere jede private Liste
+        for (const listKey of privateLists.keys) {
+          try {
+            const listResult = await window.storage.get(listKey);
+            if (!listResult) continue;
+            
+            const list = JSON.parse(listResult.value);
+            
+            // Erstelle oder aktualisiere den Gruppen-Listen-Vergleich
+            const comparisonKey = `group:${group.id}:comparison:${userId}:${list.id}`;
+            const comparisonData = {
+              groupId: group.id,
+              userId: userId,
+              userName: userName,
+              listId: list.id,
+              listName: list.name,
+              species: list.species || [],
+              observations: list.observations || [],
+              lastSync: new Date().toISOString(),
+              syncedFrom: 'private'
+            };
+            
+            await window.storage.set(comparisonKey, JSON.stringify(comparisonData), true);
+            console.log(`✅ Liste "${list.name}" in Gruppe "${group.name}" synchronisiert`);
+          } catch (err) {
+            console.error(`Fehler beim Synchronisieren der Liste ${listKey}:`, err);
+          }
+        }
+      } catch (err) {
+        console.error(`Fehler beim Verarbeiten der Gruppe ${groupKey}:`, err);
+      }
+    }
+    
+    console.log('✅ Automatische Synchronisierung abgeschlossen');
+  } catch (err) {
+    console.error('Fehler bei automatischer Synchronisierung:', err);
+  }
+}
+
+// Synchronisiere Listen beim Start der App
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    autoSyncPrivateListsToGroup().catch(err => {
+      console.error('Fehler bei initialer Synchronisierung:', err);
+    });
+  }, 2000);
+});
+
+// Wrapper für automatische Synchronisierung bei Listen-Änderungen
+function setupAutoSync() {
+  // Überwache Änderungen an Listen
+  const originalAddObservation = window.addObservation;
+  if (originalAddObservation) {
+    window.addObservation = function(...args) {
+      const result = originalAddObservation.apply(this, args);
+      setTimeout(() => autoSyncPrivateListsToGroup(), 1000);
+      return result;
+    };
+  }
+  
+  // Überwache Speichern von Listen
+  const originalSaveBtn = document.querySelector('button[onclick*="save"]');
+  if (originalSaveBtn) {
+    originalSaveBtn.addEventListener('click', () => {
+      setTimeout(() => autoSyncPrivateListsToGroup(), 1500);
+    });
+  }
+}
+
+// Setup nach DOM-Load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupAutoSync);
+} else {
+  setupAutoSync();
+}
+
+// Manuelle Synchronisierung mit visueller Rückmeldung
+async function syncPrivateListsManually() {
+  const button = event.target;
+  const originalText = button.innerHTML;
+  
+  try {
+    // Zeige Loading-Status
+    button.innerHTML = '⏳ Synchronisiere...';
+    button.disabled = true;
+    button.style.opacity = '0.7';
+    
+    // Führe Synchronisierung durch
+    await autoSyncPrivateListsToGroup();
+    
+    // Zeige Erfolg
+    button.innerHTML = '✅ Synchronisiert!';
+    button.style.background = 'var(--success)';
+    
+    // Aktualisiere die Anzeige
+    if (typeof renderComparisonFolders === 'function') {
+      renderComparisonFolders();
+    }
+    
+    // Zeige Toast-Benachrichtigung
+    showToast('Private Listen erfolgreich synchronisiert', 'success');
+    
+    // Zurück zum Original nach 2 Sekunden
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.disabled = false;
+      button.style.opacity = '1';
+      button.style.background = 'var(--accent-2)';
+    }, 2000);
+    
+  } catch (err) {
+    console.error('Fehler bei manueller Synchronisierung:', err);
+    button.innerHTML = '❌ Fehler';
+    button.style.background = 'var(--danger)';
+    
+    showToast('Fehler beim Synchronisieren der Listen', 'error');
+    
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.disabled = false;
+      button.style.opacity = '1';
+      button.style.background = 'var(--accent-2)';
+    }, 2000);
+  }
+}
+
+// Toast-Benachrichtigung
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--accent)'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    z-index: 10000;
+    font-weight: 600;
+    animation: slideIn 0.3s ease;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
 
 // Funktion zum Laden von Gruppen-Beobachtungen
 var loadGroupObservations=function(groupId, user){
@@ -24946,6 +25786,9 @@ async function renderGroupComparison() {
     // NEU: Rendere Arten-Leaderboard
     await renderSpeciesLeaderboard(groupData);
     
+    // NEU: Rendere exklusive Arten-Leaderboard
+    await renderUniqueSpeciesLeaderboard(groupData);
+    
     // Rendere detaillierten Vergleich
     await renderDetailedObservationComparison(groupData);
     
@@ -25070,6 +25913,101 @@ async function renderSpeciesLeaderboard(groupData) {
   container.innerHTML = html;
 }
 
+// NEU: Rendere exklusive Arten-Leaderboard (Arten, die nur einer gesehen hat)
+async function renderUniqueSpeciesLeaderboard(groupData) {
+  const container = document.getElementById('uniqueSpeciesLeaderboard');
+  if (!container) return; // Falls Container nicht existiert
+  
+  const users = Object.values(groupData.userStats);
+  
+  // Sortiere nach Anzahl der exklusiven Arten
+  users.sort((a, b) => (b.uniqueSpeciesCount || 0) - (a.uniqueSpeciesCount || 0));
+  
+  if (users.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--muted);">
+        <p>Noch keine Daten verfügbar</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Berechne Gesamtzahl exklusiver Arten
+  const totalUniqueSpecies = users.reduce((sum, u) => sum + (u.uniqueSpeciesCount || 0), 0);
+  
+  let html = `
+    <div style="margin-bottom:16px;padding:12px;background:rgba(124,58,237,0.1);border-radius:8px;border:1px solid rgba(124,58,237,0.2);">
+      <div style="text-align:center;">
+        <div style="font-size:32px;font-weight:700;color:var(--accent-2);">${totalUniqueSpecies}</div>
+        <div style="font-size:12px;color:var(--muted);">Exklusive Arten insgesamt</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Arten, die nur ein Mitglied gesehen hat</div>
+      </div>
+    </div>
+    
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;">
+  `;
+  
+  users.forEach((user, index) => {
+    const rank = index + 1;
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+    const isCurrentUser = user.userId === (window.FBA?.currentUser?.uid || '');
+    const uniqueCount = user.uniqueSpeciesCount || 0;
+    
+    // Berechne Prozentsatz der exklusiven Arten
+    const exclusivePercentage = user.speciesCount > 0 ? ((uniqueCount / user.speciesCount) * 100).toFixed(1) : 0;
+    
+    html += `
+      <div class="card" style="
+        padding:16px;
+        background:${isCurrentUser ? 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.08))' : 'rgba(255,255,255,0.02)'};
+        border-left:4px solid ${rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#7c3aed'};
+        ${uniqueCount === 0 ? 'opacity:0.6;' : ''}
+      ">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-size:32px;min-width:50px;text-align:center;">${medal}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:16px;">
+              ${user.userName}${isCurrentUser ? ' <span style="color:#7c3aed;font-size:12px;">(Du)</span>' : ''}
+            </div>
+            <div style="display:flex;gap:16px;margin-top:8px;font-size:13px;color:var(--muted);">
+              <div style="color:${uniqueCount > 0 ? 'var(--accent-2)' : 'var(--muted)'};font-weight:${uniqueCount > 0 ? '600' : '400'};">
+                ⭐ ${uniqueCount} exklusive ${uniqueCount === 1 ? 'Art' : 'Arten'}
+              </div>
+              <div>📊 ${user.speciesCount} gesamt</div>
+              <div style="color:var(--muted);font-size:11px;">
+                (${exclusivePercentage}% exklusiv)
+              </div>
+            </div>
+            ${uniqueCount > 0 && user.uniqueSpeciesList && user.uniqueSpeciesList.length <= 5 ? `
+              <div style="margin-top:8px;font-size:11px;color:var(--soft);padding:8px;background:rgba(124,58,237,0.08);border-radius:6px;">
+                <strong>Exklusive Arten:</strong> ${user.uniqueSpeciesList.join(', ')}
+              </div>
+            ` : uniqueCount > 5 ? `
+              <div style="margin-top:8px;font-size:11px;color:var(--soft);padding:8px;background:rgba(124,58,237,0.08);border-radius:6px;">
+                <strong>Exklusive Arten (${uniqueCount}):</strong> ${user.uniqueSpeciesList.slice(0, 3).join(', ')} und ${uniqueCount - 3} weitere...
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `
+    </div>
+    
+    <div style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.05);border-radius:8px;border:1px solid rgba(6,182,212,0.1);">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+        💡 <strong>Was sind exklusive Arten?</strong><br>
+        Exklusive Arten sind Vogelarten, die nur <strong>ein einziges</strong> Mitglied in der Gruppe gesehen hat. 
+        Sie zeigen, wer besonders seltene oder ungewöhnliche Vögel entdeckt hat, die anderen entgangen sind!
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
 // Rendere detaillierten Beobachtungsvergleich
 async function renderDetailedObservationComparison(groupData) {
   const container = document.getElementById('detailedObservationComparison');
@@ -25080,9 +26018,11 @@ async function renderDetailedObservationComparison(groupData) {
     return;
   }
   
-  // Berechne Durchschnitt
+  // Berechne Durchschnitt und Maximum
   const avgObservations = users.reduce((sum, u) => sum + u.totalCount, 0) / users.length;
   const avgSpecies = users.reduce((sum, u) => sum + u.speciesCount, 0) / users.length;
+  const maxObservations = Math.max(...users.map(u => u.totalCount));
+  const maxSpecies = Math.max(...users.map(u => u.speciesCount));
   
   let html = `
     <div style="margin-bottom:16px;padding:12px;background:rgba(6,182,212,0.05);border-radius:8px;">
@@ -25092,11 +26032,11 @@ async function renderDetailedObservationComparison(groupData) {
           <div style="font-size:12px;color:var(--muted);">Mitglieder</div>
         </div>
         <div>
-          <div style="font-size:24px;font-weight:700;color:var(--accent);">${Math.round(avgObservations)}</div>
+          <div style="font-size:24px;font-weight:700;color:var(--accent);">${groupData.totalObservations || users.reduce((sum, u) => sum + u.totalCount, 0)}</div>
           <div style="font-size:12px;color:var(--muted);">Ø Beobachtungen</div>
         </div>
         <div>
-          <div style="font-size:24px;font-weight:700;color:var(--accent);">${Math.round(avgSpecies)}</div>
+          <div style="font-size:24px;font-weight:700;color:var(--accent);">${groupData.totalSpecies || Math.max(...users.map(u => u.speciesCount))}</div>
           <div style="font-size:12px;color:var(--muted);">Ø Arten</div>
         </div>
       </div>
@@ -25106,8 +26046,9 @@ async function renderDetailedObservationComparison(groupData) {
   `;
   
   users.forEach(user => {
-    const obsPercentage = avgObservations > 0 ? (user.totalCount / avgObservations) * 100 : 0;
-    const speciesPercentage = avgSpecies > 0 ? (user.speciesCount / avgSpecies) * 100 : 0;
+    // Berechne Prozentsatz basierend auf Maximum (nicht Durchschnitt!)
+    const obsPercentage = maxObservations > 0 ? (user.totalCount / maxObservations) * 100 : 0;
+    const speciesPercentage = maxSpecies > 0 ? (user.speciesCount / maxSpecies) * 100 : 0;
     
     html += `
       <div style="padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;">
@@ -25116,19 +26057,19 @@ async function renderDetailedObservationComparison(groupData) {
           <div>
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
               <span>Beobachtungen</span>
-              <span style="color:${obsPercentage >= 100 ? 'var(--success)' : 'var(--muted)'};">${user.totalCount}</span>
+              <span style="color:${user.totalCount === maxObservations ? 'var(--success)' : 'var(--muted)'};">${user.totalCount}</span>
             </div>
             <div style="background:rgba(255,255,255,0.1);height:6px;border-radius:3px;overflow:hidden;">
-              <div style="background:var(--accent);height:100%;width:${Math.min(obsPercentage, 200)}%;transition:width 0.5s ease;"></div>
+              <div style="background:var(--accent);height:100%;width:${obsPercentage}%;transition:width 0.5s ease;"></div>
             </div>
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
               <span>Arten</span>
-              <span style="color:${speciesPercentage >= 100 ? 'var(--success)' : 'var(--muted)'};">${user.speciesCount}</span>
+              <span style="color:${user.speciesCount === maxSpecies ? 'var(--success)' : 'var(--muted)'};">${user.speciesCount}</span>
             </div>
             <div style="background:rgba(255,255,255,0.1);height:6px;border-radius:3px;overflow:hidden;">
-              <div style="background:var(--accent-2);height:100%;width:${Math.min(speciesPercentage, 200)}%;transition:width 0.5s ease;"></div>
+              <div style="background:var(--accent-2);height:100%;width:${speciesPercentage}%;transition:width 0.5s ease;"></div>
             </div>
           </div>
         </div>
@@ -25143,6 +26084,197 @@ async function renderDetailedObservationComparison(groupData) {
   renderMemberComparisonGrid(groupData);
 }
 
+// NEU: Zeige komplette Artenliste eines Benutzers (MOVED HERE to fix reference error)
+window.showUserSpeciesList = async function(userId, userName) {
+  console.log('🔍 showUserSpeciesList called with:', userId, userName);
+  if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    showNotification('⚠️ Kein Gruppenmodus aktiv', 3000);
+    return;
+  }
+  
+  try {
+    const groupData = await loadGroupData();
+    const user = groupData.userStats[userId];
+    
+    if (!user || !user.observations) {
+      showNotification('❌ Keine Daten für diesen Benutzer gefunden', 3000);
+      return;
+    }
+    
+    // Zähle nur tickbare Beobachtungen für Arten
+    const tickableObservations = user.observations.filter(obs => obs.tickable !== false);
+    
+    // Gruppiere Beobachtungen nach Arten
+    const speciesMap = {};
+    tickableObservations.forEach(obs => {
+      const normalized = normalizeBirdName(obs.bird);
+      if (!normalized) return;
+      
+      if (!speciesMap[obs.bird]) {
+        speciesMap[obs.bird] = {
+          name: obs.bird,
+          count: 0,
+          firstDate: obs.date,
+          lastDate: obs.date,
+          observations: []
+        };
+      }
+      speciesMap[obs.bird].count++;
+      speciesMap[obs.bird].observations.push(obs);
+      
+      // Update Daten
+      if (obs.date < speciesMap[obs.bird].firstDate) {
+        speciesMap[obs.bird].firstDate = obs.date;
+      }
+      if (obs.date > speciesMap[obs.bird].lastDate) {
+        speciesMap[obs.bird].lastDate = obs.date;
+      }
+    });
+    
+    // Sortiere nach Name oder Anzahl
+    const speciesList = Object.values(speciesMap);
+    speciesList.sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Erstelle Modal
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,6,23,0.9);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;';
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = 'background:var(--card);padding:24px;border-radius:16px;max-width:900px;width:100%;max-height:85vh;overflow-y:auto;border:1px solid rgba(6,182,212,0.3);box-shadow:0 20px 60px rgba(6,182,212,0.3);';
+    modalContent.onclick = (e) => e.stopPropagation();
+    
+    // Header
+    let html = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:16px;">
+        <div>
+          <h2 style="margin:0;font-size:24px;color:var(--text);">🐦 Artenliste: ${userName}</h2>
+          <p style="margin:4px 0 0 0;color:var(--muted);font-size:14px;">
+            ${speciesList.length} Arten • ${tickableObservations.length} tickbare Beobachtungen
+          </p>
+        </div>
+        <button onclick="this.closest('.modal-overlay').remove()" 
+                style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:28px;line-height:1;padding:4px 8px;"
+                onmouseover="this.style.color='var(--danger)'" 
+                onmouseout="this.style.color='var(--muted)'">×</button>
+      </div>
+      
+      <!-- Sortier-Optionen -->
+      <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;">
+        <span style="font-size:13px;color:var(--muted);">Sortieren:</span>
+        <button class="small-btn" onclick="sortSpeciesList('name')" id="sortByName" style="background:var(--accent);font-size:12px;">
+          📝 Name
+        </button>
+        <button class="small-btn" onclick="sortSpeciesList('count')" id="sortByCount" style="background:transparent;font-size:12px;">
+          🔢 Anzahl
+        </button>
+        <button class="small-btn" onclick="sortSpeciesList('date')" id="sortByDate" style="background:transparent;font-size:12px;">
+          📅 Datum
+        </button>
+      </div>
+      
+      <!-- Artenliste -->
+      <div id="speciesListContainer" style="display:flex;flex-direction:column;gap:10px;">
+    `;
+    
+    // Speichere Liste für Sortierung
+    window.currentSpeciesList = speciesList;
+    
+    // Rendere jede Art
+    speciesList.forEach(species => {
+      const rarity = getRarityStyle(species.name, species.observations[0]?.manualRarity);
+      
+      html += `
+        <div class="card" style="padding:14px;background:rgba(255,255,255,0.02);border-left:3px solid ${rarity.color || 'var(--accent)'};">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:15px;color:var(--text);margin-bottom:4px;">
+                ${rarity.rarityIcon} ${species.name}
+              </div>
+              <div style="font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;">
+                <span>📊 ${species.count}× beobachtet</span>
+                <span>📅 Erste: ${formatDateForDisplay(species.firstDate)}</span>
+                ${species.firstDate !== species.lastDate ? `<span>📅 Letzte: ${formatDateForDisplay(species.lastDate)}</span>` : ''}
+              </div>
+            </div>
+            <div style="font-size:28px;color:var(--accent);">${species.count}×</div>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+      </div>
+    `;
+    
+    modalContent.innerHTML = html;
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+  } catch (error) {
+    console.error('Fehler beim Laden der Artenliste:', error);
+    showNotification('❌ Fehler beim Laden der Artenliste', 3000);
+  }
+};
+
+// NEU: Sortiere Artenliste
+window.sortSpeciesList = function(sortBy) {
+  console.log('📊 sortSpeciesList called with:', sortBy);
+  if (!window.currentSpeciesList) return;
+  
+  const speciesList = [...window.currentSpeciesList];
+  
+  // Sortiere
+  if (sortBy === 'name') {
+    speciesList.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortBy === 'count') {
+    speciesList.sort((a, b) => b.count - a.count);
+  } else if (sortBy === 'date') {
+    speciesList.sort((a, b) => a.firstDate.localeCompare(b.firstDate));
+  }
+  
+  // Update Button-Styles
+  document.querySelectorAll('#sortByName, #sortByCount, #sortByDate').forEach(btn => {
+    btn.style.background = 'transparent';
+  });
+  document.getElementById(`sortBy${sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}`).style.background = 'var(--accent)';
+  
+  // Rendere Liste neu
+  const container = document.getElementById('speciesListContainer');
+  let html = '';
+  
+  speciesList.forEach(species => {
+    const rarity = getRarityStyle(species.name, species.observations[0]?.manualRarity);
+    
+    html += `
+      <div class="card" style="padding:14px;background:rgba(255,255,255,0.02);border-left:3px solid ${rarity.color || 'var(--accent)'};">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:15px;color:var(--text);margin-bottom:4px;">
+              ${rarity.rarityIcon} ${species.name}
+            </div>
+            <div style="font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;">
+              <span>📊 ${species.count}× beobachtet</span>
+              <span>📅 Erste: ${formatDateForDisplay(species.firstDate)}</span>
+              ${species.firstDate !== species.lastDate ? `<span>📅 Letzte: ${formatDateForDisplay(species.lastDate)}</span>` : ''}
+            </div>
+          </div>
+          <div style="font-size:28px;color:var(--accent);">${species.count}×</div>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+  window.currentSpeciesList = speciesList;
+};
+
+
+// DEBUG: Confirm functions are loaded
+console.log("✅ showUserSpeciesList and sortSpeciesList are now globally available:", typeof window.showUserSpeciesList, typeof window.sortSpeciesList);
 // NEU: Rendere Mitglieder-Vergleichs-Grid
 async function renderMemberComparisonGrid(groupData) {
   const container = document.getElementById('memberComparisonGrid');
@@ -25193,6 +26325,10 @@ async function renderMemberComparisonGrid(groupData) {
             </div>
           ` : ''}
         </div>
+        <button class="small-btn" onclick="showUserSpeciesList('${user.userId}', '${user.userName.replace(/'/g, "\\'")}')" 
+                style="width:100%;margin-top:12px;background:var(--accent);font-size:12px;padding:8px;">
+          📋 Artenliste anzeigen
+        </button>
       </div>
     `;
   });
@@ -25313,6 +26449,11 @@ async function openDetailedMemberComparison() {
               </div>
             </div>
           ` : ''}
+          
+          <button class="small-btn" onclick="showUserSpeciesList('${user.userId}', '${user.userName.replace(/'/g, "\\'")}')" 
+                  style="width:100%;margin-top:12px;background:var(--accent);font-size:13px;padding:10px;">
+            📋 Alle ${user.speciesCount} Arten anzeigen
+          </button>
         </div>
       `;
     });
@@ -25330,6 +26471,8 @@ async function openDetailedMemberComparison() {
     showNotification('❌ Fehler beim Laden der Daten', 3000);
   }
 }
+
+// NEU: Zeige komplette Artenliste eines Benutzers
 
 // Rendere Erfolgs-Leaderboard
 async function renderAchievementLeaderboard(groupData) {
@@ -25497,6 +26640,7 @@ async function renderDetailedAchievementComparison(groupData) {
             <th style="padding:12px;text-align:left;font-weight:600;">Rang</th>
             <th style="padding:12px;text-align:left;font-weight:600;">Name</th>
             <th style="padding:12px;text-align:center;font-weight:600;">🐦 Arten</th>
+            <th style="padding:12px;text-align:center;font-weight:600;">⭐ Exklusiv</th>
             <th style="padding:12px;text-align:center;font-weight:600;">📊 Beob.</th>
             <th style="padding:12px;text-align:center;font-weight:600;">🔴 Selffounds</th>
             <th style="padding:12px;text-align:center;font-weight:600;">📸 Fotos</th>
@@ -25517,6 +26661,7 @@ async function renderDetailedAchievementComparison(groupData) {
         <td style="padding:12px;text-align:center;font-size:18px;">${medal}</td>
         <td style="padding:12px;font-weight:600;">${user.userName}</td>
         <td style="padding:12px;text-align:center;">${user.speciesCount}</td>
+        <td style="padding:12px;text-align:center;color:${(user.uniqueSpeciesCount || 0) > 0 ? 'var(--accent-2)' : 'var(--muted)'};font-weight:${(user.uniqueSpeciesCount || 0) > 0 ? '600' : '400'};">${user.uniqueSpeciesCount || 0}</td>
         <td style="padding:12px;text-align:center;">${user.totalCount}</td>
         <td style="padding:12px;text-align:center;">${user.selffoundsCount || 0}</td>
         <td style="padding:12px;text-align:center;">${user.photosCount}</td>
@@ -25539,6 +26684,7 @@ async function renderDetailedAchievementComparison(groupData) {
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:8px;font-size:12px;color:var(--muted);">
         <div>🐦 Arten = Einzigartige beobachtete Arten</div>
+        <div>⭐ Exklusiv = Nur dieses Mitglied hat sie gesehen</div>
         <div>📊 Beob. = Gesamtzahl Beobachtungen</div>
         <div>🔴 Selffounds = Als Selffound markiert</div>
         <div>📸 Fotos = Beobachtungen mit Foto</div>
@@ -25896,8 +27042,8 @@ async function checkAndRewardGroupChallengeCompletions(groupData, userProgressDa
   
   // Hole oder erstelle Challenge-Completion-Record
   const groupId = window.currentSelectedGroup;
-  const completionsRef = window.FBD.ref(window.FBA, `groups/${groupId}/challengeCompletions/${currentUserId}`);
-  const snapshot = await window.FBD.get(completionsRef);
+  const completionsRef = window.FBD.ref(`groups/${groupId}/challengeCompletions/${currentUserId}`);
+  const snapshot = await completionsRef.once('value');
   const completions = snapshot.exists() ? snapshot.val() : {};
   
   // Berechne Perioden-Keys
@@ -25931,7 +27077,7 @@ async function checkAndRewardGroupChallengeCompletions(groupData, userProgressDa
       
       // Markiere als abgeschlossen
       completions[periodKeys[challenge.id]] = true;
-      await window.FBD.set(completionsRef, completions);
+      await completionsRef.set(completions);
       
       // Vergebe XP (im persönlichen Bereich)
       try {
@@ -25988,8 +27134,8 @@ async function openChallengeSettings() {
   }
   
   // Lade aktuelle Ziele aus Firebase
-  const groupRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}`);
-  const snapshot = await window.FBD.get(groupRef);
+  const groupRef = window.FBD.ref(`groups/${window.currentSelectedGroup}`);
+  const snapshot = await groupRef.once('value');
   
   if (!snapshot.exists()) {
     showNotification('❌ Gruppendaten nicht gefunden', 2000);
@@ -26020,8 +27166,8 @@ async function openAdvancedChallengeSettings() {
   }
   
   // Lade aktuelle Ziele und Typen aus Firebase
-  const groupRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}`);
-  const snapshot = await window.FBD.get(groupRef);
+  const groupRef = window.FBD.ref(`groups/${window.currentSelectedGroup}`);
+  const snapshot = await groupRef.once('value');
   
   if (!snapshot.exists()) {
     showNotification('❌ Gruppendaten nicht gefunden', 2000);
@@ -26095,16 +27241,16 @@ async function saveAdvancedChallengeSettings(event) {
   
   try {
     // Speichere Ziele in Firebase
-    const goalsRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}/challengeGoals`);
-    await window.FBD.set(goalsRef, {
+    const goalsRef = window.FBD.ref(`groups/${window.currentSelectedGroup}/challengeGoals`);
+    await goalsRef.set({
       week: weekGoal,
       month: monthGoal,
       year: yearGoal
     });
     
     // Speichere Typen in Firebase
-    const typesRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}/challengeTypes`);
-    await window.FBD.set(typesRef, {
+    const typesRef = window.FBD.ref(`groups/${window.currentSelectedGroup}/challengeTypes`);
+    await typesRef.set({
       week: weekType,
       month: monthType,
       year: yearType
@@ -26156,8 +27302,8 @@ async function saveChallengeSettings(event) {
   
   try {
     // Speichere in Firebase
-    const groupRef = window.FBD.ref(window.FBA, `groups/${window.currentSelectedGroup}/challengeGoals`);
-    await window.FBD.set(groupRef, {
+    const groupRef = window.FBD.ref(`groups/${window.currentSelectedGroup}/challengeGoals`);
+    await groupRef.set({
       week: weekGoal,
       month: monthGoal,
       year: yearGoal
@@ -27546,15 +28692,143 @@ window.clearAllSpeciesFilters = clearAllSpeciesFilters;
 // ==================== TICKABLE & SELFFOUND TOGGLE FUNKTIONEN ====================
 
 // Toggle Tickable Status
+// NEU: Markiere alle Beobachtungen einer Art als nicht tickbar
+async function markAllSpeciesAsNonTickable(birdName, groupId = null, isFirebaseMode = false) {
+  try {
+    console.log(`🔄 Markiere alle "${birdName}"-Beobachtungen als nicht tickbar...`);
+    let updatedCount = 0;
+    
+    if (isFirebaseMode && groupId) {
+      // Firebase-Modus: Alle Beobachtungen dieser Art in der Gruppe markieren
+      const groupObsRef = window.FBD.ref(`groups/${groupId}/observations`);
+      const snapshot = await groupObsRef.once('value');
+      
+      if (!snapshot.exists()) {
+        console.log('Keine Beobachtungen in der Gruppe gefunden');
+        return 0;
+      }
+      
+      const observations = snapshot.val();
+      const updates = {};
+      
+      // Finde alle Beobachtungen dieser Art
+      for (const [obsId, obs] of Object.entries(observations)) {
+        if (obs.bird === birdName && obs.tickable !== false) {
+          updates[`groups/${groupId}/observations/${obsId}/tickable`] = false;
+          updates[`groups/${groupId}/observations/${obsId}/updatedAt`] = new Date().toISOString();
+          updatedCount++;
+        }
+      }
+      
+      // Batch-Update
+      if (Object.keys(updates).length > 0) {
+        await window.FBD.ref().update(updates);
+        console.log(`✅ ${updatedCount} Firebase-Beobachtungen aktualisiert`);
+        
+        // Synchronisiere auch zu IndexedDB
+        await syncAllSpeciesTickableToIndexedDB(birdName, false);
+      }
+      
+    } else {
+      // IndexedDB-Modus: Alle lokalen Beobachtungen dieser Art markieren
+      const observations = await getAllFromIndexedDB('observations');
+      
+      for (const obs of observations) {
+        if (obs.bird === birdName && obs.tickable !== false) {
+          obs.tickable = false;
+          obs.updatedAt = new Date().toISOString();
+          await saveToIndexedDB('observations', obs);
+          updatedCount++;
+        }
+      }
+      
+      console.log(`✅ ${updatedCount} IndexedDB-Beobachtungen aktualisiert`);
+      
+      // Synchronisiere auch zu Firebase falls verbunden
+      await syncAllSpeciesTickableToFirebase(birdName, false);
+    }
+    
+    return updatedCount;
+    
+  } catch (error) {
+    console.error('Fehler beim Markieren aller Beobachtungen:', error);
+    throw error;
+  }
+}
+
+// Hilfsfunktion: Synchronisiere alle Beobachtungen einer Art zu IndexedDB
+async function syncAllSpeciesTickableToIndexedDB(birdName, tickableStatus) {
+  try {
+    const observations = await getAllFromIndexedDB('observations');
+    let syncCount = 0;
+    
+    for (const obs of observations) {
+      if (obs.bird === birdName && obs.tickable !== tickableStatus) {
+        obs.tickable = tickableStatus;
+        obs.updatedAt = new Date().toISOString();
+        await saveToIndexedDB('observations', obs);
+        syncCount++;
+      }
+    }
+    
+    if (syncCount > 0) {
+      console.log(`🔄 ${syncCount} Beobachtungen in IndexedDB synchronisiert`);
+    }
+  } catch (error) {
+    console.warn('Fehler beim Sync zu IndexedDB:', error);
+  }
+}
+
+// Hilfsfunktion: Synchronisiere alle Beobachtungen einer Art zu Firebase
+async function syncAllSpeciesTickableToFirebase(birdName, tickableStatus) {
+  try {
+    if (!window.FBA || !window.FBA.currentUser || !window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+      return; // Kein Firebase-Modus
+    }
+    
+    const groupId = window.currentSelectedGroup;
+    const groupObsRef = window.FBD.ref(`groups/${groupId}/observations`);
+    const snapshot = await groupObsRef.once('value');
+    
+    if (!snapshot.exists()) return;
+    
+    const observations = snapshot.val();
+    const updates = {};
+    let syncCount = 0;
+    
+    for (const [obsId, obs] of Object.entries(observations)) {
+      if (obs.bird === birdName && obs.tickable !== tickableStatus) {
+        updates[`groups/${groupId}/observations/${obsId}/tickable`] = tickableStatus;
+        updates[`groups/${groupId}/observations/${obsId}/updatedAt`] = new Date().toISOString();
+        syncCount++;
+      }
+    }
+    
+    if (Object.keys(updates).length > 0) {
+      await window.FBD.ref().update(updates);
+      console.log(`🔄 ${syncCount} Beobachtungen in Firebase synchronisiert`);
+    }
+  } catch (error) {
+    console.warn('Fehler beim Sync zu Firebase:', error);
+  }
+}
+
 async function toggleTickable(observationId, forcePersonalMode = false) {
   try {
+    console.log('🔄 toggleTickable aufgerufen für:', observationId);
+    
     // NEU: Prüfe explizit ob wir in einer privaten Listen-Ansicht sind
     const isInPrivateListView = document.getElementById('listDetailView')?.style.display === 'block';
+    console.log('   isInPrivateListView:', isInPrivateListView);
     
-    // NEU: Prüfe ob im Gruppenmodus UND nicht in privater Listen-Ansicht
-    const isGroupMode = !forcePersonalMode && !isInPrivateListView && window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+    // WICHTIG: Im Gruppenmodus kommen die Beobachtungen IMMER aus Firebase,
+    // auch wenn wir eine private Liste anzeigen!
+    const isGroupMode = !forcePersonalMode && window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+    console.log('   isGroupMode:', isGroupMode, 'currentSelectedGroup:', window.currentSelectedGroup);
     
     if (isGroupMode) {
+      console.log('   → Firebase-Modus');
+      // Firebase-Modus - auch für private Listen im Gruppenmodus!
       // NEU: Prüfe ob Firebase verfügbar ist
       if (!window.FBA || !window.FBD) {
         showNotification('❌ Firebase nicht verfügbar', 2000);
@@ -27581,6 +28855,8 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
       const groupId = window.currentSelectedGroup;
       const obsRef = window.FBD.ref(`groups/${groupId}/observations/${observationId}`);
       
+      console.log('   Lade Beobachtung aus Firebase:', `groups/${groupId}/observations/${observationId}`);
+      
       // Lade aktuelle Beobachtung
       const snapshot = await obsRef.once('value');
       const obs = snapshot.val();
@@ -27590,6 +28866,8 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
         console.error('Beobachtung nicht in Firebase gefunden:', observationId);
         return;
       }
+      
+      console.log('   Beobachtung gefunden:', obs.bird, 'tickable:', obs.tickable);
       
       // NEU: Prüfe ob Owner oder Admin
       const isOwner = obs.userId === user.uid || obs.createdBy === user.email;
@@ -27609,10 +28887,17 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
       
       // Toggle: wenn undefined oder true, dann false, sonst true
       const newTickable = obs.tickable === false ? true : false;
+      console.log('   Toggle von', obs.tickable, 'zu', newTickable);
+      
       await obsRef.update({
         tickable: newTickable,
         updatedAt: new Date().toISOString()
       });
+      
+      console.log('   ✅ Firebase aktualisiert');
+      
+      // NEU: Synchronisiere tickable-Status zurück zu IndexedDB
+      await syncTickableStatusToIndexedDB(observationId, obs.bird, obs.date, newTickable);
       
       // Visuelles Update
       updateToggleButtonVisuals(observationId, 'tickable', newTickable);
@@ -27622,14 +28907,67 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
         2000
       );
       
-      // Aktualisiere Challenge falls auf der Seite
+      // NEU: Frage ob alle Beobachtungen dieser Art markiert werden sollen (nur wenn auf nicht-tickbar gesetzt)
+      if (newTickable === false) {
+        setTimeout(() => {
+          const birdName = obs.bird;
+          const confirmMessage = `Möchtest du ALLE Beobachtungen von "${birdName}" als nicht tickbar markieren?`;
+          
+          if (confirm(confirmMessage)) {
+            markAllSpeciesAsNonTickable(birdName, groupId, true).then(async (count) => {
+              showNotification(`✅ ${count} "${birdName}"-Beobachtungen als nicht tickbar markiert`, 3000);
+              
+              // Aktualisiere UI komplett
+              if (isInPrivateListView && currentListId) {
+                await openListDetail(currentListId, window.currentListViewMode || 'observations');
+              }
+              
+              // Aktualisiere Observation Manager falls offen
+              if (typeof renderObservationManager === 'function') {
+                await renderObservationManager();
+              }
+              
+              // Aktualisiere Challenge
+              if (document.getElementById('compareRarity2026View')?.style.display !== 'none') {
+                setTimeout(() => renderRarityChallenge2026(), 100);
+              }
+            }).catch(err => {
+              console.error('Fehler beim Markieren aller Beobachtungen:', err);
+              showNotification('❌ Fehler beim Markieren aller Beobachtungen', 3000);
+            });
+          }
+        }, 500);
+      }
+      
+      // NEU: Aktualisiere Listen-Ansicht wenn offen - SOFORT
+      if (isInPrivateListView && currentListId) {
+        console.log('🔄 Aktualisiere Listen-Ansicht sofort...');
+        
+        // Merke Scroll-Position
+        const listContainer = document.getElementById('listObservations');
+        const scrollPos = listContainer ? listContainer.scrollTop : 0;
+        
+        // Sofortige Aktualisierung ohne Verzögerung
+        openListDetail(currentListId, window.currentListViewMode || 'observations').then(() => {
+          // Stelle Scroll-Position wieder her
+          if (listContainer) {
+            setTimeout(() => {
+              const newContainer = document.getElementById('listObservations');
+              if (newContainer) newContainer.scrollTop = scrollPos;
+            }, 50);
+          }
+        });
+      }
+      
+      // Aktualisiere Challenge falls auf der Seite - sofort
       if (document.getElementById('compareRarity2026View') && 
           document.getElementById('compareRarity2026View').style.display !== 'none') {
-        setTimeout(() => renderRarityChallenge2026(), 500);
+        setTimeout(() => renderRarityChallenge2026(), 100);
       }
       
     } else {
-      // IndexedDB-Modus (persönliche Beobachtungen) - NEU: Auch für private Listen!
+      // IndexedDB-Modus (nur im echten persönlichen Modus ohne Gruppe)
+      console.log('   → IndexedDB-Modus');
       console.log('🔍 Toggle Tickable in IndexedDB-Modus für ID:', observationId);
       const observations = await getAllFromIndexedDB('observations');
       const obs = observations.find(o => o.id === observationId);
@@ -27641,11 +28979,21 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
         return;
       }
       
+      console.log('   Beobachtung gefunden:', obs.bird, 'tickable:', obs.tickable);
+      
       // Toggle: wenn undefined oder true, dann false, sonst true
+      const oldTickable = obs.tickable;
       obs.tickable = obs.tickable === false ? true : false;
       obs.updatedAt = new Date().toISOString();
       
+      console.log('   Toggle von', oldTickable, 'zu', obs.tickable);
+      
       await saveToIndexedDB('observations', obs);
+      
+      console.log('   ✅ IndexedDB aktualisiert');
+      
+      // NEU: Synchronisiere tickable-Status zu Firebase
+      await syncTickableStatusToFirebase(observationId, obs.bird, obs.date, obs.tickable);
       
       // Visuelles Update
       updateToggleButtonVisuals(observationId, 'tickable', obs.tickable);
@@ -27655,13 +29003,56 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
         2000
       );
       
-      // NEU: Aktualisiere Listen-Ansicht wenn offen
-      if (isInPrivateListView && currentListId) {
-        console.log('🔄 Aktualisiere Listen-Ansicht...');
-        // Kurze Verzögerung damit die Änderung gespeichert ist
+      // NEU: Frage ob alle Beobachtungen dieser Art markiert werden sollen (nur wenn auf nicht-tickbar gesetzt)
+      if (obs.tickable === false) {
         setTimeout(() => {
-          openListDetail(currentListId, window.currentListViewMode || 'observations');
-        }, 300);
+          const birdName = obs.bird;
+          const confirmMessage = `Möchtest du ALLE Beobachtungen von "${birdName}" als nicht tickbar markieren?`;
+          
+          if (confirm(confirmMessage)) {
+            markAllSpeciesAsNonTickable(birdName, null, false).then(async (count) => {
+              showNotification(`✅ ${count} "${birdName}"-Beobachtungen als nicht tickbar markiert`, 3000);
+              
+              // Aktualisiere UI komplett
+              if (isInPrivateListView && currentListId) {
+                await openListDetail(currentListId, window.currentListViewMode || 'observations');
+              }
+              
+              // Aktualisiere Observation Manager falls offen
+              if (typeof renderObservationManager === 'function') {
+                await renderObservationManager();
+              }
+              
+              // Aktualisiere Challenge
+              if (document.getElementById('compareRarity2026View')?.style.display !== 'none') {
+                setTimeout(() => renderRarityChallenge2026(), 100);
+              }
+            }).catch(err => {
+              console.error('Fehler beim Markieren aller Beobachtungen:', err);
+              showNotification('❌ Fehler beim Markieren aller Beobachtungen', 3000);
+            });
+          }
+        }, 500);
+      }
+      
+      // NEU: Aktualisiere Listen-Ansicht wenn offen - SOFORT
+      if (isInPrivateListView && currentListId) {
+        console.log('🔄 Aktualisiere Listen-Ansicht sofort...');
+        
+        // Merke Scroll-Position
+        const listContainer = document.getElementById('listObservations');
+        const scrollPos = listContainer ? listContainer.scrollTop : 0;
+        
+        // Sofortige Aktualisierung ohne Verzögerung
+        openListDetail(currentListId, window.currentListViewMode || 'observations').then(() => {
+          // Stelle Scroll-Position wieder her
+          if (listContainer) {
+            setTimeout(() => {
+              const newContainer = document.getElementById('listObservations');
+              if (newContainer) newContainer.scrollTop = scrollPos;
+            }, 50);
+          }
+        });
       }
       
       // NEU: Synchronisiere geteilte Listen nach Toggle-Änderung
@@ -27674,15 +29065,250 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
         }, 500);
       }
       
-      // Aktualisiere Challenge falls auf der Seite
+      // Aktualisiere Challenge falls auf der Seite - sofort
       if (document.getElementById('compareRarity2026View') && 
           document.getElementById('compareRarity2026View').style.display !== 'none') {
-        setTimeout(() => renderRarityChallenge2026(), 500);
+        setTimeout(() => renderRarityChallenge2026(), 100);
       }
     }
   } catch (error) {
     console.error('Fehler beim Toggle Tickable:', error);
     showNotification('❌ Fehler: ' + error.message, 3000);
+  }
+}
+
+// NEU: Synchronisiere tickable-Status von Firebase zu IndexedDB
+async function syncTickableStatusToIndexedDB(firebaseObsId, birdName, observationDate, tickableStatus) {
+  try {
+    console.log('🔄 Sync tickable zu IndexedDB:', birdName, observationDate, tickableStatus);
+    
+    // Lade alle Beobachtungen aus IndexedDB
+    const observations = await getAllFromIndexedDB('observations');
+    
+    // Finde passende Beobachtung(en) - kann mehrere geben mit gleichem Vogel/Datum
+    const matchingObs = observations.filter(obs => 
+      obs.bird === birdName && 
+      obs.date === observationDate
+    );
+    
+    if (matchingObs.length === 0) {
+      console.log('   ℹ️ Keine passende Beobachtung in IndexedDB gefunden');
+      return;
+    }
+    
+    console.log(`   Gefunden: ${matchingObs.length} passende Beobachtung(en)`);
+    
+    // Aktualisiere alle passenden Beobachtungen
+    for (const obs of matchingObs) {
+      obs.tickable = tickableStatus;
+      obs.updatedAt = new Date().toISOString();
+      await saveToIndexedDB('observations', obs);
+      console.log(`   ✓ Beobachtung ${obs.id} aktualisiert`);
+    }
+    
+    console.log('✅ Tickable-Status in IndexedDB synchronisiert');
+  } catch (error) {
+    console.error('Fehler beim Sync zu IndexedDB:', error);
+  }
+}
+
+// NEU: Synchronisiere tickable-Status von IndexedDB zu Firebase (alle Gruppen)
+async function syncTickableStatusToFirebase(indexedDBObsId, birdName, observationDate, tickableStatus) {
+  try {
+    console.log('🔄 Sync tickable zu Firebase:', birdName, observationDate, tickableStatus);
+    
+    // Prüfe ob Firebase verfügbar ist
+    if (!window.FBA || !window.FBD || !window.FBA.currentUser) {
+      console.log('   ℹ️ Firebase nicht verfügbar oder nicht angemeldet - Sync übersprungen');
+      return;
+    }
+    
+    const userId = window.FBA.currentUser.uid;
+    const userEmail = window.FBA.currentUser.email;
+    
+    // Lade alle Gruppen
+    const groupsSnapshot = await window.FBD.ref('groups').once('value');
+    if (!groupsSnapshot.exists()) {
+      console.log('   ℹ️ Keine Gruppen gefunden');
+      return;
+    }
+    
+    const groups = groupsSnapshot.val();
+    let updatedCount = 0;
+    
+    // Durchsuche alle Gruppen
+    for (const [groupKey, groupData] of Object.entries(groups)) {
+      // Prüfe ob Benutzer Mitglied ist
+      if (!groupData.members) continue;
+      const isMember = Object.values(groupData.members).some(member => 
+        member.uid === userId || member.id === userId
+      );
+      
+      if (!isMember) continue;
+      
+      console.log(`   📁 Prüfe Gruppe: ${groupData.name || groupKey}`);
+      
+      // Suche nach passenden Beobachtungen in dieser Gruppe
+      const obsSnapshot = await window.FBD.ref(`groups/${groupKey}/observations`).once('value');
+      if (!obsSnapshot.exists()) continue;
+      
+      const observations = obsSnapshot.val();
+      
+      // Durchsuche alle Beobachtungen
+      for (const [obsKey, obsData] of Object.entries(observations)) {
+        // Prüfe ob Beobachtung zum Benutzer gehört
+        const isOwnObservation = 
+          obsData.userId === userId || 
+          obsData.createdBy === userEmail ||
+          (obsData.userName && obsData.userName === userEmail);
+        
+        if (!isOwnObservation) continue;
+        
+        // Prüfe ob Vogel und Datum übereinstimmen
+        if (obsData.bird === birdName && obsData.date === observationDate) {
+          // Aktualisiere tickable-Status
+          await window.FBD.ref(`groups/${groupKey}/observations/${obsKey}`).update({
+            tickable: tickableStatus,
+            updatedAt: new Date().toISOString()
+          });
+          
+          console.log(`   ✓ Beobachtung in Gruppe ${groupData.name || groupKey} aktualisiert`);
+          updatedCount++;
+        }
+      }
+    }
+    
+    if (updatedCount > 0) {
+      console.log(`✅ Tickable-Status in ${updatedCount} Gruppen-Beobachtung(en) synchronisiert`);
+    } else {
+      console.log('   ℹ️ Keine passenden Beobachtungen in Gruppen gefunden');
+    }
+  } catch (error) {
+    console.error('Fehler beim Sync zu Firebase:', error);
+  }
+}
+
+// NEU: Umfassende Synchronisation aller tickable-Stati beim Moduswechsel
+async function syncAllTickableStates(direction = 'both') {
+  try {
+    console.log('🔄 Starte umfassende tickable-Status-Synchronisation:', direction);
+    
+    if (!window.FBA || !window.FBD || !window.FBA.currentUser) {
+      console.log('   ℹ️ Firebase nicht verfügbar - Sync übersprungen');
+      return;
+    }
+    
+    const userId = window.FBA.currentUser.uid;
+    const userEmail = window.FBA.currentUser.email;
+    
+    // Lade IndexedDB-Beobachtungen
+    const localObservations = await getAllFromIndexedDB('observations');
+    console.log(`   📊 ${localObservations.length} lokale Beobachtungen geladen`);
+    
+    // Lade alle Gruppen
+    const groupsSnapshot = await window.FBD.ref('groups').once('value');
+    if (!groupsSnapshot.exists()) {
+      console.log('   ℹ️ Keine Gruppen gefunden');
+      return;
+    }
+    
+    const groups = groupsSnapshot.val();
+    let syncedCount = 0;
+    
+    // Erstelle Map für schnellen Zugriff: bird+date -> tickable status
+    const localStatusMap = new Map();
+    localObservations.forEach(obs => {
+      const key = `${obs.bird}|${obs.date}`;
+      // Speichere tickable-Status (neuester zählt wenn mehrere)
+      if (!localStatusMap.has(key) || new Date(obs.updatedAt || obs.timestamp || 0) > new Date(localStatusMap.get(key).updatedAt || 0)) {
+        localStatusMap.set(key, {
+          tickable: obs.tickable,
+          updatedAt: obs.updatedAt || obs.timestamp
+        });
+      }
+    });
+    
+    console.log(`   📋 ${localStatusMap.size} eindeutige Vogel/Datum-Kombinationen`);
+    
+    // Durchsuche alle Gruppen
+    for (const [groupKey, groupData] of Object.entries(groups)) {
+      // Prüfe ob Benutzer Mitglied ist
+      if (!groupData.members) continue;
+      const isMember = Object.values(groupData.members).some(member => 
+        member.uid === userId || member.id === userId
+      );
+      
+      if (!isMember) continue;
+      
+      console.log(`   👥 Synchronisiere Gruppe: ${groupData.name || groupKey}`);
+      
+      // Lade Gruppenbeobachtungen
+      const obsSnapshot = await window.FBD.ref(`groups/${groupKey}/observations`).once('value');
+      if (!obsSnapshot.exists()) continue;
+      
+      const groupObservations = obsSnapshot.val();
+      
+      // Durchsuche alle Beobachtungen
+      for (const [obsKey, obsData] of Object.entries(groupObservations)) {
+        // Nur eigene Beobachtungen
+        const isOwnObservation = 
+          obsData.userId === userId || 
+          obsData.createdBy === userEmail ||
+          (obsData.userName && obsData.userName === userEmail);
+        
+        if (!isOwnObservation) continue;
+        
+        const key = `${obsData.bird}|${obsData.date}`;
+        const localStatus = localStatusMap.get(key);
+        
+        // Bestimme welcher Status neuer ist
+        const localUpdated = localStatus ? new Date(localStatus.updatedAt || 0) : new Date(0);
+        const groupUpdated = new Date(obsData.updatedAt || obsData.timestamp || 0);
+        
+        if (direction === 'toGroup' || direction === 'both') {
+          // Sync von lokal zu Gruppe (wenn lokal neuer oder Gruppe nicht tickable gesetzt hat)
+          if (localStatus && (localUpdated > groupUpdated || obsData.tickable === undefined)) {
+            if (obsData.tickable !== localStatus.tickable) {
+              await window.FBD.ref(`groups/${groupKey}/observations/${obsKey}`).update({
+                tickable: localStatus.tickable,
+                updatedAt: new Date().toISOString()
+              });
+              console.log(`      ✓ ${obsData.bird} (${obsData.date}): lokal→Gruppe (tickable: ${localStatus.tickable})`);
+              syncedCount++;
+            }
+          }
+        }
+        
+        if (direction === 'toPrivate' || direction === 'both') {
+          // Sync von Gruppe zu lokal (wenn Gruppe neuer)
+          if (groupUpdated > localUpdated && obsData.tickable !== undefined) {
+            // Finde und aktualisiere lokale Beobachtung(en)
+            const matchingLocalObs = localObservations.filter(obs =>
+              obs.bird === obsData.bird && obs.date === obsData.date
+            );
+            
+            for (const localObs of matchingLocalObs) {
+              if (localObs.tickable !== obsData.tickable) {
+                localObs.tickable = obsData.tickable;
+                localObs.updatedAt = new Date().toISOString();
+                await saveToIndexedDB('observations', localObs);
+                console.log(`      ✓ ${obsData.bird} (${obsData.date}): Gruppe→lokal (tickable: ${obsData.tickable})`);
+                syncedCount++;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (syncedCount > 0) {
+      console.log(`✅ ${syncedCount} tickable-Stati synchronisiert`);
+      showNotification(`🔄 ${syncedCount} tickable-Stati synchronisiert`, 2000);
+    } else {
+      console.log('✓ Alle tickable-Stati bereits synchron');
+    }
+  } catch (error) {
+    console.error('Fehler bei umfassender tickable-Synchronisation:', error);
   }
 }
 
@@ -27692,10 +29318,12 @@ async function toggleSelffound(observationId, forcePersonalMode = false) {
     // NEU: Prüfe explizit ob wir in einer privaten Listen-Ansicht sind
     const isInPrivateListView = document.getElementById('listDetailView')?.style.display === 'block';
     
-    // NEU: Prüfe ob im Gruppenmodus UND nicht in privater Listen-Ansicht
-    const isGroupMode = !forcePersonalMode && !isInPrivateListView && window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+    // WICHTIG: Im Gruppenmodus kommen die Beobachtungen IMMER aus Firebase,
+    // auch wenn wir eine private Liste anzeigen!
+    const isGroupMode = !forcePersonalMode && window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
     
     if (isGroupMode) {
+      // Firebase-Modus - auch für private Listen im Gruppenmodus!
       // NEU: Prüfe ob Firebase verfügbar ist
       if (!window.FBA || !window.FBD) {
         showNotification('❌ Firebase nicht verfügbar', 2000);
@@ -27763,6 +29391,27 @@ async function toggleSelffound(observationId, forcePersonalMode = false) {
         2000
       );
       
+      // NEU: Aktualisiere Listen-Ansicht wenn offen
+      if (isInPrivateListView && currentListId) {
+        console.log('🔄 Aktualisiere Listen-Ansicht...');
+        
+        // Merke Scroll-Position
+        const listContainer = document.getElementById('listObservations');
+        const scrollPos = listContainer ? listContainer.scrollTop : 0;
+        
+        setTimeout(() => {
+          openListDetail(currentListId, window.currentListViewMode || 'observations').then(() => {
+            // Stelle Scroll-Position wieder her
+            if (listContainer) {
+              setTimeout(() => {
+                const newContainer = document.getElementById('listObservations');
+                if (newContainer) newContainer.scrollTop = scrollPos;
+              }, 50);
+            }
+          });
+        }, 600);
+      }
+      
       // Aktualisiere Challenge falls auf der Seite
       if (document.getElementById('compareRarity2026View') && 
           document.getElementById('compareRarity2026View').style.display !== 'none') {
@@ -27770,7 +29419,7 @@ async function toggleSelffound(observationId, forcePersonalMode = false) {
       }
       
     } else {
-      // IndexedDB-Modus (persönliche Beobachtungen) - NEU: Auch für private Listen!
+      // IndexedDB-Modus (nur im echten persönlichen Modus ohne Gruppe)
       console.log('🔍 Toggle Selffound in IndexedDB-Modus für ID:', observationId);
       const observations = await getAllFromIndexedDB('observations');
       const obs = observations.find(o => o.id === observationId);
@@ -27795,14 +29444,27 @@ async function toggleSelffound(observationId, forcePersonalMode = false) {
         obs.selffound ? '🔴 Als Selffound markiert' : '⚪ Selffound entfernt',
         2000
       );
-    }
-    
-    // Listen-Ansicht aktualisieren (falls offen) - NEU: Mit richtigem View Mode
-    if (currentListId && isInPrivateListView) {
-      console.log('🔄 Aktualisiere Listen-Ansicht...');
-      setTimeout(() => {
-        openListDetail(currentListId, window.currentListViewMode || 'observations');
-      }, 300);
+      
+      // NEU: Aktualisiere Listen-Ansicht wenn offen
+      if (isInPrivateListView && currentListId) {
+        console.log('🔄 Aktualisiere Listen-Ansicht...');
+        
+        // Merke Scroll-Position
+        const listContainer = document.getElementById('listObservations');
+        const scrollPos = listContainer ? listContainer.scrollTop : 0;
+        
+        setTimeout(() => {
+          openListDetail(currentListId, window.currentListViewMode || 'observations').then(() => {
+            // Stelle Scroll-Position wieder her
+            if (listContainer) {
+              setTimeout(() => {
+                const newContainer = document.getElementById('listObservations');
+                if (newContainer) newContainer.scrollTop = scrollPos;
+              }, 50);
+            }
+          });
+        }, 400);
+      }
     }
     
     // Beobachtungen-Manager aktualisieren (falls offen)
@@ -27850,10 +29512,11 @@ function updateToggleButtonVisuals(observationId, toggleType, isActive) {
         }
       } else {
         button.classList.remove('active');
-        button.innerHTML = '';
         if (toggleType === 'tickable') {
+          button.innerHTML = '⊘'; // Zeige ⊘ Symbol für nicht-tickbar
           button.setAttribute('title', 'Nicht tickbar');
         } else if (toggleType === 'selffound') {
+          button.innerHTML = ''; // Selffound bleibt leer wenn nicht aktiv
           button.setAttribute('title', 'Nicht selbst gefunden');
         }
       }
@@ -28386,6 +30049,9 @@ function filterObservationsByManager(observations) {
       break;
     case 'tickable':
       filtered = filtered.filter(obs => obs.tickable !== false);
+      break;
+    case 'non-tickable':
+      filtered = filtered.filter(obs => obs.tickable === false);
       break;
     case 'with-photo':
       filtered = filtered.filter(obs => obs.photo);
@@ -30183,7 +31849,7 @@ async function saveQuickAdd() {
       lat: lat,
       lng: lng,
       timestamp: new Date().toISOString(),
-      tickable: true,
+      tickable: !isAutoNonTickableSpecies(bird), // NEU: Automatisch nicht-tickbar für bestimmte Arten
       selffound: false
     };
     
@@ -30213,6 +31879,15 @@ async function saveQuickAdd() {
       // Aktualisiere Ansicht
       if (typeof loadObservations === 'function') {
         loadObservations();
+      }
+      
+      // NEU: Synchronisiere Listen nach neuer Beobachtung
+      if (typeof syncSharedListsAfterNewObservation === 'function') {
+        setTimeout(() => {
+          syncSharedListsAfterNewObservation().catch(err => {
+            console.error('Fehler bei automatischer Listen-Synchronisation:', err);
+          });
+        }, 500);
       }
       
       // Aktualisiere Karte falls sichtbar
@@ -31536,7 +33211,7 @@ function showObservationsForLabel(labelIndex, chartInstance, isNewSpeciesMode = 
     card.onclick = (e) => {
       e.stopPropagation();
       modal.remove();
-      showPage('home');
+      // Modal schließt sich - keine weitere Aktion nötig
     };
     
     content.appendChild(card);
