@@ -286,9 +286,83 @@
       to { opacity: 0; transform: translateX(100px); }
     }
     
+    /* Modal Base Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(2, 6, 23, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .modal-content {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 32px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      font-size: 24px;
+      color: var(--text);
+    }
+    
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+    
+    .modal-body {
+      overflow-y: auto;
+      max-height: calc(90vh - 120px);
+    }
+    
     /* Enhanced Stats */
     .enhanced-stats-modal {
       max-width: 1000px;
+      width: 100%;
     }
     .stats-tabs {
       display: flex; gap: 8px; margin-bottom: 24px;
@@ -311,6 +385,115 @@
     .stats-tab-content {
       animation: fadeInUp 0.3s ease;
     }
+    
+    /* Advanced Stats Tabs */
+    .adv-stats-tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 12px 20px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      border-bottom: 2px solid transparent;
+    }
+    .adv-stats-tab:hover {
+      background: var(--glass);
+      color: var(--text);
+    }
+    .adv-stats-tab.active {
+      background: linear-gradient(180deg, rgba(6,182,212,0.12), transparent);
+      color: var(--text);
+      border-bottom: 2px solid var(--accent);
+    }
+    .adv-stats-content {
+      animation: fadeInUp 0.3s ease;
+    }
+    
+    /* Milestone Card */
+    .milestone-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    .milestone-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(6,182,212,0.2);
+      border-color: rgba(6,182,212,0.3);
+    }
+    .milestone-card.achieved {
+      background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05));
+      border-color: rgba(16,185,129,0.3);
+    }
+    .milestone-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .milestone-info h4 {
+      margin: 0 0 8px 0;
+      color: var(--text);
+      font-size: 16px;
+    }
+    .milestone-info p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .milestone-progress {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--soft);
+      font-weight: 600;
+    }
+    .milestone-badge {
+      margin-top: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      background: rgba(6,182,212,0.1);
+      color: var(--accent);
+    }
+    .milestone-card.achieved .milestone-badge {
+      background: rgba(16,185,129,0.1);
+      color: var(--success);
+    }
+    
+    /* View Mode Buttons */
+    .view-mode-btn, .monthly-view-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--glass);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .view-mode-btn:hover, .monthly-view-btn:hover {
+      background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.1));
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(6,182,212,0.2);
+    }
+    .view-mode-btn.active, .monthly-view-btn.active {
+      background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(6,182,212,0.1));
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(6,182,212,0.2);
+    }
+    .view-mode-btn:active, .monthly-view-btn:active {
+      transform: translateY(0);
+    }
+    
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -5380,6 +5563,7 @@
         <button data-page="eingabe">✍️ Eingabe</button>
         <button data-page="diagramme">📊 Analyse</button>
         <button data-page="statistiken">📈 Statistiken</button>
+        <button data-page="erweiterte-stats">🚀 Erweiterte Stats</button>
         <button data-page="karte">🗺 Karte</button>
         <button data-page="listen">📋 Listen</button>
         <button data-page="arten">🐦 Arten-DB</button>
@@ -5389,7 +5573,6 @@
       </nav>
 
       <div class="actions">
-        <button class="btn" id="btnEnhancedStats" onclick="EnhancedStatsManager.open()" title="Erweiterte Statistiken mit Jahresvergleichen, Heatmaps und Meilensteinen">📊 Erweiterte Stats</button>
         <button class="btn" id="btnBulkEdit" onclick="BulkEditManager.open()" style="display: none;" title="Mehrere Beobachtungen gleichzeitig bearbeiten">📦 Mehrfachbearbeitung (<span id="bulkCountBadge">0</span>)</button>
         <button class="btn ghost" id="addFolderBtn">Neuer Ordner</button>
         <button class="btn ghost" id="exportAllBtn">Export All</button>
@@ -5430,7 +5613,6 @@
           <input id="globalSearch" placeholder="Suche Vogelart, Datum, Ort oder Merkmale..." />
         </div>
         <div class="controls">
-          <button id="btnEnhancedStats" class="btn" onclick="EnhancedStatsManager.open()" title="Erweiterte Statistiken">📊 Statistiken+</button>
           <button id="btnBulkEdit" class="btn" onclick="BulkEditManager.open()" style="display:none;" title="Mehrfachbearbeitung">📦 Bulk-Edit</button>
           <button id="importBtn" class="btn ghost">📥 Import</button>
           <button id="exportBtn" class="btn">📤 Export</button>
@@ -5875,6 +6057,20 @@
             
             <div class="feature-section">
               <h3 style="margin-top:0;">Monatliche Übersicht</h3>
+              
+              <!-- View Mode Switcher -->
+              <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button class="monthly-view-btn active" data-mode="observations" onclick="changeMonthlyViewMode('observations')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05)); color: var(--text); cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">
+                  📊 Meldungen
+                </button>
+                <button class="monthly-view-btn" data-mode="species" onclick="changeMonthlyViewMode('species')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--glass); color: var(--text); cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">
+                  🦅 Artenanzahl
+                </button>
+                <button class="monthly-view-btn" data-mode="newSpecies" onclick="changeMonthlyViewMode('newSpecies')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--glass); color: var(--text); cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">
+                  ⭐ Neue Arten
+                </button>
+              </div>
+              
               <div id="monthlyOverview" style="margin-top:12px;">
                 <div class="muted">Lade Daten...</div>
               </div>
@@ -5889,6 +6085,176 @@
             
             <!-- Hier wird die Beobachtungsübersicht automatisch eingefügt -->
             <div id="detailsPerDate" style="margin-top:20px;"></div>
+          </section>
+
+          <!-- Erweiterte Statistiken -->
+          <section id="erweiterte-stats" class="card" style="display:none;">
+            <h2>🚀 Erweiterte Statistiken</h2>
+            <p class="muted" style="margin-bottom: 24px;">Detaillierte Analysen und Insights zu deinen Beobachtungen</p>
+            
+            <!-- Tab Navigation -->
+            <div class="advanced-stats-tabs" style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid rgba(255,255,255,0.04); overflow-x: auto; padding-bottom: 8px;">
+              <button class="adv-stats-tab active" data-tab="jahresvergleich" onclick="switchAdvancedStatsTab('jahresvergleich')">
+                📈 Jahresvergleich
+              </button>
+              <button class="adv-stats-tab" data-tab="heatmap" onclick="switchAdvancedStatsTab('heatmap')">
+                🔥 Heatmap
+              </button>
+              <button class="adv-stats-tab" data-tab="meilensteine" onclick="switchAdvancedStatsTab('meilensteine')">
+                🎯 Meilensteine
+              </button>
+              <button class="adv-stats-tab" data-tab="arten-timeline" onclick="switchAdvancedStatsTab('arten-timeline')">
+                ⏰ Arten-Timeline
+              </button>
+              <button class="adv-stats-tab" data-tab="hotspots" onclick="switchAdvancedStatsTab('hotspots')">
+                🗺️ Hotspots
+              </button>
+              <button class="adv-stats-tab" data-tab="insights" onclick="switchAdvancedStatsTab('insights')">
+                💡 Insights
+              </button>
+            </div>
+            
+            <!-- Jahresvergleich Tab -->
+            <div id="tab-jahresvergleich" class="adv-stats-content">
+              <div class="feature-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                  <h3 style="margin: 0;">Jahresvergleich</h3>
+                  <div style="display: flex; gap: 12px; align-items: center;">
+                    <button onclick="changeComparisonYear(-1)" class="btn ghost" style="padding: 8px 16px;">◀ Vorheriges</button>
+                    <span id="comparisonYear" style="font-size: 18px; font-weight: 700; min-width: 80px; text-align: center;">2025</span>
+                    <button onclick="changeComparisonYear(1)" class="btn ghost" style="padding: 8px 16px;">Nächstes ▶</button>
+                  </div>
+                </div>
+                
+                <!-- Jahres-KPIs -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                  <div class="stat-card" style="background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">🦅</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 8px;" id="yearTotalSpecies">-</div>
+                    <div style="font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Arten dieses Jahr</div>
+                    <div id="yearSpeciesChange" style="margin-top: 8px; font-size: 12px;"></div>
+                  </div>
+                  
+                  <div class="stat-card" style="background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">👁️</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 8px;" id="yearTotalObs">-</div>
+                    <div style="font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Beobachtungen</div>
+                    <div id="yearObsChange" style="margin-top: 8px; font-size: 12px;"></div>
+                  </div>
+                  
+                  <div class="stat-card" style="background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">📅</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 8px;" id="yearBestMonth">-</div>
+                    <div style="font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Bester Monat</div>
+                    <div id="yearBestMonthCount" style="margin-top: 8px; font-size: 12px;"></div>
+                  </div>
+                  
+                  <div class="stat-card" style="background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">⭐</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 8px;" id="yearNewSpecies">-</div>
+                    <div style="font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Neue Arten</div>
+                    <div id="yearNewSpeciesPercent" style="margin-top: 8px; font-size: 12px;"></div>
+                  </div>
+                </div>
+                
+                <!-- Jahres-Chart -->
+                <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px;">
+                  <canvas id="yearComparisonChart" style="max-height: 350px;"></canvas>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Heatmap Tab -->
+            <div id="tab-heatmap" class="adv-stats-content" style="display: none;">
+              <div class="feature-section">
+                <h3>Aktivitäts-Heatmap</h3>
+                <p class="muted">Wann beobachtest du am meisten?</p>
+                
+                <!-- Heatmap Type Selector -->
+                <div style="display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
+                    <input type="radio" name="heatmapType" value="hour-weekday" checked onchange="updateHeatmap()">
+                    🕐 Stunde × Wochentag
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
+                    <input type="radio" name="heatmapType" value="month-year" onchange="updateHeatmap()">
+                    📅 Monat × Jahr
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
+                    <input type="radio" name="heatmapType" value="day-month" onchange="updateHeatmap()">
+                    📆 Tag × Monat
+                  </label>
+                </div>
+                
+                <div id="heatmapContainer" style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; overflow-x: auto;">
+                  <div class="muted" style="text-align: center; padding: 40px;">Lade Heatmap...</div>
+                </div>
+                
+                <!-- Heatmap Legende -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; font-size: 13px; color: var(--muted);">
+                  <span>Weniger</span>
+                  <div style="width: 200px; height: 20px; border-radius: 10px; background: linear-gradient(90deg, rgba(6,182,212,0.1), rgba(6,182,212,0.3), rgba(6,182,212,0.6), rgba(6,182,212,1)); border: 1px solid rgba(255,255,255,0.1);"></div>
+                  <span>Mehr</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Meilensteine Tab -->
+            <div id="tab-meilensteine" class="adv-stats-content" style="display: none;">
+              <div class="feature-section">
+                <h3>🎯 Deine Meilensteine</h3>
+                <p class="muted">Erreiche diese Ziele und sammle Achievements!</p>
+                
+                <div id="milestonesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px;">
+                  <!-- Wird dynamisch gefüllt -->
+                </div>
+                
+                <!-- Lifelist Progress -->
+                <div style="background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px; margin-top: 24px;">
+                  <h4 style="margin: 0 0 16px 0;">🇩🇪 Lebenslist-Fortschritt Deutschland</h4>
+                  <div style="background: rgba(255,255,255,0.05); border-radius: 12px; height: 24px; overflow: hidden; position: relative;">
+                    <div id="lifelistProgressBar" style="height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width 1s ease;"></div>
+                  </div>
+                  <p id="lifelistProgressText" style="margin-top: 12px; text-align: center; color: var(--soft);">0 von ~500 möglichen Arten (0%)</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Arten-Timeline Tab -->
+            <div id="tab-arten-timeline" class="adv-stats-content" style="display: none;">
+              <div class="feature-section">
+                <h3>⏰ Erstsichtungs-Timeline</h3>
+                <p class="muted">Wann hast du welche Art zum ersten Mal gesehen?</p>
+                
+                <div id="timelineContainer" style="margin-top: 24px;">
+                  <!-- Wird dynamisch gefüllt -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Hotspots Tab -->
+            <div id="tab-hotspots" class="adv-stats-content" style="display: none;">
+              <div class="feature-section">
+                <h3>🗺️ Deine Top-Beobachtungsstandorte</h3>
+                <p class="muted">Wo hast du die meisten Arten gesehen?</p>
+                
+                <div id="hotspotsList" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+                  <!-- Wird dynamisch gefüllt -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Insights Tab -->
+            <div id="tab-insights" class="adv-stats-content" style="display: none;">
+              <div class="feature-section">
+                <h3>💡 Persönliche Insights</h3>
+                <p class="muted">Interessante Fakten über deine Beobachtungen</p>
+                
+                <div id="insightsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 24px;">
+                  <!-- Wird dynamisch gefüllt -->
+                </div>
+              </div>
+            </div>
           </section>
 
           <!-- Listen -->
@@ -20084,32 +20450,96 @@
       return stats;
     }
     
+    // Globale Variable für den aktuellen Ansichtsmodus
+    let currentMonthlyViewMode = 'observations';
+    
+    function changeMonthlyViewMode(mode) {
+      currentMonthlyViewMode = mode;
+      
+      // Update button states
+      document.querySelectorAll('.monthly-view-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`[data-mode="${mode}"]`)?.classList.add('active');
+      
+      // Re-render overview
+      updateMonthlyOverview();
+    }
+    
     async function updateMonthlyOverview() {
-      const stats = await getDetailedStatistics();
+      const allObservations = await getAllObservationsWithDetails();
+      const observations = allObservations.filter(obs => 
+        obs.tickable !== false && isValidObservation(obs)
+      );
+      
       const container = document.getElementById('monthlyOverview');
       
-      if (Object.keys(stats.byMonth).length === 0) {
+      if (observations.length === 0) {
         container.innerHTML = '<div class="muted">Keine Daten für monatliche Übersicht</div>';
         return;
       }
       
       const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+      const monthData = Array(12).fill(0);
+      const currentYear = new Date().getFullYear();
+      
+      // Hole Beobachtungen des aktuellen Jahres
+      const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentYear);
+      
+      if (currentMonthlyViewMode === 'observations') {
+        // Modus 1: Anzahl Meldungen pro Monat
+        yearObs.forEach(o => {
+          const month = new Date(o.date).getMonth();
+          monthData[month]++;
+        });
+      } else if (currentMonthlyViewMode === 'species') {
+        // Modus 2: Anzahl verschiedener Arten pro Monat
+        for (let month = 0; month < 12; month++) {
+          const monthObs = yearObs.filter(o => new Date(o.date).getMonth() === month);
+          const uniqueSpecies = new Set(monthObs.map(o => o.bird));
+          monthData[month] = uniqueSpecies.size;
+        }
+      } else if (currentMonthlyViewMode === 'newSpecies') {
+        // Modus 3: Neue Arten (Erstbeobachtungen) pro Monat
+        const seenSpecies = new Set();
+        const sortedObs = [...yearObs].sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        sortedObs.forEach(o => {
+          if (!seenSpecies.has(o.bird)) {
+            seenSpecies.add(o.bird);
+            const month = new Date(o.date).getMonth();
+            monthData[month]++;
+          }
+        });
+      }
+      
+      const max = Math.max(...monthData, 1);
+      
       let html = '<div style="display:flex;flex-direction:column;gap:8px;">';
       
-      for (let month = 1; month <= 12; month++) {
-        const monthKey = month.toString().padStart(2, '0');
-        const count = stats.byMonth[monthKey] || 0;
-        const max = Math.max(...Object.values(stats.byMonth));
+      for (let month = 0; month < 12; month++) {
+        const count = monthData[month];
         const percentage = max > 0 ? (count / max) * 100 : 0;
         
+        // Farbe je nach Modus
+        let barColor = 'var(--accent)'; // Blau für Meldungen
+        if (currentMonthlyViewMode === 'species') {
+          barColor = '#7c3aed'; // Lila für Artenanzahl
+        } else if (currentMonthlyViewMode === 'newSpecies') {
+          barColor = '#22c55e'; // Grün für neue Arten
+        }
+        
         html += `
-          <div>
+          <div style="cursor: pointer; transition: all 0.2s;" 
+               onmouseover="this.style.transform='translateX(4px)'" 
+               onmouseout="this.style.transform='translateX(0)'"
+               onclick="showMonthDetails(${month}, '${monthNames[month]}', '${currentMonthlyViewMode}')">
             <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-              <span>${monthNames[month-1]}</span>
+              <span>${monthNames[month]}</span>
               <span style="font-weight:600;">${count}</span>
             </div>
             <div style="height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
-              <div style="height:100%;background:var(--accent);width:${percentage}%;"></div>
+              <div style="height:100%;background:${barColor};width:${percentage}%;transition:width 0.3s ease;"></div>
             </div>
           </div>
         `;
@@ -20117,6 +20547,55 @@
       
       html += '</div>';
       container.innerHTML = html;
+    }
+    
+    async function showMonthDetails(monthIndex, monthName, viewMode) {
+      const allObservations = await getAllObservationsWithDetails();
+      const observations = allObservations.filter(obs => 
+        obs.tickable !== false && isValidObservation(obs)
+      );
+      
+      const currentYear = new Date().getFullYear();
+      const yearObs = observations.filter(o => {
+        const date = new Date(o.date);
+        return date.getFullYear() === currentYear && date.getMonth() === monthIndex;
+      });
+      
+      let detailObs = [];
+      let title = '';
+      
+      if (viewMode === 'observations') {
+        detailObs = yearObs;
+        title = `Beobachtungen: ${monthName} ${currentYear}`;
+      } else if (viewMode === 'species') {
+        // Zeige eine Beobachtung pro Art
+        const speciesMap = new Map();
+        yearObs.forEach(obs => {
+          if (!speciesMap.has(obs.bird)) {
+            speciesMap.set(obs.bird, obs);
+          }
+        });
+        detailObs = Array.from(speciesMap.values());
+        title = `Artenübersicht: ${monthName} ${currentYear}`;
+      } else if (viewMode === 'newSpecies') {
+        // Zeige nur Erstbeobachtungen
+        const allYearObs = observations.filter(o => new Date(o.date).getFullYear() === currentYear);
+        const seenSpecies = new Set();
+        const sortedObs = [...allYearObs].sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        sortedObs.forEach(o => {
+          const obsMonth = new Date(o.date).getMonth();
+          if (obsMonth === monthIndex && !seenSpecies.has(o.bird)) {
+            detailObs.push(o);
+          }
+          seenSpecies.add(o.bird);
+        });
+        title = `Erstbeobachtungen: ${monthName} ${currentYear}`;
+      }
+      
+      if (detailObs.length > 0) {
+        showObservationsForLabel(monthIndex, null, viewMode === 'newSpecies', detailObs, title);
+      }
     }
     
     // ---------- Dashboard & Statistiken ----------
@@ -31992,12 +32471,6 @@ const TutorialManager = {
       highlight: ".fab-quick-add"
     },
     {
-      title: "Erweiterte Statistiken 📊",
-      text: "Der neue Statistiken+ Button zeigt dir detaillierte Analysen: Jahresvergleiche, Heatmaps nach Tageszeit und Monat, sowie deine persönlichen Meilensteine!",
-      image: "📊",
-      highlight: "#btnEnhancedStats"
-    },
-    {
       title: "Mehrfachbearbeitung 📦",
       text: "Wähle mehrere Beobachtungen aus (Checkboxen), um sie gleichzeitig zu bearbeiten: Datum ändern, Notizen hinzufügen, exportieren oder löschen!",
       image: "📦"
@@ -32080,7 +32553,6 @@ const TutorialManager = {
 const TooltipManager = {
   tooltips: {
     '.fab-quick-add': 'Schnelleingabe (Strg+Q): Füge blitzschnell eine neue Beobachtung hinzu',
-    '#btnEnhancedStats': 'Erweiterte Statistiken: Jahresvergleiche, Heatmaps und Meilensteine',
     '#btnBulkEdit': 'Mehrfachbearbeitung: Bearbeite mehrere Beobachtungen gleichzeitig',
     '#exportBtn': 'Exportiere alle Beobachtungen als CSV',
     '#importBtn': 'Importiere Beobachtungen aus CSV',
@@ -32348,301 +32820,6 @@ const BulkEditManager = {
 };
 
 // ==================== ENHANCED STATISTICS MANAGER ====================
-const EnhancedStatsManager = {
-  observations: [],
-  currentYear: new Date().getFullYear(),
-  charts: {},
-  
-  async open() {
-    if (!window.Chart) {
-      await this.loadChartJS();
-    }
-    await this.loadObservations();
-    document.getElementById('enhancedStatsModal').style.display = 'flex';
-    this.showTab('overview');
-  },
-  
-  async loadChartJS() {
-    return new Promise((resolve, reject) => {
-      if (window.Chart) { resolve(); return; }
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-      script.onload = resolve;
-      script.onerror = reject;
-      document.body.appendChild(script);
-    });
-  },
-  
-  close() {
-    document.getElementById('enhancedStatsModal').style.display = 'none';
-    Object.values(this.charts).forEach(chart => { if (chart) chart.destroy(); });
-    this.charts = {};
-  },
-  
-  async loadObservations() {
-    if (window.FBD && currentUser) {
-      try {
-        const snapshot = await window.FBD.ref(`observations/${currentUser.uid}`).once('value');
-        const data = snapshot.val();
-        this.observations = [];
-        if (data) {
-          Object.keys(data).forEach(key => {
-            if (typeof data[key] === 'object') {
-              Object.values(data[key]).forEach(obs => {
-                if (obs && obs.bird) this.observations.push(obs);
-              });
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Fehler beim Laden:', error);
-        this.observations = [];
-      }
-    } else {
-      this.observations = window.observations || [];
-    }
-  },
-  
-  showTab(tabName) {
-    document.querySelectorAll('.stats-tab-content').forEach(tab => tab.style.display = 'none');
-    document.querySelectorAll('.stats-tab').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`statsTab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).style.display = 'block';
-    event?.target?.classList.add('active');
-    
-    switch(tabName) {
-      case 'overview': this.renderOverview(); break;
-      case 'yearly': this.renderYearlyComparison(); break;
-      case 'heatmap': this.renderHeatmap(); break;
-      case 'milestones': this.renderMilestones(); break;
-    }
-  },
-  
-  renderOverview() {
-    const totalSpecies = countUniqueSpecies(this.observations);
-    const totalObs = this.observations.length;
-    
-    const now = new Date();
-    const thisMonth = this.observations.filter(o => {
-      const obsDate = new Date(o.date);
-      return obsDate.getMonth() === now.getMonth() && obsDate.getFullYear() === now.getFullYear();
-    });
-    const thisMonthSpecies = countUniqueSpecies(thisMonth);
-    
-    const birdCounts = {};
-    this.observations.forEach(o => {
-      birdCounts[o.bird] = (birdCounts[o.bird] || 0) + (o.count || 1);
-    });
-    const topBird = Object.entries(birdCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
-    
-    document.getElementById('totalSpecies').textContent = totalSpecies;
-    document.getElementById('totalObservations').textContent = totalObs;
-    document.getElementById('thisMonthSpecies').textContent = thisMonthSpecies;
-    document.getElementById('topBird').textContent = topBird;
-    
-    this.renderTopSpeciesChart(birdCounts);
-  },
-  
-  renderTopSpeciesChart(birdCounts) {
-    const canvas = document.getElementById('topSpeciesChart');
-    if (!canvas) return;
-    if (this.charts.topSpecies) this.charts.topSpecies.destroy();
-    
-    const top10 = Object.entries(birdCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const ctx = canvas.getContext('2d');
-    this.charts.topSpecies = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: top10.map(([bird]) => bird),
-        datasets: [{
-          label: 'Anzahl Beobachtungen',
-          data: top10.map(([, count]) => count),
-          backgroundColor: 'rgba(6, 182, 212, 0.6)',
-          borderColor: 'rgba(6, 182, 212, 1)',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
-          x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { display: false } }
-        }
-      }
-    });
-  },
-  
-  renderYearlyComparison() {
-    document.getElementById('currentYearDisplay').textContent = this.currentYear;
-    
-    const yearObs = this.observations.filter(o => new Date(o.date).getFullYear() === this.currentYear);
-    const yearSpecies = countUniqueSpecies(yearObs);
-    const yearCount = yearObs.length;
-    
-    document.getElementById('yearTitle').textContent = this.currentYear;
-    document.getElementById('yearSpecies').textContent = yearSpecies;
-    document.getElementById('yearObservations').textContent = yearCount;
-    
-    const lastYearObs = this.observations.filter(o => new Date(o.date).getFullYear() === this.currentYear - 1);
-    const lastYearSpecies = countUniqueSpecies(lastYearObs);
-    const diff = yearSpecies - lastYearSpecies;
-    const comparisonEl = document.getElementById('yearComparison');
-    
-    if (diff > 0) {
-      comparisonEl.textContent = `+${diff} Arten mehr als ${this.currentYear - 1}`;
-      comparisonEl.className = 'year-comparison positive';
-    } else if (diff < 0) {
-      comparisonEl.textContent = `${diff} Arten weniger als ${this.currentYear - 1}`;
-      comparisonEl.className = 'year-comparison negative';
-    } else {
-      comparisonEl.textContent = `Gleich viele Arten wie ${this.currentYear - 1}`;
-      comparisonEl.className = 'year-comparison';
-    }
-    
-    this.renderYearlyChart();
-  },
-  
-  renderYearlyChart() {
-    const canvas = document.getElementById('yearlyComparisonChart');
-    if (!canvas) return;
-    if (this.charts.yearly) this.charts.yearly.destroy();
-    
-    const monthData = Array(12).fill(0);
-    this.observations.forEach(o => {
-      const date = new Date(o.date);
-      if (date.getFullYear() === this.currentYear) monthData[date.getMonth()]++;
-    });
-    
-    const ctx = canvas.getContext('2d');
-    this.charts.yearly = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
-        datasets: [{
-          label: 'Beobachtungen ' + this.currentYear,
-          data: monthData,
-          borderColor: 'rgba(6, 182, 212, 1)',
-          backgroundColor: 'rgba(6, 182, 212, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: 'rgba(255, 255, 255, 0.7)' } } },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
-          x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { display: false } }
-        }
-      }
-    });
-  },
-  
-  changeYear(direction) {
-    this.currentYear += direction;
-    this.renderYearlyComparison();
-  },
-  
-  renderHeatmap() {
-    const type = document.querySelector('input[name="heatmapType"]:checked')?.value || 'hour';
-    this.updateHeatmap(type);
-  },
-  
-  updateHeatmap(type) {
-    const canvas = document.getElementById('heatmapCanvas');
-    if (!canvas) return;
-    if (this.charts.heatmap) this.charts.heatmap.destroy();
-    
-    let labels, data;
-    
-    if (type === 'hour') {
-      labels = Array.from({length: 24}, (_, i) => `${i}:00`);
-      data = Array(24).fill(0);
-      this.observations.forEach(o => {
-        if (o.timestamp) data[new Date(o.timestamp).getHours()]++;
-      });
-    } else if (type === 'month') {
-      labels = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-      data = Array(12).fill(0);
-      this.observations.forEach(o => data[new Date(o.date).getMonth()]++);
-    } else {
-      labels = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-      data = Array(7).fill(0);
-      this.observations.forEach(o => data[new Date(o.date).getDay()]++);
-    }
-    
-    const ctx = canvas.getContext('2d');
-    this.charts.heatmap = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Beobachtungen',
-          data: data,
-          backgroundColor: data.map(val => {
-            const max = Math.max(...data);
-            const intensity = max > 0 ? val / max : 0;
-            return `rgba(6, 182, 212, ${0.2 + intensity * 0.8})`;
-          }),
-          borderColor: 'rgba(6, 182, 212, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.04)' } },
-          x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { display: false } }
-        }
-      }
-    });
-  },
-  
-  renderMilestones() {
-    const container = document.getElementById('milestonesContainer');
-    container.innerHTML = '';
-    
-    const totalSpecies = countUniqueSpecies(this.observations);
-    const totalObs = this.observations.length;
-    
-    const milestones = [
-      { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, achieved: totalSpecies >= 1 },
-      { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, achieved: totalSpecies >= 10 },
-      { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, achieved: totalSpecies >= 25 },
-      { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, achieved: totalSpecies >= 50 },
-      { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, achieved: totalObs >= 100 },
-      { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, achieved: totalObs >= 500 },
-      { icon: '⭐', title: 'Meister', desc: '100 Arten beobachtet', target: 100, achieved: totalSpecies >= 100 },
-      { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, achieved: totalObs >= 1000 }
-    ];
-    
-    milestones.forEach(m => {
-      const card = document.createElement('div');
-      card.className = `milestone-card ${m.achieved ? 'achieved' : ''}`;
-      const current = m.desc.includes('Arten') ? totalSpecies : totalObs;
-      const progress = Math.min(100, (current / m.target) * 100);
-      
-      card.innerHTML = `
-        <div class="milestone-icon">${m.icon}</div>
-        <div class="milestone-info">
-          <h4>${m.title}</h4>
-          <p>${m.desc}</p>
-          <div class="milestone-progress">${current} / ${m.target}</div>
-        </div>
-        <div class="milestone-badge">${m.achieved ? '✓ Erreicht' : `${progress.toFixed(0)}%`}</div>
-      `;
-      container.appendChild(card);
-    });
-    
-    const lifelistProgress = Math.min(100, (totalSpecies / 500) * 100);
-    document.getElementById('lifelistProgress').style.width = lifelistProgress + '%';
-    document.getElementById('lifelistText').textContent = `${totalSpecies} von 500 möglichen Arten in Deutschland (${lifelistProgress.toFixed(1)}%)`;
-  }
-};
 
 // ==================== TUTORIAL RESET FUNCTION ====================
 TutorialManager.reset = function() {
@@ -32681,196 +32858,6 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-<!-- ==================== TOOLTIP CONTAINER ==================== -->
-<div id="tooltipContainer" class="tooltip-container" style="display: none;"></div>
-
-<!-- ==================== BULK EDIT MODAL ==================== -->
-<div id="bulkEditModal" class="modal" style="display: none;">
-  <div class="modal-content bulk-edit-modal">
-    <div class="modal-header">
-      <h2>📦 Mehrfachbearbeitung</h2>
-      <button onclick="BulkEditManager.close()" class="modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      <p class="muted"><span id="bulkSelectedCount">0</span> Beobachtungen ausgewählt</p>
-      
-      <div class="bulk-actions">
-        <h3>Aktion wählen:</h3>
-        <div class="bulk-action-grid">
-          <button onclick="BulkEditManager.changeDate()" class="bulk-action-btn">
-            📅<br>Datum ändern
-          </button>
-          <button onclick="BulkEditManager.changeLocation()" class="bulk-action-btn">
-            📍<br>Standort ändern
-          </button>
-          <button onclick="BulkEditManager.addNote()" class="bulk-action-btn">
-            📝<br>Notiz hinzufügen
-          </button>
-          <button onclick="BulkEditManager.deleteSelected()" class="bulk-action-btn danger">
-            🗑️<br>Löschen
-          </button>
-          <button onclick="BulkEditManager.exportSelected()" class="bulk-action-btn">
-            💾<br>Exportieren
-          </button>
-          <button onclick="BulkEditManager.moveToFolder()" class="bulk-action-btn">
-            📁<br>In Ordner verschieben
-          </button>
-        </div>
-      </div>
-      
-      <div class="selected-list">
-        <h3>Ausgewählte Beobachtungen:</h3>
-        <div id="bulkSelectedList" class="bulk-selected-list"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== ENHANCED STATISTICS MODAL ==================== -->
-<div id="enhancedStatsModal" class="modal" style="display: none;">
-  <div class="modal-content enhanced-stats-modal">
-    <div class="modal-header">
-      <h2>📊 Erweiterte Statistiken</h2>
-      <button onclick="EnhancedStatsManager.close()" class="modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      
-      <!-- Tab Navigation -->
-      <div class="stats-tabs">
-        <button class="stats-tab active" onclick="EnhancedStatsManager.showTab('overview')">Übersicht</button>
-        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('yearly')">Jahresvergleich</button>
-        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('heatmap')">Heatmap</button>
-        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('milestones')">Meilensteine</button>
-      </div>
-      
-      <!-- Overview Tab -->
-      <div id="statsTabOverview" class="stats-tab-content active">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">🦅</div>
-            <div class="stat-value" id="totalSpecies">-</div>
-            <div class="stat-label">Arten gesamt</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">👁️</div>
-            <div class="stat-value" id="totalObservations">-</div>
-            <div class="stat-label">Beobachtungen</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-value" id="thisMonthSpecies">-</div>
-            <div class="stat-label">Arten diesen Monat</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-value" id="topBird">-</div>
-            <div class="stat-label">Häufigste Art</div>
-          </div>
-        </div>
-        
-        <div class="chart-container">
-          <h3>Top 10 Arten</h3>
-          <canvas id="topSpeciesChart"></canvas>
-        </div>
-      </div>
-      
-      <!-- Yearly Comparison Tab -->
-      <div id="statsTabYearly" class="stats-tab-content" style="display: none;">
-        <div class="year-selector">
-          <button onclick="EnhancedStatsManager.changeYear(-1)">◀</button>
-          <span id="currentYearDisplay">2024</span>
-          <button onclick="EnhancedStatsManager.changeYear(1)">▶</button>
-        </div>
-        
-        <div class="chart-container">
-          <canvas id="yearlyComparisonChart"></canvas>
-        </div>
-        
-        <div class="year-stats">
-          <div class="year-stat-card">
-            <h4 id="yearTitle">2024</h4>
-            <p><strong id="yearSpecies">-</strong> Arten</p>
-            <p><strong id="yearObservations">-</strong> Beobachtungen</p>
-            <p class="year-comparison" id="yearComparison"></p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Heatmap Tab -->
-      <div id="statsTabHeatmap" class="stats-tab-content" style="display: none;">
-        <div class="heatmap-controls">
-          <label>
-            <input type="radio" name="heatmapType" value="hour" checked onchange="EnhancedStatsManager.updateHeatmap()">
-            Nach Tageszeit
-          </label>
-          <label>
-            <input type="radio" name="heatmapType" value="month" onchange="EnhancedStatsManager.updateHeatmap()">
-            Nach Monat
-          </label>
-          <label>
-            <input type="radio" name="heatmapType" value="weekday" onchange="EnhancedStatsManager.updateHeatmap()">
-            Nach Wochentag
-          </label>
-        </div>
-        
-        <div class="heatmap-container">
-          <canvas id="heatmapCanvas"></canvas>
-        </div>
-        
-        <div class="heatmap-legend">
-          <span>Weniger</span>
-          <div class="legend-gradient"></div>
-          <span>Mehr</span>
-        </div>
-      </div>
-      
-      <!-- Milestones Tab -->
-      <div id="statsTabMilestones" class="stats-tab-content" style="display: none;">
-        <div class="milestones-container" id="milestonesContainer">
-          <!-- Wird dynamisch gefüllt -->
-        </div>
-        
-        <div class="progress-section">
-          <h3>Lebenslist-Fortschritt</h3>
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="lifelistProgress" style="width: 0%"></div>
-          </div>
-          <p class="progress-text" id="lifelistText">-</p>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-</div>
-
-<!-- Floating Action Button für Quick Add -->
-<button class="fab-quick-add" onclick="openQuickAdd()" title="Schnelleingabe (Strg+Q)">
-  ⚡
-</button>
-
-<!-- === NEUE FEATURES: Modals === -->
-
-<!-- Tutorial Overlay -->
-<div id="tutorialOverlay" class="tutorial-overlay" style="display: none;">
-  <div class="tutorial-box">
-    <div class="tutorial-header">
-      <h3 id="tutorialTitle">Willkommen bei BirdCount!</h3>
-      <button onclick="TutorialManager.skip()" class="tutorial-close">✕</button>
-    </div>
-    <div class="tutorial-content">
-      <p id="tutorialText"></p>
-      <div class="tutorial-image" id="tutorialImage"></div>
-    </div>
-    <div class="tutorial-footer">
-      <span id="tutorialProgress">1 / 6</span>
-      <div class="tutorial-buttons">
-        <button onclick="TutorialManager.skip()" class="btn ghost">Überspringen</button>
-        <button onclick="TutorialManager.prev()" id="tutorialPrev" class="btn ghost">Zurück</button>
-        <button onclick="TutorialManager.next()" id="tutorialNext" class="btn">Weiter</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Tooltip Container -->
 <div id="tooltipContainer" class="tooltip-container" style="display: none;"></div>
@@ -32918,119 +32905,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <!-- Enhanced Statistics Modal -->
-<div id="enhancedStatsModal" class="modal" style="display: none;">
-  <div class="modal-content enhanced-stats-modal">
-    <div class="modal-header">
-      <h2>📊 Erweiterte Statistiken</h2>
-      <button onclick="EnhancedStatsManager.close()" class="modal-close">✕</button>
-    </div>
-    <div class="modal-body">
-      
-      <!-- Tab Navigation -->
-      <div class="stats-tabs">
-        <button class="stats-tab active" onclick="EnhancedStatsManager.showTab('overview')">Übersicht</button>
-        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('yearly')">Jahresvergleich</button>
-        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('heatmap')">Heatmap</button>
-        <button class="stats-tab" onclick="EnhancedStatsManager.showTab('milestones')">Meilensteine</button>
-      </div>
-      
-      <!-- Overview Tab -->
-      <div id="statsTabOverview" class="stats-tab-content active">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">🦅</div>
-            <div class="stat-value" id="totalSpecies">-</div>
-            <div class="stat-label">Arten gesamt</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">👁️</div>
-            <div class="stat-value" id="totalObservations">-</div>
-            <div class="stat-label">Beobachtungen</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-value" id="thisMonthSpecies">-</div>
-            <div class="stat-label">Arten diesen Monat</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-value" id="topBird">-</div>
-            <div class="stat-label">Häufigste Art</div>
-          </div>
-        </div>
-        
-        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px;">
-          <h3 style="margin: 0 0 20px 0;">Top 10 Arten</h3>
-          <canvas id="topSpeciesChart" style="max-height: 400px;"></canvas>
-        </div>
-      </div>
-      
-      <!-- Yearly Comparison Tab -->
-      <div id="statsTabYearly" class="stats-tab-content" style="display: none;">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 24px;">
-          <button onclick="EnhancedStatsManager.changeYear(-1)" class="btn ghost">◀</button>
-          <span id="currentYearDisplay" style="font-size: 24px; font-weight: 700; min-width: 100px; text-align: center;">2024</span>
-          <button onclick="EnhancedStatsManager.changeYear(1)" class="btn ghost">▶</button>
-        </div>
-        
-        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-          <canvas id="yearlyComparisonChart" style="max-height: 400px;"></canvas>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-          <div style="background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.06)); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px;">
-            <h4 id="yearTitle" style="margin: 0 0 16px 0;">2024</h4>
-            <p style="margin: 8px 0;"><strong id="yearSpecies" style="color: var(--accent); font-size: 20px;">-</strong> Arten</p>
-            <p style="margin: 8px 0;"><strong id="yearObservations" style="color: var(--accent); font-size: 20px;">-</strong> Beobachtungen</p>
-            <p id="yearComparison" class="muted" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.04);"></p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Heatmap Tab -->
-      <div id="statsTabHeatmap" class="stats-tab-content" style="display: none;">
-        <div style="display: flex; gap: 20px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap;">
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
-            <input type="radio" name="heatmapType" value="hour" checked onchange="EnhancedStatsManager.updateHeatmap(this.value)">
-            Nach Tageszeit
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
-            <input type="radio" name="heatmapType" value="month" onchange="EnhancedStatsManager.updateHeatmap(this.value)">
-            Nach Monat
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
-            <input type="radio" name="heatmapType" value="weekday" onchange="EnhancedStatsManager.updateHeatmap(this.value)">
-            Nach Wochentag
-          </label>
-        </div>
-        
-        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; display: flex; justify-content: center; align-items: center; min-height: 400px;">
-          <canvas id="heatmapCanvas" style="max-width: 100%; height: auto;"></canvas>
-        </div>
-        
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; font-size: 13px; color: var(--muted);">
-          <span>Weniger</span>
-          <div style="width: 200px; height: 20px; border-radius: 10px; background: linear-gradient(90deg, rgba(6,182,212,0.1), rgba(6,182,212,0.3), rgba(6,182,212,0.6), rgba(6,182,212,1)); border: 1px solid rgba(255,255,255,0.1);"></div>
-          <span>Mehr</span>
-        </div>
-      </div>
-      
-      <!-- Milestones Tab -->
-      <div id="statsTabMilestones" class="stats-tab-content" style="display: none;">
-        <div id="milestonesContainer"></div>
-        
-        <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; margin-top: 24px;">
-          <h3 style="margin: 0 0 16px 0;">Lebenslist-Fortschritt</h3>
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="lifelistProgress" style="width: 0%"></div>
-          </div>
-          <p id="lifelistText" style="margin-top: 12px; text-align: center; color: var(--soft);"></p>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-</div>
 
 <script>
 
@@ -33047,21 +32921,35 @@ setTimeout(() => {
 window.chartObservationsByLabel = {};
 
 // Funktion zum Anzeigen der Beobachtungen für ein bestimmtes Label
-function showObservationsForLabel(labelIndex, chartInstance, isNewSpeciesMode = false) {
+function showObservationsForLabel(labelIndex, chartInstance, isNewSpeciesMode = false, customObservations = null, customTitle = null) {
   console.log('🔍 showObservationsForLabel aufgerufen mit Index:', labelIndex);
-  console.log('📊 Chart Labels:', chartInstance.data.labels);
-  console.log('🎯 Erstbeobachtungs-Modus:', isNewSpeciesMode);
   
-  const label = chartInstance.data.labels[labelIndex];
-  console.log('🏷️ Ausgewähltes Label:', label);
-  console.log('📦 Verfügbare Labels in chartObservationsByLabel:', Object.keys(window.chartObservationsByLabel));
+  let label, observations;
   
-  const observations = window.chartObservationsByLabel[label] || [];
-  console.log('🐦 Gefundene Beobachtungen:', observations.length, observations);
+  if (customObservations && customTitle) {
+    // Verwende benutzerdefinierte Daten
+    label = customTitle;
+    observations = customObservations;
+    console.log('📦 Verwende benutzerdefinierte Beobachtungen:', observations.length);
+  } else if (chartInstance) {
+    // Verwende Chart-Daten
+    console.log('📊 Chart Labels:', chartInstance.data.labels);
+    console.log('🎯 Erstbeobachtungs-Modus:', isNewSpeciesMode);
+    
+    label = chartInstance.data.labels[labelIndex];
+    console.log('🏷️ Ausgewähltes Label:', label);
+    console.log('📦 Verfügbare Labels in chartObservationsByLabel:', Object.keys(window.chartObservationsByLabel));
+    
+    observations = window.chartObservationsByLabel[label] || [];
+    console.log('🐦 Gefundene Beobachtungen:', observations.length, observations);
+  } else {
+    console.error('❌ Weder chartInstance noch customObservations angegeben!');
+    return;
+  }
   
   if (observations.length === 0) {
     console.warn('⚠️ Keine Beobachtungen für dieses Label gefunden!');
-    alert(`Keine Beobachtungen für "${label}" gefunden.\n\nVerfügbare Labels: ${Object.keys(window.chartObservationsByLabel).join(', ')}`);
+    alert(`Keine Beobachtungen für "${label}" gefunden.`);
     return;
   }
   
@@ -33248,6 +33136,742 @@ function getBirdEmoji(birdName) {
   };
   return emojiMap[birdName] || '🐦';
 }
+
+// ==================== ERWEITERTE STATISTIKEN ====================
+
+let currentComparisonYear = new Date().getFullYear();
+let advancedStatsCharts = {};
+
+// Tab-Switching
+function switchAdvancedStatsTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.adv-stats-tab').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector(`[data-tab="${tabName}"]`)?.classList.add('active');
+  
+  // Update content
+  document.querySelectorAll('.adv-stats-content').forEach(content => {
+    content.style.display = 'none';
+  });
+  document.getElementById(`tab-${tabName}`).style.display = 'block';
+  
+  // Load content for this tab
+  switch(tabName) {
+    case 'jahresvergleich':
+      loadJahresvergleich();
+      break;
+    case 'heatmap':
+      updateHeatmap();
+      break;
+    case 'meilensteine':
+      loadMeilensteine();
+      break;
+    case 'arten-timeline':
+      loadArtenTimeline();
+      break;
+    case 'hotspots':
+      loadHotspots();
+      break;
+    case 'insights':
+      loadInsights();
+      break;
+  }
+}
+
+// Jahresvergleich
+function changeComparisonYear(delta) {
+  currentComparisonYear += delta;
+  document.getElementById('comparisonYear').textContent = currentComparisonYear;
+  loadJahresvergleich();
+}
+
+async function loadJahresvergleich() {
+  const allObs = await getAllObservationsWithDetails();
+  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  
+  const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear);
+  const lastYearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear - 1);
+  
+  const yearSpecies = countUniqueSpecies(yearObs);
+  const lastYearSpecies = countUniqueSpecies(lastYearObs);
+  const speciesChange = yearSpecies - lastYearSpecies;
+  
+  const yearObsCount = yearObs.length;
+  const lastYearObsCount = lastYearObs.length;
+  const obsChange = yearObsCount - lastYearObsCount;
+  
+  // Update KPIs
+  document.getElementById('yearTotalSpecies').textContent = yearSpecies;
+  document.getElementById('yearTotalObs').textContent = yearObsCount;
+  
+  // Species change
+  const speciesChangeEl = document.getElementById('yearSpeciesChange');
+  if (speciesChange > 0) {
+    speciesChangeEl.innerHTML = `<span style="color: var(--success);">▲ +${speciesChange} zum Vorjahr</span>`;
+  } else if (speciesChange < 0) {
+    speciesChangeEl.innerHTML = `<span style="color: var(--danger);">▼ ${speciesChange} zum Vorjahr</span>`;
+  } else {
+    speciesChangeEl.innerHTML = `<span style="color: var(--muted);">= Gleich wie Vorjahr</span>`;
+  }
+  
+  // Obs change
+  const obsChangeEl = document.getElementById('yearObsChange');
+  if (obsChange > 0) {
+    obsChangeEl.innerHTML = `<span style="color: var(--success);">▲ +${obsChange} zum Vorjahr</span>`;
+  } else if (obsChange < 0) {
+    obsChangeEl.innerHTML = `<span style="color: var(--danger);">▼ ${obsChange} zum Vorjahr</span>`;
+  } else {
+    obsChangeEl.innerHTML = `<span style="color: var(--muted);">= Gleich wie Vorjahr</span>`;
+  }
+  
+  // Best month
+  const monthCounts = {};
+  const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+  yearObs.forEach(o => {
+    const month = new Date(o.date).getMonth();
+    monthCounts[month] = (monthCounts[month] || 0) + 1;
+  });
+  
+  let bestMonth = 0;
+  let bestCount = 0;
+  Object.entries(monthCounts).forEach(([month, count]) => {
+    if (count > bestCount) {
+      bestMonth = parseInt(month);
+      bestCount = count;
+    }
+  });
+  
+  document.getElementById('yearBestMonth').textContent = monthNames[bestMonth] || '-';
+  document.getElementById('yearBestMonthCount').innerHTML = `<span style="color: var(--soft);">${bestCount} Beobachtungen</span>`;
+  
+  // New species this year
+  const allTimeObs = observations.filter(o => new Date(o.date).getFullYear() < currentComparisonYear);
+  const seenSpeciesBefore = new Set(allTimeObs.map(o => o.bird));
+  const newThisYear = yearObs.filter(o => !seenSpeciesBefore.has(o.bird));
+  const newSpeciesCount = countUniqueSpecies(newThisYear);
+  
+  document.getElementById('yearNewSpecies').textContent = newSpeciesCount;
+  const newPercent = yearSpecies > 0 ? Math.round((newSpeciesCount / yearSpecies) * 100) : 0;
+  document.getElementById('yearNewSpeciesPercent').innerHTML = `<span style="color: var(--soft);">${newPercent}% aller Arten</span>`;
+  
+  // Render chart
+  renderYearComparisonChart(yearObs);
+}
+
+async function renderYearComparisonChart(yearObs) {
+  const canvas = document.getElementById('yearComparisonChart');
+  if (!canvas) return;
+  
+  // Destroy old chart
+  if (advancedStatsCharts.yearComparison) {
+    advancedStatsCharts.yearComparison.destroy();
+  }
+  
+  // Load Chart.js if needed
+  if (!window.Chart) {
+    await loadChartJS();
+  }
+  
+  const monthData = Array(12).fill(0);
+  const speciesData = Array(12).fill(0);
+  
+  yearObs.forEach(o => {
+    const month = new Date(o.date).getMonth();
+    monthData[month]++;
+  });
+  
+  // Species per month
+  for (let month = 0; month < 12; month++) {
+    const monthObs = yearObs.filter(o => new Date(o.date).getMonth() === month);
+    speciesData[month] = countUniqueSpecies(monthObs);
+  }
+  
+  const ctx = canvas.getContext('2d');
+  advancedStatsCharts.yearComparison = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+      datasets: [
+        {
+          label: 'Beobachtungen',
+          data: monthData,
+          borderColor: 'rgba(6, 182, 212, 1)',
+          backgroundColor: 'rgba(6, 182, 212, 0.1)',
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Arten',
+          data: speciesData,
+          borderColor: 'rgba(124, 58, 237, 1)',
+          backgroundColor: 'rgba(124, 58, 237, 0.1)',
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          labels: { color: 'rgba(255, 255, 255, 0.7)' }
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          beginAtZero: true,
+          ticks: { color: 'rgba(255, 255, 255, 0.7)', precision: 0 },
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          title: { display: true, text: 'Beobachtungen', color: 'rgba(6, 182, 212, 1)' }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          beginAtZero: true,
+          ticks: { color: 'rgba(255, 255, 255, 0.7)', precision: 0 },
+          grid: { display: false },
+          title: { display: true, text: 'Arten', color: 'rgba(124, 58, 237, 1)' }
+        },
+        x: {
+          ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+async function loadChartJS() {
+  if (window.Chart) return;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
+// Heatmap
+async function updateHeatmap() {
+  const type = document.querySelector('input[name="heatmapType"]:checked')?.value || 'hour-weekday';
+  const container = document.getElementById('heatmapContainer');
+  
+  const allObs = await getAllObservationsWithDetails();
+  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  
+  if (observations.length === 0) {
+    container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
+    return;
+  }
+  
+  if (type === 'hour-weekday') {
+    renderHourWeekdayHeatmap(observations, container);
+  } else if (type === 'month-year') {
+    renderMonthYearHeatmap(observations, container);
+  } else if (type === 'day-month') {
+    renderDayMonthHeatmap(observations, container);
+  }
+}
+
+function renderHourWeekdayHeatmap(observations, container) {
+  const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const hours = Array.from({length: 24}, (_, i) => i);
+  
+  // Initialize matrix
+  const matrix = Array(7).fill(0).map(() => Array(24).fill(0));
+  
+  observations.forEach(o => {
+    if (o.timestamp) {
+      const date = new Date(o.timestamp);
+      const day = date.getDay();
+      const hour = date.getHours();
+      matrix[day][hour]++;
+    }
+  });
+  
+  // Find max for color scaling
+  const max = Math.max(...matrix.flat(), 1);
+  
+  // Render
+  let html = '<div style="display: inline-block; min-width: 100%;">';
+  html += '<table style="border-collapse: collapse; width: 100%;">';
+  html += '<tr><th style="padding: 8px;"></th>';
+  hours.forEach(h => {
+    html += `<th style="padding: 4px; font-size: 11px; color: var(--muted);">${h}</th>`;
+  });
+  html += '</tr>';
+  
+  weekdays.forEach((day, dayIdx) => {
+    html += `<tr><td style="padding: 8px; font-weight: 600; color: var(--text);">${day}</td>`;
+    hours.forEach(hour => {
+      const count = matrix[dayIdx][hour];
+      const intensity = count / max;
+      const color = `rgba(6, 182, 212, ${0.1 + intensity * 0.9})`;
+      html += `<td style="padding: 12px; background: ${color}; border: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 11px; min-width: 30px;" title="${day} ${hour}:00 - ${count} Beobachtungen">${count || ''}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table></div>';
+  
+  container.innerHTML = html;
+}
+
+function renderMonthYearHeatmap(observations, container) {
+  const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+  
+  // Get years
+  const years = [...new Set(observations.map(o => new Date(o.date).getFullYear()))].sort();
+  
+  // Initialize matrix
+  const matrix = {};
+  years.forEach(year => {
+    matrix[year] = Array(12).fill(0);
+  });
+  
+  observations.forEach(o => {
+    const date = new Date(o.date);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    if (matrix[year]) {
+      matrix[year][month]++;
+    }
+  });
+  
+  // Find max
+  const max = Math.max(...Object.values(matrix).flat(), 1);
+  
+  // Render
+  let html = '<div style="display: inline-block; min-width: 100%;">';
+  html += '<table style="border-collapse: collapse; width: 100%;">';
+  html += '<tr><th style="padding: 8px;"></th>';
+  monthNames.forEach(m => {
+    html += `<th style="padding: 8px; font-size: 12px; color: var(--muted);">${m}</th>`;
+  });
+  html += '</tr>';
+  
+  years.forEach(year => {
+    html += `<tr><td style="padding: 8px; font-weight: 600; color: var(--text);">${year}</td>`;
+    for (let month = 0; month < 12; month++) {
+      const count = matrix[year][month];
+      const intensity = count / max;
+      const color = `rgba(6, 182, 212, ${0.1 + intensity * 0.9})`;
+      html += `<td style="padding: 16px; background: ${color}; border: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 12px; font-weight: 600;" title="${monthNames[month]} ${year} - ${count} Beobachtungen">${count || ''}</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</table></div>';
+  
+  container.innerHTML = html;
+}
+
+function renderDayMonthHeatmap(observations, container) {
+  const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+  const currentYear = new Date().getFullYear();
+  
+  // Filter current year
+  const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentYear);
+  
+  // Initialize matrix (31 days x 12 months)
+  const matrix = Array(12).fill(0).map(() => Array(31).fill(0));
+  
+  yearObs.forEach(o => {
+    const date = new Date(o.date);
+    const month = date.getMonth();
+    const day = date.getDate() - 1; // 0-indexed
+    if (day >= 0 && day < 31) {
+      matrix[month][day]++;
+    }
+  });
+  
+  // Find max
+  const max = Math.max(...matrix.flat(), 1);
+  
+  // Render
+  let html = '<div style="display: inline-block; min-width: 100%;">';
+  html += `<h4 style="margin: 0 0 16px 0;">Jahr ${currentYear}</h4>`;
+  html += '<table style="border-collapse: collapse; width: 100%;">';
+  html += '<tr><th style="padding: 8px;"></th>';
+  for (let day = 1; day <= 31; day++) {
+    html += `<th style="padding: 4px; font-size: 10px; color: var(--muted);">${day}</th>`;
+  }
+  html += '</tr>';
+  
+  monthNames.forEach((month, monthIdx) => {
+    html += `<tr><td style="padding: 8px; font-weight: 600; color: var(--text); white-space: nowrap;">${month}</td>`;
+    for (let day = 0; day < 31; day++) {
+      const count = matrix[monthIdx][day];
+      const intensity = count / max;
+      const color = count > 0 ? `rgba(6, 182, 212, ${0.1 + intensity * 0.9})` : 'rgba(255,255,255,0.02)';
+      html += `<td style="padding: 8px; background: ${color}; border: 1px solid rgba(255,255,255,0.05); min-width: 20px;" title="${day + 1}. ${month} ${currentYear} - ${count} Beobachtungen"></td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</table></div>';
+  
+  container.innerHTML = html;
+}
+
+// Meilensteine
+async function loadMeilensteine() {
+  const allObs = await getAllObservationsWithDetails();
+  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  
+  const totalSpecies = countUniqueSpecies(observations);
+  const totalObs = observations.length;
+  
+  // Count consecutive days
+  const dates = [...new Set(observations.map(o => o.date))].sort();
+  let currentStreak = 0;
+  let maxStreak = 0;
+  let streakDate = new Date();
+  
+  for (let i = dates.length - 1; i >= 0; i--) {
+    const date = new Date(dates[i]);
+    const dayDiff = Math.floor((streakDate - date) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff <= 1) {
+      currentStreak++;
+      maxStreak = Math.max(maxStreak, currentStreak);
+      streakDate = date;
+    } else {
+      break;
+    }
+  }
+  
+  const milestones = [
+    { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, current: totalSpecies, type: 'species' },
+    { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, current: totalSpecies, type: 'species' },
+    { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, current: totalSpecies, type: 'species' },
+    { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, current: totalSpecies, type: 'species' },
+    { icon: '🦉', title: 'Meister', desc: '100 Arten beobachtet', target: 100, current: totalSpecies, type: 'species' },
+    { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, current: totalObs, type: 'obs' },
+    { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, current: totalObs, type: 'obs' },
+    { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, current: totalObs, type: 'obs' },
+    { icon: '🔥', title: 'Streak Starter', desc: '7 Tage Streak', target: 7, current: currentStreak, type: 'streak' },
+    { icon: '⚡', title: 'Streak Master', desc: '30 Tage Streak', target: 30, current: currentStreak, type: 'streak' },
+    { icon: '💎', title: 'Diamant Streak', desc: '100 Tage Streak', target: 100, current: currentStreak, type: 'streak' }
+  ];
+  
+  const container = document.getElementById('milestonesGrid');
+  container.innerHTML = '';
+  
+  milestones.forEach(m => {
+    const achieved = m.current >= m.target;
+    const progress = Math.min(100, (m.current / m.target) * 100);
+    
+    const card = document.createElement('div');
+    card.className = `milestone-card ${achieved ? 'achieved' : ''}`;
+    card.innerHTML = `
+      <div class="milestone-icon">${m.icon}</div>
+      <div class="milestone-info">
+        <h4>${m.title}</h4>
+        <p>${m.desc}</p>
+        <div class="milestone-progress">${m.current} / ${m.target}</div>
+        <div style="background: rgba(255,255,255,0.05); border-radius: 8px; height: 8px; overflow: hidden; margin-top: 8px;">
+          <div style="height: 100%; background: ${achieved ? 'var(--success)' : 'var(--accent)'}; width: ${progress}%; transition: width 0.5s ease;"></div>
+        </div>
+      </div>
+      <div class="milestone-badge">${achieved ? '✓ Erreicht!' : `${progress.toFixed(0)}%`}</div>
+    `;
+    container.appendChild(card);
+  });
+  
+  // Lifelist progress
+  const lifelistPercent = Math.min(100, (totalSpecies / 500) * 100);
+  document.getElementById('lifelistProgressBar').style.width = lifelistPercent + '%';
+  document.getElementById('lifelistProgressText').textContent = `${totalSpecies} von ~500 möglichen Arten in Deutschland (${lifelistPercent.toFixed(1)}%)`;
+}
+
+// Arten-Timeline
+async function loadArtenTimeline() {
+  const allObs = await getAllObservationsWithDetails();
+  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs)).sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  const firstSightings = {};
+  observations.forEach(o => {
+    if (!firstSightings[o.bird]) {
+      firstSightings[o.bird] = {
+        bird: o.bird,
+        date: o.date,
+        location: o.location || 'Unbekannt'
+      };
+    }
+  });
+  
+  const timeline = Object.values(firstSightings).sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  const container = document.getElementById('timelineContainer');
+  
+  if (timeline.length === 0) {
+    container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
+    return;
+  }
+  
+  container.innerHTML = '<div style="position: relative; padding-left: 40px;">';
+  
+  timeline.forEach((sighting, index) => {
+    const rarity = getRarityStyle(sighting.bird);
+    const card = document.createElement('div');
+    card.style.cssText = `
+      position: relative;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.03));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+    `;
+    
+    card.innerHTML = `
+      <div style="position: absolute; left: -40px; top: 16px; width: 24px; height: 24px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 11px; border: 3px solid var(--bg);">
+        ${index + 1}
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px;">
+        <div style="flex: 1;">
+          <div class="${rarity.rarityClass}" style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">
+            ${rarity.rarityIcon}${sighting.bird}
+          </div>
+          <div style="font-size: 13px; color: var(--muted);">
+            📍 ${sighting.location}
+          </div>
+        </div>
+        <div style="text-align: right; white-space: nowrap;">
+          <div style="font-weight: 600; color: var(--accent);">${formatDateForDisplay(sighting.date)}</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">
+            Erstsichtung #${index + 1}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(card);
+  });
+  
+  container.innerHTML += '</div>';
+}
+
+// Hotspots
+async function loadHotspots() {
+  const allObs = await getAllObservationsWithDetails();
+  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs) && obs.location);
+  
+  if (observations.length === 0) {
+    document.getElementById('hotspotsList').innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Standortdaten verfügbar</div>';
+    return;
+  }
+  
+  const locationStats = {};
+  observations.forEach(o => {
+    if (!locationStats[o.location]) {
+      locationStats[o.location] = {
+        location: o.location,
+        count: 0,
+        species: new Set()
+      };
+    }
+    locationStats[o.location].count++;
+    locationStats[o.location].species.add(o.bird);
+  });
+  
+  const hotspots = Object.values(locationStats).map(stat => ({
+    location: stat.location,
+    count: stat.count,
+    species: stat.species.size
+  })).sort((a, b) => b.species - a.species).slice(0, 10);
+  
+  const container = document.getElementById('hotspotsList');
+  container.innerHTML = '';
+  
+  hotspots.forEach((hotspot, index) => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.03));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      transition: all 0.2s;
+    `;
+    
+    card.onmouseover = () => {
+      card.style.transform = 'translateX(4px)';
+      card.style.boxShadow = '0 6px 20px rgba(6,182,212,0.2)';
+    };
+    card.onmouseout = () => {
+      card.style.transform = 'translateX(0)';
+      card.style.boxShadow = 'none';
+    };
+    
+    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+    
+    card.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+        <div style="font-size: 32px; width: 50px; text-align: center;">${medal}</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 4px;">
+            📍 ${hotspot.location}
+          </div>
+          <div style="font-size: 13px; color: var(--muted);">
+            ${hotspot.count} Beobachtungen
+          </div>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 24px; font-weight: 700; color: var(--accent);">${hotspot.species}</div>
+        <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Arten</div>
+      </div>
+    `;
+    
+    container.appendChild(card);
+  });
+}
+
+// Insights
+async function loadInsights() {
+  const allObs = await getAllObservationsWithDetails();
+  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  
+  if (observations.length === 0) {
+    document.getElementById('insightsContainer').innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
+    return;
+  }
+  
+  const insights = [];
+  
+  // Most active day
+  const dayCounts = {};
+  observations.forEach(o => {
+    dayCounts[o.date] = (dayCounts[o.date] || 0) + 1;
+  });
+  const mostActiveDay = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0];
+  insights.push({
+    icon: '🗓️',
+    title: 'Aktivster Tag',
+    value: formatDateForDisplay(mostActiveDay[0]),
+    subtitle: `${mostActiveDay[1]} Beobachtungen`
+  });
+  
+  // Most observed bird
+  const birdCounts = {};
+  observations.forEach(o => {
+    birdCounts[o.bird] = (birdCounts[o.bird] || 0) + 1;
+  });
+  const mostObservedBird = Object.entries(birdCounts).sort((a, b) => b[1] - a[1])[0];
+  insights.push({
+    icon: '🐦',
+    title: 'Häufigste Art',
+    value: mostObservedBird[0],
+    subtitle: `${mostObservedBird[1]}× beobachtet`
+  });
+  
+  // Average per day
+  const uniqueDates = new Set(observations.map(o => o.date)).size;
+  const avgPerDay = (observations.length / uniqueDates).toFixed(1);
+  insights.push({
+    icon: '📊',
+    title: 'Durchschnitt pro Tag',
+    value: avgPerDay,
+    subtitle: `Bei ${uniqueDates} aktiven Tagen`
+  });
+  
+  // Rarest bird
+  const rarestBird = Object.entries(birdCounts).sort((a, b) => a[1] - b[1])[0];
+  insights.push({
+    icon: '💎',
+    title: 'Seltenste Beobachtung',
+    value: rarestBird[0],
+    subtitle: `Nur ${rarestBird[1]}× gesehen`
+  });
+  
+  // First observation
+  const firstObs = observations.sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+  insights.push({
+    icon: '🌅',
+    title: 'Erste Beobachtung',
+    value: firstObs.bird,
+    subtitle: formatDateForDisplay(firstObs.date)
+  });
+  
+  // Latest observation
+  const latestObs = observations.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  insights.push({
+    icon: '🌆',
+    title: 'Letzte Beobachtung',
+    value: latestObs.bird,
+    subtitle: formatDateForDisplay(latestObs.date)
+  });
+  
+  const container = document.getElementById('insightsContainer');
+  container.innerHTML = '';
+  
+  insights.forEach(insight => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.08));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s;
+    `;
+    
+    card.onmouseover = () => {
+      card.style.transform = 'translateY(-4px)';
+      card.style.boxShadow = '0 8px 24px rgba(6,182,212,0.2)';
+    };
+    card.onmouseout = () => {
+      card.style.transform = 'translateY(0)';
+      card.style.boxShadow = 'none';
+    };
+    
+    card.innerHTML = `
+      <div style="font-size: 48px; margin-bottom: 12px;">${insight.icon}</div>
+      <div style="font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">${insight.title}</div>
+      <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px;">${insight.value}</div>
+      <div style="font-size: 12px; color: var(--soft);">${insight.subtitle}</div>
+    `;
+    
+    container.appendChild(card);
+  });
+}
+
+// Initialize when page loads erweiterte-stats
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if we're on the advanced stats page
+  const advStatsSection = document.getElementById('erweiterte-stats');
+  if (advStatsSection) {
+    // Set up observer to load content when page becomes visible
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'style') {
+          const display = advStatsSection.style.display;
+          if (display !== 'none') {
+            // Page is now visible, load initial tab
+            switchAdvancedStatsTab('jahresvergleich');
+            observer.disconnect(); // Only load once
+          }
+        }
+      });
+    });
+    
+    observer.observe(advStatsSection, { attributes: true });
+  }
+});
 
 </script>
 
