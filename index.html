@@ -10361,8 +10361,7 @@
         
         switch (challenge.type) {
           case 'species_count':
-            const uniqueSpecies = new Set(observations.map(obs => obs.bird));
-            progress = uniqueSpecies.size;
+            progress = countUniqueSpecies(observations);
             break;
             
           case 'observation_count':
@@ -10472,9 +10471,8 @@
             break;
             
           case 'bird_families':
-            // Vereinfacht: Zähle verschiedene Vogelarten
-            const families = new Set(observations.map(obs => obs.bird));
-            progress = Math.min(families.size, challenge.goal);
+            // Vereinfacht: Zähle verschiedene Vogelarten (normalisiert)
+            progress = countUniqueSpecies(observations);
             break;
             
           case 'nocturnal_species':
@@ -11416,10 +11414,14 @@
               // NEU: Nur tickable Beobachtungen zählen (konsistent mit addListToComparisonFolder)
               const tickableObs = (list.observations || []).filter(obs => obs.tickable !== false);
               const obsCount = tickableObs.length;
-              const speciesSet = new Set(tickableObs.map(obs => obs.bird));
+              const speciesCount = countUniqueSpecies(tickableObs);
               
               totalObservations += obsCount;
-              speciesSet.forEach(s => totalSpecies.add(s));
+              // Füge normalisierte Arten zum Gesamt-Set hinzu
+              tickableObs.forEach(obs => {
+                const normalized = normalizeBirdName(obs.bird);
+                if (normalized) totalSpecies.add(normalized);
+              });
               
               listStats.push({
                 listId: listId, // NEU: Speichere listId direkt im Objekt
@@ -11427,7 +11429,7 @@
                 userName: list.userName,
                 userId: list.userId, // NEU: Speichere auch userId
                 observations: obsCount,
-                species: speciesSet.size
+                species: speciesCount
               });
             }
           }
@@ -11563,7 +11565,7 @@
           // Berechne Statistiken für diese Liste
           const filteredObs = await filterObservationsByList(observations, list);
           const tickableObs = filteredObs.filter(o => o.tickable !== false);
-          const speciesCount = new Set(tickableObs.map(o => o.bird)).size;
+          const speciesCount = countUniqueSpecies(tickableObs);
           
           html += `
             <div class="card" style="cursor:pointer;transition:all 0.2s;" onclick="addListToComparisonFolder('${list.id}')">
@@ -11994,7 +11996,7 @@
         // NEU: Filtere Nullmeldungen aus
         const validObs = observations.filter(o => isValidObservation(o));
         const tickableObs = validObs.filter(o => o.tickable !== false);
-        const speciesCount = new Set(tickableObs.map(o => o.bird)).size;
+        const speciesCount = countUniqueSpecies(tickableObs);
         const daysCount = new Set(validObs.map(o => o.date)).size;
         
         document.getElementById('comparisonListObsCount').textContent = validObs.length;
@@ -16130,6 +16132,24 @@
       listsGrid.innerHTML = html;
     }
     
+    // Hilfsfunktion: Normalisiere Vogelnamen für konsistente Zählung
+    function normalizeBirdName(birdName) {
+      if (!birdName || typeof birdName !== 'string') return '';
+      return birdName.trim().toLowerCase();
+    }
+    
+    // Hilfsfunktion: Zähle einzigartige Arten mit Normalisierung
+    function countUniqueSpecies(observations) {
+      const normalizedNames = new Set();
+      observations.forEach(obs => {
+        const normalized = normalizeBirdName(obs.bird);
+        if (normalized) { // Nur nicht-leere Namen
+          normalizedNames.add(normalized);
+        }
+      });
+      return normalizedNames.size;
+    }
+    
     async function calculateListStats(list) {
       try {
         // Verwende IMMER persönliche Beobachtungen für Listen
@@ -16141,7 +16161,7 @@
         
         return {
           observationCount: filteredObs.length, // Alle Beobachtungen
-          speciesCount: new Set(tickableObs.map(o => o.bird)).size, // Nur tickbare Arten
+          speciesCount: countUniqueSpecies(tickableObs), // Normalisierte Zählung
           daysCount: new Set(filteredObs.map(o => o.date)).size
         };
       } catch (error) {
@@ -16674,7 +16694,7 @@
         const tickableObs = filteredObs.filter(o => o.tickable !== false);
         const stats = {
           total: filteredObs.length, // Alle Beobachtungen
-          species: new Set(tickableObs.map(o => o.bird)).size, // Nur tickbare Arten
+          species: countUniqueSpecies(tickableObs), // Nur tickbare Arten (normalisiert)
           area: list.polygon ? calculatePolygonArea(list.polygon).toFixed(2) + ' km²' : 'Kein Gebiet'
         };
         
@@ -18557,15 +18577,16 @@
         
         // Berechne Statistiken
         const totalCount = filtered.length;
-        const speciesCount = new Set(filtered.map(obs => obs.bird).filter(Boolean)).size;
+        const speciesCount = countUniqueSpecies(filtered);
         const daysCount = new Set(filtered.map(obs => obs.date).filter(Boolean)).size;
         const foldersCount = new Set(filtered.map(obs => obs.folderId).filter(Boolean)).size;
         
-        // Häufigste Art
+        // Häufigste Art (mit Normalisierung)
         const birdCounts = {};
         filtered.forEach(obs => {
-          if (obs.bird) {
-            birdCounts[obs.bird] = (birdCounts[obs.bird] || 0) + 1;
+          const normalizedName = normalizeBirdName(obs.bird);
+          if (normalizedName) {
+            birdCounts[normalizedName] = (birdCounts[normalizedName] || 0) + 1;
           }
         });
         
@@ -19564,7 +19585,7 @@
       
       const stats = {
         totalObservations: observations.length,
-        uniqueSpecies: new Set(observations.map(o => o.bird)).size,
+        uniqueSpecies: countUniqueSpecies(observations),
         uniqueDates: new Set(observations.map(o => o.date)).size,
         byMonth: {},
         bySpecies: {},
@@ -20714,7 +20735,13 @@
             };
             
             userStats[userId].observations.push(obsWithId);
-            userStats[userId].species.add(obs.bird);
+            
+            // Verwende normalisierte Vogelnamen für Set
+            const normalizedBirdName = normalizeBirdName(obs.bird);
+            if (normalizedBirdName) {
+              userStats[userId].species.add(normalizedBirdName);
+            }
+            
             if (obs.photo) userStats[userId].photosCount++;
             if (obs.selffound) userStats[userId].selffoundsCount++;
             userStats[userId].totalCount++;
@@ -25577,16 +25604,6 @@ async function renderChallengesDashboard(groupData) {
     editBtn.style.display = isAdmin ? 'block' : 'none';
   }
   
-  // Helper: Berechne Zeitraum-Daten
-  const calculatePeriodData = (user, startDate) => {
-    const periodObs = user.observations.filter(o => new Date(o.date) >= startDate);
-    const periodSpecies = new Set(periodObs.map(o => o.bird));
-    return {
-      observations: periodObs.length,
-      species: periodSpecies.size
-    };
-  };
-  
   // Challenge 1: Wochenchallenge
   const weekStart = new Date(now);
   weekStart.setDate(now.getDate() - now.getDay()); // Montag dieser Woche
@@ -25605,7 +25622,7 @@ async function renderChallengesDashboard(groupData) {
     
     switch(weekType) {
       case 'species':
-        progress = new Set(periodObs.map(o => o.bird)).size;
+        progress = countUniqueSpecies(periodObs);
         break;
       case 'observations':
         progress = periodObs.length;
@@ -25646,7 +25663,7 @@ async function renderChallengesDashboard(groupData) {
     
     switch(monthType) {
       case 'species':
-        progress = new Set(periodObs.map(o => o.bird)).size;
+        progress = countUniqueSpecies(periodObs);
         break;
       case 'observations':
         progress = periodObs.length;
@@ -25687,7 +25704,7 @@ async function renderChallengesDashboard(groupData) {
     
     switch(yearType) {
       case 'species':
-        progress = new Set(periodObs.map(o => o.bird)).size;
+        progress = countUniqueSpecies(periodObs);
         break;
       case 'observations':
         progress = periodObs.length;
@@ -25714,7 +25731,7 @@ async function renderChallengesDashboard(groupData) {
   }).sort((a, b) => b.progress - a.progress);
   
   // Helper: Erstelle Challenge-Karte
-  const createChallengeCard = (icon, title, timeLeft, goal, users, unit) => {
+  const createChallengeCard = (icon, title, timeLeft, goal, users, unit, xpReward) => {
     const usersHTML = users.slice(0, 3).map((user, i) => {
       const barColor = i === 0 ? '#10b981' : i === 1 ? '#06b6d4' : '#8b5cf6';
       const isComplete = user.progress >= goal;
@@ -25751,6 +25768,7 @@ async function renderChallengesDashboard(groupData) {
         <div style="padding:12px;background:rgba(16,185,129,0.05);border-radius:8px;margin-bottom:12px;">
           <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Ziel:</div>
           <div style="font-size:16px;font-weight:600;">${goal} ${unit}</div>
+          ${xpReward ? `<div style="margin-top:6px;font-size:12px;color:#7c3aed;font-weight:600;">🎁 +${xpReward} XP</div>` : ''}
         </div>
         ${usersHTML}
         ${users.length > 3 ? `
@@ -25770,7 +25788,8 @@ async function renderChallengesDashboard(groupData) {
         daysLeftWeek,
         weekGoal,
         weekUsers,
-        weekLabel.unit
+        weekLabel.unit,
+        100
       )}
       ${createChallengeCard(
         '🌙',
@@ -25778,7 +25797,8 @@ async function renderChallengesDashboard(groupData) {
         daysLeftMonth,
         monthGoal,
         monthUsers,
-        monthLabel.unit
+        monthLabel.unit,
+        500
       )}
       ${createChallengeCard(
         '🎯',
@@ -25786,7 +25806,8 @@ async function renderChallengesDashboard(groupData) {
         daysLeftYear,
         yearGoal,
         yearUsers,
-        yearLabel.unit
+        yearLabel.unit,
+        10000
       )}
     </div>
     
@@ -25807,6 +25828,14 @@ async function renderChallengesDashboard(groupData) {
         <div>🌙 <strong>Monat:</strong> ${monthGoal} ${monthLabel.desc}</div>
         <div>🎯 <strong>Jahr:</strong> ${yearGoal} ${yearLabel.desc}</div>
       </div>
+      <div style="margin-top:12px;padding:12px;background:rgba(124,58,237,0.08);border-radius:8px;border-left:3px solid #7c3aed;">
+        <div style="font-weight:600;margin-bottom:6px;font-size:12px;color:#7c3aed;">🎁 XP-Belohnungen:</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.8;">
+          📅 <strong>Wochenchallenge:</strong> +100 XP<br>
+          🌙 <strong>Monatschallenge:</strong> +500 XP<br>
+          🎯 <strong>Jahreschallenge:</strong> +10.000 XP
+        </div>
+      </div>
       <div style="margin-top:12px;font-size:11px;color:var(--muted);">
         Challenges werden automatisch jede Woche/Monat/Jahr zurückgesetzt.
         ${isAdmin ? '<br><strong>👑 Du bist Admin:</strong> Klicke oben auf "Challenges bearbeiten" um die Challenge-Ziele für die Gruppe anzupassen.' : ''}
@@ -25815,6 +25844,140 @@ async function renderChallengesDashboard(groupData) {
   `;
   
   container.innerHTML = html;
+  
+  // Prüfe Challenge-Abschlüsse und vergebe XP
+  await checkAndRewardGroupChallengeCompletions(
+    groupData,
+    { week: weekUsers, month: monthUsers, year: yearUsers },
+    { week: weekGoal, month: monthGoal, year: yearGoal }
+  );
+}
+
+// NEU: Prüfe und belohne Gruppen-Challenge-Abschlüsse
+async function checkAndRewardGroupChallengeCompletions(groupData, userProgressData, goals) {
+  if (!window.FBA?.currentUser || !window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    return; // Nicht im Gruppenmodus oder nicht eingeloggt
+  }
+  
+  const currentUserId = window.FBA.currentUser.uid;
+  const currentUser = userProgressData.week.find(u => u.userName === (groupData.userStats[currentUserId]?.userName));
+  
+  if (!currentUser) {
+    return; // User nicht in der Gruppe gefunden
+  }
+  
+  // Challenge-Definitionen mit XP-Belohnungen
+  const challenges = [
+    {
+      id: 'week',
+      name: 'Wochenchallenge',
+      xp: 100,
+      icon: '📅',
+      users: userProgressData.week,
+      goal: goals.week
+    },
+    {
+      id: 'month',
+      name: 'Monats-Challenge',
+      xp: 500,
+      icon: '🌙',
+      users: userProgressData.month,
+      goal: goals.month
+    },
+    {
+      id: 'year',
+      name: 'Jahres-Challenge',
+      xp: 10000,
+      icon: '🎯',
+      users: userProgressData.year,
+      goal: goals.year
+    }
+  ];
+  
+  // Hole oder erstelle Challenge-Completion-Record
+  const groupId = window.currentSelectedGroup;
+  const completionsRef = window.FBD.ref(window.FBA, `groups/${groupId}/challengeCompletions/${currentUserId}`);
+  const snapshot = await window.FBD.get(completionsRef);
+  const completions = snapshot.exists() ? snapshot.val() : {};
+  
+  // Berechne Perioden-Keys
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+  const weekKey = `week_${weekStart.getFullYear()}_${weekStart.getMonth()}_${weekStart.getDate()}`;
+  
+  const monthKey = `month_${now.getFullYear()}_${now.getMonth()}`;
+  const yearKey = `year_${now.getFullYear()}`;
+  
+  const periodKeys = {
+    week: weekKey,
+    month: monthKey,
+    year: yearKey
+  };
+  
+  // Prüfe jede Challenge
+  for (const challenge of challenges) {
+    const userProgress = challenge.users.find(u => u.userName === currentUser.userName);
+    
+    if (!userProgress) continue;
+    
+    const hasCompleted = userProgress.progress >= challenge.goal;
+    const alreadyRewarded = completions[periodKeys[challenge.id]] === true;
+    
+    // Wenn abgeschlossen und noch nicht belohnt
+    if (hasCompleted && !alreadyRewarded) {
+      console.log(`🎉 ${challenge.name} abgeschlossen! Vergebe ${challenge.xp} XP`);
+      
+      // Markiere als abgeschlossen
+      completions[periodKeys[challenge.id]] = true;
+      await window.FBD.set(completionsRef, completions);
+      
+      // Vergebe XP (im persönlichen Bereich)
+      try {
+        // Lade aktuelle Challenge-Daten
+        let challengeData = await getFromIndexedDB('challengeProgress', 'progress');
+        if (!challengeData) {
+          challengeData = {
+            id: 'progress',
+            level: 1,
+            xp: 0,
+            completedChallenges: []
+          };
+        }
+        
+        // Füge XP hinzu
+        challengeData.xp = (challengeData.xp || 0) + challenge.xp;
+        
+        // Level-Up prüfen
+        const XP_PER_LEVEL = 1000;
+        while (challengeData.xp >= XP_PER_LEVEL * challengeData.level) {
+          challengeData.xp -= XP_PER_LEVEL * challengeData.level;
+          challengeData.level++;
+          
+          // Level-Up Notification
+          showNotification(`🎊 Level ${challengeData.level} erreicht!`, 4000);
+        }
+        
+        // Speichere
+        await saveToIndexedDB('challengeProgress', challengeData);
+        
+        // Update Display
+        if (typeof updateChallengeDisplay === 'function') {
+          updateChallengeDisplay();
+        }
+        
+        // Zeige Erfolgs-Notification
+        showNotification(
+          `${challenge.icon} ${challenge.name} abgeschlossen! +${challenge.xp} XP 🎉`,
+          5000
+        );
+        
+      } catch (error) {
+        console.error('Fehler beim Vergeben von XP:', error);
+      }
+    }
+  }
 }
 
 // NEU: Challenge-Einstellungen öffnen (nur für Admins)
@@ -27928,7 +28091,7 @@ async function renderObservationManager() {
     filteredObs = sortObservationsByManager(filteredObs);
     
     // Statistiken berechnen
-    const uniqueSpecies = new Set(filteredObs.map(o => o.bird)).size;
+    const uniqueSpecies = countUniqueSpecies(filteredObs);
     const rareCount = filteredObs.filter(o => {
       const rarity = o.rarity || (birdDatabase[o.bird] ? birdDatabase[o.bird].status : null);
       return rarity === 'selten';
@@ -28007,7 +28170,7 @@ async function renderObservationManager() {
       const personInitial = personName.charAt(0).toUpperCase();
       
       // Berechne Statistiken für diese Person
-      const personUniqueSpecies = new Set(personObs.map(o => o.bird)).size;
+      const personUniqueSpecies = countUniqueSpecies(personObs);
       const personRareCount = personObs.filter(o => {
         const rarity = o.rarity || (birdDatabase[o.bird] ? birdDatabase[o.bird].status : null);
         return rarity === 'selten';
@@ -30580,7 +30743,7 @@ const EnhancedStatsManager = {
   },
   
   renderOverview() {
-    const totalSpecies = new Set(this.observations.map(o => o.bird)).size;
+    const totalSpecies = countUniqueSpecies(this.observations);
     const totalObs = this.observations.length;
     
     const now = new Date();
@@ -30588,7 +30751,7 @@ const EnhancedStatsManager = {
       const obsDate = new Date(o.date);
       return obsDate.getMonth() === now.getMonth() && obsDate.getFullYear() === now.getFullYear();
     });
-    const thisMonthSpecies = new Set(thisMonth.map(o => o.bird)).size;
+    const thisMonthSpecies = countUniqueSpecies(thisMonth);
     
     const birdCounts = {};
     this.observations.forEach(o => {
@@ -30639,7 +30802,7 @@ const EnhancedStatsManager = {
     document.getElementById('currentYearDisplay').textContent = this.currentYear;
     
     const yearObs = this.observations.filter(o => new Date(o.date).getFullYear() === this.currentYear);
-    const yearSpecies = new Set(yearObs.map(o => o.bird)).size;
+    const yearSpecies = countUniqueSpecies(yearObs);
     const yearCount = yearObs.length;
     
     document.getElementById('yearTitle').textContent = this.currentYear;
@@ -30647,7 +30810,7 @@ const EnhancedStatsManager = {
     document.getElementById('yearObservations').textContent = yearCount;
     
     const lastYearObs = this.observations.filter(o => new Date(o.date).getFullYear() === this.currentYear - 1);
-    const lastYearSpecies = new Set(lastYearObs.map(o => o.bird)).size;
+    const lastYearSpecies = countUniqueSpecies(lastYearObs);
     const diff = yearSpecies - lastYearSpecies;
     const comparisonEl = document.getElementById('yearComparison');
     
@@ -30768,7 +30931,7 @@ const EnhancedStatsManager = {
     const container = document.getElementById('milestonesContainer');
     container.innerHTML = '';
     
-    const totalSpecies = new Set(this.observations.map(o => o.bird)).size;
+    const totalSpecies = countUniqueSpecies(this.observations);
     const totalObs = this.observations.length;
     
     const milestones = [
