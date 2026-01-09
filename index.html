@@ -5752,6 +5752,78 @@
       }
     }
     
+    /* Info Button Styles */
+    .info-btn {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 22px !important;
+      height: 22px !important;
+      min-width: 22px;
+      min-height: 22px;
+      border-radius: 50%;
+      background: var(--accent) !important;
+      color: white !important;
+      border: none;
+      cursor: help !important;
+      font-size: 13px !important;
+      font-weight: 700;
+      margin-left: 8px;
+      vertical-align: middle;
+      transition: all 0.2s !important;
+      flex-shrink: 0;
+      padding: 0 !important;
+      line-height: 1;
+    }
+    
+    .info-btn:hover {
+      background: var(--accent-2) !important;
+      transform: scale(1.15) !important;
+      transition: all 0.2s !important;
+    }
+    
+    .info-btn:active {
+      transform: scale(1.05) !important;
+      transition: all 0.2s !important;
+    }
+    
+    .info-tooltip {
+      position: fixed !important;
+      background: var(--card);
+      border: 2px solid rgba(6,182,212,0.4);
+      border-radius: 10px;
+      padding: 14px 18px;
+      max-width: 320px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      z-index: 100000;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(6,182,212,0.1);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      transform: translateY(-5px);
+    }
+    
+    .info-tooltip.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    
+    .info-tooltip::before {
+      content: '';
+      position: absolute;
+      top: -7px;
+      left: 20px;
+      width: 14px;
+      height: 14px;
+      background: var(--card);
+      border-left: 2px solid rgba(6,182,212,0.4);
+      border-top: 2px solid rgba(6,182,212,0.4);
+      transform: rotate(45deg);
+    }
+    
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -5831,7 +5903,10 @@
         <!-- Effects Toggle -->
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="muted">✨ Premium Effekte</div>
+            <div class="muted" style="display: flex; align-items: center;">
+              ✨ Premium Effekte
+              <button class="info-btn" onclick="showInfoTooltip(event, 'Schalte visuelle Effekte wie Animationen, Glassmorphism und Glow-Effekte ein oder aus. Deaktivieren kann die Performance auf älteren Geräten verbessern.')">i</button>
+            </div>
             <label class="toggle-switch" title="Premium-Effekte aktivieren/deaktivieren">
               <input type="checkbox" id="effectsToggle" checked onchange="togglePremiumEffects()">
               <span class="toggle-slider"></span>
@@ -6536,7 +6611,7 @@
                 
                 <!-- Jahres-Chart -->
                 <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px;">
-                  <canvas id="yearComparisonChart" style="max-height: 350px;"></canvas>
+                  <canvas id="yearComparisonChart" style="height: 500px;"></canvas>
                 </div>
               </div>
             </div>
@@ -6638,7 +6713,10 @@
           <section id="listen" class="card" style="display:none;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
               <div>
-                <h2 style="margin:0;">📋 Benutzerdefinierte Listen</h2>
+                <h2 style="margin:0; display: flex; align-items: center;">
+                  📋 Benutzerdefinierte Listen
+                  <button class="info-btn" onclick="showInfoTooltip(event, 'Erstelle intelligente Listen mit Filtern wie Zeitraum, Bundesland oder Polygon. Nutze \"Listen vergleichen\" um Unterschiede zwischen Listen zu finden.')">i</button>
+                </h2>
                 <p class="muted" style="margin-top:4px;">Erstelle und verwalte Listen für spezifische Vogelbeobachtungen</p>
               </div>
               <div style="display:flex;gap:8px;">
@@ -8979,7 +9057,10 @@
       
       <!-- NEU: Zeitraum-Auswahl -->
       <div class="form-group">
-        <label class="form-label">📅 Zeitraum</label>
+        <label class="form-label" style="display: flex; align-items: center;">
+          📅 Zeitraum
+          <button class="info-btn" onclick="showInfoTooltip(event, 'Lege einen Zeitraum fest, um nur Beobachtungen aus diesem Zeitfenster in die Liste aufzunehmen. Ideal für Jahres- oder Saisonlisten.')">i</button>
+        </label>
         <div style="background: var(--glass); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);">
           <div style="display: flex; gap: 12px; margin-bottom: 12px;">
             <div style="flex: 1;">
@@ -9038,7 +9119,10 @@
 
       <!-- NEU: Polygon-Erweiterung -->
       <div class="form-group">
-        <label class="form-label">🗺️ Geografischer Filter (Polygon)</label>
+        <label class="form-label" style="display: flex; align-items: center;">
+          🗺️ Geografischer Filter (Polygon)
+          <button class="info-btn" onclick="showInfoTooltip(event, 'Zeichne ein Polygon auf der Karte, um nur Beobachtungen aus einem bestimmten geografischen Gebiet in die Liste aufzunehmen. Perfekt für lokale Hotspots oder Schutzgebiete.')">i</button>
+        </label>
         <div class="polygon-creation" id="polygonCreation">
           <div class="polygon-instructions">
             <p>Zeichne ein Polygon auf der Karte, um Beobachtungen auf dieses Gebiet zu beschränken.</p>
@@ -9110,7 +9194,10 @@
       
       <!-- NEU: Beobachtungsmodus -->
       <div class="form-group">
-        <label class="form-label">📊 Zählmodus</label>
+        <label class="form-label" style="display: flex; align-items: center;">
+          📊 Zählmodus
+          <button class="info-btn" onclick="showInfoTooltip(event, '<strong>Alle Beobachtungen:</strong> Jede Sichtung einer Art zählt separat.<br><br><strong>Nur Erstbeobachtungen:</strong> Pro Art wird nur die erste (älteste) Beobachtung gezählt - ideal für Life Lists.')">i</button>
+        </label>
         <div style="background: var(--glass); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);">
           <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin-bottom: 12px;">
             <input type="radio" name="observationMode" id="modeAllObservations" value="all" checked style="margin-top: 2px;">
@@ -9736,7 +9823,10 @@
     <div class="challenge-creator-container" style="max-width:600px;">
       <div class="challenge-creator-header">
         <div>
-          <h2 style="margin:0;font-size:24px;">📁 Vergleichs-Ordner erstellen</h2>
+          <h2 style="margin:0;font-size:24px;display:flex;align-items:center;">
+            📁 Vergleichs-Ordner erstellen
+            <button class="info-btn" onclick="showInfoTooltip(event, 'Erstelle einen Ordner, in dem mehrere Gruppenmitglieder ihre Listen hinzufügen können. So könnt ihr eure Beobachtungen direkt vergleichen - z.B. für Wettbewerbe oder gemeinsame Projekte.')">i</button>
+          </h2>
           <p style="margin:4px 0 0 0;color:var(--muted);font-size:14px;">
             Lade andere ein, ihre Listen zu teilen
           </p>
@@ -23780,6 +23870,73 @@ async function tryAsync(fn, errorContext, retryFn = null) {
 
 // ==================== LOADING STATES ====================
 
+// ==================== INFO TOOLTIPS ====================
+
+/**
+ * Erstellt einen Info-Button mit Tooltip
+ */
+function createInfoButton(text) {
+  return `<button class="info-btn" onclick="showInfoTooltip(event, '${text.replace(/'/g, "\\'")}')">i</button>`;
+}
+
+/**
+ * Zeigt einen Info-Tooltip an
+ */
+function showInfoTooltip(event, text) {
+  event.stopPropagation();
+  
+  // Entferne existierende Tooltips
+  const existingTooltips = document.querySelectorAll('.info-tooltip');
+  existingTooltips.forEach(t => t.remove());
+  
+  const button = event.target;
+  const tooltip = document.createElement('div');
+  tooltip.className = 'info-tooltip';
+  tooltip.innerHTML = text;
+  
+  document.body.appendChild(tooltip);
+  
+  // Positioniere Tooltip unter dem Button
+  const rect = button.getBoundingClientRect();
+  tooltip.style.position = 'fixed';
+  tooltip.style.top = (rect.bottom + 10) + 'px';
+  tooltip.style.left = Math.max(10, rect.left - 10) + 'px';
+  
+  // Prüfe ob Tooltip aus dem Viewport läuft
+  setTimeout(() => {
+    const tooltipRect = tooltip.getBoundingClientRect();
+    if (tooltipRect.right > window.innerWidth - 10) {
+      tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
+    }
+    if (tooltipRect.bottom > window.innerHeight - 10) {
+      tooltip.style.top = (rect.top - tooltipRect.height - 10) + 'px';
+      // Passe Pfeil an
+      const arrow = tooltip.querySelector('::before');
+      if (arrow) {
+        tooltip.style.setProperty('--arrow-position', 'bottom');
+      }
+    }
+  }, 0);
+  
+  // Zeige Tooltip
+  setTimeout(() => tooltip.classList.add('show'), 10);
+  
+  // Schließe beim Klicken außerhalb
+  const closeTooltip = (e) => {
+    if (!tooltip.contains(e.target) && e.target !== button) {
+      tooltip.classList.remove('show');
+      setTimeout(() => tooltip.remove(), 200);
+      document.removeEventListener('click', closeTooltip);
+    }
+  };
+  
+  setTimeout(() => {
+    document.addEventListener('click', closeTooltip);
+  }, 100);
+}
+
+// ==================== LOADING STATES ====================
+
 function showSkeleton(elementId, lines = 3) {
   const element = document.getElementById(elementId);
   if (!element) return;
@@ -25604,6 +25761,9 @@ var hideLoading=function(){document.getElementById("fbLoading").classList.remove
 
 // Automatische Synchronisierung privater Listen in Gruppen-Vergleich
 async function autoSyncPrivateListsToGroup() {
+  // DEAKTIVIERT - wird nicht mehr verwendet
+  return;
+  
   try {
     const groups = await window.storage.list('group:', true);
     if (!groups || !groups.keys || groups.keys.length === 0) {
@@ -34373,13 +34533,38 @@ function changeComparisonYear(delta) {
 }
 
 async function loadJahresvergleich() {
-  const allObs = await getAllObservationsWithDetails();
-  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  console.warn('=== 📊 JAHRESVERGLEICH START ===');
+  
+  // Hole Beobachtungen (im Gruppenmodus alle, sonst nur eigene)
+  const observations = await getOwnObservationsForStats();
+  
+  console.warn('📊 Jahresvergleich - Geladene Beobachtungen:', observations.length);
+  console.warn('📊 Gruppenmodus:', window.currentSelectedGroup);
+  
+  // Debug: Zähle tickable vs non-tickable
+  const tickableCount = observations.filter(o => o.tickable !== false).length;
+  const nonTickableCount = observations.filter(o => o.tickable === false).length;
+  console.warn('📊 Tickable:', tickableCount, 'Non-tickable:', nonTickableCount);
+  
+  // Debug: Zeige Sample der Vogelnamen
+  const sampleBirds = [...new Set(observations.slice(0, 20).map(o => o.bird))];
+  console.warn('📊 Sample Vogelnamen (erste 20 Beobachtungen):', sampleBirds);
   
   const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear);
   const lastYearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear - 1);
   
+  console.warn('📊 Beobachtungen in', currentComparisonYear, ':', yearObs.length);
+  
+  // Debug: Zähle Arten manuell
+  const uniqueBirds = new Set(yearObs.map(o => o.bird));
+  console.warn('📊 Einzigartige Vogelnamen (roh, ohne Normalisierung):', uniqueBirds.size);
+  console.warn('📊 Sample einzigartige Vögel (erste 30):', [...uniqueBirds].slice(0, 30));
+  
   const yearSpecies = countUniqueSpecies(yearObs);
+  console.warn('📊 Arten in', currentComparisonYear, '(nach countUniqueSpecies mit Normalisierung):', yearSpecies);
+  
+  console.warn('=== 📊 JAHRESVERGLEICH DEBUG ENDE ===');
+  
   const lastYearSpecies = countUniqueSpecies(lastYearObs);
   const speciesChange = yearSpecies - lastYearSpecies;
   
@@ -34449,6 +34634,15 @@ async function renderYearComparisonChart(yearObs) {
   const canvas = document.getElementById('yearComparisonChart');
   if (!canvas) return;
   
+  console.warn('=== 📈 CHART RENDERING START ===');
+  console.warn('📈 Rendering Chart für', yearObs.length, 'Beobachtungen');
+  
+  // Debug: Zeige Sample der Beobachtungen
+  if (yearObs.length > 0) {
+    console.warn('📈 Sample Beobachtung:', yearObs[0]);
+    console.warn('📈 Alle Vogelarten (Sample von 10):', [...new Set(yearObs.slice(0, 10).map(o => o.bird))]);
+  }
+  
   // Destroy old chart
   if (advancedStatsCharts.yearComparison) {
     advancedStatsCharts.yearComparison.destroy();
@@ -34460,18 +34654,61 @@ async function renderYearComparisonChart(yearObs) {
   }
   
   const monthData = Array(12).fill(0);
-  const speciesData = Array(12).fill(0);
+  const speciesData = Array(12).fill(null); // null für Monate ohne Daten
   
   yearObs.forEach(o => {
     const month = new Date(o.date).getMonth();
     monthData[month]++;
   });
   
-  // Species per month
-  for (let month = 0; month < 12; month++) {
-    const monthObs = yearObs.filter(o => new Date(o.date).getMonth() === month);
-    speciesData[month] = countUniqueSpecies(monthObs);
+  console.warn('📈 Beobachtungen pro Monat:', monthData);
+  
+  // Finde den letzten Monat mit Beobachtungen
+  let lastMonthWithData = -1;
+  for (let month = 11; month >= 0; month--) {
+    if (monthData[month] > 0) {
+      lastMonthWithData = month;
+      break;
+    }
   }
+  
+  console.warn('📈 Letzter Monat mit Daten (0=Jan, 11=Dez):', lastMonthWithData);
+  
+  // Species per month - KUMULATIV (alle bis zu diesem Monat gesehenen Arten)
+  const seenSpeciesUpToMonth = new Set();
+  
+  for (let month = 0; month < 12; month++) {
+    // Beobachtungen in diesem Monat
+    const monthObs = yearObs.filter(o => new Date(o.date).getMonth() === month);
+    
+    if (monthObs.length > 0) {
+      // Füge Arten dieses Monats hinzu
+      monthObs.forEach(o => {
+        if (o.bird) {
+          const normalized = normalizeBirdName(o.bird);
+          if (normalized) seenSpeciesUpToMonth.add(normalized);
+        }
+      });
+      speciesData[month] = seenSpeciesUpToMonth.size;
+    } else if (month <= lastMonthWithData && seenSpeciesUpToMonth.size > 0) {
+      // Nur zwischen erstem und letztem Monat mit Daten: behalte letzten Wert
+      speciesData[month] = seenSpeciesUpToMonth.size;
+    } else if (month === lastMonthWithData + 1 && lastMonthWithData >= 0) {
+      // Direkt nach letztem Monat: setze auf 0 für sanften Übergang
+      speciesData[month] = 0;
+    }
+    // Danach: bleibt undefined (keine Linie mehr)
+  }
+  
+  console.warn('📈 Arten pro Monat (kumulativ):', speciesData);
+  console.warn('📈 Arten pro Monat (detailliert):');
+  speciesData.forEach((val, idx) => {
+    const monthName = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'][idx];
+    console.warn(`  ${monthName}: ${val !== undefined ? val : 'keine Daten'}`);
+  });
+  console.warn('📈 Gesamte einzigartige Arten (Set.size):', seenSpeciesUpToMonth.size);
+  console.warn('📈 Sample der gezählten Arten (erste 30):', Array.from(seenSpeciesUpToMonth).slice(0, 30));
+  console.warn('=== 📈 CHART RENDERING ENDE ===');
   
   const ctx = canvas.getContext('2d');
   advancedStatsCharts.yearComparison = new Chart(ctx, {
@@ -34486,7 +34723,7 @@ async function renderYearComparisonChart(yearObs) {
           backgroundColor: 'rgba(6, 182, 212, 0.1)',
           fill: true,
           tension: 0.4,
-          yAxisID: 'y'
+          yAxisID: 'y' // Beide nutzen die linke Y-Achse
         },
         {
           label: 'Arten',
@@ -34495,7 +34732,8 @@ async function renderYearComparisonChart(yearObs) {
           backgroundColor: 'rgba(124, 58, 237, 0.1)',
           fill: true,
           tension: 0.4,
-          yAxisID: 'y1'
+          yAxisID: 'y', // Beide nutzen die linke Y-Achse
+          spanGaps: false // Keine Linie für undefined Werte
         }
       ]
     },
@@ -34519,16 +34757,7 @@ async function renderYearComparisonChart(yearObs) {
           beginAtZero: true,
           ticks: { color: 'rgba(255, 255, 255, 0.7)', precision: 0 },
           grid: { color: 'rgba(255, 255, 255, 0.04)' },
-          title: { display: true, text: 'Beobachtungen', color: 'rgba(6, 182, 212, 1)' }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          beginAtZero: true,
-          ticks: { color: 'rgba(255, 255, 255, 0.7)', precision: 0 },
-          grid: { display: false },
-          title: { display: true, text: 'Arten', color: 'rgba(124, 58, 237, 1)' }
+          title: { display: true, text: 'Anzahl', color: 'rgba(255, 255, 255, 0.7)' }
         },
         x: {
           ticks: { color: 'rgba(255, 255, 255, 0.7)' },
@@ -34555,8 +34784,8 @@ async function updateHeatmap() {
   const type = document.querySelector('input[name="heatmapType"]:checked')?.value || 'hour-weekday';
   const container = document.getElementById('heatmapContainer');
   
-  const allObs = await getAllObservationsWithDetails();
-  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  // Hole nur EIGENE Beobachtungen
+  const observations = await getOwnObservationsForStats();
   
   if (observations.length === 0) {
     container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
@@ -34710,10 +34939,22 @@ function renderDayMonthHeatmap(observations, container) {
   container.innerHTML = html;
 }
 
+// Hilfsfunktion: Hole Beobachtungen für Statistiken (im Gruppenmodus alle Gruppenbeobachtungen, sonst nur eigene)
+async function getOwnObservationsForStats() {
+  if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal') {
+    // Im Gruppenmodus: ALLE Gruppenbeobachtungen (nicht nur eigene)
+    const allGroupObs = await getAllObservationsWithDetails();
+    return allGroupObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  } else {
+    // Im persönlichen Modus: Nur eigene
+    const allObs = await getAllObservationsWithDetails();
+    return allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  }
+}
+
 // Meilensteine
 async function loadMeilensteine() {
-  const allObs = await getAllObservationsWithDetails();
-  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  const observations = await getOwnObservationsForStats();
   
   const totalSpecies = countUniqueSpecies(observations);
   const totalObs = observations.length;
@@ -34783,8 +35024,7 @@ async function loadMeilensteine() {
 
 // Arten-Timeline
 async function loadArtenTimeline() {
-  const allObs = await getAllObservationsWithDetails();
-  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs)).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const observations = (await getOwnObservationsForStats()).sort((a, b) => new Date(a.date) - new Date(b.date));
   
   const firstSightings = {};
   observations.forEach(o => {
@@ -34851,8 +35091,7 @@ async function loadArtenTimeline() {
 
 // Hotspots
 async function loadHotspots() {
-  const allObs = await getAllObservationsWithDetails();
-  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs) && obs.location);
+  const observations = (await getOwnObservationsForStats()).filter(obs => obs.location);
   
   if (observations.length === 0) {
     document.getElementById('hotspotsList').innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Standortdaten verfügbar</div>';
@@ -34929,8 +35168,7 @@ async function loadHotspots() {
 
 // Insights
 async function loadInsights() {
-  const allObs = await getAllObservationsWithDetails();
-  const observations = allObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+  const observations = await getOwnObservationsForStats();
   
   if (observations.length === 0) {
     document.getElementById('insightsContainer').innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
@@ -35425,7 +35663,10 @@ function createListComparisonModalElement() {
         <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 28px;">
           <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 8px 24px rgba(6,182,212,0.4);">🔄</div>
           <div style="flex: 1;">
-            <h2 style="margin: 0; font-size: 24px; color: var(--text); font-weight: 700;">Listenvergleich</h2>
+            <h2 style="margin: 0; font-size: 24px; color: var(--text); font-weight: 700; display: flex; align-items: center;">
+              Listenvergleich
+              <button class="info-btn" onclick="showInfoTooltip(event, 'Vergleiche zwei Listen miteinander und finde heraus, welche Arten nur in einer Liste vorkommen und welche in beiden Listen enthalten sind. Du kannst private Listen oder Listen von Gruppenmitgliedern vergleichen.')">i</button>
+            </h2>
             <p style="margin: 6px 0 0 0; font-size: 14px; color: var(--muted);">Vergleiche zwei Listen und finde die Unterschiede</p>
           </div>
         </div>
@@ -35435,8 +35676,9 @@ function createListComparisonModalElement() {
           <button class="btn active" id="modalPrivateCompareBtn" onclick="setModalCompareMode('private')" style="flex:1; padding: 14px;">
             📋 Private Listen vergleichen
           </button>
-          <button class="btn ghost" id="modalGroupCompareBtn" onclick="setModalCompareMode('group')" style="flex:1; padding: 14px;">
-            👥 Gruppenmitglieder vergleichen
+          <button class="btn ghost" id="modalGroupCompareBtn" onclick="setModalCompareMode('group')" style="flex:1; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span>👥 Gruppenmitglieder vergleichen</span>
+            <button class="info-btn" onclick="event.stopPropagation(); showInfoTooltip(event, 'Vergleiche die Beobachtungen verschiedener Gruppenmitglieder. Du kannst entweder alle Beobachtungen eines Mitglieds oder nur die Arten aus einer bestimmten Liste vergleichen.')">i</button>
           </button>
         </div>
         
