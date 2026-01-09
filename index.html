@@ -21110,7 +21110,12 @@
     async function updateDashboard() {
       try {
         const stats = await getDetailedStatistics();
-        const observations = await getAllObservations();
+        const allObservations = await getAllObservationsWithDetails();
+        const observations = allObservations.filter(obs => 
+          obs.tickable !== false && isValidObservation(obs)
+        );
+        
+        console.log('📊 Dashboard Update:', { stats, observationsCount: observations.length });
         
         // === HERO HEADER ===
         const now = new Date();
@@ -21126,29 +21131,38 @@
           day: 'numeric' 
         });
         
-        document.getElementById('dashboardGreeting').textContent = greeting + '!';
-        document.getElementById('dashboardDate').textContent = dateStr;
+        const greetingEl = document.getElementById('dashboardGreeting');
+        const dateEl = document.getElementById('dashboardDate');
+        if (greetingEl) greetingEl.textContent = greeting + '!';
+        if (dateEl) dateEl.textContent = dateStr;
         
         // Hero Quick Stats
-        document.getElementById('heroTotalObs').textContent = stats.totalObservations.toLocaleString();
-        document.getElementById('heroSpeciesCount').textContent = stats.uniqueSpecies;
+        const heroTotalEl = document.getElementById('heroTotalObs');
+        const heroSpeciesEl = document.getElementById('heroSpeciesCount');
+        const heroWeekEl = document.getElementById('heroThisWeek');
+        const heroStreakEl = document.getElementById('heroStreak');
+        
+        if (heroTotalEl) heroTotalEl.textContent = stats.totalObservations.toLocaleString();
+        if (heroSpeciesEl) heroSpeciesEl.textContent = stats.uniqueSpecies;
         
         // Diese Woche
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
-        const thisWeekObs = observations.filter(o => new Date(o.date) >= weekAgo);
-        document.getElementById('heroThisWeek').textContent = thisWeekObs.length;
+        const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekAgo);
+        if (heroWeekEl) heroWeekEl.textContent = thisWeekObs.length;
         
         // Streak (vereinfacht - könnte verbessert werden)
-        document.getElementById('heroStreak').textContent = calculateStreak(observations);
+        if (heroStreakEl) heroStreakEl.textContent = calculateStreak(observations);
         
         // === AKTIVITÄT HEUTE ===
-        const today = new Date().toISOString().split('T')[0];
-        const todayObs = observations.filter(o => o.date === today);
-        
-        if (todayObs.length > 0) {
-          const todaySpecies = new Set(todayObs.map(o => o.bird)).size;
-          document.getElementById('todayActivity').innerHTML = `
+        const todayActivityEl = document.getElementById('todayActivity');
+        if (todayActivityEl) {
+          const today = new Date().toISOString().split('T')[0];
+          const todayObs = observations.filter(o => o.date === today);
+          
+          if (todayObs.length > 0) {
+            const todaySpecies = new Set(todayObs.map(o => o.bird)).size;
+            todayActivityEl.innerHTML = `
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div style="text-align:center;padding:16px;background:rgba(6,182,212,0.1);border-radius:10px;">
                 <div style="font-size:32px;font-weight:700;color:var(--accent);">${todayObs.length}</div>
@@ -21169,21 +21183,23 @@
               `).join('')}
             </div>
           `;
-        } else {
-          document.getElementById('todayActivity').innerHTML = `
-            <div style="text-align:center;padding:24px;">
-              <div style="font-size:48px;margin-bottom:12px;opacity:0.5;">🐦</div>
-              <p style="color:var(--muted);margin:0;font-size:14px;">Noch keine Beobachtungen heute</p>
-              <button class="small-btn" onclick="document.querySelector('.nav button[data-page=\\'eingabe\\']').click()" style="margin-top:12px;">
-                ➕ Erste Beobachtung eintragen
-              </button>
-            </div>
-          `;
+          } else {
+            todayActivityEl.innerHTML = `
+              <div style="text-align:center;padding:24px;">
+                <div style="font-size:48px;margin-bottom:12px;opacity:0.5;">🐦</div>
+                <p style="color:var(--muted);margin:0;font-size:14px;">Noch keine Beobachtungen heute</p>
+                <button class="small-btn" onclick="document.querySelector('.nav button[data-page=\\'eingabe\\']').click()" style="margin-top:12px;">
+                  ➕ Erste Beobachtung eintragen
+                </button>
+              </div>
+            `;
+          }
         }
         
         // === TOP 5 ARTEN ===
         const topSpeciesList = document.getElementById('topSpeciesList');
-        if (stats.topSpecies.length > 0) {
+        if (topSpeciesList) {
+          if (stats.topSpecies && stats.topSpecies.length > 0) {
           let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
           stats.topSpecies.slice(0, 5).forEach((species, i) => {
             const rarity = getRarityStyle(species.name);
@@ -21205,11 +21221,14 @@
         } else {
           topSpeciesList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Noch keine Beobachtungen</div>';
         }
+      }
         
         // === NEUESTE BEOBACHTUNGEN ===
-        const recentObs = observations.slice(0, 5);
-        if (recentObs.length > 0) {
-          document.getElementById('recentObservations').innerHTML = `
+        const recentObsEl = document.getElementById('recentObservations');
+        if (recentObsEl) {
+          const recentObs = observations.slice(0, 5);
+          if (recentObs.length > 0) {
+            recentObsEl.innerHTML = `
             <div style="display:flex;flex-direction:column;gap:8px;">
               ${recentObs.map(o => {
                 const date = new Date(o.timestamp);
@@ -21229,16 +21248,19 @@
               }).join('')}
             </div>
           `;
+          }
         }
         
         // === MONATLICHER FORTSCHRITT ===
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-        const monthStart = new Date(currentYear, currentMonth, 1);
-        const monthObs = observations.filter(o => new Date(o.date) >= monthStart);
-        const monthSpecies = new Set(monthObs.map(o => o.bird)).size;
-        
-        document.getElementById('monthlyProgress').innerHTML = `
+        const monthlyProgressEl = document.getElementById('monthlyProgress');
+        if (monthlyProgressEl) {
+          const currentMonth = now.getMonth();
+          const currentYear = now.getFullYear();
+          const monthStart = new Date(currentYear, currentMonth, 1);
+          const monthObs = observations.filter(o => o.date && new Date(o.date) >= monthStart);
+          const monthSpecies = new Set(monthObs.map(o => o.bird)).size;
+          
+          monthlyProgressEl.innerHTML = `
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
             <div style="text-align:center;padding:16px;background:rgba(245,158,11,0.1);border-radius:10px;">
               <div style="font-size:32px;font-weight:700;color:#f59e0b;">${monthObs.length}</div>
@@ -21259,9 +21281,12 @@
             </div>
           </div>
         `;
+        }
         
         // === ERFOLGE ===
-        document.getElementById('recentAchievements').innerHTML = `
+        const achievementsEl = document.getElementById('recentAchievements');
+        if (achievementsEl) {
+          achievementsEl.innerHTML = `
           <div style="display:flex;flex-direction:column;gap:8px;">
             ${stats.totalObservations >= 100 ? `
               <div style="padding:12px;background:rgba(234,179,8,0.1);border-radius:8px;display:flex;align-items:center;gap:12px;">
@@ -21289,53 +21314,61 @@
             ` : ''}
           </div>
         `;
+        }
         
         // === SELTENHEITEN ===
-        const rareObs = observations.filter(o => {
-          const rarity = getRarityStyle(o.bird);
-          return rarity.rarityClass.includes('rare');
-        });
-        
-        if (rareObs.length > 0) {
-          document.getElementById('rarityHighlights').innerHTML = `
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              ${rareObs.slice(0, 5).map(o => {
-                const rarity = getRarityStyle(o.bird);
-                return `
-                  <div style="padding:10px;background:rgba(236,72,153,0.05);border-radius:8px;border-left:3px solid #ec4899;display:flex;justify-content:space-between;align-items:center;">
-                    <div>
-                      <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${rarity.rarityIcon}${o.bird}</div>
-                      <div style="font-size:11px;color:var(--muted);">${o.location || 'Kein Ort'} • ${new Date(o.date).toLocaleDateString('de-DE')}</div>
+        const rarityEl = document.getElementById('rarityHighlights');
+        if (rarityEl) {
+          const rareObs = observations.filter(o => {
+            const rarity = getRarityStyle(o.bird);
+            return rarity.rarityClass.includes('rare');
+          });
+          
+          if (rareObs.length > 0) {
+            rarityEl.innerHTML = `
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                ${rareObs.slice(0, 5).map(o => {
+                  const rarity = getRarityStyle(o.bird);
+                  return `
+                    <div style="padding:10px;background:rgba(236,72,153,0.05);border-radius:8px;border-left:3px solid #ec4899;display:flex;justify-content:space-between;align-items:center;">
+                      <div>
+                        <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${rarity.rarityIcon}${o.bird}</div>
+                        <div style="font-size:11px;color:var(--muted);">${o.location || 'Kein Ort'} • ${new Date(o.date).toLocaleDateString('de-DE')}</div>
+                      </div>
+                      <div style="font-size:20px;">💎</div>
                     </div>
-                    <div style="font-size:20px;">💎</div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          `;
-        } else {
-          document.getElementById('rarityHighlights').innerHTML = `
+                  `;
+                }).join('')}
+              </div>
+            `;
+          } else {
+            rarityEl.innerHTML = `
             <div style="text-align:center;padding:20px;color:var(--muted);">
               <div style="font-size:48px;margin-bottom:12px;opacity:0.3;">💎</div>
               <p style="margin:0;font-size:13px;">Noch keine seltenen Arten entdeckt</p>
               <p style="margin:8px 0 0 0;font-size:11px;">Halte Ausschau nach ungewöhnlichen Vögeln!</p>
             </div>
           `;
+          }
         }
         
         // === JAHRESÜBERSICHT ===
-        const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentYear);
-        const yearSpecies = new Set(yearObs.map(o => o.bird)).size;
-        const monthlyData = Array(12).fill(0);
-        yearObs.forEach(o => {
-          const month = new Date(o.date).getMonth();
-          monthlyData[month]++;
-        });
-        
-        const maxMonth = Math.max(...monthlyData);
-        const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-        
-        document.getElementById('yearOverview').innerHTML = `
+        const yearOverviewEl = document.getElementById('yearOverview');
+        if (yearOverviewEl) {
+          const yearObs = observations.filter(o => o.date && new Date(o.date).getFullYear() === now.getFullYear());
+          const yearSpecies = new Set(yearObs.map(o => o.bird)).size;
+          const monthlyData = Array(12).fill(0);
+          yearObs.forEach(o => {
+            if (o.date) {
+              const month = new Date(o.date).getMonth();
+              monthlyData[month]++;
+            }
+          });
+          
+          const maxMonth = Math.max(...monthlyData);
+          const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+          
+          yearOverviewEl.innerHTML = `
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
             <div style="text-align:center;padding:16px;background:rgba(59,130,246,0.08);border-radius:10px;">
               <div style="font-size:32px;font-weight:700;color:#3b82f6;">${yearObs.length}</div>
@@ -21368,6 +21401,7 @@
             </div>
           </div>
         `;
+        }
         
       } catch (error) {
         console.error('Fehler beim Aktualisieren des Dashboards:', error);
