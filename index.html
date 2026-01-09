@@ -6439,6 +6439,16 @@
             </div>
             
             <div class="chart-controls">
+              <!-- NEU: View Mode Switcher -->
+              <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button class="analysis-view-btn active" data-mode="observations" onclick="changeAnalysisViewMode('observations')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05)); color: var(--text); cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">
+                  📊 Beobachtungen
+                </button>
+                <button class="analysis-view-btn" data-mode="species" onclick="changeAnalysisViewMode('species')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--glass); color: var(--text); cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">
+                  🦅 Artenanzahl
+                </button>
+              </div>
+              
               <div class="preset-buttons">
                 <button class="preset-btn active" data-preset="this_year">Dieses Jahr</button>
                 <button class="preset-btn" data-preset="last_year">Letztes Jahr</button>
@@ -6656,6 +6666,20 @@
               <div class="feature-section">
                 <h3>🎯 Deine Meilensteine</h3>
                 <p class="muted">Erreiche diese Ziele und sammle Achievements!</p>
+                
+                <!-- Abzeichen-Showcase -->
+                <div id="badgeShowcase" style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05)); border: 2px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <div style="font-size: 32px;">🏆</div>
+                    <div>
+                      <h4 style="margin: 0; font-size: 18px; font-weight: 700;">Deine Abzeichen</h4>
+                      <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);">Erreichte Achievements werden hier angezeigt</p>
+                    </div>
+                  </div>
+                  <div id="earnedBadges" style="display: flex; flex-wrap: wrap; gap: 12px; min-height: 80px; align-items: center; justify-content: center;">
+                    <!-- Wird dynamisch gefüllt -->
+                  </div>
+                </div>
                 
                 <div id="milestonesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px;">
                   <!-- Wird dynamisch gefüllt -->
@@ -13373,7 +13397,8 @@
       specificYear: new Date().getFullYear(),
       aggregation: 'day',
       showAllData: false,
-      showEmptyDays: true
+      showEmptyDays: true,
+      viewMode: 'observations'  // NEU: 'observations' oder 'species'
     };
     
     // ---------- VOLLSTÄNDIGE VOGELARTEN-DATENBANK ----------
@@ -20772,6 +20797,7 @@
     
     function groupObservationsWithCompleteSeries(observations, aggregation, startDate, endDate) {
       const groups = {};
+      const speciesGroups = {};  // NEU: Für Artenanzahl-Modus
       
       // Zuerst vorhandene Daten gruppieren
       observations.forEach(obs => {
@@ -20800,10 +20826,19 @@
               key = obs.date;
           }
           
+          // Für Beobachtungen-Modus: Zähle Anzahl
           if (!groups[key]) {
             groups[key] = 0;
           }
           groups[key]++;
+          
+          // NEU: Für Artenanzahl-Modus: Sammle einzigartige Arten
+          if (!speciesGroups[key]) {
+            speciesGroups[key] = new Set();
+          }
+          if (obs.bird) {
+            speciesGroups[key].add(obs.bird);
+          }
         } catch (e) {
           console.error('Fehler beim Gruppieren des Datums:', obs.date, e);
         }
@@ -20825,7 +20860,11 @@
         while (current <= end) {
           const key = formatDateToKey(current, 'day');
           allKeys.push(key);
-          allValues.push(groups[key] || 0);
+          // NEU: Wähle Wert basierend auf viewMode
+          const value = chartSettings.viewMode === 'species' 
+            ? (speciesGroups[key] ? speciesGroups[key].size : 0)
+            : (groups[key] || 0);
+          allValues.push(value);
           allLabels.push(formatDateForDisplay(key));
           current.setDate(current.getDate() + 1);
         }
@@ -20846,7 +20885,11 @@
           if (weekEndDate > end) break;
           
           allKeys.push(key);
-          allValues.push(groups[key] || 0);
+          // NEU: Wähle Wert basierend auf viewMode
+          const value = chartSettings.viewMode === 'species' 
+            ? (speciesGroups[key] ? speciesGroups[key].size : 0)
+            : (groups[key] || 0);
+          allValues.push(value);
           allLabels.push(`KW ${currentWeek} ${currentYear}`);
           
           // Nächste Woche
@@ -20871,7 +20914,11 @@
           for (let month = monthStart; month <= monthEnd; month++) {
             const key = `${year}-${String(month + 1).padStart(2, '0')}`;
             allKeys.push(key);
-            allValues.push(groups[key] || 0);
+            // NEU: Wähle Wert basierend auf viewMode
+            const value = chartSettings.viewMode === 'species' 
+              ? (speciesGroups[key] ? speciesGroups[key].size : 0)
+              : (groups[key] || 0);
+            allValues.push(value);
             
             const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
             allLabels.push(`${monthNames[month]} ${year}`);
@@ -20886,7 +20933,11 @@
         for (let year = startYear; year <= endYear; year++) {
           const key = year.toString();
           allKeys.push(key);
-          allValues.push(groups[key] || 0);
+          // NEU: Wähle Wert basierend auf viewMode
+          const value = chartSettings.viewMode === 'species' 
+            ? (speciesGroups[key] ? speciesGroups[key].size : 0)
+            : (groups[key] || 0);
+          allValues.push(value);
           allLabels.push(year.toString());
         }
       }
@@ -21075,6 +21126,25 @@
       
       // Re-render overview
       updateMonthlyOverview();
+    }
+    
+    // NEU: View-Modus für Analyse-Chart umschalten
+    function changeAnalysisViewMode(mode) {
+      chartSettings.viewMode = mode;
+      
+      // Update button states
+      document.querySelectorAll('.analysis-view-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = 'var(--glass)';
+      });
+      const activeBtn = document.querySelector(`.analysis-view-btn[data-mode="${mode}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05))';
+      }
+      
+      // Chart neu rendern
+      updateChart();
     }
     
     async function updateMonthlyOverview() {
@@ -21336,7 +21406,8 @@
               ${recentObs.map(o => {
                 const date = new Date(o.timestamp);
                 const timeAgo = getTimeAgo(date);
-                const rarity = getRarityStyle(o.bird);
+                // WICHTIG: Übergebe o.rarity (manuell gesetzt) an getRarityStyle
+                const rarity = getRarityStyle(o.bird, o.rarity);
                 return `
                   <div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
                     <div>
@@ -21423,7 +21494,8 @@
         const rarityEl = document.getElementById('rarityHighlights');
         if (rarityEl) {
           const rareObs = observations.filter(o => {
-            const rarity = getRarityStyle(o.bird);
+            // WICHTIG: Übergebe o.rarity (manuell gesetzt) an getRarityStyle
+            const rarity = getRarityStyle(o.bird, o.rarity);
             return rarity.rarityClass.includes('rare');
           });
           
@@ -21431,7 +21503,8 @@
             rarityEl.innerHTML = `
               <div style="display:flex;flex-direction:column;gap:8px;">
                 ${rareObs.slice(0, 5).map(o => {
-                  const rarity = getRarityStyle(o.bird);
+                  // WICHTIG: Übergebe o.rarity (manuell gesetzt) an getRarityStyle
+                  const rarity = getRarityStyle(o.bird, o.rarity);
                   return `
                     <div style="padding:10px;background:rgba(236,72,153,0.05);border-radius:8px;border-left:3px solid #ec4899;display:flex;justify-content:space-between;align-items:center;">
                       <div>
@@ -21488,17 +21561,23 @@
             </div>
           </div>
           
-          <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:10px;">
-            <div style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600;">Monatliche Verteilung</div>
-            <div style="display:flex;gap:4px;align-items:flex-end;height:120px;">
+          <div style="padding:20px;background:rgba(255,255,255,0.02);border-radius:10px;">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:16px;font-weight:600;">Monatliche Verteilung</div>
+            <div style="display:flex;gap:8px;align-items:flex-end;height:300px;">
               ${monthlyData.map((count, i) => {
-                const height = maxMonth > 0 ? (count / maxMonth) * 100 : 0;
+                // Berechne die tatsächliche Pixel-Höhe (nicht Prozent!)
+                let barHeight = 0;
+                if (count > 0) {
+                  // Minimum 250px für Monate mit Daten, Maximum 290px
+                  const ratio = count / maxMonth;
+                  barHeight = Math.floor(250 + (ratio * 40));
+                }
                 const isCurrentMonth = i === currentMonth;
                 return `
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                    <div style="font-size:10px;color:${isCurrentMonth ? 'var(--accent)' : 'var(--muted)'};font-weight:${isCurrentMonth ? '700' : '400'};">${count}</div>
-                    <div style="width:100%;height:${height}%;min-height:${count > 0 ? '4px' : '2px'};background:${isCurrentMonth ? 'linear-gradient(180deg,var(--accent),var(--accent-2))' : 'rgba(59,130,246,0.3)'};border-radius:2px;transition:all 0.3s;" title="${monthNames[i]}: ${count} Beobachtungen"></div>
-                    <div style="font-size:9px;color:var(--muted);">${monthNames[i]}</div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:300px;justify-content:flex-end;">
+                    <div style="font-size:13px;color:${isCurrentMonth ? '#06b6d4' : '#3b82f6'};font-weight:700;margin-bottom:auto;padding-top:8px;">${count > 0 ? count : ''}</div>
+                    ${count > 0 ? `<div style="width:100%;height:${barHeight}px;background:${isCurrentMonth ? 'linear-gradient(180deg,#06b6d4,#0891b2)' : 'linear-gradient(180deg,#3b82f6,#2563eb)'};border-radius:6px 6px 0 0;box-shadow:0 -4px 16px ${isCurrentMonth ? 'rgba(6,182,212,0.5)' : 'rgba(59,130,246,0.4)'};border:2px solid ${isCurrentMonth ? 'rgba(6,182,212,0.6)' : 'rgba(59,130,246,0.5)'};" title="${monthNames[i]}: ${count} Beobachtungen"></div>` : ''}
+                    <div style="font-size:11px;color:var(--muted);font-weight:600;padding:8px 0;">${monthNames[i]}</div>
                   </div>
                 `;
               }).join('')}
@@ -29229,7 +29308,7 @@ async function loadObservationsForSelection() {
           " onclick="toggleObservationSelection('${obs.id}')">
             <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleObservationSelection('${obs.id}')" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
             <div style="flex:1;">
-              <div class="${obs.bird ? getRarityStyle(obs.bird).rarityClass : ''}" style="font-weight:600;margin-bottom:4px;">${getRarityStyle(obs.bird || '').rarityIcon}${obs.bird || 'Unbekannte Art'}</div>
+              <div class="${obs.bird ? getRarityStyle(obs.bird, obs.rarity).rarityClass : ''}" style="font-weight:600;margin-bottom:4px;">${getRarityStyle(obs.bird || '', obs.rarity).rarityIcon}${obs.bird || 'Unbekannte Art'}</div>
               <div style="display:flex;gap:16px;font-size:12px;color:var(--muted);">
                 <span>📅 ${dateStr}</span>
                 ${obs.time ? `<span>⏰ ${obs.time}</span>` : ''}
@@ -29296,7 +29375,7 @@ async function loadObservationsForSelection() {
             " onclick="toggleObservationSelection('${obs.id}')">
               <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleObservationSelection('${obs.id}')" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
               <div style="flex:1;">
-                <div class="${obs.bird ? getRarityStyle(obs.bird).rarityClass : ''}" style="font-weight:600;margin-bottom:4px;">${getRarityStyle(obs.bird || '').rarityIcon}${obs.bird || 'Unbekannte Art'}</div>
+                <div class="${obs.bird ? getRarityStyle(obs.bird, obs.rarity).rarityClass : ''}" style="font-weight:600;margin-bottom:4px;">${getRarityStyle(obs.bird || '', obs.rarity).rarityIcon}${obs.bird || 'Unbekannte Art'}</div>
                 <div style="display:flex;gap:16px;font-size:12px;color:var(--muted);">
                   <span>📅 ${dateStr}</span>
                   ${obs.time ? `<span>⏰ ${obs.time}</span>` : ''}
@@ -34784,12 +34863,28 @@ async function updateHeatmap() {
   const type = document.querySelector('input[name="heatmapType"]:checked')?.value || 'hour-weekday';
   const container = document.getElementById('heatmapContainer');
   
-  // Hole nur EIGENE Beobachtungen
+  console.warn('=== 🔥 HEATMAP UPDATE START ===');
+  
+  // Hole Beobachtungen
   const observations = await getOwnObservationsForStats();
+  
+  console.warn('🔥 Heatmap - Geladene Beobachtungen:', observations.length);
   
   if (observations.length === 0) {
     container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
     return;
+  }
+  
+  // Debug: Prüfe ob timestamp vorhanden ist
+  const withTimestamp = observations.filter(o => o.timestamp).length;
+  const withoutTimestamp = observations.length - withTimestamp;
+  console.warn('🔥 Mit timestamp:', withTimestamp, 'Ohne timestamp:', withoutTimestamp);
+  
+  if (withTimestamp > 0) {
+    console.warn('🔥 Sample Beobachtung mit timestamp:', observations.find(o => o.timestamp));
+  }
+  if (withoutTimestamp > 0) {
+    console.warn('🔥 Sample Beobachtung OHNE timestamp:', observations.find(o => !o.timestamp));
   }
   
   if (type === 'hour-weekday') {
@@ -34799,6 +34894,8 @@ async function updateHeatmap() {
   } else if (type === 'day-month') {
     renderDayMonthHeatmap(observations, container);
   }
+  
+  console.warn('=== 🔥 HEATMAP UPDATE ENDE ===');
 }
 
 function renderHourWeekdayHeatmap(observations, container) {
@@ -34808,17 +34905,174 @@ function renderHourWeekdayHeatmap(observations, container) {
   // Initialize matrix
   const matrix = Array(7).fill(0).map(() => Array(24).fill(0));
   
-  observations.forEach(o => {
+  let processedCount = 0;
+  let skippedCount = 0;
+  let debugSamples = [];
+  let skippedSamples = [];
+  let timestampFormats = {
+    withSpace: 0,
+    dateOnly: 0,
+    withTime: 0
+  };
+  
+  // Hilfsfunktion zum Parsen verschiedener Datumsformate
+  function parseObservationDate(dateStr, timeStr) {
+    if (!dateStr) return null;
+    
+    try {
+      // Prüfe ob dateStr bereits ein vollständiger Timestamp ist (enthält Zeitangabe)
+      // Format: "YYYY-MM-DD HH:MM:SS" oder "YYYY-MM-DD HH:MM"
+      if (dateStr.includes(' ')) {
+        // dateStr enthält bereits Datum UND Zeit
+        // Konvertiere zu ISO-Format: Ersetze Leerzeichen mit T
+        const isoDateTime = dateStr.replace(' ', 'T');
+        const result = new Date(isoDateTime);
+        
+        // Prüfe ob das Ergebnis gültig ist
+        if (!isNaN(result.getTime())) {
+          return result;
+        }
+        
+        // Falls ungültig, versuche alternatives Parsing
+        console.warn('⚠️ Ungültiger Timestamp:', dateStr, '- versuche alternatives Parsing');
+        return null;
+      }
+      
+      // Versuche verschiedene Datumsformate
+      let isoDate = dateStr;
+      
+      // Format: DD.MM.YYYY -> YYYY-MM-DD
+      if (dateStr.includes('.')) {
+        const parts = dateStr.split('.');
+        if (parts.length === 3) {
+          isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      // Format: DD/MM/YYYY -> YYYY-MM-DD
+      else if (dateStr.includes('/')) {
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+          // Prüfe ob amerikanisches Format (MM/DD/YYYY) oder europäisches (DD/MM/YYYY)
+          if (parseInt(parts[0]) > 12) {
+            // Europäisch: DD/MM/YYYY
+            isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+          } else {
+            // Amerikanisch: MM/DD/YYYY (weniger wahrscheinlich für deutsche App)
+            isoDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+          }
+        }
+      }
+      
+      // Kombiniere mit Zeit wenn vorhanden
+      let dateTimeStr;
+      if (timeStr) {
+        // Prüfe ob timeStr bereits Sekunden enthält (HH:MM:SS) oder nur HH:MM
+        if (timeStr.split(':').length === 3) {
+          // Zeit enthält bereits Sekunden: HH:MM:SS
+          dateTimeStr = isoDate + 'T' + timeStr;
+        } else {
+          // Zeit enthält nur HH:MM, füge Sekunden hinzu
+          dateTimeStr = isoDate + 'T' + timeStr + ':00';
+        }
+      } else {
+        // Keine Zeit vorhanden, verwende Mittag
+        dateTimeStr = isoDate + 'T12:00:00';
+      }
+      
+      const result = new Date(dateTimeStr);
+      
+      // Prüfe ob das Ergebnis gültig ist
+      if (!isNaN(result.getTime())) {
+        return result;
+      }
+      
+      console.warn('⚠️ Ungültiges Datum nach Parsing:', dateStr, timeStr, '→', dateTimeStr);
+      return null;
+    } catch (e) {
+      console.error('❌ Fehler beim Parsen von Datum:', dateStr, timeStr, e);
+      return null;
+    }
+  }
+  
+  observations.forEach((o, index) => {
+    let date = null;
+    let debugInfo = '';
+    
+    // Versuche verschiedene Timestamp-Felder
     if (o.timestamp) {
-      const date = new Date(o.timestamp);
+      date = new Date(o.timestamp);
+      debugInfo = 'timestamp';
+    } else if (o.datetime) {
+      date = new Date(o.datetime);
+      debugInfo = 'datetime';
+    } else if (o.date) {
+      // Statistik sammeln
+      if (o.date.includes(' ')) {
+        timestampFormats.withSpace++;
+      } else if (o.time) {
+        timestampFormats.withTime++;
+      } else {
+        timestampFormats.dateOnly++;
+      }
+      
+      // Verwende robuste Parsing-Funktion
+      date = parseObservationDate(o.date, o.time);
+      debugInfo = `parsed: ${o.date} + ${o.time || 'no time'}`;
+    }
+    
+    // Debug: Sammle erste 5 Beispiele
+    if (index < 5) {
+      debugSamples.push({
+        bird: o.bird,
+        hasTimestamp: !!o.timestamp,
+        hasDatetime: !!o.datetime,
+        hasDate: !!o.date,
+        hasTime: !!o.time,
+        date: o.date,
+        time: o.time,
+        parsedDate: date ? date.toISOString() : 'FAILED',
+        isValid: date && !isNaN(date.getTime()),
+        debugInfo: debugInfo
+      });
+    }
+    
+    if (date && !isNaN(date.getTime())) {
       const day = date.getDay();
       const hour = date.getHours();
       matrix[day][hour]++;
+      processedCount++;
+    } else {
+      skippedCount++;
+      // Sammle erste 5 übersprungene Beobachtungen
+      if (skippedSamples.length < 5) {
+        skippedSamples.push({
+          bird: o.bird,
+          date: o.date,
+          time: o.time,
+          timestamp: o.timestamp,
+          datetime: o.datetime,
+          allKeys: Object.keys(o)
+        });
+      }
     }
   });
   
+  console.warn('🔥 Timestamp-Formate:', timestampFormats);
+  console.warn('🔥 DEBUG - Erste 5 Beobachtungen:', debugSamples);
+  console.warn('🔥 DEBUG - Erste 5 ÜBERSPRUNGENE Beobachtungen:', skippedSamples);
+  
+  console.warn('🔥 Heatmap verarbeitet:', processedCount, 'übersprungen:', skippedCount);
+  
   // Find max for color scaling
   const max = Math.max(...matrix.flat(), 1);
+  
+  console.warn('🔥 Heatmap max Wert:', max);
+  console.warn('🔥 Heatmap Matrix (erste 3 Tage):', matrix.slice(0, 3));
+  
+  if (max === 1 && processedCount === 0) {
+    container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Zeitdaten verfügbar. Die Heatmap benötigt Beobachtungen mit Uhrzeit-Informationen.</div>';
+    return;
+  }
   
   // Render
   let html = '<div style="display: inline-block; min-width: 100%;">';
@@ -34834,7 +35088,7 @@ function renderHourWeekdayHeatmap(observations, container) {
     hours.forEach(hour => {
       const count = matrix[dayIdx][hour];
       const intensity = count / max;
-      const color = `rgba(6, 182, 212, ${0.1 + intensity * 0.9})`;
+      const color = count > 0 ? `rgba(6, 182, 212, ${0.2 + intensity * 0.8})` : 'rgba(255,255,255,0.02)';
       html += `<td style="padding: 12px; background: ${color}; border: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 11px; min-width: 30px;" title="${day} ${hour}:00 - ${count} Beobachtungen">${count || ''}</td>`;
     });
     html += '</tr>';
@@ -34987,34 +35241,131 @@ async function loadMeilensteine() {
     { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, current: totalObs, type: 'obs' },
     { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, current: totalObs, type: 'obs' },
     { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, current: totalObs, type: 'obs' },
-    { icon: '🔥', title: 'Streak Starter', desc: '7 Tage Streak', target: 7, current: currentStreak, type: 'streak' },
-    { icon: '⚡', title: 'Streak Master', desc: '30 Tage Streak', target: 30, current: currentStreak, type: 'streak' },
-    { icon: '💎', title: 'Diamant Streak', desc: '100 Tage Streak', target: 100, current: currentStreak, type: 'streak' }
+    { icon: '🔥', title: 'Streak Starter', desc: '7 Tage Streak', target: 7, current: currentStreak, type: 'streak', id: 'streak_7' },
+    { icon: '⚡', title: 'Streak Master', desc: '30 Tage Streak', target: 30, current: currentStreak, type: 'streak', id: 'streak_30' },
+    { icon: '💎', title: 'Diamant Streak', desc: '100 Tage Streak', target: 100, current: currentStreak, type: 'streak', id: 'streak_100' }
   ];
+  
+  // Lade gespeicherte Achievements aus IndexedDB
+  let savedAchievements = {};
+  try {
+    const stored = await getFromIndexedDB('settings', 'achievements');
+    if (stored && stored.value) {
+      savedAchievements = stored.value;
+    }
+  } catch (e) {
+    console.log('Keine gespeicherten Achievements gefunden:', e);
+  }
   
   const container = document.getElementById('milestonesGrid');
   container.innerHTML = '';
   
   milestones.forEach(m => {
-    const achieved = m.current >= m.target;
+    const autoAchieved = m.current >= m.target;
+    const manuallyCompleted = savedAchievements[m.id] === true;
+    const achieved = autoAchieved || manuallyCompleted;
     const progress = Math.min(100, (m.current / m.target) * 100);
     
     const card = document.createElement('div');
     card.className = `milestone-card ${achieved ? 'achieved' : ''}`;
+    card.style.cssText = `
+      position: relative;
+      background: ${achieved ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1))' : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))'};
+      border: 2px solid ${achieved ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.06)'};
+      border-radius: 16px;
+      padding: 20px;
+      cursor: ${!achieved && progress >= 90 ? 'pointer' : 'default'};
+      transition: all 0.3s;
+      ${!achieved && progress >= 90 ? 'box-shadow: 0 0 20px rgba(6,182,212,0.3);' : ''}
+    `;
+    
+    // Hover-Effekt nur wenn fast erreicht
+    if (!achieved && progress >= 90) {
+      card.onmouseover = () => {
+        card.style.transform = 'translateY(-4px) scale(1.02)';
+        card.style.boxShadow = '0 8px 30px rgba(6,182,212,0.4)';
+      };
+      card.onmouseout = () => {
+        card.style.transform = 'translateY(0) scale(1)';
+        card.style.boxShadow = '0 0 20px rgba(6,182,212,0.3)';
+      };
+    }
+    
     card.innerHTML = `
-      <div class="milestone-icon">${m.icon}</div>
-      <div class="milestone-info">
-        <h4>${m.title}</h4>
-        <p>${m.desc}</p>
-        <div class="milestone-progress">${m.current} / ${m.target}</div>
-        <div style="background: rgba(255,255,255,0.05); border-radius: 8px; height: 8px; overflow: hidden; margin-top: 8px;">
-          <div style="height: 100%; background: ${achieved ? 'var(--success)' : 'var(--accent)'}; width: ${progress}%; transition: width 0.5s ease;"></div>
+      ${achieved ? '<div style="position: absolute; top: -12px; right: -12px; width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 16px rgba(16,185,129,0.5); border: 3px solid var(--bg);">✓</div>' : ''}
+      <div style="display: flex; align-items: start; gap: 16px;">
+        <div style="font-size: 48px; line-height: 1; ${achieved ? 'filter: drop-shadow(0 4px 8px rgba(16,185,129,0.4));' : 'opacity: 0.7;'}">${m.icon}</div>
+        <div style="flex: 1;">
+          <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: ${achieved ? '#10b981' : 'var(--text)'};">${m.title}</h4>
+          <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--muted);">${m.desc}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px; font-weight: 600; color: var(--soft);">${m.current} / ${m.target}</span>
+            <span style="font-size: 13px; font-weight: 700; color: ${achieved ? '#10b981' : 'var(--accent)'};">${progress.toFixed(0)}%</span>
+          </div>
+          <div style="background: rgba(255,255,255,0.05); border-radius: 12px; height: 10px; overflow: hidden;">
+            <div style="height: 100%; background: ${achieved ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, var(--accent), var(--accent-2))'}; width: ${progress}%; transition: width 0.5s ease; box-shadow: ${progress > 90 ? '0 0 10px currentColor' : 'none'};"></div>
+          </div>
         </div>
       </div>
-      <div class="milestone-badge">${achieved ? '✓ Erreicht!' : `${progress.toFixed(0)}%`}</div>
+      ${!achieved && progress >= 90 ? '<div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 12px; color: var(--accent); font-weight: 600;">🎯 Fast geschafft! Klicke zum Abhaken</div>' : ''}
+      ${achieved ? '<div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(16,185,129,0.2); font-size: 13px; color: #10b981; font-weight: 700;">🏆 Achievement freigeschaltet!</div>' : ''}
     `;
+    
+    // Click-Handler für manuelles Abhaken
+    if (!achieved && progress >= 90) {
+      card.onclick = async () => {
+        if (confirm(`Achievement "${m.title}" als erreicht markieren?`)) {
+          savedAchievements[m.id] = true;
+          await saveToIndexedDB('settings', { key: 'achievements', value: savedAchievements });
+          showNotification(`🎉 Achievement "${m.title}" freigeschaltet!`, 3000);
+          loadMilestones(); // Neu laden
+        }
+      };
+    }
+    
     container.appendChild(card);
   });
+  
+  // Zeige erreichte Abzeichen an
+  const earnedBadgesContainer = document.getElementById('earnedBadges');
+  const earnedMilestones = milestones.filter(m => {
+    const autoAchieved = m.current >= m.target;
+    const manuallyCompleted = savedAchievements[m.id] === true;
+    return autoAchieved || manuallyCompleted;
+  });
+  
+  if (earnedMilestones.length === 0) {
+    earnedBadgesContainer.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: var(--muted);">
+        <div style="font-size: 48px; opacity: 0.3; margin-bottom: 8px;">🎯</div>
+        <p style="margin: 0; font-size: 14px;">Noch keine Abzeichen freigeschaltet</p>
+        <p style="margin: 4px 0 0 0; font-size: 12px;">Erreiche Meilensteine, um Achievements zu sammeln!</p>
+      </div>
+    `;
+  } else {
+    earnedBadgesContainer.innerHTML = earnedMilestones.map(m => `
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
+        border: 2px solid rgba(16,185,129,0.4);
+        border-radius: 16px;
+        min-width: 120px;
+        transition: all 0.3s;
+        cursor: pointer;
+      " 
+      onmouseover="this.style.transform='translateY(-4px) scale(1.05)'; this.style.boxShadow='0 8px 24px rgba(16,185,129,0.4)';"
+      onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none';"
+      title="${m.desc}">
+        <div style="font-size: 48px; filter: drop-shadow(0 4px 12px rgba(16,185,129,0.5));">${m.icon}</div>
+        <div style="font-size: 12px; font-weight: 700; color: #10b981; text-align: center; line-height: 1.3;">${m.title}</div>
+        <div style="font-size: 10px; color: var(--muted); text-align: center;">${m.current} / ${m.target}</div>
+      </div>
+    `).join('');
+  }
   
   // Lifelist progress
   const lifelistPercent = Math.min(100, (totalSpecies / 500) * 100);
@@ -35049,7 +35400,7 @@ async function loadArtenTimeline() {
   container.innerHTML = '<div style="position: relative; padding-left: 40px;">';
   
   timeline.forEach((sighting, index) => {
-    const rarity = getRarityStyle(sighting.bird);
+    const rarity = getRarityStyle(sighting.bird, sighting.rarity);
     const card = document.createElement('div');
     card.style.cssText = `
       position: relative;
@@ -35213,8 +35564,27 @@ async function loadInsights() {
     subtitle: `Bei ${uniqueDates} aktiven Tagen`
   });
   
-  // Rarest bird
-  const rarestBird = Object.entries(birdCounts).sort((a, b) => a[1] - b[1])[0];
+  // Rarest bird - Priorisiere tatsächliche Seltenheit bei gleicher Anzahl
+  const rarestBird = Object.entries(birdCounts)
+    .sort((a, b) => {
+      // Zuerst nach Anzahl sortieren
+      if (a[1] !== b[1]) return a[1] - b[1];
+      
+      // Bei gleicher Anzahl: Nach Seltenheitsstatus sortieren
+      const rarityOrder = { 'sehr selten': 0, 'selten': 1, 'häufig': 2, '': 3 };
+      const statusA = birdDatabase[a[0]]?.status || '';
+      const statusB = birdDatabase[b[0]]?.status || '';
+      
+      // Ignoriere "Escape" Arten
+      if (statusA.toLowerCase() === 'escape') return 1;
+      if (statusB.toLowerCase() === 'escape') return -1;
+      
+      const orderA = rarityOrder[statusA] !== undefined ? rarityOrder[statusA] : 3;
+      const orderB = rarityOrder[statusB] !== undefined ? rarityOrder[statusB] : 3;
+      
+      return orderA - orderB;
+    })[0];
+  
   insights.push({
     icon: '💎',
     title: 'Seltenste Beobachtung',
