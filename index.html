@@ -21358,6 +21358,7 @@
           const yearObs = observations.filter(o => o.date && new Date(o.date).getFullYear() === now.getFullYear());
           const yearSpecies = new Set(yearObs.map(o => o.bird)).size;
           const monthlyData = Array(12).fill(0);
+          const currentMonth = now.getMonth(); // Current month for highlighting
           yearObs.forEach(o => {
             if (o.date) {
               const month = new Date(o.date).getMonth();
