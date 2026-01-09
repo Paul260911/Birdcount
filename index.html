@@ -162,6 +162,7 @@
 
     /* Grid */
     .grid { display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start; transition: all 240ms ease; }
+    .grid.no-aside { grid-template-columns: 1fr; max-width: 100%; margin: 0; }
     .card { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); box-shadow:0 6px 18px rgba(2,6,23,0.5); }
     .card h2 { margin:0 0 8px 0; font-size:16px; }
     .muted { color:var(--muted); font-size:13px; }
@@ -492,6 +493,236 @@
     }
     .view-mode-btn:active, .monthly-view-btn:active {
       transform: translateY(0);
+    }
+    
+    /* ==================== TOGGLE SWITCH ==================== */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.1);
+      transition: 0.3s;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 2px;
+      background: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input:checked + .toggle-slider {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: var(--accent);
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+    
+    /* ==================== PREMIUM EFFECTS ==================== */
+    
+    /* Glassmorphism */
+    body.effects-enabled .card,
+    body.effects-enabled .feature-section {
+      background: rgba(255, 255, 255, 0.02) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    body.effects-enabled .stat-card {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Smooth Page Transitions */
+    body.effects-enabled .page {
+      animation: fadeInUpPremium 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    @keyframes fadeInUpPremium {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Glow Effects on Hover */
+    body.effects-enabled .card:hover {
+      box-shadow: 0 8px 32px rgba(6, 182, 212, 0.3) !important,
+                  0 0 20px rgba(6, 182, 212, 0.2) !important;
+      border-color: rgba(6, 182, 212, 0.4) !important;
+    }
+    
+    body.effects-enabled .stat-card:hover {
+      box-shadow: 0 12px 40px rgba(6, 182, 212, 0.3) !important;
+      transform: translateY(-4px) scale(1.02) !important;
+    }
+    
+    body.effects-enabled .btn:hover {
+      box-shadow: 0 4px 16px rgba(6, 182, 212, 0.4),
+                  0 0 12px rgba(6, 182, 212, 0.3);
+      transform: translateY(-2px) !important;
+    }
+    
+    /* Ripple Effect */
+    body.effects-enabled .btn,
+    body.effects-enabled .small-btn,
+    body.effects-enabled .nav button {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Lift Effect on Cards */
+    body.effects-enabled .observation-card:hover,
+    body.effects-enabled .milestone-card:hover {
+      transform: translateY(-8px) scale(1.02) !important;
+      box-shadow: 0 12px 40px rgba(6, 182, 212, 0.3) !important;
+    }
+    
+    /* Progress Bar Animation */
+    body.effects-enabled .progress-fill {
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
+    
+    /* Text Gradient */
+    body.effects-enabled h1,
+    body.effects-enabled h2 {
+      background: linear-gradient(90deg, var(--text), var(--accent), var(--text));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Skeleton Screens */
+    .skeleton {
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.02) 25%,
+        rgba(255,255,255,0.05) 50%,
+        rgba(255,255,255,0.02) 75%
+      );
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+      min-height: 20px;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Parallax Background */
+    body.effects-enabled::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.03) 0%, transparent 50%);
+      animation: floatBackground 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    @keyframes floatBackground {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(5deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+    }
+    
+    body.effects-enabled .app {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Toast Notifications */
+    body.effects-enabled .notification {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+                  0 0 20px rgba(6, 182, 212, 0.3) !important;
+      animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Input Focus */
+    body.effects-enabled input:focus,
+    body.effects-enabled select:focus,
+    body.effects-enabled textarea:focus {
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2),
+                  0 4px 12px rgba(6, 182, 212, 0.3) !important;
+      transform: scale(1.01);
+    }
+    
+    /* Nav Enhancement */
+    body.effects-enabled .nav button.active {
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+      transform: translateX(4px);
+    }
+    
+    body.effects-enabled .nav button:hover {
+      transform: translateX(8px) !important;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+    }
+    
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 10000;
+      animation: confettiFall 3s ease-out forwards;
+    }
+    
+    @keyframes confettiFall {
+      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    
+    /* Chart Animation */
+    body.effects-enabled canvas {
+      animation: fadeInCanvas 0.6s ease-out;
+    }
+    
+    @keyframes fadeInCanvas {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     @keyframes fadeInUp {
@@ -5594,6 +5825,18 @@
           <button class="small-btn theme-btn" data-theme="midnight" title="Mitternacht">🌃 Midnight</button>
         </div>
         
+        <!-- Effects Toggle -->
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div class="muted">✨ Premium Effekte</div>
+            <label class="toggle-switch" title="Premium-Effekte aktivieren/deaktivieren">
+              <input type="checkbox" id="effectsToggle" checked onchange="togglePremiumEffects()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p style="font-size: 11px; color: var(--muted); margin: 0;">Animationen, Glassmorphism, Glow-Effekte</p>
+        </div>
+        
         <div style="margin-top:12px;">
           <div class="muted">Offline-Modus</div>
           <div class="progress-bar">
@@ -5626,60 +5869,191 @@
         <div>
           <!-- Dashboard -->
           <section id="home" class="card active">
-            <h2>Dashboard</h2>
-            <p class="muted">Willkommen zu deinem Vogelbeobachtungs-System. Hier findest du alle wichtigen Informationen auf einen Blick.</p>
-            
-            <!-- NEU: Datums-Filter Shortcuts -->
-            <div class="date-shortcuts" role="toolbar" aria-label="Datums-Filter">
-              <button data-range="today" onclick="applyDateFilter('today')" aria-label="Heute anzeigen">
-                📅 Heute
-              </button>
-              <button data-range="yesterday" onclick="applyDateFilter('yesterday')" aria-label="Gestern anzeigen">
-                📅 Gestern
-              </button>
-              <button data-range="week" onclick="applyDateFilter('week')" aria-label="Letzte Woche anzeigen">
-                📅 Letzte Woche
-              </button>
-              <button data-range="month" onclick="applyDateFilter('month')" aria-label="Letzter Monat anzeigen">
-                📅 Letzter Monat
-              </button>
-              <button data-range="thisYear" onclick="applyDateFilter('thisYear')" aria-label="Dieses Jahr anzeigen">
-                📅 Dieses Jahr
-              </button>
-              <button data-range="all" onclick="applyDateFilter('all')" class="active" aria-label="Alle anzeigen">
-                📅 Alle
-              </button>
-            </div>
-            
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-top:12px;">
-              <div class="card">
-                <div class="kpi"><div class="value" id="kpiTotal">0</div><div class="muted">Gesamtbeobachtungen</div></div>
-              </div>
-              <div class="card">
-                <div class="kpi"><div class="value" id="kpiSpecies">0</div><div class="muted">Vogelarten</div></div>
-              </div>
-              <div class="card">
-                <div class="kpi"><div class="value" id="kpiDays">0</div><div class="muted">Beobachtungstage</div></div>
-              </div>
-              <div class="card">
-                <div class="kpi"><div class="value" id="kpiAvg">0.0</div><div class="muted">Ø pro Tag</div></div>
+            <!-- Hero Header mit Begrüßung und Tagesinfo -->
+            <div style="background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.1));padding:32px;border-radius:16px;margin-bottom:28px;border:1px solid rgba(6,182,212,0.3);box-shadow:0 8px 32px rgba(6,182,212,0.2);position:relative;overflow:hidden;">
+              <div style="position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(6,182,212,0.2),transparent);border-radius:50%;"></div>
+              <div style="position:absolute;bottom:-40px;left:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(124,58,237,0.2),transparent);border-radius:50%;"></div>
+              
+              <div style="position:relative;z-index:1;">
+                <div style="display:flex;align-items:center;gap:20px;margin-bottom:16px;">
+                  <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 8px 24px rgba(6,182,212,0.4);">
+                    🐦
+                  </div>
+                  <div>
+                    <h1 style="margin:0;font-size:32px;font-weight:700;background:linear-gradient(90deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="dashboardGreeting">Willkommen zurück!</h1>
+                    <p style="margin:6px 0 0 0;color:var(--soft);font-size:16px;" id="dashboardDate">Lade Daten...</p>
+                  </div>
+                </div>
+                
+                <!-- Quick Stats Row -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:20px;">
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:28px;font-weight:700;color:var(--accent);" id="heroTotalObs">0</div>
+                    <div style="font-size:12px;color:var(--soft);margin-top:4px;">Beobachtungen</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:28px;font-weight:700;color:var(--accent-2);" id="heroSpeciesCount">0</div>
+                    <div style="font-size:12px;color:var(--soft);margin-top:4px;">Arten gesichtet</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:28px;font-weight:700;color:var(--success);" id="heroThisWeek">0</div>
+                    <div style="font-size:12px;color:var(--soft);margin-top:4px;">Diese Woche</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:28px;font-weight:700;color:#fbbf24;" id="heroStreak">0</div>
+                    <div style="font-size:12px;color:var(--soft);margin-top:4px;">Tage Streak</div>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div class="feature-section">
-              <h3 style="margin-top:0;">Top 5 Vogelarten</h3>
-              <div class="top-species-list" id="topSpeciesList">
-                <div class="muted">Keine Beobachtungen</div>
+
+            <!-- Schnellzugriff Buttons -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;">
+              <button class="btn" onclick="document.querySelector('.nav button[data-page=\\'eingabe\\']').click()" style="background:linear-gradient(135deg,var(--accent),var(--accent-2));padding:16px;display:flex;align-items:center;gap:12px;justify-content:center;border-radius:12px;box-shadow:0 4px 16px rgba(6,182,212,0.3);transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(6,182,212,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(6,182,212,0.3)'">
+                <span style="font-size:24px;">➕</span>
+                <span style="font-weight:600;">Neue Beobachtung</span>
+              </button>
+              <button class="small-btn" onclick="document.querySelector('.nav button[data-page=\\'karte\\']').click()" style="padding:16px;display:flex;align-items:center;gap:12px;justify-content:center;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                <span style="font-size:24px;">🗺️</span>
+                <span style="font-weight:600;">Karte öffnen</span>
+              </button>
+              <button class="small-btn" onclick="document.querySelector('.nav button[data-page=\\'listen\\']').click()" style="padding:16px;display:flex;align-items:center;gap:12px;justify-content:center;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                <span style="font-size:24px;">📋</span>
+                <span style="font-weight:600;">Meine Listen</span>
+              </button>
+              <button class="small-btn" onclick="document.querySelector('.nav button[data-page=\\'diagramme\\']').click()" style="padding:16px;display:flex;align-items:center;gap:12px;justify-content:center;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                <span style="font-size:24px;">📊</span>
+                <span style="font-weight:600;">Statistiken</span>
+              </button>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;margin-bottom:24px;">
+              
+              <!-- Aktivität heute -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.02));border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 4px 16px rgba(6,182,212,0.1);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent),#0891b2);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
+                    📅
+                  </div>
+                  <h3 style="margin:0;font-size:18px;font-weight:700;">Heute</h3>
+                </div>
+                <div id="todayActivity">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <p>Noch keine Beobachtungen heute</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top 5 Arten -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(124,58,237,0.02));border-left:4px solid var(--accent-2);border-radius:12px;box-shadow:0 4px 16px rgba(124,58,237,0.1);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--accent-2),#6d28d9);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(124,58,237,0.3);">
+                    🏆
+                  </div>
+                  <h3 style="margin:0;font-size:18px;font-weight:700;">Top 5 Arten</h3>
+                </div>
+                <div id="topSpeciesList">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <p>Keine Daten verfügbar</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Letzte Beobachtungen -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02));border-left:4px solid var(--success);border-radius:12px;box-shadow:0 4px 16px rgba(16,185,129,0.1);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--success),#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(16,185,129,0.3);">
+                    🕐
+                  </div>
+                  <h3 style="margin:0;font-size:18px;font-weight:700;">Neueste Beobachtungen</h3>
+                </div>
+                <div id="recentObservations">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <p>Keine Beobachtungen</p>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div class="feature-section">
-              <h3 style="margin-top:0;">Schnellzugriff</h3>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="small-btn" onclick="document.querySelector('button[data-page=\"eingabe\"]').click()">➕ Neue Beobachtung</button>
-                <button class="small-btn" onclick="document.querySelector('button[data-page=\"karte\"]').click()">🗺️ Karte öffnen</button>
-                <button class="small-btn" onclick="showQuickReport()">📋 Schnellbericht</button>
-                <button class="small-btn" onclick="checkSeasonalBirds()">🌱 Saison-Tipps</button>
+
+            <!-- Zweite Reihe Widgets -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;margin-bottom:24px;">
+              
+              <!-- Monatliche Fortschritte -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02));border-left:4px solid #f59e0b;border-radius:12px;box-shadow:0 4px 16px rgba(245,158,11,0.1);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(245,158,11,0.3);">
+                    📈
+                  </div>
+                  <h3 style="margin:0;font-size:18px;font-weight:700;">Dieser Monat</h3>
+                </div>
+                <div id="monthlyProgress">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <p>Lade Daten...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Erfolge & Achievements -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(234,179,8,0.08), rgba(234,179,8,0.02));border-left:4px solid #eab308;border-radius:12px;box-shadow:0 4px 16px rgba(234,179,8,0.1);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#eab308,#ca8a04);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(234,179,8,0.3);">
+                    🏅
+                  </div>
+                  <h3 style="margin:0;font-size:18px;font-weight:700;">Aktuelle Erfolge</h3>
+                </div>
+                <div id="recentAchievements">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <p>Keine Erfolge freigeschaltet</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Seltenheiten & Highlights -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(236,72,153,0.08), rgba(236,72,153,0.02));border-left:4px solid #ec4899;border-radius:12px;box-shadow:0 4px 16px rgba(236,72,153,0.1);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#ec4899,#db2777);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(236,72,153,0.3);">
+                    💎
+                  </div>
+                  <h3 style="margin:0;font-size:18px;font-weight:700;">Seltenheiten</h3>
+                </div>
+                <div id="rarityHighlights">
+                  <div style="text-align:center;padding:20px;color:var(--muted);">
+                    <p>Keine Seltenheiten gefunden</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Jahresübersicht & Kalender -->
+            <div class="card" style="background:linear-gradient(135deg, rgba(59,130,246,0.05), rgba(37,99,235,0.02));border-left:4px solid #3b82f6;border-radius:12px;margin-bottom:24px;">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                  📊
+                </div>
+                <h3 style="margin:0;font-size:18px;font-weight:700;">Jahresübersicht 2026</h3>
+              </div>
+              <div id="yearOverview">
+                <div style="text-align:center;padding:20px;color:var(--muted);">
+                  <p>Lade Jahresstatistiken...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipps & Saison-Infos -->
+            <div class="card" style="background:linear-gradient(135deg, rgba(34,197,94,0.05), rgba(16,185,129,0.02));border-left:4px solid #22c55e;border-radius:12px;">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(34,197,94,0.3);">
+                  🌱
+                </div>
+                <h3 style="margin:0;font-size:18px;font-weight:700;">Saison-Tipps & Empfehlungen</h3>
+              </div>
+              <div id="seasonalTips">
+                <div style="padding:16px;background:rgba(34,197,94,0.05);border-radius:10px;border:1px solid rgba(34,197,94,0.15);">
+                  <p style="margin:0;font-size:14px;line-height:1.6;">
+                    💡 <strong>Tipp:</strong> Januar ist eine großartige Zeit, um Wintergäste und Wasservögel zu beobachten. Halte Ausschau nach Seidenschwänzen und überwinternden Enten!
+                  </p>
+                </div>
               </div>
             </div>
           </section>
@@ -7935,43 +8309,52 @@
 
           <!-- Gruppenvergleich -->
           <section id="group-compare" class="card" style="display:none;">
-            <div style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05));padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(6,182,212,0.2);">
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                <div style="font-size:36px;">👥</div>
+            <!-- Premium Header with decorative elements -->
+            <div style="background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.1));padding:28px;border-radius:16px;margin-bottom:24px;border:1px solid rgba(6,182,212,0.3);box-shadow:0 8px 32px rgba(6,182,212,0.2);position:relative;overflow:hidden;">
+              <!-- Decorative background circles -->
+              <div style="position:absolute;top:-50px;right:-50px;width:150px;height:150px;background:radial-gradient(circle,rgba(6,182,212,0.15),transparent);border-radius:50%;"></div>
+              <div style="position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent);border-radius:50%;"></div>
+              
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;position:relative;z-index:1;">
+                <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 24px rgba(6,182,212,0.4);">
+                  👥
+                </div>
                 <div>
-                  <h2 style="margin:0;font-size:24px;">Gruppenvergleich</h2>
-                  <p style="margin:4px 0 0 0;color:var(--muted);font-size:13px;">Vergleiche Beobachtungen und Erfolge der Gruppenmitglieder</p>
+                  <h2 style="margin:0;font-size:28px;font-weight:700;background:linear-gradient(90deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Gruppenvergleich</h2>
+                  <p style="margin:4px 0 0 0;color:var(--soft);font-size:14px;">Vergleiche Beobachtungen und Erfolge der Gruppenmitglieder</p>
                 </div>
               </div>
             </div>
 
-            <!-- Tab-Navigation -->
-            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;padding:12px;background:rgba(255,255,255,0.02);border-radius:10px;">
-              <button class="small-btn active" id="compareObsTab" onclick="switchCompareTab('observations')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+            <!-- Tab-Navigation with improved design -->
+            <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;padding:8px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
+              <button class="small-btn active" id="compareObsTab" onclick="switchCompareTab('observations')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 📊 Beobachtungen
               </button>
-              <button class="small-btn" id="compareListsTab" onclick="switchCompareTab('lists')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+              <button class="small-btn" id="compareListsTab" onclick="switchCompareTab('lists')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 📋 Listen
               </button>
-              <button class="small-btn" id="compareRarityTab" onclick="switchCompareTab('rarity2026')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+              <button class="small-btn" id="compareRarityTab" onclick="switchCompareTab('rarity2026')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 💎 Raritäten
               </button>
-              <button class="small-btn" id="compareAchTab" onclick="switchCompareTab('achievements')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+              <button class="small-btn" id="compareAchTab" onclick="switchCompareTab('achievements')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 🏅 Erfolge
               </button>
-              <button class="small-btn" id="compareStatsTab" onclick="switchCompareTab('stats')" style="flex:1;min-width:140px;padding:10px 14px;font-weight:600;">
+              <button class="small-btn" id="compareStatsTab" onclick="switchCompareTab('stats')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 📈 Statistiken
               </button>
             </div>
 
             <!-- Beobachtungs-Vergleich -->
             <div id="compareObservationsView">
-              <!-- Leaderboards in Grid Layout -->
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:16px;margin-bottom:20px;">
-                <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.06));border-left:4px solid #06b6d4;">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                    <span style="font-size:28px;">🏆</span>
-                    <h3 style="margin:0;">Beobachtungen</h3>
+              <!-- Leaderboards with premium design -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:20px;margin-bottom:24px;">
+                <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.06));border-left:4px solid #06b6d4;border-radius:16px;box-shadow:0 8px 24px rgba(6,182,212,0.15);transition:all 0.3s;">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#06b6d4,#0891b2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
+                      🏆
+                    </div>
+                    <h3 style="margin:0;font-size:20px;font-weight:700;">Beobachtungen</h3>
                   </div>
                   <div id="observationLeaderboard">
                     <div class="skeleton-loader">
@@ -7982,10 +8365,12 @@
                   </div>
                 </div>
                 
-                <div class="card" style="background:linear-gradient(135deg, rgba(168,85,247,0.12), rgba(236,72,153,0.06));border-left:4px solid #a855f7;">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                    <span style="font-size:28px;">🐦</span>
-                    <h3 style="margin:0;">Arten</h3>
+                <div class="card" style="background:linear-gradient(135deg, rgba(168,85,247,0.12), rgba(236,72,153,0.06));border-left:4px solid #a855f7;border-radius:16px;box-shadow:0 8px 24px rgba(168,85,247,0.15);transition:all 0.3s;">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#a855f7,#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(168,85,247,0.3);">
+                      🐦
+                    </div>
+                    <h3 style="margin:0;font-size:20px;font-weight:700;">Arten</h3>
                   </div>
                   <div id="speciesLeaderboard">
                     <div class="skeleton-loader">
@@ -7997,13 +8382,15 @@
                 </div>
               </div>
 
-              <!-- NEU: Exklusive Arten Leaderboard -->
-              <div class="card" style="background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));border-left:4px solid #7c3aed;margin-bottom:20px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                  <span style="font-size:28px;">⭐</span>
+              <!-- Exklusive Arten with premium design -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));border-left:4px solid #7c3aed;margin-bottom:24px;border-radius:16px;box-shadow:0 8px 24px rgba(124,58,237,0.15);transition:all 0.3s;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:48px;height:48px;background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(124,58,237,0.3);">
+                    ⭐
+                  </div>
                   <div>
-                    <h3 style="margin:0;">Exklusive Arten</h3>
-                    <p style="margin:4px 0 0 0;font-size:12px;color:var(--muted);">
+                    <h3 style="margin:0;font-size:20px;font-weight:700;">Exklusive Arten</h3>
+                    <p style="margin:4px 0 0 0;font-size:13px;color:var(--muted);">
                       Arten, die nur ein Mitglied gesehen hat
                     </p>
                   </div>
@@ -8017,25 +8404,32 @@
                 </div>
               </div>
 
-              <!-- Direkter Mitglieder-Vergleich -->
-              <div class="card" style="margin-bottom:20px;border-left:4px solid #22c55e;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <span style="font-size:28px;">🔍</span>
-                    <h3 style="margin:0;">Direkter Mitglieder-Vergleich</h3>
+              <!-- Direkter Mitglieder-Vergleich with premium design -->
+              <div class="card" style="margin-bottom:24px;border-left:4px solid #22c55e;border-radius:16px;box-shadow:0 8px 24px rgba(34,197,94,0.15);transition:all 0.3s;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(34,197,94,0.3);">
+                      🔍
+                    </div>
+                    <h3 style="margin:0;font-size:20px;font-weight:700;">Direkter Mitglieder-Vergleich</h3>
                   </div>
-                  <button class="small-btn" onclick="openDetailedMemberComparison()" style="background:var(--accent);padding:8px 14px;">
+                  <button class="small-btn" onclick="openDetailedMemberComparison()" style="background:linear-gradient(135deg,var(--accent),var(--accent-2));padding:10px 18px;border-radius:10px;font-weight:600;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
                     📊 Detailansicht
                   </button>
                 </div>
-                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+                <div id="memberComparisonGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
                   <p style="color:var(--muted);text-align:center;grid-column:1/-1;padding:20px;">Lade Daten...</p>
                 </div>
               </div>
 
-              <!-- Detaillierter Vergleich -->
-              <div class="card" style="border-left:4px solid #06b6d4;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <!-- Detaillierter Vergleich with premium design -->
+              <div class="card" style="border-left:4px solid #06b6d4;border-radius:16px;box-shadow:0 8px 24px rgba(6,182,212,0.15);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="width:48px;height:48px;background:linear-gradient(135deg,#06b6d4,#0891b2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
+                    📊
+                  </div>
+                  <h3 style="margin:0;font-size:20px;font-weight:700;">Detaillierter Vergleich</h3>
+                </div>
                   <span style="font-size:28px;">📊</span>
                   <h3 style="margin:0;">Detaillierter Vergleich</h3>
                 </div>
@@ -8188,44 +8582,115 @@
 
             <!-- Statistik-Vergleich -->
             <div id="compareStatsView" style="display:none;">
-              <div class="card" style="margin-bottom:20px;border-left:4px solid #06b6d4;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                  <span style="font-size:28px;">📈</span>
-                  <h3 style="margin:0;">Gruppen-Statistiken im Überblick</h3>
+              <!-- Gruppen-Übersicht mit Premium-Design -->
+              <div class="card" style="margin-bottom:24px;background:linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.04));border-left:4px solid var(--accent);border-radius:16px;box-shadow:0 8px 24px rgba(6,182,212,0.12);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                  <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
+                    📈
+                  </div>
+                  <h3 style="margin:0;font-size:22px;font-weight:700;">Gruppen-Statistiken im Überblick</h3>
                 </div>
                 <div id="groupStatsOverview"></div>
               </div>
 
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
-                <div class="card" style="border-left:4px solid #22c55e;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">🐦</span>
-                    <h4 style="margin:0;">Meiste einzigartige Arten</h4>
+              <!-- Top Performer Grid -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;margin-bottom:24px;">
+                <!-- Meiste Arten -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(34,197,94,0.08), rgba(16,185,129,0.04));border-left:4px solid #22c55e;border-radius:12px;box-shadow:0 4px 16px rgba(34,197,94,0.1);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(34,197,94,0.25);">
+                      🐦
+                    </div>
+                    <h4 style="margin:0;font-size:16px;font-weight:700;">Artenvielfalt-Champion</h4>
                   </div>
                   <div id="topSpeciesFinders"></div>
                 </div>
                 
-                <div class="card" style="border-left:4px solid #ec4899;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">📸</span>
-                    <h4 style="margin:0;">Meiste Fotos</h4>
+                <!-- Meiste Fotos -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(236,72,153,0.08), rgba(219,39,119,0.04));border-left:4px solid #ec4899;border-radius:12px;box-shadow:0 4px 16px rgba(236,72,153,0.1);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#ec4899,#db2777);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(236,72,153,0.25);">
+                      📸
+                    </div>
+                    <h4 style="margin:0;font-size:16px;font-weight:700;">Foto-Meister</h4>
                   </div>
                   <div id="topPhotoTakers"></div>
                 </div>
                 
-                <div class="card" style="border-left:4px solid #f59e0b;">
-                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:24px;">🔥</span>
-                    <h4 style="margin:0;">Längste Streak</h4>
+                <!-- Aktivste Beobachter -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.04));border-left:4px solid #f59e0b;border-radius:12px;box-shadow:0 4px 16px rgba(245,158,11,0.1);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(245,158,11,0.25);">
+                      🔥
+                    </div>
+                    <h4 style="margin:0;font-size:16px;font-weight:700;">Aktivitäts-König</h4>
+                  </div>
+                  <div id="topActiveUsers"></div>
+                </div>
+              </div>
+
+              <!-- Erweiterte Statistiken Grid -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;margin-bottom:24px;">
+                <!-- Seltenheiten-Jäger -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(168,85,247,0.08), rgba(147,51,234,0.04));border-left:4px solid #a855f7;border-radius:12px;box-shadow:0 4px 16px rgba(168,85,247,0.1);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#a855f7,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(168,85,247,0.25);">
+                      💎
+                    </div>
+                    <h4 style="margin:0;font-size:16px;font-weight:700;">Seltenheiten-Experte</h4>
+                  </div>
+                  <div id="topRarityHunters"></div>
+                </div>
+
+                <!-- Beste Streaks -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(59,130,246,0.08), rgba(37,99,235,0.04));border-left:4px solid #3b82f6;border-radius:12px;box-shadow:0 4px 16px rgba(59,130,246,0.1);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(59,130,246,0.25);">
+                      📅
+                    </div>
+                    <h4 style="margin:0;font-size:16px;font-weight:700;">Streak-Champion</h4>
                   </div>
                   <div id="topStreaks"></div>
                 </div>
+
+                <!-- Frühaufsteher -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04));border-left:4px solid #fbbf24;border-radius:12px;box-shadow:0 4px 16px rgba(251,191,36,0.1);">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(251,191,36,0.25);">
+                      🌅
+                    </div>
+                    <h4 style="margin:0;font-size:16px;font-weight:700;">Frühaufsteher</h4>
+                  </div>
+                  <div id="topEarlyBirds"></div>
+                </div>
+              </div>
+
+              <!-- Monats- und Jahresvergleich -->
+              <div class="card" style="margin-bottom:24px;background:linear-gradient(135deg, rgba(6,182,212,0.05), rgba(124,58,237,0.03));border-left:4px solid #06b6d4;border-radius:12px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,#06b6d4,#0891b2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(6,182,212,0.25);">
+                    📊
+                  </div>
+                  <h4 style="margin:0;font-size:18px;font-weight:700;">Aktivität nach Zeitraum</h4>
+                </div>
+                <div id="timeComparisonStats"></div>
+              </div>
+
+              <!-- Detaillierte Mitglieder-Statistiken -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(124,58,237,0.05), rgba(6,182,212,0.03));border-left:4px solid var(--accent-2);border-radius:12px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,var(--accent-2),#6d28d9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(124,58,237,0.25);">
+                    👥
+                  </div>
+                  <h4 style="margin:0;font-size:18px;font-weight:700;">Detaillierte Mitglieder-Übersicht</h4>
+                </div>
+                <div id="detailedMemberStats"></div>
               </div>
             </div>
           </section>
         </div>
 
-        <aside>
+        <aside style="display: none;">
           <!-- Karte -->
           <div id="mapCard" class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -15315,6 +15780,10 @@
           updateChart();
         }
         
+        // Initialize grid layout (aside is hidden by default)
+        const grid = document.querySelector('.grid');
+        if (grid) grid.classList.add('no-aside');
+        
       } catch (error) {
         console.error('Initialisierungsfehler:', error);
         showNotification('Fehler bei der Initialisierung. Bitte Seite neu laden.', 5000);
@@ -15707,6 +16176,19 @@
         document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
+        // Show/hide aside (map) based on page
+        const aside = document.querySelector('aside');
+        const grid = document.querySelector('.grid');
+        if (aside) {
+          if (page === 'karte') {
+            aside.style.display = 'block';
+            if (grid) grid.classList.remove('no-aside');
+          } else {
+            aside.style.display = 'none';
+            if (grid) grid.classList.add('no-aside');
+          }
+        }
+        
         if (page === 'karte') {
           document.documentElement.classList.add('map-full');
         } else {
@@ -15716,6 +16198,32 @@
         document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
         const el = document.getElementById(page);
         if (el) el.style.display = 'block';
+        
+        // Reset group compare tabs when leaving group-compare page (happens in background)
+        if (page !== 'group-compare') {
+          // Reset tab buttons in background (views will be reset when returning)
+          document.querySelectorAll('#group-compare .small-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.background = '';
+            btn.style.border = '1px solid rgba(255,255,255,0.1)';
+            btn.style.transform = '';
+          });
+          
+          const obsTab = document.getElementById('compareObsTab');
+          if (obsTab) {
+            obsTab.classList.add('active');
+            obsTab.style.background = 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.1))';
+            obsTab.style.border = '2px solid #06b6d4';
+            obsTab.style.transform = 'scale(1.02)';
+          }
+        } else {
+          // When entering group-compare page, show observations view and hide others
+          document.getElementById('compareObservationsView').style.display = 'block';
+          document.getElementById('compareListsView').style.display = 'none';
+          document.getElementById('compareRarity2026View').style.display = 'none';
+          document.getElementById('compareAchievementsView').style.display = 'none';
+          document.getElementById('compareStatsView').style.display = 'none';
+        }
 
         if (page === 'diagramme') {
           updateYearSelection();
@@ -20600,29 +21108,310 @@
     
     // ---------- Dashboard & Statistiken ----------
     async function updateDashboard() {
-      const stats = await getDetailedStatistics();
-      
-      document.getElementById('kpiTotal').textContent = stats.totalObservations;
-      document.getElementById('kpiSpecies').textContent = stats.uniqueSpecies;
-      document.getElementById('kpiDays').textContent = stats.uniqueDates;
-      document.getElementById('kpiAvg').textContent = stats.averagePerDay;
-      
-      const topSpeciesList = document.getElementById('topSpeciesList');
-      if (stats.topSpecies.length > 0) {
-        let html = '';
-        stats.topSpecies.slice(0, 5).forEach(species => {
-          const rarity = getRarityStyle(species.name);
-          html += `
-            <div class="top-species-item">
-              <span class="${rarity.rarityClass}">${rarity.rarityIcon}${species.name}</span>
-              <span class="species-count">${species.count}</span>
+      try {
+        const stats = await getDetailedStatistics();
+        const observations = await getAllObservations();
+        
+        // === HERO HEADER ===
+        const now = new Date();
+        const hour = now.getHours();
+        let greeting = 'Guten Morgen';
+        if (hour >= 12 && hour < 18) greeting = 'Guten Tag';
+        else if (hour >= 18) greeting = 'Guten Abend';
+        
+        const dateStr = now.toLocaleDateString('de-DE', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        
+        document.getElementById('dashboardGreeting').textContent = greeting + '!';
+        document.getElementById('dashboardDate').textContent = dateStr;
+        
+        // Hero Quick Stats
+        document.getElementById('heroTotalObs').textContent = stats.totalObservations.toLocaleString();
+        document.getElementById('heroSpeciesCount').textContent = stats.uniqueSpecies;
+        
+        // Diese Woche
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const thisWeekObs = observations.filter(o => new Date(o.date) >= weekAgo);
+        document.getElementById('heroThisWeek').textContent = thisWeekObs.length;
+        
+        // Streak (vereinfacht - könnte verbessert werden)
+        document.getElementById('heroStreak').textContent = calculateStreak(observations);
+        
+        // === AKTIVITÄT HEUTE ===
+        const today = new Date().toISOString().split('T')[0];
+        const todayObs = observations.filter(o => o.date === today);
+        
+        if (todayObs.length > 0) {
+          const todaySpecies = new Set(todayObs.map(o => o.bird)).size;
+          document.getElementById('todayActivity').innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="text-align:center;padding:16px;background:rgba(6,182,212,0.1);border-radius:10px;">
+                <div style="font-size:32px;font-weight:700;color:var(--accent);">${todayObs.length}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;">Beobachtungen</div>
+              </div>
+              <div style="text-align:center;padding:16px;background:rgba(124,58,237,0.1);border-radius:10px;">
+                <div style="font-size:32px;font-weight:700;color:var(--accent-2);">${todaySpecies}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;">Arten</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;">
+              <div style="font-size:13px;color:var(--soft);margin-bottom:8px;font-weight:600;">Zuletzt gesehen:</div>
+              ${todayObs.slice(0, 3).map(o => `
+                <div style="font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;">
+                  <span>${o.bird}</span>
+                  <span>${new Date(o.timestamp).toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})}</span>
+                </div>
+              `).join('')}
             </div>
           `;
+        } else {
+          document.getElementById('todayActivity').innerHTML = `
+            <div style="text-align:center;padding:24px;">
+              <div style="font-size:48px;margin-bottom:12px;opacity:0.5;">🐦</div>
+              <p style="color:var(--muted);margin:0;font-size:14px;">Noch keine Beobachtungen heute</p>
+              <button class="small-btn" onclick="document.querySelector('.nav button[data-page=\\'eingabe\\']').click()" style="margin-top:12px;">
+                ➕ Erste Beobachtung eintragen
+              </button>
+            </div>
+          `;
+        }
+        
+        // === TOP 5 ARTEN ===
+        const topSpeciesList = document.getElementById('topSpeciesList');
+        if (stats.topSpecies.length > 0) {
+          let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+          stats.topSpecies.slice(0, 5).forEach((species, i) => {
+            const rarity = getRarityStyle(species.name);
+            const percentage = Math.round((species.count / stats.totalObservations) * 100);
+            html += `
+              <div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border-left:3px solid ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)'};transition:all 0.2s;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.transform='translateX(4px)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.transform=''">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                  <span style="font-weight:600;font-size:14px;">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`} ${rarity.rarityIcon}${species.name}</span>
+                  <span style="font-weight:700;color:var(--accent);">${species.count}</span>
+                </div>
+                <div style="width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+                  <div style="width:${percentage}%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:2px;"></div>
+                </div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          topSpeciesList.innerHTML = html;
+        } else {
+          topSpeciesList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Noch keine Beobachtungen</div>';
+        }
+        
+        // === NEUESTE BEOBACHTUNGEN ===
+        const recentObs = observations.slice(0, 5);
+        if (recentObs.length > 0) {
+          document.getElementById('recentObservations').innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${recentObs.map(o => {
+                const date = new Date(o.timestamp);
+                const timeAgo = getTimeAgo(date);
+                const rarity = getRarityStyle(o.bird);
+                return `
+                  <div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                    <div>
+                      <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${rarity.rarityIcon}${o.bird}</div>
+                      <div style="font-size:11px;color:var(--muted);">${o.location || 'Kein Ort'} • ${o.count || 1}x</div>
+                    </div>
+                    <div style="text-align:right;font-size:11px;color:var(--muted);">
+                      ${timeAgo}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+        
+        // === MONATLICHER FORTSCHRITT ===
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        const monthStart = new Date(currentYear, currentMonth, 1);
+        const monthObs = observations.filter(o => new Date(o.date) >= monthStart);
+        const monthSpecies = new Set(monthObs.map(o => o.bird)).size;
+        
+        document.getElementById('monthlyProgress').innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div style="text-align:center;padding:16px;background:rgba(245,158,11,0.1);border-radius:10px;">
+              <div style="font-size:32px;font-weight:700;color:#f59e0b;">${monthObs.length}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">Beobachtungen</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:rgba(245,158,11,0.1);border-radius:10px;">
+              <div style="font-size:32px;font-weight:700;color:#f59e0b;">${monthSpecies}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">Arten</div>
+            </div>
+          </div>
+          <div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;color:var(--muted);">Fortschritt</span>
+              <span style="font-size:12px;font-weight:600;color:#f59e0b;">${monthObs.length} / ${monthObs.length > 50 ? monthObs.length : '50'}</span>
+            </div>
+            <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+              <div style="width:${Math.min(100, (monthObs.length / 50) * 100)}%;height:100%;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:3px;"></div>
+            </div>
+          </div>
+        `;
+        
+        // === ERFOLGE ===
+        document.getElementById('recentAchievements').innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${stats.totalObservations >= 100 ? `
+              <div style="padding:12px;background:rgba(234,179,8,0.1);border-radius:8px;display:flex;align-items:center;gap:12px;">
+                <div style="font-size:32px;">🏅</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Jahrhundert-Beobachter</div>
+                  <div style="font-size:11px;color:var(--muted);">100+ Beobachtungen erreicht!</div>
+                </div>
+              </div>
+            ` : ''}
+            ${stats.uniqueSpecies >= 50 ? `
+              <div style="padding:12px;background:rgba(234,179,8,0.1);border-radius:8px;display:flex;align-items:center;gap:12px;">
+                <div style="font-size:32px;">🐦</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Arten-Sammler</div>
+                  <div style="font-size:11px;color:var(--muted);">50+ verschiedene Arten gesichtet!</div>
+                </div>
+              </div>
+            ` : ''}
+            ${stats.totalObservations === 0 ? `
+              <div style="text-align:center;padding:20px;color:var(--muted);">
+                <div style="font-size:32px;margin-bottom:8px;opacity:0.5;">🏅</div>
+                <p style="margin:0;font-size:13px;">Beginne mit Beobachtungen, um Erfolge freizuschalten!</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+        
+        // === SELTENHEITEN ===
+        const rareObs = observations.filter(o => {
+          const rarity = getRarityStyle(o.bird);
+          return rarity.rarityClass.includes('rare');
         });
-        topSpeciesList.innerHTML = html;
-      } else {
-        topSpeciesList.innerHTML = '<div class="muted">Keine Beobachtungen</div>';
+        
+        if (rareObs.length > 0) {
+          document.getElementById('rarityHighlights').innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${rareObs.slice(0, 5).map(o => {
+                const rarity = getRarityStyle(o.bird);
+                return `
+                  <div style="padding:10px;background:rgba(236,72,153,0.05);border-radius:8px;border-left:3px solid #ec4899;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                      <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${rarity.rarityIcon}${o.bird}</div>
+                      <div style="font-size:11px;color:var(--muted);">${o.location || 'Kein Ort'} • ${new Date(o.date).toLocaleDateString('de-DE')}</div>
+                    </div>
+                    <div style="font-size:20px;">💎</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        } else {
+          document.getElementById('rarityHighlights').innerHTML = `
+            <div style="text-align:center;padding:20px;color:var(--muted);">
+              <div style="font-size:48px;margin-bottom:12px;opacity:0.3;">💎</div>
+              <p style="margin:0;font-size:13px;">Noch keine seltenen Arten entdeckt</p>
+              <p style="margin:8px 0 0 0;font-size:11px;">Halte Ausschau nach ungewöhnlichen Vögeln!</p>
+            </div>
+          `;
+        }
+        
+        // === JAHRESÜBERSICHT ===
+        const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentYear);
+        const yearSpecies = new Set(yearObs.map(o => o.bird)).size;
+        const monthlyData = Array(12).fill(0);
+        yearObs.forEach(o => {
+          const month = new Date(o.date).getMonth();
+          monthlyData[month]++;
+        });
+        
+        const maxMonth = Math.max(...monthlyData);
+        const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+        
+        document.getElementById('yearOverview').innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+            <div style="text-align:center;padding:16px;background:rgba(59,130,246,0.08);border-radius:10px;">
+              <div style="font-size:32px;font-weight:700;color:#3b82f6;">${yearObs.length}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">Beobachtungen 2026</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:rgba(59,130,246,0.08);border-radius:10px;">
+              <div style="font-size:32px;font-weight:700;color:#3b82f6;">${yearSpecies}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">Arten 2026</div>
+            </div>
+            <div style="text-align:center;padding:16px;background:rgba(59,130,246,0.08);border-radius:10px;">
+              <div style="font-size:32px;font-weight:700;color:#3b82f6;">${Math.max(...monthlyData)}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">Bester Monat</div>
+            </div>
+          </div>
+          
+          <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:10px;">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600;">Monatliche Verteilung</div>
+            <div style="display:flex;gap:4px;align-items:flex-end;height:120px;">
+              ${monthlyData.map((count, i) => {
+                const height = maxMonth > 0 ? (count / maxMonth) * 100 : 0;
+                const isCurrentMonth = i === currentMonth;
+                return `
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                    <div style="font-size:10px;color:${isCurrentMonth ? 'var(--accent)' : 'var(--muted)'};font-weight:${isCurrentMonth ? '700' : '400'};">${count}</div>
+                    <div style="width:100%;height:${height}%;min-height:${count > 0 ? '4px' : '2px'};background:${isCurrentMonth ? 'linear-gradient(180deg,var(--accent),var(--accent-2))' : 'rgba(59,130,246,0.3)'};border-radius:2px;transition:all 0.3s;" title="${monthNames[i]}: ${count} Beobachtungen"></div>
+                    <div style="font-size:9px;color:var(--muted);">${monthNames[i]}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+        
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren des Dashboards:', error);
       }
+    }
+    
+    // Hilfsfunktion: Berechne Streak
+    function calculateStreak(observations) {
+      if (observations.length === 0) return 0;
+      
+      const dates = [...new Set(observations.map(o => o.date))].sort().reverse();
+      let streak = 0;
+      let currentDate = new Date();
+      currentDate.setHours(0, 0, 0, 0);
+      
+      for (let date of dates) {
+        const obsDate = new Date(date);
+        obsDate.setHours(0, 0, 0, 0);
+        
+        const diffDays = Math.floor((currentDate - obsDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === streak || diffDays === streak + 1) {
+          streak = diffDays + 1;
+        } else {
+          break;
+        }
+      }
+      
+      return streak;
+    }
+    
+    // Hilfsfunktion: Zeit seit Beobachtung
+    function getTimeAgo(date) {
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      
+      if (diffMins < 1) return 'Gerade eben';
+      if (diffMins < 60) return `vor ${diffMins} Min.`;
+      if (diffHours < 24) return `vor ${diffHours} Std.`;
+      if (diffDays < 7) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`;
+      return date.toLocaleDateString('de-DE');
     }
     
     async function updateStorageInfo() {
@@ -23479,8 +24268,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // Karte ist im aside-Element, nicht in einer section
         // Verstecke alle sections wenn Karte aktiv ist
         document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
+        // Zeige das aside-Element mit der Karte (das aside innerhalb von main)
+        const mapAside = document.querySelector('main > aside');
+        if (mapAside) {
+          mapAside.style.display = 'block';
+          // Initialisiere Karte falls nötig
+          if (typeof initMap === 'function' && !window.mapInitialized) {
+            setTimeout(() => initMap(), 100);
+          }
+        }
       } else {
         document.documentElement.classList.remove('map-full');
+        // Verstecke das aside-Element mit der Karte
+        const mapAside = document.querySelector('main > aside');
+        if (mapAside) mapAside.style.display = 'none';
         // Sections umschalten - INSTANT ohne Animation
         document.querySelectorAll('main section').forEach(s => {
           if (s.id === page) {
@@ -23489,6 +24290,39 @@ document.addEventListener('DOMContentLoaded', function() {
             s.style.display = 'none';
           }
         });
+        
+        // Reset group compare tabs when leaving group-compare page
+        if (page !== 'group-compare') {
+          // WICHTIG: Verstecke alle Compare-Views explizit
+          const compareViews = ['compareObservationsView', 'compareListsView', 'compareRarity2026View', 'compareAchievementsView', 'compareStatsView'];
+          compareViews.forEach(viewId => {
+            const view = document.getElementById(viewId);
+            if (view) view.style.display = 'none';
+          });
+          
+          // Reset tab buttons in background
+          document.querySelectorAll('#group-compare .small-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.background = '';
+            btn.style.border = '1px solid rgba(255,255,255,0.1)';
+            btn.style.transform = '';
+          });
+          
+          const obsTab = document.getElementById('compareObsTab');
+          if (obsTab) {
+            obsTab.classList.add('active');
+            obsTab.style.background = 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.1))';
+            obsTab.style.border = '2px solid #06b6d4';
+            obsTab.style.transform = 'scale(1.02)';
+          }
+        } else {
+          // When entering group-compare page, show observations view and hide others
+          document.getElementById('compareObservationsView').style.display = 'block';
+          document.getElementById('compareListsView').style.display = 'none';
+          document.getElementById('compareRarity2026View').style.display = 'none';
+          document.getElementById('compareAchievementsView').style.display = 'none';
+          document.getElementById('compareStatsView').style.display = 'none';
+        }
       }
       
       log('Navigation:', page);
@@ -27803,65 +28637,217 @@ async function saveChallengeSettings(event) {
 async function renderStatsComparison(groupData) {
   const users = Object.values(groupData.userStats);
   
-  // Top Species Finders
-  const topSpecies = [...users].sort((a, b) => b.speciesCount - a.speciesCount).slice(0, 3);
-  const speciesHTML = topSpecies.map((user, i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px;margin-bottom:4px;">
-      <div style="font-size:20px;">${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600;">${user.userName}</div>
-        <div style="font-size:11px;color:var(--muted);">${user.speciesCount} Arten</div>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('topSpeciesFinders').innerHTML = speciesHTML || '<p style="color:var(--muted);font-size:12px;">Keine Daten</p>';
-  
-  // Top Photo Takers
-  const topPhotos = [...users].sort((a, b) => b.photosCount - a.photosCount).slice(0, 3);
-  const photosHTML = topPhotos.map((user, i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px;margin-bottom:4px;">
-      <div style="font-size:20px;">${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600;">${user.userName}</div>
-        <div style="font-size:11px;color:var(--muted);">${user.photosCount} Fotos</div>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('topPhotoTakers').innerHTML = photosHTML || '<p style="color:var(--muted);font-size:12px;">Keine Daten</p>';
-  
-  // Top Streaks (Platzhalter)
-  document.getElementById('topStreaks').innerHTML = `
-    <div style="padding:12px;text-align:center;color:var(--muted);font-size:12px;">
-      <p>Streak-Berechnung wird in einer zukünftigen Version hinzugefügt</p>
-    </div>
-  `;
-  
-  // Gruppen-Übersicht
+  // === GRUPPEN-ÜBERSICHT ===
   const totalObs = users.reduce((sum, u) => sum + u.totalCount, 0);
   const totalSpecies = new Set();
   users.forEach(u => u.species.forEach(s => totalSpecies.add(s)));
   const totalPhotos = users.reduce((sum, u) => sum + u.photosCount, 0);
+  const avgObsPerMember = users.length > 0 ? Math.round(totalObs / users.length) : 0;
   
   document.getElementById('groupStatsOverview').innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;">
-      <div style="padding:16px;background:rgba(6,182,212,0.05);border-radius:8px;">
-        <div style="font-size:32px;font-weight:700;color:var(--accent);">${totalObs}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Gesamt-Beobachtungen</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;text-align:center;">
+      <div style="padding:20px;background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05));border-radius:12px;border:1px solid rgba(6,182,212,0.2);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(6,182,212,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px;font-weight:700;background:linear-gradient(135deg,#06b6d4,#0891b2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${totalObs.toLocaleString()}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:600;">Gesamt-Beobachtungen</div>
       </div>
-      <div style="padding:16px;background:rgba(124,58,237,0.05);border-radius:8px;">
-        <div style="font-size:32px;font-weight:700;color:var(--accent-2);">${totalSpecies.size}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Einzigartige Arten</div>
+      <div style="padding:20px;background:linear-gradient(135deg, rgba(124,58,237,0.1), rgba(124,58,237,0.05));border-radius:12px;border:1px solid rgba(124,58,237,0.2);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(124,58,237,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px;font-weight:700;background:linear-gradient(135deg,#a855f7,#9333ea);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${totalSpecies.size}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:600;">Einzigartige Arten</div>
       </div>
-      <div style="padding:16px;background:rgba(16,185,129,0.05);border-radius:8px;">
-        <div style="font-size:32px;font-weight:700;color:var(--success);">${totalPhotos}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Gesamt-Fotos</div>
+      <div style="padding:20px;background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05));border-radius:12px;border:1px solid rgba(16,185,129,0.2);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(16,185,129,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px;font-weight:700;background:linear-gradient(135deg,#10b981,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${totalPhotos.toLocaleString()}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:600;">Gesamt-Fotos</div>
       </div>
-      <div style="padding:16px;background:rgba(239,68,68,0.05);border-radius:8px;">
-        <div style="font-size:32px;font-weight:700;color:var(--danger);">${users.length}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Aktive Mitglieder</div>
+      <div style="padding:20px;background:linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05));border-radius:12px;border:1px solid rgba(239,68,68,0.2);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(239,68,68,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px;font-weight:700;background:linear-gradient(135deg,#ef4444,#dc2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${users.length}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:600;">Aktive Mitglieder</div>
+      </div>
+      <div style="padding:20px;background:linear-gradient(135deg, rgba(234,179,8,0.1), rgba(234,179,8,0.05));border-radius:12px;border:1px solid rgba(234,179,8,0.2);transition:all 0.3s;cursor:pointer;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(234,179,8,0.2)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:40px;font-weight:700;background:linear-gradient(135deg,#eab308,#ca8a04);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${avgObsPerMember}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;font-weight:600;">⌀ Beob. pro Mitglied</div>
       </div>
     </div>
   `;
+  
+  // === TOP SPECIES FINDERS ===
+  const topSpecies = [...users].sort((a, b) => b.speciesCount - a.speciesCount).slice(0, 5);
+  const speciesHTML = topSpecies.map((user, i) => {
+    const percentage = totalSpecies.size > 0 ? Math.round((user.speciesCount / totalSpecies.size) * 100) : 0;
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:8px;border-left:3px solid ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)'};transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.transform='translateX(4px)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.transform=''">
+        <div style="font-size:24px;min-width:32px;text-align:center;">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${user.userName}</div>
+          <div style="font-size:12px;color:var(--muted);">${user.speciesCount} Arten (${percentage}% der Gruppe)</div>
+          <div style="width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:6px;overflow:hidden;">
+            <div style="width:${percentage}%;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('topSpeciesFinders').innerHTML = speciesHTML || '<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px;">Keine Daten</p>';
+  
+  // === TOP PHOTO TAKERS ===
+  const topPhotos = [...users].sort((a, b) => b.photosCount - a.photosCount).slice(0, 5);
+  const photosHTML = topPhotos.map((user, i) => {
+    const percentage = totalPhotos > 0 ? Math.round((user.photosCount / totalPhotos) * 100) : 0;
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:8px;border-left:3px solid ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)'};transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.transform='translateX(4px)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.transform=''">
+        <div style="font-size:24px;min-width:32px;text-align:center;">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${user.userName}</div>
+          <div style="font-size:12px;color:var(--muted);">${user.photosCount} Fotos (${percentage}% der Gruppe)</div>
+          <div style="width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:6px;overflow:hidden;">
+            <div style="width:${percentage}%;height:100%;background:linear-gradient(90deg,#ec4899,#db2777);border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('topPhotoTakers').innerHTML = photosHTML || '<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px;">Keine Daten</p>';
+  
+  // === TOP ACTIVE USERS (nach Beobachtungen) ===
+  const topActive = [...users].sort((a, b) => b.totalCount - a.totalCount).slice(0, 5);
+  const activeHTML = topActive.map((user, i) => {
+    const percentage = totalObs > 0 ? Math.round((user.totalCount / totalObs) * 100) : 0;
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:8px;border-left:3px solid ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)'};transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.transform='translateX(4px)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.transform=''">
+        <div style="font-size:24px;min-width:32px;text-align:center;">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${user.userName}</div>
+          <div style="font-size:12px;color:var(--muted);">${user.totalCount} Beobachtungen (${percentage}% der Gruppe)</div>
+          <div style="width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:6px;overflow:hidden;">
+            <div style="width:${percentage}%;height:100%;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('topActiveUsers').innerHTML = activeHTML || '<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px;">Keine Daten</p>';
+  
+  // === TOP RARITY HUNTERS (Benutzer mit meisten seltenen Arten) ===
+  const topRarity = [...users].sort((a, b) => {
+    const aRare = (a.rareSpeciesCount || 0) + (a.veryRareSpeciesCount || 0);
+    const bRare = (b.rareSpeciesCount || 0) + (b.veryRareSpeciesCount || 0);
+    return bRare - aRare;
+  }).slice(0, 5);
+  
+  const rarityHTML = topRarity.map((user, i) => {
+    const rareCount = (user.rareSpeciesCount || 0) + (user.veryRareSpeciesCount || 0);
+    if (rareCount === 0 && i > 0) return ''; // Zeige nur User mit Seltenheiten
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:8px;border-left:3px solid ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)'};transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.transform='translateX(4px)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.transform=''">
+        <div style="font-size:24px;min-width:32px;text-align:center;">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${user.userName}</div>
+          <div style="font-size:12px;color:var(--muted);">
+            ${rareCount} Seltenheiten
+            ${user.rareSpeciesCount ? `<span style="color:#eab308;">●</span> ${user.rareSpeciesCount} selten` : ''}
+            ${user.veryRareSpeciesCount ? `<span style="color:#f59e0b;">●</span> ${user.veryRareSpeciesCount} sehr selten` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('topRarityHunters').innerHTML = rarityHTML || '<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px;">Noch keine Seltenheiten gefunden</p>';
+  
+  // === TOP STREAKS ===
+  document.getElementById('topStreaks').innerHTML = `
+    <div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;background:rgba(255,255,255,0.02);border-radius:8px;">
+      <div style="font-size:32px;margin-bottom:8px;">📅</div>
+      <p style="margin:0;">Streak-Berechnung wird in einer zukünftigen Version hinzugefügt</p>
+      <p style="margin:8px 0 0 0;font-size:11px;">Bald: Längste Beobachtungs-Serien!</p>
+    </div>
+  `;
+  
+  // === EARLY BIRDS (Früheste durchschnittliche Beobachtungszeit) ===
+  document.getElementById('topEarlyBirds').innerHTML = `
+    <div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;background:rgba(255,255,255,0.02);border-radius:8px;">
+      <div style="font-size:32px;margin-bottom:8px;">🌅</div>
+      <p style="margin:0;">Tageszeit-Analyse kommt bald</p>
+      <p style="margin:8px 0 0 0;font-size:11px;">Bald: Wer beobachtet am frühesten?</p>
+    </div>
+  `;
+  
+  // === TIME COMPARISON (Monats- und Jahresvergleich) ===
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+  
+  document.getElementById('timeComparisonStats').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px;">
+      <div style="padding:16px;background:rgba(6,182,212,0.05);border-radius:10px;border:1px solid rgba(6,182,212,0.15);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Dieses Jahr (${currentYear})</div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent);">
+          ${users.reduce((sum, u) => sum + (u.yearlyStats?.[currentYear]?.count || 0), 0)}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Beobachtungen</div>
+      </div>
+      <div style="padding:16px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Dieser Monat</div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent-2);">
+          ${users.reduce((sum, u) => sum + (u.monthlyStats?.[currentYear]?.[currentMonth]?.count || 0), 0)}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Beobachtungen</div>
+      </div>
+      <div style="padding:16px;background:rgba(16,185,129,0.05);border-radius:10px;border:1px solid rgba(16,185,129,0.15);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Letztes Jahr (${currentYear-1})</div>
+        <div style="font-size:28px;font-weight:700;color:var(--success);">
+          ${users.reduce((sum, u) => sum + (u.yearlyStats?.[currentYear-1]?.count || 0), 0)}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Beobachtungen</div>
+      </div>
+    </div>
+    <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:10px;text-align:center;">
+      <div style="font-size:13px;color:var(--muted);">
+        📊 Detaillierte Zeitreihen-Analysen und Trends kommen in einem zukünftigen Update
+      </div>
+    </div>
+  `;
+  
+  // === DETAILED MEMBER STATS TABLE ===
+  const memberStatsHTML = `
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.03);text-align:left;">
+            <th style="padding:12px;border-bottom:2px solid rgba(255,255,255,0.1);font-weight:700;">Mitglied</th>
+            <th style="padding:12px;border-bottom:2px solid rgba(255,255,255,0.1);font-weight:700;text-align:center;">Beobachtungen</th>
+            <th style="padding:12px;border-bottom:2px solid rgba(255,255,255,0.1);font-weight:700;text-align:center;">Arten</th>
+            <th style="padding:12px;border-bottom:2px solid rgba(255,255,255,0.1);font-weight:700;text-align:center;">Fotos</th>
+            <th style="padding:12px;border-bottom:2px solid rgba(255,255,255,0.1);font-weight:700;text-align:center;">Foto-Rate</th>
+            <th style="padding:12px;border-bottom:2px solid rgba(255,255,255,0.1);font-weight:700;text-align:center;">Seltenheiten</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${[...users].sort((a, b) => b.totalCount - a.totalCount).map((user, i) => {
+            const photoRate = user.totalCount > 0 ? Math.round((user.photosCount / user.totalCount) * 100) : 0;
+            const rareCount = (user.rareSpeciesCount || 0) + (user.veryRareSpeciesCount || 0);
+            const isCurrentUser = user.userId === (window.FBA?.currentUser?.uid || '');
+            return `
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);${isCurrentUser ? 'background:rgba(6,182,212,0.05);' : ''}transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='${isCurrentUser ? 'rgba(6,182,212,0.05)' : ''}'">
+                <td style="padding:12px;font-weight:600;">
+                  ${user.userName}${isCurrentUser ? ' <span style="color:var(--accent);font-size:11px;">(Du)</span>' : ''}
+                </td>
+                <td style="padding:12px;text-align:center;color:var(--accent);">${user.totalCount}</td>
+                <td style="padding:12px;text-align:center;color:var(--accent-2);">${user.speciesCount}</td>
+                <td style="padding:12px;text-align:center;color:var(--success);">${user.photosCount}</td>
+                <td style="padding:12px;text-align:center;">
+                  <span style="color:${photoRate >= 50 ? 'var(--success)' : photoRate >= 25 ? '#f59e0b' : 'var(--muted)'};">
+                    ${photoRate}%
+                  </span>
+                </td>
+                <td style="padding:12px;text-align:center;">
+                  ${rareCount > 0 ? `<span style="color:#f59e0b;">💎 ${rareCount}</span>` : '<span style="color:var(--muted);">-</span>'}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById('detailedMemberStats').innerHTML = memberStatsHTML;
 }
 
 // Zeige/Verstecke Gruppenvergleichs-Menüpunkt basierend auf Gruppenmodus
@@ -33136,6 +34122,158 @@ function getBirdEmoji(birdName) {
   };
   return emojiMap[birdName] || '🐦';
 }
+
+// ==================== PREMIUM EFFECTS ====================
+
+// Initialize effects state
+let effectsEnabled = localStorage.getItem('premiumEffects') !== 'false';
+
+// Apply effects on load
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('effectsToggle');
+  if (toggle) {
+    toggle.checked = effectsEnabled;
+    if (effectsEnabled) {
+      document.body.classList.add('effects-enabled');
+    }
+  }
+});
+
+// Toggle premium effects
+function togglePremiumEffects() {
+  const toggle = document.getElementById('effectsToggle');
+  effectsEnabled = toggle.checked;
+  localStorage.setItem('premiumEffects', effectsEnabled);
+  
+  if (effectsEnabled) {
+    document.body.classList.add('effects-enabled');
+    showToast('✨ Premium-Effekte aktiviert!', 'success');
+  } else {
+    document.body.classList.remove('effects-enabled');
+    showToast('👍 Schlichte Ansicht aktiviert', 'info');
+  }
+}
+
+// Confetti Animation
+function triggerConfetti() {
+  if (!effectsEnabled) return;
+  
+  const colors = ['#06b6d4', '#7c3aed', '#10b981', '#ef4444', '#f59e0b'];
+  const confettiCount = 50;
+  
+  for (let i = 0; i < confettiCount; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => confetti.remove(), 3500);
+    }, i * 30);
+  }
+}
+
+// Enhanced Toast with better animations
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = 'notification';
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    min-width: 250px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  
+  if (type === 'success') {
+    toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+  } else if (type === 'error') {
+    toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+  } else if (type === 'warning') {
+    toast.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+  } else {
+    toast.style.background = 'linear-gradient(135deg, #06b6d4, #0891b2)';
+  }
+  
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+// Add CSS for slideOutRight
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+  @keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
+  }
+`;
+document.head.appendChild(toastStyle);
+
+// Create Skeleton Loader
+function createSkeleton(container, count = 3) {
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'skeleton';
+    skeleton.style.cssText = 'margin-bottom: 12px; height: 60px;';
+    container.appendChild(skeleton);
+  }
+}
+
+// Add ripple effect to buttons
+document.addEventListener('click', function(e) {
+  if (!effectsEnabled) return;
+  
+  const button = e.target.closest('.btn, .small-btn, .nav button');
+  if (!button) return;
+  
+  const ripple = document.createElement('span');
+  const rect = button.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const x = e.clientX - rect.left - size / 2;
+  const y = e.clientY - rect.top - size / 2;
+  
+  ripple.style.cssText = `
+    position: absolute;
+    width: ${size}px;
+    height: ${size}px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    left: ${x}px;
+    top: ${y}px;
+    pointer-events: none;
+    transform: scale(0);
+    animation: rippleEffect 0.6s ease-out;
+  `;
+  
+  button.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+});
+
+// Add ripple animation CSS
+const rippleStyle = document.createElement('style');
+rippleStyle.textContent = `
+  @keyframes rippleEffect {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+`;
+document.head.appendChild(rippleStyle);
 
 // ==================== ERWEITERTE STATISTIKEN ====================
 
