@@ -8770,7 +8770,7 @@
                   </div>
                 </div>
                 
-                <div id="membersProfileGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+                <div id="membersProfileGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%, 320px),1fr));gap:16px;">
                   <!-- Wird dynamisch gefüllt -->
                 </div>
               </div>
@@ -26733,12 +26733,16 @@ async function renderMembersProfiles() {
         border-radius: 16px;
         padding: 20px;
         position: relative;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
         cursor: pointer;
+        transform: translateZ(0);
+        will-change: transform, box-shadow;
       " 
       onclick="showMemberProfile('${member.id}', '${member.email.replace(/'/g, "\\'")}')"
-      onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 32px ${member.isCurrentUser ? 'rgba(34,197,94,0.3)' : 'rgba(6,182,212,0.3)'}';"
-      onmouseout="this.style.transform=''; this.style.boxShadow='none';">
+      onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 16px 40px ${member.isCurrentUser ? 'rgba(34,197,94,0.4)' : 'rgba(6,182,212,0.4)'}'; this.style.borderColor='${member.isCurrentUser ? 'rgba(34,197,94,0.6)' : 'var(--accent)'}';"
+      onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none'; this.style.borderColor='${member.isCurrentUser ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'}';"
+      ontouchstart="this.style.transform='scale(0.98)';"
+      ontouchend="this.style.transform='scale(1)';">
         
         <!-- Rank Badge -->
         <div style="position: absolute; top: 12px; right: 12px; font-size: 24px;">${rankEmoji}</div>
@@ -26796,34 +26800,142 @@ async function renderMembersProfiles() {
   console.log(`✅ ${memberStats.length} Mitglieder-Profile gerendert`);
 }
 
-// Mitgliederprofil im Modal anzeigen
-async function showMemberProfile(memberId, memberEmail) {
-  console.log('👤 Zeige Profil für:', memberEmail);
-  
-  const modal = document.getElementById('memberProfileModal');
-  if (!modal) {
-    console.error('Modal nicht gefunden');
-    return;
-  }
-  
-  const group = window.currentGroup;
-  if (!group) return;
-  
-  // Finde Mitglied
-  const member = group.members?.find(m => m.id === memberId || m.email === memberEmail);
-  if (!member) {
-    console.error('Mitglied nicht gefunden');
-    return;
-  }
-  
-  // Sichere Werte mit Fallbacks
-  const safeEmail = member.email || member.userEmail || memberEmail || 'unknown@example.com';
-  const safeUsername = member.username || member.name || safeEmail.split('@')[0];
-  const safeMemberId = member.id || member.userId || memberId;
+// Mitgliederprofil im Modal anzeigen (global verfügbar)
+window.showMemberProfile = async function(memberId, memberEmail) {
+  try {
+    console.log('👤 === PROFIL ÖFFNEN START ===');
+    console.log('👤 Zeige Profil für:', { memberId, memberEmail });
+    
+    const modal = document.getElementById('memberProfileModal');
+    if (!modal) {
+      console.error('❌ Modal nicht gefunden: memberProfileModal');
+      alert('Fehler: Modal-Element nicht gefunden!');
+      return;
+    }
+    console.log('✅ Modal gefunden:', modal);
+    
+    // Zeige Modal sofort mit Ladeanimation
+    const profileContent = document.getElementById('memberProfileContent');
+    if (!profileContent) {
+      console.error('❌ profileContent nicht gefunden');
+      alert('Fehler: Profile-Content-Element nicht gefunden!');
+      return;
+    }
+    console.log('✅ ProfileContent gefunden:', profileContent);
+    
+    profileContent.innerHTML = `
+      <div style="text-align: center; padding: 60px 20px;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 24px; border: 4px solid rgba(6,182,212,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="font-size: 16px; color: var(--muted); margin: 0;">Lade Profil...</p>
+      </div>
+      <style>
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+    `;
+    
+    console.log('✅ Ladeanimation eingefügt');
+    
+    // Modal sofort anzeigen mit visueller Debug-Bestätigung
+    modal.style.display = 'flex';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.minWidth = '100vw';
+    modal.style.minHeight = '100vh';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.zIndex = '999999';
+    modal.style.background = 'rgba(255, 0, 0, 0.8)'; // TEMPORÄR: Roter Hintergrund zum Debuggen
+    document.body.style.overflow = 'hidden';
+    console.log('✅ Modal angezeigt (display: flex, overflow: hidden)');
+    console.log('📍 Modal computed style:', window.getComputedStyle(modal).display);
+    console.log('📍 Modal visibility:', window.getComputedStyle(modal).visibility);
+    console.log('📍 Modal z-index:', window.getComputedStyle(modal).zIndex);
+    console.log('📍 Modal position:', {
+      top: modal.getBoundingClientRect().top,
+      left: modal.getBoundingClientRect().left,
+      width: modal.getBoundingClientRect().width,
+      height: modal.getBoundingClientRect().height,
+      bottom: modal.getBoundingClientRect().bottom,
+      right: modal.getBoundingClientRect().right
+    });
+    console.log('📍 Window size:', {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight
+    });
+    console.log('📍 Modal offsetParent:', modal.offsetParent);
+    console.log('📍 Modal parent element:', modal.parentElement?.tagName);
+    console.log('📍 Modal parent size:', {
+      width: modal.parentElement?.getBoundingClientRect().width,
+      height: modal.parentElement?.getBoundingClientRect().height,
+      display: modal.parentElement ? window.getComputedStyle(modal.parentElement).display : 'N/A',
+      position: modal.parentElement ? window.getComputedStyle(modal.parentElement).position : 'N/A'
+    });
+    
+    // NOTLÖSUNG: Verschiebe Modal direkt in body wenn es in einem Container mit Größe 0 ist
+    if (modal.getBoundingClientRect().width === 0 || modal.getBoundingClientRect().height === 0) {
+      console.log('⚠️ Modal hat Größe 0, verschiebe es in body...');
+      document.body.appendChild(modal);
+      console.log('✅ Modal in body verschoben');
+      console.log('📍 Neue Modal position:', {
+        top: modal.getBoundingClientRect().top,
+        left: modal.getBoundingClientRect().left,
+        width: modal.getBoundingClientRect().width,
+        height: modal.getBoundingClientRect().height
+      });
+    }
+    
+    // Scroll zum Modal und bringe es in den Vordergrund
+    modal.scrollIntoView({ behavior: 'instant', block: 'start' });
+    window.scrollTo(0, 0);
+    
+    // Prüfe ob das Modal wirklich am obersten Punkt ist
+    const elementsAtPoint = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+    console.log('📍 Elemente in der Mitte des Bildschirms:', elementsAtPoint.map(el => ({
+      tag: el.tagName,
+      id: el.id,
+      classes: el.className,
+      zIndex: window.getComputedStyle(el).zIndex
+    })));
+    
+    const group = window.currentGroup;
+    console.log('📊 Gruppe:', group ? 'Gefunden' : 'NICHT GEFUNDEN');
+    
+    if (!group) {
+      profileContent.innerHTML = '<p style="text-align:center;color:var(--danger);padding:40px;">Keine Gruppe geladen</p>';
+      console.error('❌ Keine Gruppe geladen');
+      return;
+    }
+    
+    console.log('📊 Gruppe Members:', group.members?.length || 0);
+    
+    // Finde Mitglied
+    const member = group.members?.find(m => m.id === memberId || m.email === memberEmail);
+    console.log('👤 Mitglied gefunden:', member ? 'JA' : 'NEIN');
+    
+    if (!member) {
+      console.error('❌ Mitglied nicht gefunden');
+      console.log('Available members:', group.members?.map(m => ({ id: m.id, email: m.email })));
+      profileContent.innerHTML = '<p style="text-align:center;color:var(--danger);padding:40px;">Mitglied nicht gefunden</p>';
+      return;
+    }
+    
+    // Sichere Werte mit Fallbacks
+    const safeEmail = member.email || member.userEmail || memberEmail || 'unknown@example.com';
+    const safeUsername = member.username || member.name || safeEmail.split('@')[0];
+    const safeMemberId = member.id || member.userId || memberId;
+    
+    console.log('✅ Sichere Werte:', { safeEmail, safeUsername, safeMemberId });
   
   // Berechne detaillierte Stats
+  console.log('📊 Berechne Stats...');
   const memberObs = (group.observations || []).filter(o => o.userId === safeMemberId || o.userEmail === safeEmail);
   const uniqueSpecies = new Set(memberObs.map(o => o.bird).filter(Boolean));
+  console.log('✅ Beobachtungen:', memberObs.length, 'Arten:', uniqueSpecies.size);
   
   // Streak berechnen
   const dates = [...new Set(memberObs.map(o => o.date))].sort();
@@ -26841,10 +26953,37 @@ async function showMemberProfile(memberId, memberEmail) {
       break;
     }
   }
+  console.log('✅ Streak berechnet:', currentStreak);
   
   // XP & Level berechnen
   const totalXP = (memberObs.length * 10) + (uniqueSpecies.size * 50) + (currentStreak * 25);
-  const levelData = getLevelFromXP(totalXP);
+  console.log('✅ Total XP:', totalXP);
+  
+  let levelData;
+  try {
+    if (typeof getLevelFromXP === 'function') {
+      levelData = getLevelFromXP(totalXP);
+      console.log('✅ Level berechnet:', levelData);
+    } else {
+      console.warn('⚠️ getLevelFromXP nicht gefunden, verwende Fallback');
+      levelData = {
+        level: Math.floor(totalXP / 500) + 1,
+        title: 'Vogelbeobachter',
+        progressPercent: 50,
+        xpToNext: 100,
+        nextLevel: { level: Math.floor(totalXP / 500) + 2 }
+      };
+    }
+  } catch (error) {
+    console.error('❌ Fehler bei Level-Berechnung:', error);
+    levelData = {
+      level: 1,
+      title: 'Anfänger',
+      progressPercent: 0,
+      xpToNext: 100,
+      nextLevel: { level: 2 }
+    };
+  }
   
   // Erste & letzte Beobachtung
   const sortedObs = [...memberObs].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -26947,13 +27086,36 @@ async function showMemberProfile(memberId, memberEmail) {
     ` : '<p style="color: var(--muted); text-align: center;">Noch keine Beobachtungen</p>'}
   `;
   
-  // Modal anzeigen
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  console.log('✅ Profil-HTML generiert');
+  
+  // Modal ist bereits sichtbar - keine weiteren display/opacity Änderungen nötig
+  console.log('✅ === PROFIL ÖFFNEN ERFOLGREICH ===');
+  
+  } catch (error) {
+    console.error('❌ === FEHLER BEIM PROFIL ÖFFNEN ===');
+    console.error('❌ Error:', error);
+    console.error('❌ Stack:', error.stack);
+    
+    const profileContent = document.getElementById('memberProfileContent');
+    if (profileContent) {
+      profileContent.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px;">
+          <div style="font-size: 64px; margin-bottom: 16px;">❌</div>
+          <h3 style="margin: 0 0 12px 0; color: var(--danger);">Fehler beim Laden</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px;">Es gab einen Fehler beim Laden des Profils.</p>
+          <p style="margin: 12px 0 0 0; color: var(--muted); font-size: 12px; font-family: monospace;">${error.message}</p>
+          <button onclick="closeMemberProfileModal()" style="margin-top: 20px; padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Schließen</button>
+        </div>
+      `;
+    }
+    
+    alert('Fehler beim Öffnen des Profils: ' + error.message + '\n\nBitte öffne die Browser-Konsole (F12) für Details.');
+  }
 }
 
-// Mitgliederprofil-Modal schließen
+// Mitgliederprofil-Modal schließen (global verfügbar)
 window.closeMemberProfileModal = function() {
+  console.log('🔒 Schließe Mitgliederprofil-Modal');
   const modal = document.getElementById('memberProfileModal');
   if (modal) {
     modal.style.display = 'none';
@@ -37587,6 +37749,7 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     closeAchievementModal();
     closeShowcaseModal();
+    closeMemberProfileModal(); // Schließe auch das Mitgliederprofil-Modal
   }
 });
 
@@ -38297,8 +38460,8 @@ window.openShowcaseSelector = openShowcaseSelector;
 </div>
 
 <!-- Modal für Mitgliederprofil -->
-<div id="memberProfileModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeMemberProfileModal()">
-  <div style="background: var(--card); padding: 32px; border-radius: 20px; max-width: 600px; width: 95%; max-height: 85vh; overflow-y: auto; position: relative; border: 2px solid rgba(6,182,212,0.3); box-shadow: 0 24px 80px rgba(6,182,212,0.4); animation: modalSlideIn 0.3s ease;" onclick="event.stopPropagation()">
+<div id="memberProfileModal" class="modal-overlay" onclick="if(event.target === this) closeMemberProfileModal()">
+  <div id="memberProfileModalInner" onclick="event.stopPropagation()">
     <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 32px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--muted)'; this.style.transform='rotate(0deg)'">×</button>
     
     <div id="memberProfileContent">
@@ -38306,6 +38469,53 @@ window.openShowcaseSelector = openShowcaseSelector;
     </div>
   </div>
 </div>
+
+<style>
+#memberProfileModal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  background: rgba(2,6,23,0.95) !important;
+  display: none; /* KEIN !important hier, damit JS es ändern kann */
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 999999 !important;
+  padding: 20px !important;
+  backdrop-filter: blur(8px) !important;
+  overflow-y: auto !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#memberProfileModal[style*="display: flex"],
+#memberProfileModal[style*="display:flex"] {
+  display: flex !important; /* Nur wenn JS display:flex setzt */
+}
+
+#memberProfileModalInner {
+  background: var(--card) !important;
+  padding: 32px !important;
+  border-radius: 20px !important;
+  max-width: 600px !important;
+  width: 95% !important;
+  max-height: 85vh !important;
+  min-width: 300px !important;
+  min-height: 200px !important;
+  overflow-y: auto !important;
+  position: relative !important;
+  border: 2px solid rgba(6,182,212,0.3) !important;
+  box-shadow: 0 24px 80px rgba(6,182,212,0.4) !important;
+  animation: modalSlideIn 0.3s ease !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+</style>
 
 <!-- Modal für Showcase Achievement Auswahl -->
 <div id="showcaseModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeShowcaseModal()">
