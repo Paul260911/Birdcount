@@ -5865,6 +5865,7 @@
 
       <nav class="nav" role="navigation" aria-label="Hauptnavigation">
         <button class="active" data-page="home">🏠 Dashboard</button>
+        <button data-page="profil">👤 Profil</button>
         <button data-page="beobachtungen">📝 Beobachtungen</button>
         <button data-page="eingabe">✍️ Eingabe</button>
         <button data-page="diagramme">📊 Analyse</button>
@@ -6132,6 +6133,162 @@
                     💡 <strong>Tipp:</strong> Januar ist eine großartige Zeit, um Wintergäste und Wasservögel zu beobachten. Halte Ausschau nach Seidenschwänzen und überwinternden Enten!
                   </p>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Profil -->
+          <section id="profil" class="card" style="display:none;">
+            <h2 style="margin: 0 0 8px 0; display: flex; align-items: center; gap: 12px;">
+              <span>👤 Dein Profil</span>
+            </h2>
+            <p class="muted" style="margin: 0 0 32px 0;">Deine Statistiken, Level und Achievements</p>
+            
+            <!-- Profil Header Card -->
+            <div style="background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.1)); border: 2px solid rgba(6,182,212,0.3); border-radius: 20px; padding: 32px; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 12px 40px rgba(6,182,212,0.2);">
+              <!-- Decorative Background Elements -->
+              <div style="position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(6,182,212,0.3), transparent); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+              <div style="position: absolute; bottom: -60px; left: -60px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(124,58,237,0.3), transparent); border-radius: 50%; animation: float 8s ease-in-out infinite reverse;"></div>
+              
+              <div style="position: relative; z-index: 1;">
+                <div style="display: flex; align-items: start; gap: 24px; flex-wrap: wrap;">
+                  <!-- Avatar & Level -->
+                  <div style="text-align: center;">
+                    <div style="position: relative; display: inline-block;">
+                      <div style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 56px; box-shadow: 0 12px 32px rgba(6,182,212,0.5); border: 4px solid var(--bg);">
+                        🐦
+                      </div>
+                      <div id="profileLevelBadge" style="position: absolute; bottom: -8px; right: -8px; width: 48px; height: 48px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white; box-shadow: 0 4px 16px rgba(251,191,36,0.6); border: 3px solid var(--bg);">
+                        1
+                      </div>
+                    </div>
+                    <div style="margin-top: 16px; font-size: 14px; color: var(--muted); font-weight: 600;" id="profileLevelText">Level 1 Ornithologe</div>
+                  </div>
+                  
+                  <!-- Stats & XP -->
+                  <div style="flex: 1; min-width: 300px;">
+                    <h3 id="profileUsername" style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">BirdCount Nutzer</h3>
+                    <p style="margin: 0 0 20px 0; font-size: 14px; color: var(--soft);" id="profileMemberSince">Mitglied seit Januar 2026</p>
+                    
+                    <!-- XP Progress Bar -->
+                    <div style="margin-bottom: 20px;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 600; color: var(--soft);">Erfahrungspunkte (XP)</span>
+                        <span style="font-size: 14px; font-weight: 700; color: #fbbf24;" id="profileXPText">0 / 100 XP</span>
+                      </div>
+                      <div style="background: rgba(255,255,255,0.1); border-radius: 12px; height: 16px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shimmer 2s infinite;"></div>
+                        <div id="profileXPBar" style="height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: 0%; transition: width 0.8s ease; box-shadow: 0 0 12px rgba(251,191,36,0.6); border-radius: 12px;"></div>
+                      </div>
+                      <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--muted);" id="profileXPToNext">Noch 100 XP bis Level 2</p>
+                    </div>
+                    
+                    <!-- Quick Stats Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px;">
+                      <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 22px; font-weight: 700; color: var(--accent);" id="profileTotalObs">0</div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Beobachtungen</div>
+                      </div>
+                      <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 22px; font-weight: 700; color: var(--accent-2);" id="profileTotalSpecies">0</div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Arten</div>
+                      </div>
+                      <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 22px; font-weight: 700; color: #10b981;" id="profileAchievements">0</div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Achievements</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Showcase Achievement -->
+            <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05)); border: 2px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h4 style="margin: 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 24px;">🌟</span>
+                  Showcase Achievement
+                </h4>
+                <button class="btn ghost" onclick="openShowcaseSelector()" style="padding: 8px 16px; font-size: 13px;">
+                  ✏️ Ändern
+                </button>
+              </div>
+              
+              <div id="profileShowcase" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center; color: var(--muted); padding: 20px;">
+                  <div style="font-size: 48px; opacity: 0.3; margin-bottom: 12px;">🏆</div>
+                  <p style="margin: 0; font-size: 14px;">Wähle ein Achievement aus, um es hier zu präsentieren!</p>
+                  <button class="btn" onclick="openShowcaseSelector()" style="margin-top: 12px; padding: 10px 20px;">
+                    Achievement auswählen
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- XP Breakdown -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); margin-bottom: 24px;">
+              <h4 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">⚡</span>
+                XP-Quellen
+              </h4>
+              
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 28px;">📝</div>
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: var(--text);">Beobachtung hinzufügen</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Pro Beobachtung</div>
+                    </div>
+                  </div>
+                  <div style="font-size: 18px; font-weight: 700; color: #fbbf24;">+10 XP</div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 28px;">⭐</div>
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: var(--text);">Neue Art entdecken</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Erste Sichtung einer Art</div>
+                    </div>
+                  </div>
+                  <div style="font-size: 18px; font-weight: 700; color: #fbbf24;">+50 XP</div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 28px;">🏆</div>
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: var(--text);">Achievement einlösen</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Pro eingelöstem Achievement</div>
+                    </div>
+                  </div>
+                  <div style="font-size: 18px; font-weight: 700; color: #fbbf24;">+100 XP</div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 28px;">🔥</div>
+                    <div>
+                      <div style="font-size: 14px; font-weight: 600; color: var(--text);">Täglicher Streak</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Pro aktivem Streak-Tag</div>
+                    </div>
+                  </div>
+                  <div style="font-size: 18px; font-weight: 700; color: #fbbf24;">+25 XP</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Level Übersicht -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));">
+              <h4 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">📊</span>
+                Level-System
+              </h4>
+              
+              <div id="levelSystemGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">
+                <!-- Wird dynamisch gefüllt -->
               </div>
             </div>
           </section>
@@ -6574,6 +6731,9 @@
               <button class="adv-stats-tab" data-tab="insights" onclick="switchAdvancedStatsTab('insights')">
                 💡 Insights
               </button>
+              <button class="adv-stats-tab" data-tab="achievements-overview" onclick="switchAdvancedStatsTab('achievements-overview')">
+                🏆 Achievements
+              </button>
             </div>
             
             <!-- Jahresvergleich Tab -->
@@ -6727,6 +6887,55 @@
                 <p class="muted">Interessante Fakten über deine Beobachtungen</p>
                 
                 <div id="insightsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 24px;">
+                  <!-- Wird dynamisch gefüllt -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Achievements Overview Tab -->
+            <div id="tab-achievements-overview" class="adv-stats-content" style="display: none;">
+              <div class="feature-section">
+                <h3>🏆 Achievement-Übersicht</h3>
+                <p class="muted">Alle deine erreichten Achievements und deren Details</p>
+                
+                <!-- Übersicht der erreichten Achievements -->
+                <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05)); border: 2px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 24px; margin: 24px 0;">
+                  <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 48px;">🎖️</div>
+                    <div style="flex: 1;">
+                      <h4 style="margin: 0; font-size: 20px; font-weight: 700;">Deine Errungenschaften</h4>
+                      <p id="achievementsSummary" style="margin: 6px 0 0 0; font-size: 14px; color: var(--muted);">Lade Achievements...</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Statistik-Grid -->
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px; text-align: center;">
+                      <div style="font-size: 28px; font-weight: 700; color: #10b981;" id="totalClaimedCount">0</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Eingelöst</div>
+                    </div>
+                    <div style="background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); border-radius: 12px; padding: 16px; text-align: center;">
+                      <div style="font-size: 28px; font-weight: 700; color: #fbbf24;" id="totalReadyCount">0</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Bereit</div>
+                    </div>
+                    <div style="background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 16px; text-align: center;">
+                      <div style="font-size: 28px; font-weight: 700; color: var(--accent);" id="totalInProgressCount">0</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">In Arbeit</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; text-align: center;">
+                      <div style="font-size: 28px; font-weight: 700; color: var(--text);" id="achievementCompletionPercent">0%</div>
+                      <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Fortschritt</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Achievement Gallery -->
+                  <div id="achievementGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;">
+                    <!-- Wird dynamisch gefüllt -->
+                  </div>
+                </div>
+                
+                <!-- Detaillierte Achievement-Liste -->
+                <div id="achievementDetailList" style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px;">
                   <!-- Wird dynamisch gefüllt -->
                 </div>
               </div>
@@ -8439,6 +8648,9 @@
               <button class="small-btn active" id="compareObsTab" onclick="switchCompareTab('observations')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 📊 Beobachtungen
               </button>
+              <button class="small-btn" id="compareMembersTab" onclick="switchCompareTab('members')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
+                👤 Mitglieder
+              </button>
               <button class="small-btn" id="compareListsTab" onclick="switchCompareTab('lists')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 📋 Listen
               </button>
@@ -8542,6 +8754,25 @@
                   <h3 style="margin:0;">Detaillierter Vergleich</h3>
                 </div>
                 <div id="detailedObservationComparison"></div>
+              </div>
+            </div>
+
+            <!-- Mitglieder-Übersicht -->
+            <div id="compareMembersView" style="display:none;">
+              <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.02));border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 4px 16px rgba(6,182,212,0.1);margin-bottom:24px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                  <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--accent),#0891b2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
+                    👥
+                  </div>
+                  <div>
+                    <h3 style="margin:0;font-size:20px;font-weight:700;">Mitglieder</h3>
+                    <p style="margin:4px 0 0 0;font-size:13px;color:var(--muted);">Profile und Statistiken aller Gruppenmitglieder</p>
+                  </div>
+                </div>
+                
+                <div id="membersProfileGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+                  <!-- Wird dynamisch gefüllt -->
+                </div>
               </div>
             </div>
 
@@ -16347,6 +16578,7 @@
         } else {
           // When entering group-compare page, show observations view and hide others
           document.getElementById('compareObservationsView').style.display = 'block';
+          document.getElementById('compareMembersView').style.display = 'none';
           document.getElementById('compareListsView').style.display = 'none';
           document.getElementById('compareRarity2026View').style.display = 'none';
           document.getElementById('compareAchievementsView').style.display = 'none';
@@ -24679,6 +24911,8 @@ async function loadPageData(page) {
       if (typeof renderGroupComparison === 'function') await renderGroupComparison();
     } else if (page === 'home') {
       if (typeof updateDashboard === 'function') updateDashboard();
+    } else if (page === 'profil') {
+      if (typeof loadProfile === 'function') await loadProfile();
     } else if (page === 'challenges') {
       if (typeof loadChallengeProgress === 'function') await loadChallengeProgress();
       if (typeof loadCustomChallenges === 'function') await loadCustomChallenges();
@@ -26362,60 +26596,370 @@ function switchCompareTab(tab) {
     btn.style.transform = '';
   });
   
+  // Alle Views ausblenden
+  document.getElementById('compareObservationsView').style.display = 'none';
+  document.getElementById('compareMembersView').style.display = 'none';
+  document.getElementById('compareListsView').style.display = 'none';
+  document.getElementById('compareRarity2026View').style.display = 'none';
+  document.getElementById('compareAchievementsView').style.display = 'none';
+  document.getElementById('compareStatsView').style.display = 'none';
+  
   if (tab === 'observations') {
     document.getElementById('compareObsTab').classList.add('active');
     document.getElementById('compareObsTab').style.background = 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.1))';
     document.getElementById('compareObsTab').style.border = '2px solid #06b6d4';
     document.getElementById('compareObsTab').style.transform = 'scale(1.02)';
     document.getElementById('compareObservationsView').style.display = 'block';
-    document.getElementById('compareListsView').style.display = 'none';
-    document.getElementById('compareRarity2026View').style.display = 'none';
-    document.getElementById('compareAchievementsView').style.display = 'none';
-    document.getElementById('compareStatsView').style.display = 'none';
+  } else if (tab === 'members') {
+    document.getElementById('compareMembersTab').classList.add('active');
+    document.getElementById('compareMembersTab').style.background = 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(6,182,212,0.1))';
+    document.getElementById('compareMembersTab').style.border = '2px solid #22c55e';
+    document.getElementById('compareMembersTab').style.transform = 'scale(1.02)';
+    document.getElementById('compareMembersView').style.display = 'block';
+    renderMembersProfiles(); // Lade Mitglieder-Profile
   } else if (tab === 'lists') {
     document.getElementById('compareListsTab').classList.add('active');
     document.getElementById('compareListsTab').style.background = 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1))';
     document.getElementById('compareListsTab').style.border = '2px solid #7c3aed';
     document.getElementById('compareListsTab').style.transform = 'scale(1.02)';
-    document.getElementById('compareObservationsView').style.display = 'none';
     document.getElementById('compareListsView').style.display = 'block';
-    document.getElementById('compareRarity2026View').style.display = 'none';
-    document.getElementById('compareAchievementsView').style.display = 'none';
-    document.getElementById('compareStatsView').style.display = 'none';
     renderComparisonFolders(); // Lade Listen-Vergleich
   } else if (tab === 'rarity2026') {
     document.getElementById('compareRarityTab').classList.add('active');
     document.getElementById('compareRarityTab').style.background = 'linear-gradient(135deg, rgba(234,179,8,0.25), rgba(217,119,6,0.15))';
     document.getElementById('compareRarityTab').style.border = '2px solid #eab308';
     document.getElementById('compareRarityTab').style.transform = 'scale(1.02)';
-    document.getElementById('compareObservationsView').style.display = 'none';
-    document.getElementById('compareListsView').style.display = 'none';
     document.getElementById('compareRarity2026View').style.display = 'block';
-    document.getElementById('compareAchievementsView').style.display = 'none';
-    document.getElementById('compareStatsView').style.display = 'none';
     renderRarityChallenge2026(); // Lade Rarität-Challenge
   } else if (tab === 'achievements') {
     document.getElementById('compareAchTab').classList.add('active');
     document.getElementById('compareAchTab').style.background = 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1))';
     document.getElementById('compareAchTab').style.border = '2px solid #7c3aed';
     document.getElementById('compareAchTab').style.transform = 'scale(1.02)';
-    document.getElementById('compareObservationsView').style.display = 'none';
-    document.getElementById('compareListsView').style.display = 'none';
-    document.getElementById('compareRarity2026View').style.display = 'none';
     document.getElementById('compareAchievementsView').style.display = 'block';
-    document.getElementById('compareStatsView').style.display = 'none';
   } else if (tab === 'stats') {
     document.getElementById('compareStatsTab').classList.add('active');
     document.getElementById('compareStatsTab').style.background = 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(34,197,94,0.1))';
     document.getElementById('compareStatsTab').style.border = '2px solid #06b6d4';
     document.getElementById('compareStatsTab').style.transform = 'scale(1.02)';
-    document.getElementById('compareObservationsView').style.display = 'none';
-    document.getElementById('compareListsView').style.display = 'none';
-    document.getElementById('compareRarity2026View').style.display = 'none';
-    document.getElementById('compareAchievementsView').style.display = 'none';
     document.getElementById('compareStatsView').style.display = 'block';
   }
 }
+
+// Mitglieder-Profile rendern
+async function renderMembersProfiles() {
+  console.log('👥 Lade Mitglieder-Profile...');
+  
+  const container = document.getElementById('membersProfileGrid');
+  
+  if (!window.currentGroup) {
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px;">Keine Gruppe geladen</p>';
+    return;
+  }
+  
+  const group = window.currentGroup;
+  const members = group.members || [];
+  const currentUserEmail = firebase.auth().currentUser?.email;
+  
+  if (members.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px;">Keine Mitglieder in der Gruppe</p>';
+    return;
+  }
+  
+  // Berechne Stats für jedes Mitglied
+  const memberStats = await Promise.all(members.map(async (member) => {
+    // Sichere Werte mit Fallbacks
+    const memberId = member.id || member.userId || 'unknown';
+    const memberEmail = member.email || member.userEmail || 'unknown@example.com';
+    const memberUsername = member.username || member.name || memberEmail.split('@')[0];
+    
+    const memberObs = (group.observations || []).filter(o => o.userId === memberId || o.userEmail === memberEmail);
+    const uniqueSpecies = new Set(memberObs.map(o => o.bird).filter(Boolean)).size;
+    
+    // Streak berechnen
+    const dates = [...new Set(memberObs.map(o => o.date))].sort();
+    let currentStreak = 0;
+    let streakDate = new Date();
+    
+    for (let i = dates.length - 1; i >= 0; i--) {
+      const date = new Date(dates[i]);
+      const dayDiff = Math.floor((streakDate - date) / (1000 * 60 * 60 * 24));
+      
+      if (dayDiff <= 1) {
+        currentStreak++;
+        streakDate = date;
+      } else {
+        break;
+      }
+    }
+    
+    // XP berechnen (vereinfacht)
+    const totalXP = (memberObs.length * 10) + (uniqueSpecies * 50) + (currentStreak * 25);
+    
+    // Level berechnen
+    let level = 1;
+    for (let i = LEVELS.length - 1; i >= 0; i--) {
+      if (totalXP >= LEVELS[i].xpRequired) {
+        level = LEVELS[i].level;
+        break;
+      }
+    }
+    
+    return {
+      id: memberId,
+      email: memberEmail,
+      username: memberUsername,
+      observations: memberObs.length,
+      species: uniqueSpecies,
+      streak: currentStreak,
+      xp: totalXP,
+      level: level,
+      isCurrentUser: memberEmail === currentUserEmail
+    };
+  }));
+  
+  // Sortiere nach XP (höchste zuerst)
+  memberStats.sort((a, b) => b.xp - a.xp);
+  
+  // Render Member Cards
+  container.innerHTML = memberStats.map((member, index) => {
+    const rankColor = index === 0 ? '#fbbf24' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'var(--accent)';
+    const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+    
+    return `
+      <div style="
+        background: ${member.isCurrentUser ? 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(6,182,212,0.1))' : 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))'};
+        border: 2px solid ${member.isCurrentUser ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'};
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        transition: all 0.3s;
+        cursor: pointer;
+      " 
+      onclick="showMemberProfile('${member.id}', '${member.email.replace(/'/g, "\\'")}')"
+      onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 32px ${member.isCurrentUser ? 'rgba(34,197,94,0.3)' : 'rgba(6,182,212,0.3)'}';"
+      onmouseout="this.style.transform=''; this.style.boxShadow='none';">
+        
+        <!-- Rank Badge -->
+        <div style="position: absolute; top: 12px; right: 12px; font-size: 24px;">${rankEmoji}</div>
+        
+        ${member.isCurrentUser ? '<div style="position: absolute; top: 12px; left: 12px; background: linear-gradient(135deg, #22c55e, #16a34a); padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; color: white; text-transform: uppercase;">DU</div>' : ''}
+        
+        <!-- Avatar & Info -->
+        <div style="display: flex; align-items: start; gap: 16px; margin-bottom: 16px; margin-top: ${member.isCurrentUser ? '24px' : '0'};">
+          <div style="position: relative;">
+            <div style="width: 72px; height: 72px; background: linear-gradient(135deg, ${rankColor}, ${index === 0 ? '#f59e0b' : index === 1 ? '#9ca3af' : index === 2 ? '#b45309' : 'var(--accent-2)'}); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 8px 20px ${index < 3 ? 'rgba(251,191,36,0.4)' : 'rgba(6,182,212,0.3)'}; border: 3px solid var(--bg);">
+              👤
+            </div>
+            <!-- Level Badge -->
+            <div style="position: absolute; bottom: -6px; right: -6px; width: 32px; height: 32px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; box-shadow: 0 4px 12px rgba(251,191,36,0.5); border: 2px solid var(--bg);">
+              ${member.level}
+            </div>
+          </div>
+          
+          <div style="flex: 1;">
+            <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: var(--text); word-break: break-word;">${(member.username || member.email.split('@')[0]).replace(/'/g, "&#39;")}</h4>
+            <p style="margin: 0; font-size: 12px; color: var(--muted); word-break: break-all;">${member.email}</p>
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 11px; color: #fbbf24; font-weight: 600;">Level ${member.level}</span>
+              <span style="color: var(--muted);">•</span>
+              <span style="font-size: 11px; color: var(--muted);">${member.xp.toLocaleString('de-DE')} XP</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
+          <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--accent);">${member.observations}</div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">Beobachtungen</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--accent-2);">${member.species}</div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">Arten</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 700; color: #fbbf24;">${member.streak}</div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">Streak</div>
+          </div>
+        </div>
+        
+        <!-- Action Button -->
+        <button class="btn ghost" style="width: 100%; padding: 10px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="event.stopPropagation(); showMemberProfile('${member.id}', '${member.email.replace(/'/g, "\\'")}')">
+          <span>👁️</span>
+          <span>Profil ansehen</span>
+        </button>
+      </div>
+    `;
+  }).join('');
+  
+  console.log(`✅ ${memberStats.length} Mitglieder-Profile gerendert`);
+}
+
+// Mitgliederprofil im Modal anzeigen
+async function showMemberProfile(memberId, memberEmail) {
+  console.log('👤 Zeige Profil für:', memberEmail);
+  
+  const modal = document.getElementById('memberProfileModal');
+  if (!modal) {
+    console.error('Modal nicht gefunden');
+    return;
+  }
+  
+  const group = window.currentGroup;
+  if (!group) return;
+  
+  // Finde Mitglied
+  const member = group.members?.find(m => m.id === memberId || m.email === memberEmail);
+  if (!member) {
+    console.error('Mitglied nicht gefunden');
+    return;
+  }
+  
+  // Sichere Werte mit Fallbacks
+  const safeEmail = member.email || member.userEmail || memberEmail || 'unknown@example.com';
+  const safeUsername = member.username || member.name || safeEmail.split('@')[0];
+  const safeMemberId = member.id || member.userId || memberId;
+  
+  // Berechne detaillierte Stats
+  const memberObs = (group.observations || []).filter(o => o.userId === safeMemberId || o.userEmail === safeEmail);
+  const uniqueSpecies = new Set(memberObs.map(o => o.bird).filter(Boolean));
+  
+  // Streak berechnen
+  const dates = [...new Set(memberObs.map(o => o.date))].sort();
+  let currentStreak = 0;
+  let streakDate = new Date();
+  
+  for (let i = dates.length - 1; i >= 0; i--) {
+    const date = new Date(dates[i]);
+    const dayDiff = Math.floor((streakDate - date) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff <= 1) {
+      currentStreak++;
+      streakDate = date;
+    } else {
+      break;
+    }
+  }
+  
+  // XP & Level berechnen
+  const totalXP = (memberObs.length * 10) + (uniqueSpecies.size * 50) + (currentStreak * 25);
+  const levelData = getLevelFromXP(totalXP);
+  
+  // Erste & letzte Beobachtung
+  const sortedObs = [...memberObs].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const firstDate = sortedObs[0] ? new Date(sortedObs[0].date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt';
+  const lastDate = sortedObs[sortedObs.length - 1] ? new Date(sortedObs[sortedObs.length - 1].date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt';
+  
+  // Top 5 Arten
+  const speciesCount = {};
+  memberObs.forEach(o => {
+    if (o.bird) {
+      speciesCount[o.bird] = (speciesCount[o.bird] || 0) + 1;
+    }
+  });
+  const topSpecies = Object.entries(speciesCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  
+  // Modal Content aktualisieren
+  document.getElementById('memberProfileContent').innerHTML = `
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 64px; margin: 0 auto 16px; box-shadow: 0 12px 32px rgba(6,182,212,0.4); border: 4px solid var(--bg); position: relative;">
+        👤
+        <div style="position: absolute; bottom: -8px; right: 8px; width: 48px; height: 48px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; box-shadow: 0 4px 16px rgba(251,191,36,0.6); border: 3px solid var(--bg);">
+          ${levelData.level}
+        </div>
+      </div>
+      <h3 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">${safeUsername.replace(/'/g, "&#39;")}</h3>
+      <p style="margin: 0 0 12px 0; font-size: 14px; color: var(--muted);">${safeEmail}</p>
+      <div style="display: inline-block; background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.1)); padding: 8px 16px; border-radius: 12px; border: 2px solid rgba(251,191,36,0.3);">
+        <span style="font-size: 14px; font-weight: 700; color: #fbbf24;">Level ${levelData.level} ${levelData.title}</span>
+      </div>
+    </div>
+    
+    <!-- XP Progress -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 12px; font-weight: 600; color: var(--soft);">Erfahrungspunkte (XP)</span>
+        <span style="font-size: 13px; font-weight: 700; color: #fbbf24;">${totalXP.toLocaleString('de-DE')} XP</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.1); border-radius: 12px; height: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: ${levelData.progressPercent}%; transition: width 0.8s ease; box-shadow: 0 0 12px rgba(251,191,36,0.6); border-radius: 12px;"></div>
+      </div>
+      <p style="margin: 6px 0 0 0; font-size: 11px; color: var(--muted);">${levelData.nextLevel ? `Noch ${levelData.xpToNext} XP bis Level ${levelData.nextLevel.level}` : 'Maximales Level erreicht!'}</p>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;">
+      <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 28px; font-weight: 700; color: var(--accent);">${memberObs.length}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Beobachtungen</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 28px; font-weight: 700; color: var(--accent-2);">${uniqueSpecies.size}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Arten</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 28px; font-weight: 700; color: #fbbf24;">${currentStreak}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Tage Streak</div>
+      </div>
+    </div>
+    
+    <!-- Aktivitätszeitraum -->
+    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); padding: 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.1);">
+      <h4 style="margin: 0 0 12px 0; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <span>📅</span>
+        <span>Aktivitätszeitraum</span>
+      </h4>
+      <div style="display: flex; justify-content: space-between; gap: 16px;">
+        <div>
+          <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">Erste Beobachtung</div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text);">${firstDate}</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">Letzte Beobachtung</div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text);">${lastDate}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Top Arten -->
+    ${topSpecies.length > 0 ? `
+    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+      <h4 style="margin: 0 0 12px 0; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <span>🐦</span>
+        <span>Top 5 Arten</span>
+      </h4>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        ${topSpecies.map(([bird, count], index) => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white;">${index + 1}</div>
+              <span style="font-size: 14px; font-weight: 600; color: var(--text);">${bird}</span>
+            </div>
+            <span style="font-size: 14px; font-weight: 700; color: var(--accent);">${count}x</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : '<p style="color: var(--muted); text-align: center;">Noch keine Beobachtungen</p>'}
+  `;
+  
+  // Modal anzeigen
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+// Mitgliederprofil-Modal schließen
+window.closeMemberProfileModal = function() {
+  const modal = document.getElementById('memberProfileModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  document.body.style.overflow = '';
+};
 
 // Hilfsfunktion: Raritätenpunkte für Benutzer hinzufügen (wird beim Import verwendet)
 async function addRarityPointsForUser(groupId, userEmail, observation) {
@@ -27380,6 +27924,9 @@ async function renderGroupComparison() {
     // Lade alle Gruppendaten
     const groupData = await loadGroupData();
     
+    // Setze window.currentGroup für andere Funktionen (wie renderMembersProfiles)
+    window.currentGroup = await loadFullGroupData();
+    
     // Rendere Beobachtungs-Leaderboard
     await renderObservationLeaderboard(groupData);
     
@@ -27391,6 +27938,9 @@ async function renderGroupComparison() {
     
     // Rendere detaillierten Vergleich
     await renderDetailedObservationComparison(groupData);
+    
+    // Rendere Mitglieder-Profile (für den Mitglieder-Tab)
+    await renderMembersProfiles();
     
     // Rendere Erfolgs-Leaderboard
     await renderAchievementLeaderboard(groupData);
@@ -27409,6 +27959,42 @@ async function renderGroupComparison() {
     console.error('❌ Fehler beim Laden des Gruppenvergleichs:', error);
     showNotification('Fehler beim Laden der Gruppendaten', 3000);
   }
+}
+
+// Hilfsfunktion: Lade vollständige Gruppendaten für window.currentGroup
+async function loadFullGroupData() {
+  return new Promise((resolve, reject) => {
+    const groupId = window.currentSelectedGroup;
+    const groupRef = window.FBD.ref(`groups/${groupId}`);
+    
+    groupRef.once('value', (snapshot) => {
+      const data = snapshot.val();
+      if (!data) {
+        reject(new Error('Keine Gruppendaten gefunden'));
+        return;
+      }
+      
+      // Konvertiere Objekte zu Arrays
+      const members = data.members ? Object.entries(data.members).map(([id, member]) => ({
+        id: id,
+        ...member
+      })) : [];
+      
+      const observations = data.observations ? Object.entries(data.observations).map(([id, obs]) => ({
+        id: id,
+        ...obs
+      })) : [];
+      
+      resolve({
+        name: data.name || 'Unbenannte Gruppe',
+        members: members,
+        observations: observations,
+        sharedLists: data.sharedLists || []
+      });
+    }, (error) => {
+      reject(error);
+    });
+  });
 }
 
 // Rendere Beobachtungs-Leaderboard
@@ -34601,6 +35187,9 @@ function switchAdvancedStatsTab(tabName) {
     case 'insights':
       loadInsights();
       break;
+    case 'achievements-overview':
+      loadAchievementsOverview();
+      break;
   }
 }
 
@@ -35233,14 +35822,14 @@ async function loadMeilensteine() {
   }
   
   const milestones = [
-    { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, current: totalSpecies, type: 'species' },
-    { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, current: totalSpecies, type: 'species' },
-    { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, current: totalSpecies, type: 'species' },
-    { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, current: totalSpecies, type: 'species' },
-    { icon: '🦉', title: 'Meister', desc: '100 Arten beobachtet', target: 100, current: totalSpecies, type: 'species' },
-    { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, current: totalObs, type: 'obs' },
-    { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, current: totalObs, type: 'obs' },
-    { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, current: totalObs, type: 'obs' },
+    { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, current: totalSpecies, type: 'species', id: 'species_1' },
+    { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, current: totalSpecies, type: 'species', id: 'species_10' },
+    { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, current: totalSpecies, type: 'species', id: 'species_25' },
+    { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, current: totalSpecies, type: 'species', id: 'species_50' },
+    { icon: '🦉', title: 'Meister', desc: '100 Arten beobachtet', target: 100, current: totalSpecies, type: 'species', id: 'species_100' },
+    { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, current: totalObs, type: 'obs', id: 'obs_100' },
+    { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, current: totalObs, type: 'obs', id: 'obs_500' },
+    { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, current: totalObs, type: 'obs', id: 'obs_1000' },
     { icon: '🔥', title: 'Streak Starter', desc: '7 Tage Streak', target: 7, current: currentStreak, type: 'streak', id: 'streak_7' },
     { icon: '⚡', title: 'Streak Master', desc: '30 Tage Streak', target: 30, current: currentStreak, type: 'streak', id: 'streak_30' },
     { icon: '💎', title: 'Diamant Streak', desc: '100 Tage Streak', target: 100, current: currentStreak, type: 'streak', id: 'streak_100' }
@@ -35261,116 +35850,448 @@ async function loadMeilensteine() {
   container.innerHTML = '';
   
   milestones.forEach(m => {
-    const autoAchieved = m.current >= m.target;
-    const manuallyCompleted = savedAchievements[m.id] === true;
-    const achieved = autoAchieved || manuallyCompleted;
+    const goalReached = m.current >= m.target;  // Ziel erreicht
+    const claimed = savedAchievements[m.id] === true;  // Bereits abgeholt
+    const canClaim = goalReached && !claimed;  // Kann abgeholt werden
     const progress = Math.min(100, (m.current / m.target) * 100);
     
     const card = document.createElement('div');
-    card.className = `milestone-card ${achieved ? 'achieved' : ''}`;
+    card.className = `milestone-card ${claimed ? 'claimed' : ''}`;
     card.style.cssText = `
       position: relative;
-      background: ${achieved ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1))' : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))'};
-      border: 2px solid ${achieved ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.06)'};
+      background: ${claimed ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1))' : canClaim ? 'linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1))' : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))'};
+      border: 2px solid ${claimed ? 'rgba(16,185,129,0.4)' : canClaim ? 'rgba(251,191,36,0.6)' : 'rgba(255,255,255,0.06)'};
       border-radius: 16px;
       padding: 20px;
-      cursor: ${!achieved && progress >= 90 ? 'pointer' : 'default'};
+      cursor: ${canClaim ? 'pointer' : 'default'};
       transition: all 0.3s;
-      ${!achieved && progress >= 90 ? 'box-shadow: 0 0 20px rgba(6,182,212,0.3);' : ''}
+      ${canClaim ? 'animation: pulse 2s infinite; box-shadow: 0 0 30px rgba(251,191,36,0.4);' : ''}
     `;
     
-    // Hover-Effekt nur wenn fast erreicht
-    if (!achieved && progress >= 90) {
+    // Hover-Effekt nur wenn abholbar
+    if (canClaim) {
       card.onmouseover = () => {
-        card.style.transform = 'translateY(-4px) scale(1.02)';
-        card.style.boxShadow = '0 8px 30px rgba(6,182,212,0.4)';
+        card.style.transform = 'translateY(-8px) scale(1.03)';
+        card.style.boxShadow = '0 12px 40px rgba(251,191,36,0.6)';
       };
       card.onmouseout = () => {
         card.style.transform = 'translateY(0) scale(1)';
-        card.style.boxShadow = '0 0 20px rgba(6,182,212,0.3)';
+        card.style.boxShadow = '0 0 30px rgba(251,191,36,0.4)';
       };
     }
     
     card.innerHTML = `
-      ${achieved ? '<div style="position: absolute; top: -12px; right: -12px; width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 16px rgba(16,185,129,0.5); border: 3px solid var(--bg);">✓</div>' : ''}
+      ${claimed ? '<div style="position: absolute; top: -12px; right: -12px; width: 56px; height: 56px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 6px 20px rgba(16,185,129,0.6); border: 4px solid var(--bg); animation: checkmark 0.5s ease;">✓</div>' : ''}
+      ${canClaim ? '<div style="position: absolute; top: -12px; right: -12px; width: 56px; height: 56px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 20px rgba(251,191,36,0.6); border: 4px solid var(--bg); animation: bounce 1s infinite;">🎁</div>' : ''}
       <div style="display: flex; align-items: start; gap: 16px;">
-        <div style="font-size: 48px; line-height: 1; ${achieved ? 'filter: drop-shadow(0 4px 8px rgba(16,185,129,0.4));' : 'opacity: 0.7;'}">${m.icon}</div>
+        <div style="font-size: 56px; line-height: 1; ${claimed ? 'filter: drop-shadow(0 4px 12px rgba(16,185,129,0.5));' : canClaim ? 'filter: drop-shadow(0 4px 12px rgba(251,191,36,0.5)); animation: wiggle 1s infinite;' : 'opacity: 0.5;'}">${m.icon}</div>
         <div style="flex: 1;">
-          <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: ${achieved ? '#10b981' : 'var(--text)'};">${m.title}</h4>
+          <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: ${claimed ? '#10b981' : canClaim ? '#fbbf24' : 'var(--text)'};">${m.title}</h4>
           <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--muted);">${m.desc}</p>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span style="font-size: 14px; font-weight: 600; color: var(--soft);">${m.current} / ${m.target}</span>
-            <span style="font-size: 13px; font-weight: 700; color: ${achieved ? '#10b981' : 'var(--accent)'};">${progress.toFixed(0)}%</span>
+            <span style="font-size: 13px; font-weight: 700; color: ${claimed ? '#10b981' : canClaim ? '#fbbf24' : 'var(--accent)'};">${progress.toFixed(0)}%</span>
           </div>
           <div style="background: rgba(255,255,255,0.05); border-radius: 12px; height: 10px; overflow: hidden;">
-            <div style="height: 100%; background: ${achieved ? 'linear-gradient(90deg, #10b981, #059669)' : 'linear-gradient(90deg, var(--accent), var(--accent-2))'}; width: ${progress}%; transition: width 0.5s ease; box-shadow: ${progress > 90 ? '0 0 10px currentColor' : 'none'};"></div>
+            <div style="height: 100%; background: ${claimed ? 'linear-gradient(90deg, #10b981, #059669)' : canClaim ? 'linear-gradient(90deg, #fbbf24, #f59e0b)' : 'linear-gradient(90deg, var(--accent), var(--accent-2))'}; width: ${progress}%; transition: width 0.5s ease;"></div>
           </div>
         </div>
       </div>
-      ${!achieved && progress >= 90 ? '<div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 12px; color: var(--accent); font-weight: 600;">🎯 Fast geschafft! Klicke zum Abhaken</div>' : ''}
-      ${achieved ? '<div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(16,185,129,0.2); font-size: 13px; color: #10b981; font-weight: 700;">🏆 Achievement freigeschaltet!</div>' : ''}
+      ${canClaim ? `
+        <div style="text-align: center; margin-top: 20px; padding: 16px; border-top: 2px solid rgba(251,191,36,0.3); background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05)); border-radius: 0 0 12px 12px; margin: 16px -20px -20px -20px;">
+          <div style="font-size: 16px; color: #fbbf24; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span style="font-size: 24px; animation: sparkle 1.5s infinite;">✨</span>
+            BEREIT ZUM ABHOLEN!
+            <span style="font-size: 24px; animation: sparkle 1.5s infinite;">✨</span>
+          </div>
+          <div style="font-size: 12px; color: var(--soft);">Klicke hier um dein Achievement einzulösen</div>
+        </div>
+      ` : claimed ? `
+        <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(16,185,129,0.2); font-size: 13px; color: #10b981; font-weight: 700;">
+          🏆 Achievement freigeschaltet am ${new Date(savedAchievements[m.id + '_date'] || Date.now()).toLocaleDateString('de-DE')}
+        </div>
+      ` : `
+        <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: var(--muted);">
+          Noch ${m.target - m.current} ${m.type === 'species' ? 'Arten' : m.type === 'observations' ? 'Beobachtungen' : m.type === 'streak' ? 'Tage' : ''} bis zum Ziel
+        </div>
+      `}
     `;
     
-    // Click-Handler für manuelles Abhaken
-    if (!achieved && progress >= 90) {
+    // Click-Handler für Abholen
+    if (canClaim) {
       card.onclick = async () => {
-        if (confirm(`Achievement "${m.title}" als erreicht markieren?`)) {
-          savedAchievements[m.id] = true;
-          await saveToIndexedDB('settings', { key: 'achievements', value: savedAchievements });
-          showNotification(`🎉 Achievement "${m.title}" freigeschaltet!`, 3000);
-          loadMilestones(); // Neu laden
-        }
+        // Feuerwerk-Animation
+        card.style.animation = 'explode 0.5s ease';
+        
+        savedAchievements[m.id] = true;
+        savedAchievements[m.id + '_date'] = Date.now();
+        await saveToIndexedDB('settings', { key: 'achievements', value: savedAchievements });
+        
+        // Erfolgs-Nachricht mit mehr Effekt
+        showNotification(`🎉 Achievement "${m.title}" erfolgreich eingelöst!`, 4000);
+        
+        // Confetti-Effekt (optional - kann später hinzugefügt werden)
+        setTimeout(() => {
+          loadMeilensteine(); // Neu laden
+        }, 500);
       };
     }
     
     container.appendChild(card);
   });
   
-  // Zeige erreichte Abzeichen an
-  const earnedBadgesContainer = document.getElementById('earnedBadges');
-  const earnedMilestones = milestones.filter(m => {
-    const autoAchieved = m.current >= m.target;
-    const manuallyCompleted = savedAchievements[m.id] === true;
-    return autoAchieved || manuallyCompleted;
-  });
+  // CSS für Animationen hinzufügen (falls noch nicht vorhanden)
+  if (!document.getElementById('achievement-animations')) {
+    const style = document.createElement('style');
+    style.id = 'achievement-animations';
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 30px rgba(251,191,36,0.4); }
+        50% { box-shadow: 0 0 50px rgba(251,191,36,0.7); }
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      @keyframes wiggle {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg); }
+        75% { transform: rotate(10deg); }
+      }
+      @keyframes sparkle {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+      }
+      @keyframes checkmark {
+        0% { transform: scale(0) rotate(-45deg); }
+        50% { transform: scale(1.2) rotate(10deg); }
+        100% { transform: scale(1) rotate(0deg); }
+      }
+      @keyframes explode {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
   
-  if (earnedMilestones.length === 0) {
+  // Zeige NUR eingelöste Abzeichen an
+  const earnedBadgesContainer = document.getElementById('earnedBadges');
+  const claimedMilestones = milestones.filter(m => savedAchievements[m.id] === true);
+  
+  if (claimedMilestones.length === 0) {
     earnedBadgesContainer.innerHTML = `
       <div style="text-align: center; padding: 20px; color: var(--muted);">
-        <div style="font-size: 48px; opacity: 0.3; margin-bottom: 8px;">🎯</div>
-        <p style="margin: 0; font-size: 14px;">Noch keine Abzeichen freigeschaltet</p>
-        <p style="margin: 4px 0 0 0; font-size: 12px;">Erreiche Meilensteine, um Achievements zu sammeln!</p>
+        <div style="font-size: 64px; opacity: 0.2; margin-bottom: 12px;">🏆</div>
+        <p style="margin: 0; font-size: 15px; font-weight: 600;">Noch keine Abzeichen eingelöst</p>
+        <p style="margin: 8px 0 0 0; font-size: 12px;">Erreiche Meilensteine und löse sie unten ein!</p>
       </div>
     `;
   } else {
-    earnedBadgesContainer.innerHTML = earnedMilestones.map(m => `
-      <div style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        padding: 16px;
-        background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
-        border: 2px solid rgba(16,185,129,0.4);
-        border-radius: 16px;
-        min-width: 120px;
-        transition: all 0.3s;
-        cursor: pointer;
-      " 
-      onmouseover="this.style.transform='translateY(-4px) scale(1.05)'; this.style.boxShadow='0 8px 24px rgba(16,185,129,0.4)';"
-      onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none';"
-      title="${m.desc}">
-        <div style="font-size: 48px; filter: drop-shadow(0 4px 12px rgba(16,185,129,0.5));">${m.icon}</div>
-        <div style="font-size: 12px; font-weight: 700; color: #10b981; text-align: center; line-height: 1.3;">${m.title}</div>
-        <div style="font-size: 10px; color: var(--muted); text-align: center;">${m.current} / ${m.target}</div>
-      </div>
-    `).join('');
+    earnedBadgesContainer.innerHTML = claimedMilestones.map(m => {
+      const claimDate = savedAchievements[m.id + '_date'] ? new Date(savedAchievements[m.id + '_date']).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '?';
+      const claimDateLong = savedAchievements[m.id + '_date'] ? new Date(savedAchievements[m.id + '_date']).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt';
+      
+      // Escape quotes for onclick attribute
+      const achievementDataJson = JSON.stringify({
+        icon: m.icon,
+        title: m.title,
+        desc: m.desc,
+        target: m.target,
+        current: m.current,
+        type: m.type,
+        claimDate: claimDateLong
+      }).replace(/"/g, '&quot;');
+      
+      return `
+        <div style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 20px 16px;
+          background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.15));
+          border: 2px solid rgba(16,185,129,0.5);
+          border-radius: 16px;
+          min-width: 140px;
+          transition: all 0.3s;
+          cursor: pointer;
+          position: relative;
+        " 
+        onmouseover="this.style.transform='translateY(-6px) scale(1.05)'; this.style.boxShadow='0 12px 32px rgba(16,185,129,0.5)';"
+        onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none';"
+        onclick="openAchievementDetailModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify({
+          icon: m.icon,
+          title: m.title,
+          desc: m.desc,
+          target: m.target,
+          current: m.current,
+          type: m.type,
+          claimDate: claimDateLong
+        }))}')))"
+        title="${m.desc} - Eingelöst am ${claimDate} - Klicke für Details">
+          <div style="position: absolute; top: -8px; right: -8px; width: 28px; height: 28px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 8px rgba(251,191,36,0.5); border: 2px solid var(--bg);">✨</div>
+          <div style="font-size: 56px; filter: drop-shadow(0 6px 16px rgba(16,185,129,0.6)); animation: float 3s ease-in-out infinite;">${m.icon}</div>
+          <div style="font-size: 13px; font-weight: 700; color: #10b981; text-align: center; line-height: 1.3;">${m.title}</div>
+          <div style="font-size: 10px; color: var(--muted); text-align: center;">${claimDate}</div>
+          <div style="width: 100%; height: 4px; background: linear-gradient(90deg, #10b981, #059669); border-radius: 2px; margin-top: 4px;"></div>
+        </div>
+      `;
+    }).join('');
+    
+    // Float-Animation für Badges
+    if (!document.getElementById('badge-float-animation')) {
+      const style = document.createElement('style');
+      style.id = 'badge-float-animation';
+      style.textContent = `
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }
   
   // Lifelist progress
   const lifelistPercent = Math.min(100, (totalSpecies / 500) * 100);
   document.getElementById('lifelistProgressBar').style.width = lifelistPercent + '%';
   document.getElementById('lifelistProgressText').textContent = `${totalSpecies} von ~500 möglichen Arten in Deutschland (${lifelistPercent.toFixed(1)}%)`;
+}
+
+// Achievements Overview - Detaillierte Ansicht aller Achievements
+async function loadAchievementsOverview() {
+  const observations = await getOwnObservationsForStats();
+  
+  const totalSpecies = countUniqueSpecies(observations);
+  const totalObs = observations.length;
+  
+  // Count consecutive days
+  const dates = [...new Set(observations.map(o => o.date))].sort();
+  let currentStreak = 0;
+  let maxStreak = 0;
+  let streakDate = new Date();
+  
+  for (let i = dates.length - 1; i >= 0; i--) {
+    const date = new Date(dates[i]);
+    const dayDiff = Math.floor((streakDate - date) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff <= 1) {
+      currentStreak++;
+      maxStreak = Math.max(maxStreak, currentStreak);
+      streakDate = date;
+    } else {
+      break;
+    }
+  }
+  
+  const milestones = [
+    { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, current: totalSpecies, type: 'species', id: 'species_1' },
+    { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, current: totalSpecies, type: 'species', id: 'species_10' },
+    { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, current: totalSpecies, type: 'species', id: 'species_25' },
+    { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, current: totalSpecies, type: 'species', id: 'species_50' },
+    { icon: '🦉', title: 'Meister', desc: '100 Arten beobachtet', target: 100, current: totalSpecies, type: 'species', id: 'species_100' },
+    { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, current: totalObs, type: 'obs', id: 'obs_100' },
+    { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, current: totalObs, type: 'obs', id: 'obs_500' },
+    { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, current: totalObs, type: 'obs', id: 'obs_1000' },
+    { icon: '🔥', title: 'Streak Starter', desc: '7 Tage Streak', target: 7, current: currentStreak, type: 'streak', id: 'streak_7' },
+    { icon: '⚡', title: 'Streak Master', desc: '30 Tage Streak', target: 30, current: currentStreak, type: 'streak', id: 'streak_30' },
+    { icon: '💎', title: 'Diamant Streak', desc: '100 Tage Streak', target: 100, current: currentStreak, type: 'streak', id: 'streak_100' }
+  ];
+  
+  // Lade gespeicherte Achievements
+  let savedAchievements = {};
+  try {
+    const stored = await getFromIndexedDB('settings', 'achievements');
+    if (stored && stored.value) {
+      savedAchievements = stored.value;
+    }
+  } catch (e) {
+    console.log('Keine gespeicherten Achievements gefunden:', e);
+  }
+  
+  // Kategorisiere Achievements
+  const claimed = milestones.filter(m => savedAchievements[m.id] === true);
+  const ready = milestones.filter(m => m.current >= m.target && savedAchievements[m.id] !== true);
+  const inProgress = milestones.filter(m => m.current < m.target);
+  
+  // Update Summary
+  const totalAchievements = milestones.length;
+  const claimedCount = claimed.length;
+  const completionPercent = ((claimedCount / totalAchievements) * 100).toFixed(0);
+  
+  document.getElementById('achievementsSummary').textContent = 
+    `${claimedCount} von ${totalAchievements} Achievements eingelöst (${completionPercent}% abgeschlossen)`;
+  document.getElementById('totalClaimedCount').textContent = claimedCount;
+  document.getElementById('totalReadyCount').textContent = ready.length;
+  document.getElementById('totalInProgressCount').textContent = inProgress.length;
+  document.getElementById('achievementCompletionPercent').textContent = completionPercent + '%';
+  
+  // Render Achievement Gallery (nur eingelöste)
+  const galleryContainer = document.getElementById('achievementGallery');
+  if (claimed.length === 0) {
+    galleryContainer.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--muted);">
+        <div style="font-size: 72px; opacity: 0.2; margin-bottom: 16px;">🏆</div>
+        <p style="margin: 0; font-size: 16px; font-weight: 600;">Noch keine Achievements eingelöst</p>
+        <p style="margin: 8px 0 0 0; font-size: 13px;">Erreiche Meilensteine und löse sie ein!</p>
+      </div>
+    `;
+  } else {
+    galleryContainer.innerHTML = claimed.map(m => {
+      const claimDate = savedAchievements[m.id + '_date'] ? 
+        new Date(savedAchievements[m.id + '_date']).toLocaleDateString('de-DE', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: '2-digit' 
+        }) : '?';
+      
+      const claimDateLong = savedAchievements[m.id + '_date'] ? 
+        new Date(savedAchievements[m.id + '_date']).toLocaleDateString('de-DE', { 
+          day: '2-digit', 
+          month: 'long', 
+          year: 'numeric' 
+        }) : 'Unbekannt';
+      
+      return `
+        <div style="
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          padding: 24px 16px;
+          background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.15));
+          border: 2px solid rgba(16,185,129,0.5);
+          border-radius: 16px;
+          transition: all 0.3s;
+          cursor: pointer;
+        " 
+        onmouseover="this.style.transform='translateY(-8px) scale(1.05)'; this.style.boxShadow='0 16px 40px rgba(16,185,129,0.6)';"
+        onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='none';"
+        onclick="openAchievementDetailModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify({
+          icon: m.icon,
+          title: m.title,
+          desc: m.desc,
+          target: m.target,
+          current: m.current,
+          type: m.type,
+          claimDate: claimDateLong
+        }))}')))"
+        title="${m.desc} - Klicke für Details">
+          <div style="position: absolute; top: -10px; right: -10px; width: 32px; height: 32px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 12px rgba(251,191,36,0.6); border: 3px solid var(--bg);">✨</div>
+          <div style="font-size: 64px; filter: drop-shadow(0 8px 20px rgba(16,185,129,0.7)); animation: float 3s ease-in-out infinite;">${m.icon}</div>
+          <div style="font-size: 14px; font-weight: 700; color: #10b981; text-align: center; line-height: 1.3;">${m.title}</div>
+          <div style="font-size: 11px; color: var(--muted); text-align: center; margin-top: 4px;">${claimDate}</div>
+          <div style="width: 100%; height: 4px; background: linear-gradient(90deg, #10b981, #059669); border-radius: 2px; margin-top: 6px;"></div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  // Render Detailed Achievement List
+  const detailContainer = document.getElementById('achievementDetailList');
+  
+  // Kategorien rendern
+  const categories = [
+    { 
+      title: '✅ Eingelöste Achievements', 
+      items: claimed, 
+      color: '#10b981',
+      bgColor: 'rgba(16,185,129,0.15)',
+      borderColor: 'rgba(16,185,129,0.3)'
+    },
+    { 
+      title: '🎁 Bereit zum Abholen', 
+      items: ready, 
+      color: '#fbbf24',
+      bgColor: 'rgba(251,191,36,0.15)',
+      borderColor: 'rgba(251,191,36,0.3)'
+    },
+    { 
+      title: '🎯 In Arbeit', 
+      items: inProgress, 
+      color: 'var(--accent)',
+      bgColor: 'rgba(6,182,212,0.1)',
+      borderColor: 'rgba(6,182,212,0.2)'
+    }
+  ];
+  
+  let detailHtml = '';
+  
+  categories.forEach(cat => {
+    if (cat.items.length > 0) {
+      detailHtml += `
+        <div style="background: ${cat.bgColor}; border: 2px solid ${cat.borderColor}; border-radius: 16px; padding: 24px;">
+          <h4 style="margin: 0 0 20px 0; font-size: 18px; color: ${cat.color}; font-weight: 700;">${cat.title} (${cat.items.length})</h4>
+          <div style="display: grid; gap: 12px;">
+      `;
+      
+      cat.items.forEach(m => {
+        const progress = Math.min(100, (m.current / m.target) * 100);
+        const isClaimed = savedAchievements[m.id] === true;
+        const claimDate = isClaimed && savedAchievements[m.id + '_date'] ? 
+          new Date(savedAchievements[m.id + '_date']).toLocaleDateString('de-DE', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+          }) : null;
+        
+        detailHtml += `
+          <div style="
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            transition: all 0.2s;
+          " onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+            <div style="font-size: 48px; ${isClaimed ? 'filter: drop-shadow(0 4px 12px ' + cat.color + ');' : ''}">${m.icon}</div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <div>
+                  <h5 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text);">${m.title}</h5>
+                  <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);">${m.desc}</p>
+                </div>
+                ${isClaimed ? `<div style="background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; white-space: nowrap;">✓ EINGELÖST</div>` : ''}
+              </div>
+              
+              <div style="margin-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 13px; font-weight: 600; color: var(--soft);">${m.current} / ${m.target}</span>
+                  <span style="font-size: 13px; font-weight: 700; color: ${cat.color};">${progress.toFixed(0)}%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; height: 8px; overflow: hidden;">
+                  <div style="height: 100%; background: linear-gradient(90deg, ${cat.color}, ${cat.color}dd); width: ${progress}%; transition: width 0.5s ease;"></div>
+                </div>
+              </div>
+              
+              ${claimDate ? `
+                <div style="margin-top: 12px; font-size: 11px; color: ${cat.color}; font-weight: 600;">
+                  🗓️ Eingelöst am ${claimDate}
+                </div>
+              ` : progress === 100 ? `
+                <div style="margin-top: 12px; font-size: 12px; color: #fbbf24; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                  ✨ Bereit zum Abholen! Gehe zu "Meilensteine" um es einzulösen.
+                </div>
+              ` : `
+                <div style="margin-top: 12px; font-size: 11px; color: var(--muted);">
+                  Noch ${m.target - m.current} ${m.type === 'species' ? 'Arten' : m.type === 'obs' ? 'Beobachtungen' : 'Tage'} bis zum Ziel
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      });
+      
+      detailHtml += '</div></div>';
+    }
+  });
+  
+  detailContainer.innerHTML = detailHtml;
 }
 
 // Arten-Timeline
@@ -36626,6 +37547,669 @@ function toggleModalCommonSpecies() {
   }
 }
 
+// Achievement Detail Modal
+function openAchievementDetailModal(achievementData) {
+  const modal = document.getElementById('achievementDetailModal');
+  
+  // Fill modal with data
+  document.getElementById('achievementModalIcon').textContent = achievementData.icon;
+  document.getElementById('achievementModalTitle').textContent = achievementData.title;
+  document.getElementById('achievementModalDesc').textContent = achievementData.desc;
+  document.getElementById('achievementModalTarget').textContent = achievementData.target;
+  document.getElementById('achievementModalCurrent').textContent = achievementData.current;
+  document.getElementById('achievementModalProgress').style.width = '100%';
+  document.getElementById('achievementModalDate').textContent = achievementData.claimDate;
+  
+  // Set type label
+  let typeLabel = 'Unbekannt';
+  if (achievementData.type === 'species') typeLabel = 'Arten';
+  else if (achievementData.type === 'obs') typeLabel = 'Beobachtungen';
+  else if (achievementData.type === 'streak') typeLabel = 'Streak';
+  document.getElementById('achievementModalType').textContent = typeLabel;
+  
+  // Show modal
+  modal.style.display = 'flex';
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAchievementModal() {
+  const modal = document.getElementById('achievementDetailModal');
+  modal.style.display = 'none';
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeAchievementModal();
+    closeShowcaseModal();
+  }
+});
+
+// ===============================================
+// PROFIL-SYSTEM: XP, Level & Showcase
+// ===============================================
+
+// Showcase-Funktionen ZUERST definieren (müssen global verfügbar sein)
+
+// Handle click on showcase achievement item
+window.handleShowcaseClick = function(index) {
+  console.log('🎯🎯🎯 SHOWCASE ITEM GEKLICKT! Index:', index);
+  
+  if (!window.showcaseAchievementsMap) {
+    console.error('❌ showcaseAchievementsMap nicht gefunden!');
+    return;
+  }
+  
+  const achievement = window.showcaseAchievementsMap.get(index);
+  console.log('Achievement aus Map:', achievement);
+  
+  if (!achievement) {
+    console.error('❌ Achievement nicht in Map gefunden für Index:', index);
+    return;
+  }
+  
+  window.selectShowcaseAchievement(achievement);
+};
+
+window.selectShowcaseAchievement = async function(achievement) {
+  console.log('✅✅✅ selectShowcaseAchievement aufgerufen!');
+  console.log('Achievement Daten:', achievement);
+  
+  if (!achievement) {
+    console.error('❌ Kein Achievement übergeben!');
+    if (typeof showNotification === 'function') {
+      showNotification('❌ Fehler: Kein Achievement ausgewählt', 3000);
+    }
+    return;
+  }
+  
+  try {
+    console.log('💾 Speichere Achievement...');
+    await saveToIndexedDB('settings', { key: 'showcaseAchievement', value: achievement });
+    console.log('✅ Achievement gespeichert!');
+    
+    renderShowcaseAchievement(achievement);
+    window.closeShowcaseModal();
+    
+    if (typeof showNotification === 'function') {
+      showNotification('✅ Showcase Achievement aktualisiert!', 3000);
+    }
+  } catch (e) {
+    console.error('❌ Fehler beim Speichern des Showcase Achievements:', e);
+    if (typeof showNotification === 'function') {
+      showNotification('❌ Fehler beim Speichern: ' + e.message, 3000);
+    }
+  }
+};
+
+window.closeShowcaseModal = function() {
+  console.log('🚪 Showcase Modal schließen');
+  const modal = document.getElementById('showcaseModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  document.body.style.overflow = '';
+};
+
+console.log('✅ Showcase-Funktionen definiert:', {
+  handleShowcaseClick: typeof window.handleShowcaseClick,
+  selectShowcaseAchievement: typeof window.selectShowcaseAchievement,
+  closeShowcaseModal: typeof window.closeShowcaseModal
+});
+
+// Level-Definitionen (100 Levels)
+const LEVELS = (() => {
+  const levels = [];
+  const titles = [
+    'Anfänger', 'Beobachter', 'Enthusiast', 'Forscher', 'Entdecker',
+    'Experte', 'Meister', 'Virtuose', 'Profi', 'Veteran',
+    'Champion', 'Elite', 'Legende', 'Mythisch', 'Unsterblich',
+    'Göttlich', 'Transzendent', 'Allmächtig', 'Kosmisch', 'Ewig'
+  ];
+  
+  // Level 1-100 generieren mit progressiver XP-Kurve
+  for (let i = 1; i <= 100; i++) {
+    let xpRequired;
+    
+    if (i === 1) {
+      xpRequired = 0;
+    } else if (i <= 10) {
+      // Level 2-10: Linear ansteigend (100, 250, 500, 850, 1300, 1850, 2500, 3250, 4100)
+      xpRequired = Math.floor(100 * (i - 1) + 50 * Math.pow(i - 1, 1.5));
+    } else if (i <= 30) {
+      // Level 11-30: Moderate Steigerung
+      const base = 4100;
+      xpRequired = Math.floor(base + (i - 10) * 500 + 25 * Math.pow(i - 10, 1.8));
+    } else if (i <= 50) {
+      // Level 31-50: Stärkere Steigerung
+      const base = 24000;
+      xpRequired = Math.floor(base + (i - 30) * 1000 + 50 * Math.pow(i - 30, 2));
+    } else if (i <= 75) {
+      // Level 51-75: Exponentiell
+      const base = 70000;
+      xpRequired = Math.floor(base + (i - 50) * 2000 + 100 * Math.pow(i - 50, 2.2));
+    } else {
+      // Level 76-100: Sehr hoch
+      const base = 250000;
+      xpRequired = Math.floor(base + (i - 75) * 5000 + 200 * Math.pow(i - 75, 2.5));
+    }
+    
+    // Titel basierend auf Level-Bereich
+    let title;
+    const titleIndex = Math.floor((i - 1) / 5) % titles.length;
+    
+    if (i <= 20) {
+      title = titles[titleIndex];
+    } else if (i <= 40) {
+      title = `Senior ${titles[titleIndex]}`;
+    } else if (i <= 60) {
+      title = `Erhabener ${titles[titleIndex]}`;
+    } else if (i <= 80) {
+      title = `Legendärer ${titles[titleIndex]}`;
+    } else if (i < 100) {
+      title = `Ultimativer ${titles[titleIndex]}`;
+    } else {
+      title = '🌟 GRANDMASTER 🌟';
+    }
+    
+    levels.push({ level: i, xpRequired, title });
+  }
+  
+  return levels;
+})();
+
+// XP berechnen
+async function calculateTotalXP() {
+  const observations = await getOwnObservationsForStats();
+  const totalSpecies = countUniqueSpecies(observations);
+  
+  // Lade gespeicherte Achievements
+  let savedAchievements = {};
+  try {
+    const stored = await getFromIndexedDB('settings', 'achievements');
+    if (stored && stored.value) {
+      savedAchievements = stored.value;
+    }
+  } catch (e) {
+    console.log('Keine Achievements gefunden:', e);
+  }
+  
+  // Zähle eingelöste Achievements
+  const claimedAchievementsCount = Object.keys(savedAchievements).filter(key => 
+    !key.endsWith('_date') && savedAchievements[key] === true
+  ).length;
+  
+  // Streak berechnen
+  const dates = [...new Set(observations.map(o => o.date))].sort();
+  let currentStreak = 0;
+  let streakDate = new Date();
+  
+  for (let i = dates.length - 1; i >= 0; i--) {
+    const date = new Date(dates[i]);
+    const dayDiff = Math.floor((streakDate - date) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff <= 1) {
+      currentStreak++;
+      streakDate = date;
+    } else {
+      break;
+    }
+  }
+  
+  // XP-Berechnung
+  const xpFromObservations = observations.length * 10;  // 10 XP pro Beobachtung
+  const xpFromNewSpecies = totalSpecies * 50;  // 50 XP pro neuer Art
+  const xpFromAchievements = claimedAchievementsCount * 100;  // 100 XP pro Achievement
+  const xpFromStreak = currentStreak * 25;  // 25 XP pro Streak-Tag
+  
+  const totalXP = xpFromObservations + xpFromNewSpecies + xpFromAchievements + xpFromStreak;
+  
+  return {
+    totalXP,
+    breakdown: {
+      observations: xpFromObservations,
+      species: xpFromNewSpecies,
+      achievements: xpFromAchievements,
+      streak: xpFromStreak
+    },
+    stats: {
+      totalObservations: observations.length,
+      totalSpecies,
+      claimedAchievements: claimedAchievementsCount,
+      currentStreak
+    }
+  };
+}
+
+// Level aus XP ermitteln
+function getLevelFromXP(xp) {
+  let currentLevel = LEVELS[0];
+  
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].xpRequired) {
+      currentLevel = LEVELS[i];
+      break;
+    }
+  }
+  
+  // Nächstes Level finden
+  const nextLevel = LEVELS.find(l => l.level === currentLevel.level + 1);
+  const xpInCurrentLevel = xp - currentLevel.xpRequired;
+  const xpForNextLevel = nextLevel ? nextLevel.xpRequired - currentLevel.xpRequired : 0;
+  const progressPercent = nextLevel ? (xpInCurrentLevel / xpForNextLevel) * 100 : 100;
+  
+  return {
+    level: currentLevel.level,
+    title: currentLevel.title,
+    currentXP: xp,
+    xpInLevel: xpInCurrentLevel,
+    xpForNext: xpForNextLevel,
+    xpToNext: nextLevel ? nextLevel.xpRequired - xp : 0,
+    progressPercent: Math.min(100, progressPercent),
+    nextLevel: nextLevel || null
+  };
+}
+
+// Profil laden
+async function loadProfile() {
+  console.log('📊 Lade Profil...');
+  
+  // Lade Nutzernamen
+  let username = 'BirdCount Nutzer';
+  try {
+    // Versuche erst aus dem aktuellen User-Objekt zu laden
+    if (window.currentUser && window.currentUser.username) {
+      username = window.currentUser.username;
+    } else if (window.userProfile && window.userProfile.username) {
+      username = window.userProfile.username;
+    } else {
+      // Versuche aus gespeicherten Einstellungen zu laden
+      const stored = await getFromIndexedDB('settings', 'username');
+      if (stored && stored.value) {
+        username = stored.value;
+      }
+    }
+  } catch (e) {
+    console.log('Kein Nutzername gefunden, verwende Standard');
+  }
+  
+  document.getElementById('profileUsername').textContent = username;
+  
+  const xpData = await calculateTotalXP();
+  const levelData = getLevelFromXP(xpData.totalXP);
+  
+  // Update Level Badge & Text
+  document.getElementById('profileLevelBadge').textContent = levelData.level;
+  document.getElementById('profileLevelText').textContent = `Level ${levelData.level} ${levelData.title}`;
+  
+  // Update XP Bar
+  if (levelData.nextLevel) {
+    document.getElementById('profileXPText').textContent = 
+      `${xpData.totalXP} / ${levelData.nextLevel.xpRequired} XP`;
+    document.getElementById('profileXPToNext').textContent = 
+      `Noch ${levelData.xpToNext} XP bis Level ${levelData.nextLevel.level}`;
+  } else {
+    document.getElementById('profileXPText').textContent = `${xpData.totalXP} XP (MAX)`;
+    document.getElementById('profileXPToNext').textContent = 'Maximales Level erreicht!';
+  }
+  
+  document.getElementById('profileXPBar').style.width = levelData.progressPercent + '%';
+  
+  // Update Stats
+  document.getElementById('profileTotalObs').textContent = xpData.stats.totalObservations;
+  document.getElementById('profileTotalSpecies').textContent = xpData.stats.totalSpecies;
+  document.getElementById('profileAchievements').textContent = xpData.stats.claimedAchievements;
+  
+  // Member Since (verwende früheste Beobachtung)
+  const observations = await getOwnObservationsForStats();
+  if (observations.length > 0) {
+    const sortedObs = observations.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const firstDate = new Date(sortedObs[0].date);
+    const monthYear = firstDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+    document.getElementById('profileMemberSince').textContent = `Mitglied seit ${monthYear}`;
+  }
+  
+  // Level System Grid
+  renderLevelSystemGrid(levelData.level);
+  
+  // Showcase laden
+  await loadShowcase();
+  
+  console.log('📊 Profil geladen:', levelData);
+}
+
+// Level-System Grid rendern
+function renderLevelSystemGrid(currentLevel) {
+  const container = document.getElementById('levelSystemGrid');
+  
+  // Zeige nur Level im Bereich: current - 10 bis current + 15 (aber max 100)
+  const minLevel = Math.max(1, currentLevel - 10);
+  const maxLevel = Math.min(100, currentLevel + 15);
+  const levelsToShow = LEVELS.filter(l => l.level >= minLevel && l.level <= maxLevel);
+  
+  // Navigation Header
+  const navHtml = `
+    <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 12px;">
+      <button onclick="showLevelRange(${Math.max(1, currentLevel - 25)}, ${currentLevel})" 
+        class="btn ghost" 
+        style="padding: 8px 16px; font-size: 13px; ${currentLevel <= 10 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+        ${currentLevel <= 10 ? 'disabled' : ''}>
+        ◀ Frühere Level
+      </button>
+      <div style="text-align: center;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">Level ${minLevel} - ${maxLevel}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Zeige ${levelsToShow.length} von 100 Leveln</div>
+      </div>
+      <button onclick="showLevelRange(${currentLevel}, ${Math.min(100, currentLevel + 25)})" 
+        class="btn ghost" 
+        style="padding: 8px 16px; font-size: 13px; ${currentLevel >= 90 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+        ${currentLevel >= 90 ? 'disabled' : ''}>
+        Spätere Level ▶
+      </button>
+    </div>
+  `;
+  
+  const levelsHtml = levelsToShow.map(level => {
+    const isUnlocked = currentLevel >= level.level;
+    const isCurrent = currentLevel === level.level;
+    
+    // Spezielle Hervorhebung für Meilenstein-Level (10, 25, 50, 75, 100)
+    const isMilestone = [10, 25, 50, 75, 100].includes(level.level);
+    
+    return `
+      <div style="
+        padding: 16px;
+        background: ${isCurrent ? 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.1))' : isUnlocked ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1))' : 'rgba(255,255,255,0.03)'};
+        border: ${isMilestone ? '3px' : '2px'} solid ${isCurrent ? 'rgba(251,191,36,0.5)' : isUnlocked ? (isMilestone ? 'rgba(16,185,129,0.5)' : 'rgba(16,185,129,0.3)') : 'rgba(255,255,255,0.08)'};
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s;
+        position: relative;
+        ${isUnlocked ? 'cursor: pointer;' : 'opacity: 0.5;'}
+      " ${isUnlocked ? `onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px ${isCurrent ? 'rgba(251,191,36,0.3)' : 'rgba(16,185,129,0.3)'}'" onmouseout="this.style.transform=''; this.style.boxShadow='none'"` : ''}>
+        ${isMilestone && !isCurrent ? '<div style="position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid var(--bg);">🎯</div>' : ''}
+        <div style="font-size: 32px; margin-bottom: 8px; ${isUnlocked ? '' : 'filter: grayscale(100%); opacity: 0.5;'}">
+          ${level.level === 100 ? '👑' : isUnlocked ? (isCurrent ? '⭐' : '✅') : '🔒'}
+        </div>
+        <div style="font-size: 20px; font-weight: 700; color: ${isCurrent ? '#fbbf24' : isUnlocked ? '#10b981' : 'var(--muted)'}; margin-bottom: 4px;">
+          Level ${level.level}
+        </div>
+        <div style="font-size: ${level.title.length > 20 ? '11px' : '13px'}; font-weight: 600; color: ${isUnlocked ? 'var(--text)' : 'var(--muted)'}; margin-bottom: 8px; line-height: 1.2;">
+          ${level.title}
+        </div>
+        <div style="font-size: 11px; color: var(--muted);">
+          ${level.xpRequired.toLocaleString('de-DE')} XP
+        </div>
+        ${isCurrent ? `<div style="margin-top: 8px; padding: 4px 8px; background: rgba(251,191,36,0.2); border-radius: 6px; font-size: 10px; font-weight: 700; color: #fbbf24;">AKTUELL</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  
+  container.innerHTML = navHtml + levelsHtml;
+}
+
+// Level-Bereich anzeigen
+window.showLevelRange = function(startLevel, endLevel) {
+  const container = document.getElementById('levelSystemGrid');
+  const currentLevel = parseInt(document.getElementById('profileLevelBadge').textContent);
+  
+  const minLevel = Math.max(1, startLevel);
+  const maxLevel = Math.min(100, endLevel);
+  const levelsToShow = LEVELS.filter(l => l.level >= minLevel && l.level <= maxLevel);
+  
+  // Navigation Header
+  const navHtml = `
+    <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 12px;">
+      <button onclick="showLevelRange(${Math.max(1, minLevel - 25)}, ${minLevel - 1})" 
+        class="btn ghost" 
+        style="padding: 8px 16px; font-size: 13px; ${minLevel <= 1 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+        ${minLevel <= 1 ? 'disabled' : ''}>
+        ◀ Frühere Level
+      </button>
+      <div style="text-align: center;">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">Level ${minLevel} - ${maxLevel}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Zeige ${levelsToShow.length} von 100 Leveln</div>
+        <button onclick="renderLevelSystemGrid(${currentLevel})" class="btn ghost" style="margin-top: 8px; padding: 4px 12px; font-size: 11px;">
+          🎯 Zurück zu Level ${currentLevel}
+        </button>
+      </div>
+      <button onclick="showLevelRange(${maxLevel + 1}, ${Math.min(100, maxLevel + 25)})" 
+        class="btn ghost" 
+        style="padding: 8px 16px; font-size: 13px; ${maxLevel >= 100 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+        ${maxLevel >= 100 ? 'disabled' : ''}>
+        Spätere Level ▶
+      </button>
+    </div>
+  `;
+  
+  const levelsHtml = levelsToShow.map(level => {
+    const isUnlocked = currentLevel >= level.level;
+    const isCurrent = currentLevel === level.level;
+    const isMilestone = [10, 25, 50, 75, 100].includes(level.level);
+    
+    return `
+      <div style="
+        padding: 16px;
+        background: ${isCurrent ? 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.1))' : isUnlocked ? 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1))' : 'rgba(255,255,255,0.03)'};
+        border: ${isMilestone ? '3px' : '2px'} solid ${isCurrent ? 'rgba(251,191,36,0.5)' : isUnlocked ? (isMilestone ? 'rgba(16,185,129,0.5)' : 'rgba(16,185,129,0.3)') : 'rgba(255,255,255,0.08)'};
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s;
+        position: relative;
+        ${isUnlocked ? 'cursor: pointer;' : 'opacity: 0.5;'}
+      " ${isUnlocked ? `onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px ${isCurrent ? 'rgba(251,191,36,0.3)' : 'rgba(16,185,129,0.3)'}'" onmouseout="this.style.transform=''; this.style.boxShadow='none'"` : ''}>
+        ${isMilestone && !isCurrent ? '<div style="position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid var(--bg);">🎯</div>' : ''}
+        <div style="font-size: 32px; margin-bottom: 8px; ${isUnlocked ? '' : 'filter: grayscale(100%); opacity: 0.5;'}">
+          ${level.level === 100 ? '👑' : isUnlocked ? (isCurrent ? '⭐' : '✅') : '🔒'}
+        </div>
+        <div style="font-size: 20px; font-weight: 700; color: ${isCurrent ? '#fbbf24' : isUnlocked ? '#10b981' : 'var(--muted)'}; margin-bottom: 4px;">
+          Level ${level.level}
+        </div>
+        <div style="font-size: ${level.title.length > 20 ? '11px' : '13px'}; font-weight: 600; color: ${isUnlocked ? 'var(--text)' : 'var(--muted)'}; margin-bottom: 8px; line-height: 1.2;">
+          ${level.title}
+        </div>
+        <div style="font-size: 11px; color: var(--muted);">
+          ${level.xpRequired.toLocaleString('de-DE')} XP
+        </div>
+        ${isCurrent ? `<div style="margin-top: 8px; padding: 4px 8px; background: rgba(251,191,36,0.2); border-radius: 6px; font-size: 10px; font-weight: 700; color: #fbbf24;">AKTUELL</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  
+  container.innerHTML = navHtml + levelsHtml;
+};
+
+// Showcase Achievement laden
+async function loadShowcase() {
+  try {
+    const stored = await getFromIndexedDB('settings', 'showcaseAchievement');
+    
+    if (stored && stored.value) {
+      renderShowcaseAchievement(stored.value);
+    }
+  } catch (e) {
+    console.log('Kein Showcase Achievement gefunden');
+  }
+}
+
+// Showcase Achievement rendern
+function renderShowcaseAchievement(achievement) {
+  const container = document.getElementById('profileShowcase');
+  
+  container.innerHTML = `
+    <div style="
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
+      border: 2px solid rgba(16,185,129,0.4);
+      border-radius: 16px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(16,185,129,0.2);
+      transition: all 0.3s;
+      cursor: pointer;
+    " onclick="openAchievementDetailModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(achievement))}')))"
+    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 32px rgba(16,185,129,0.3)'"
+    onmouseout="this.style.transform=''; this.style.boxShadow='0 8px 24px rgba(16,185,129,0.2)'">
+      <div style="font-size: 80px; filter: drop-shadow(0 8px 20px rgba(16,185,129,0.6)); animation: float 3s ease-in-out infinite;">
+        ${achievement.icon}
+      </div>
+      <div style="flex: 1;">
+        <div style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); padding: 4px 12px; border-radius: 8px; margin-bottom: 8px;">
+          <div style="font-size: 10px; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">✓ SHOWCASE</div>
+        </div>
+        <h4 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: var(--text);">${achievement.title}</h4>
+        <p style="margin: 0 0 12px 0; font-size: 14px; color: var(--soft);">${achievement.desc}</p>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted);">
+            <span style="font-size: 16px;">🎯</span>
+            <span>${achievement.target} ${achievement.type === 'species' ? 'Arten' : achievement.type === 'obs' ? 'Beobachtungen' : 'Tage'}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted);">
+            <span style="font-size: 16px;">📅</span>
+            <span>Eingelöst: ${achievement.claimDate}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Showcase Selector öffnen
+async function openShowcaseSelector() {
+  const modal = document.getElementById('showcaseModal');
+  const listContainer = document.getElementById('showcaseAchievementsList');
+  const emptyState = document.getElementById('showcaseEmptyState');
+  
+  // Lade alle eingelösten Achievements
+  const observations = await getOwnObservationsForStats();
+  const totalSpecies = countUniqueSpecies(observations);
+  const totalObs = observations.length;
+  
+  // Streak berechnen
+  const dates = [...new Set(observations.map(o => o.date))].sort();
+  let currentStreak = 0;
+  let streakDate = new Date();
+  
+  for (let i = dates.length - 1; i >= 0; i--) {
+    const date = new Date(dates[i]);
+    const dayDiff = Math.floor((streakDate - date) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff <= 1) {
+      currentStreak++;
+      streakDate = date;
+    } else {
+      break;
+    }
+  }
+  
+  const milestones = [
+    { icon: '🥚', title: 'Erste Schritte', desc: '1 Art beobachtet', target: 1, current: totalSpecies, type: 'species', id: 'species_1' },
+    { icon: '🐣', title: 'Anfänger', desc: '10 Arten beobachtet', target: 10, current: totalSpecies, type: 'species', id: 'species_10' },
+    { icon: '🐥', title: 'Fortgeschritten', desc: '25 Arten beobachtet', target: 25, current: totalSpecies, type: 'species', id: 'species_25' },
+    { icon: '🦅', title: 'Experte', desc: '50 Arten beobachtet', target: 50, current: totalSpecies, type: 'species', id: 'species_50' },
+    { icon: '🦉', title: 'Meister', desc: '100 Arten beobachtet', target: 100, current: totalSpecies, type: 'species', id: 'species_100' },
+    { icon: '👁️', title: 'Beobachter', desc: '100 Beobachtungen', target: 100, current: totalObs, type: 'obs', id: 'obs_100' },
+    { icon: '🔭', title: 'Enthusiast', desc: '500 Beobachtungen', target: 500, current: totalObs, type: 'obs', id: 'obs_500' },
+    { icon: '🏆', title: 'Legende', desc: '1000 Beobachtungen', target: 1000, current: totalObs, type: 'obs', id: 'obs_1000' },
+    { icon: '🔥', title: 'Streak Starter', desc: '7 Tage Streak', target: 7, current: currentStreak, type: 'streak', id: 'streak_7' },
+    { icon: '⚡', title: 'Streak Master', desc: '30 Tage Streak', target: 30, current: currentStreak, type: 'streak', id: 'streak_30' },
+    { icon: '💎', title: 'Diamant Streak', desc: '100 Tage Streak', target: 100, current: currentStreak, type: 'streak', id: 'streak_100' }
+  ];
+  
+  let savedAchievements = {};
+  try {
+    const stored = await getFromIndexedDB('settings', 'achievements');
+    if (stored && stored.value) {
+      savedAchievements = stored.value;
+    }
+  } catch (e) {
+    console.log('Keine Achievements gefunden');
+  }
+  
+  const claimedMilestones = milestones.filter(m => savedAchievements[m.id] === true);
+  
+  if (claimedMilestones.length === 0) {
+    listContainer.style.display = 'none';
+    emptyState.style.display = 'block';
+  } else {
+    listContainer.style.display = 'grid';
+    emptyState.style.display = 'none';
+    
+    // Store achievements in global map for easy access
+    window.showcaseAchievementsMap = new Map();
+    
+    // Render achievements
+    const achievementsHTML = claimedMilestones.map((m, index) => {
+      const claimDate = savedAchievements[m.id + '_date'] ? 
+        new Date(savedAchievements[m.id + '_date']).toLocaleDateString('de-DE', { 
+          day: '2-digit', 
+          month: 'long', 
+          year: 'numeric' 
+        }) : 'Unbekannt';
+      
+      const achievement = {
+        icon: m.icon,
+        title: m.title,
+        desc: m.desc,
+        target: m.target,
+        current: m.current,
+        type: m.type,
+        claimDate: claimDate
+      };
+      
+      // Store in map
+      window.showcaseAchievementsMap.set(index, achievement);
+      
+      return `
+        <div class="showcase-achievement-item" 
+          onclick="window.handleShowcaseClick(${index})"
+          style="
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          padding: 20px;
+          background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
+          border: 2px solid rgba(16,185,129,0.4);
+          border-radius: 16px;
+          cursor: pointer;
+          transition: all 0.3s;
+          user-select: none;
+          -webkit-user-select: none;
+        " 
+        onmouseover="this.style.transform='translateY(-6px) scale(1.05)'; this.style.boxShadow='0 12px 32px rgba(16,185,129,0.5)'"
+        onmouseout="this.style.transform=''; this.style.boxShadow='none'">
+          <div style="font-size: 64px; filter: drop-shadow(0 6px 16px rgba(16,185,129,0.6)); pointer-events: none;">${m.icon}</div>
+          <div style="text-align: center; pointer-events: none;">
+            <div style="font-size: 15px; font-weight: 700; color: #10b981; margin-bottom: 4px;">${m.title}</div>
+            <div style="font-size: 11px; color: var(--muted);">${m.desc}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    listContainer.innerHTML = achievementsHTML;
+    console.log(`✅ ${claimedMilestones.length} Achievement-Items gerendert`);
+  }
+  
+  console.log('📊 Showcase Selector öffnen...');
+  console.log('Eingelöste Achievements:', claimedMilestones.length);
+  
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+// Showcase Selector öffnen (explizit global)
+window.openShowcaseSelector = openShowcaseSelector;
+
 </script>
 
 <!-- Modal für Erstbeobachtungs-Details -->
@@ -36642,6 +38226,127 @@ function toggleModalCommonSpecies() {
     <div id="firstSightingsDetailContent" style="display: flex; flex-direction: column; gap: 10px;"></div>
   </div>
 </div>
+
+<!-- Modal für Achievement-Details -->
+<div id="achievementDetailModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeAchievementModal()">
+  <div style="background: var(--card); padding: 32px; border-radius: 20px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; border: 2px solid rgba(16,185,129,0.4); box-shadow: 0 24px 80px rgba(16,185,129,0.5); animation: modalSlideIn 0.3s ease;" onclick="event.stopPropagation()">
+    <button onclick="closeAchievementModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 32px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--muted)'; this.style.transform='rotate(0deg)'">×</button>
+    
+    <!-- Achievement Icon & Title -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div id="achievementModalIcon" style="font-size: 96px; margin-bottom: 16px; filter: drop-shadow(0 12px 24px rgba(16,185,129,0.6)); animation: float 3s ease-in-out infinite;">🏆</div>
+      <div style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); padding: 8px 20px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(16,185,129,0.4);">
+        <div style="font-size: 11px; color: rgba(255,255,255,0.9); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">✓ EINGELÖST</div>
+      </div>
+      <h3 id="achievementModalTitle" style="margin: 0 0 8px 0; font-size: 28px; color: var(--text); font-weight: 700;">Achievement Name</h3>
+      <p id="achievementModalDesc" style="margin: 0; font-size: 15px; color: var(--muted);">Beschreibung</p>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+      <div style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1)); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">🎯</div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Ziel</div>
+        <div id="achievementModalTarget" style="font-size: 24px; font-weight: 700; color: #10b981;">100</div>
+      </div>
+      
+      <div style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1)); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">📈</div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Erreicht</div>
+        <div id="achievementModalCurrent" style="font-size: 24px; font-weight: 700; color: #10b981;">100</div>
+      </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.05)); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span style="font-size: 13px; font-weight: 600; color: var(--soft);">Fortschritt</span>
+        <span style="font-size: 16px; font-weight: 700; color: #10b981;">100%</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.05); border-radius: 12px; height: 16px; overflow: hidden; position: relative;">
+        <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shimmer 2s infinite;"></div>
+        <div id="achievementModalProgress" style="height: 100%; background: linear-gradient(90deg, #10b981, #059669); width: 100%; transition: width 0.5s ease; border-radius: 12px; box-shadow: 0 0 12px rgba(16,185,129,0.5);"></div>
+      </div>
+    </div>
+    
+    <!-- Achievement Info -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <div style="font-size: 24px;">📅</div>
+        <div style="flex: 1;">
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Eingelöst am</div>
+          <div id="achievementModalDate" style="font-size: 15px; font-weight: 600; color: var(--text);">10. Januar 2026</div>
+        </div>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="font-size: 24px;">🏷️</div>
+        <div style="flex: 1;">
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Kategorie</div>
+          <div id="achievementModalType" style="font-size: 15px; font-weight: 600; color: var(--text);">Arten</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Celebration Message -->
+    <div style="text-align: center; margin-top: 24px; padding: 20px; background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.05)); border: 1px solid rgba(251,191,36,0.3); border-radius: 12px;">
+      <div style="font-size: 32px; margin-bottom: 8px; animation: sparkle 1.5s infinite;">✨</div>
+      <div style="font-size: 14px; color: var(--text); font-weight: 600; line-height: 1.5;">Gratulation zu diesem Erfolg!</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal für Mitgliederprofil -->
+<div id="memberProfileModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeMemberProfileModal()">
+  <div style="background: var(--card); padding: 32px; border-radius: 20px; max-width: 600px; width: 95%; max-height: 85vh; overflow-y: auto; position: relative; border: 2px solid rgba(6,182,212,0.3); box-shadow: 0 24px 80px rgba(6,182,212,0.4); animation: modalSlideIn 0.3s ease;" onclick="event.stopPropagation()">
+    <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 32px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--muted)'; this.style.transform='rotate(0deg)'">×</button>
+    
+    <div id="memberProfileContent">
+      <!-- Wird dynamisch gefüllt -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal für Showcase Achievement Auswahl -->
+<div id="showcaseModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeShowcaseModal()">
+  <div style="background: var(--card); padding: 32px; border-radius: 20px; max-width: 800px; width: 95%; max-height: 85vh; overflow-y: auto; position: relative; border: 2px solid rgba(16,185,129,0.3); box-shadow: 0 24px 80px rgba(16,185,129,0.4); animation: modalSlideIn 0.3s ease;" onclick="event.stopPropagation()">
+    <button onclick="closeShowcaseModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 32px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--muted)'; this.style.transform='rotate(0deg)'">×</button>
+    
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="font-size: 56px; margin-bottom: 12px;">🌟</div>
+      <h3 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700;">Showcase Achievement wählen</h3>
+      <p style="margin: 0; font-size: 14px; color: var(--muted);">Wähle ein eingelöstes Achievement, das in deinem Profil angezeigt wird</p>
+    </div>
+    
+    <div id="showcaseAchievementsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+      <!-- Wird dynamisch gefüllt -->
+    </div>
+    
+    <div id="showcaseEmptyState" style="display: none; text-align: center; padding: 40px; color: var(--muted);">
+      <div style="font-size: 64px; opacity: 0.2; margin-bottom: 16px;">🏆</div>
+      <p style="margin: 0; font-size: 15px; font-weight: 600;">Keine Achievements eingelöst</p>
+      <p style="margin: 8px 0 0 0; font-size: 13px;">Erreiche und löse Meilensteine ein, um sie hier auszuwählen!</p>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+</style>
 
 
 </body>
