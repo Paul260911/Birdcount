@@ -935,6 +935,31 @@
       }
     }
     
+    /* Quick Access Buttons - Responsive Layout */
+    @media (min-width: 1024px) {
+      #dashboardQuickButtons {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
+      #dashboardQuickButtons button {
+        white-space: nowrap;
+      }
+    }
+    
+    @media (min-width: 768px) and (max-width: 1023px) {
+      #dashboardQuickButtons {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      #dashboardQuickButtons button {
+        white-space: nowrap;
+      }
+    }
+    
+    @media (max-width: 767px) {
+      #dashboardQuickButtons button {
+        white-space: nowrap;
+      }
+    }
+    
     @media (max-width:1000px){
       .app{ padding:18px; }
       .grid{ grid-template-columns: 1fr; }
@@ -5964,21 +5989,37 @@
                   </div>
                 </div>
                 
-                <!-- Quick Stats Row -->
+                <!-- Quick Stats Row mit Gruppenindikator -->
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:20px;">
-                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                      <span style="font-size:14px;">👥</span>
+                      <span style="background:rgba(6,182,212,0.2);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;border:1px solid rgba(6,182,212,0.4);">Gruppe</span>
+                    </div>
                     <div style="font-size:28px;font-weight:700;color:var(--accent);" id="heroTotalObs">0</div>
                     <div style="font-size:12px;color:var(--soft);margin-top:4px;">Beobachtungen</div>
                   </div>
-                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                      <span style="font-size:14px;">👥</span>
+                      <span style="background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;color:var(--accent-2);text-transform:uppercase;letter-spacing:0.5px;border:1px solid rgba(124,58,237,0.4);">Gruppe</span>
+                    </div>
                     <div style="font-size:28px;font-weight:700;color:var(--accent-2);" id="heroSpeciesCount">0</div>
                     <div style="font-size:12px;color:var(--soft);margin-top:4px;">Arten gesichtet</div>
                   </div>
-                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                      <span style="font-size:14px;">👥</span>
+                      <span style="background:rgba(16,185,129,0.2);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:0.5px;border:1px solid rgba(16,185,129,0.4);">Gruppe</span>
+                    </div>
                     <div style="font-size:28px;font-weight:700;color:var(--success);" id="heroThisWeek">0</div>
                     <div style="font-size:12px;color:var(--soft);margin-top:4px;">Diese Woche</div>
                   </div>
-                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                      <span style="font-size:14px;">👥</span>
+                      <span style="background:rgba(251,191,36,0.2);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:0.5px;border:1px solid rgba(251,191,36,0.4);">Gruppe</span>
+                    </div>
                     <div style="font-size:28px;font-weight:700;color:#fbbf24;" id="heroStreak">0</div>
                     <div style="font-size:12px;color:var(--soft);margin-top:4px;">Tage Streak</div>
                   </div>
@@ -5987,7 +6028,7 @@
             </div>
 
             <!-- Schnellzugriff Buttons -->
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;">
+            <div id="dashboardQuickButtons" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;">
               <button class="btn" onclick="document.querySelector('.nav button[data-page=\\'eingabe\\']').click()" style="background:linear-gradient(135deg,var(--accent),var(--accent-2));padding:16px;display:flex;align-items:center;gap:12px;justify-content:center;border-radius:12px;box-shadow:0 4px 16px rgba(6,182,212,0.3);transition:all 0.3s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(6,182,212,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(6,182,212,0.3)'">
                 <span style="font-size:24px;">➕</span>
                 <span style="font-weight:600;">Neue Beobachtung</span>
@@ -8663,6 +8704,9 @@
               <button class="small-btn" id="compareStatsTab" onclick="switchCompareTab('stats')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
                 📈 Statistiken
               </button>
+              <button class="small-btn" id="compareActivityTab" onclick="switchCompareTab('activity')" style="flex:1;min-width:140px;padding:12px 16px;font-weight:600;border-radius:10px;transition:all 0.3s;">
+                🕐 Aktivität
+              </button>
             </div>
 
             <!-- Beobachtungs-Vergleich -->
@@ -8778,6 +8822,19 @@
 
             <!-- Listen-Vergleich -->
             <div id="compareListsView" style="display:none;">
+              <!-- Info-Banner über Listen-Aktualisierung -->
+              <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(34,197,94,0.12), rgba(16,185,129,0.06));border-left:4px solid #22c55e;border-radius:12px;">
+                <div style="display:flex;align-items:start;gap:12px;">
+                  <div style="font-size:24px;flex-shrink:0;">💡</div>
+                  <div style="flex:1;">
+                    <div style="font-weight:600;font-size:14px;margin-bottom:4px;color:var(--text);">Tipp: Listen aktualisieren</div>
+                    <div style="font-size:12px;color:var(--soft);line-height:1.5;">
+                      Wenn du mehr Beobachtungen in der Gruppe hast als privat (oder umgekehrt), klicke auf <strong>"🔄 Listen aktualisieren"</strong> bei einem Ordner, um automatisch die Version mit den meisten Arten zu verwenden.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <div class="card" style="border-left:4px solid #7c3aed;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                   <div>
@@ -8790,8 +8847,8 @@
                     </p>
                   </div>
                   <div style="display:flex;gap:8px;">
-                    <button class="small-btn" onclick="syncPrivateListsManually()" style="background:var(--accent-2);color:white;padding:8px 14px;font-weight:600;" title="Synchronisiere deine privaten Listen mit allen Gruppen">
-                      🔄 Listen synchronisieren
+                    <button class="small-btn" onclick="refreshAllComparisonFolders()" style="background:linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.1));border:1px solid #22c55e;color:white;padding:8px 14px;font-weight:600;" title="Aktualisiere alle deine Listen in allen Ordnern automatisch">
+                      🔄 Alle Ordner aktualisieren
                     </button>
                     <button class="small-btn" onclick="openCreateComparisonFolderModal()" style="background:var(--accent);color:white;padding:8px 14px;font-weight:600;">
                       ➕ Ordner erstellen
@@ -9024,6 +9081,140 @@
                   <h4 style="margin:0;font-size:18px;font-weight:700;">Detaillierte Mitglieder-Übersicht</h4>
                 </div>
                 <div id="detailedMemberStats"></div>
+              </div>
+            </div>
+
+            <!-- Aktivitäts-Übersicht -->
+            <div id="compareActivityView" style="display:none;">
+              <!-- Header Card -->
+              <div class="card" style="margin-bottom:24px;background:linear-gradient(135deg, rgba(59,130,246,0.12), rgba(6,182,212,0.08));border-left:4px solid #3b82f6;border-radius:16px;box-shadow:0 8px 24px rgba(59,130,246,0.15);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                  <div style="width:48px;height:48px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                    🕐
+                  </div>
+                  <div>
+                    <h3 style="margin:0;font-size:22px;font-weight:700;">Aktivitäts-Übersicht</h3>
+                    <p style="margin:4px 0 0 0;color:var(--soft);font-size:13px;">Sieh wann Mitglieder zuletzt aktiv waren</p>
+                  </div>
+                </div>
+                
+                <!-- Info Box -->
+                <div style="background:rgba(59,130,246,0.08);padding:12px 16px;border-radius:10px;border:1px solid rgba(59,130,246,0.2);margin-bottom:16px;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">💡</span>
+                    <div style="font-size:13px;color:var(--soft);">
+                      <strong>Letzte Aktivität</strong> basiert auf der zuletzt hinzugefügten Beobachtung in der Gruppe.
+                      <br>
+                      <span style="font-size:11px;opacity:0.8;">Die Zeiten werden bis auf die Sekunde genau angezeigt, wenn verfügbar.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Activity Table -->
+              <div class="card" style="overflow:hidden;border-radius:16px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                      <tr style="background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.1));border-bottom:2px solid rgba(255,255,255,0.1);">
+                        <th style="padding:16px 20px;text-align:left;font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;">
+                          <div style="display:flex;align-items:center;gap:8px;">
+                            <span>👤</span>
+                            <span>Mitglied</span>
+                          </div>
+                        </th>
+                        <th style="padding:16px 20px;text-align:center;font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;">
+                          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>🕐</span>
+                            <span>Letzte Aktivität</span>
+                          </div>
+                        </th>
+                        <th style="padding:16px 20px;text-align:center;font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;">
+                          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>📊</span>
+                            <span>Beobachtungen</span>
+                          </div>
+                        </th>
+                        <th style="padding:16px 20px;text-align:center;font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;">
+                          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>🐦</span>
+                            <span>Arten</span>
+                          </div>
+                        </th>
+                        <th style="padding:16px 20px;text-align:center;font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;">
+                          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>📈</span>
+                            <span>Status</span>
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="activityTableBody">
+                      <!-- Wird dynamisch gefüllt -->
+                      <tr>
+                        <td colspan="5" style="padding:60px 20px;text-align:center;">
+                          <div style="width:60px;height:60px;margin:0 auto 16px;border:4px solid rgba(6,182,212,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;"></div>
+                          <p style="color:var(--muted);margin:0;">Lade Aktivitätsdaten...</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Activity Summary Cards -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:16px;margin-top:24px;">
+                <!-- Heute Aktiv -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(34,197,94,0.12), rgba(16,185,129,0.06));border-left:4px solid #22c55e;border-radius:12px;box-shadow:0 4px 16px rgba(34,197,94,0.12);">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(34,197,94,0.3);">
+                      ✅
+                    </div>
+                    <div>
+                      <div style="font-size:28px;font-weight:700;color:var(--text);" id="activeTodayCount">-</div>
+                      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Heute aktiv</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Diese Woche -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(59,130,246,0.12), rgba(37,99,235,0.06));border-left:4px solid #3b82f6;border-radius:12px;box-shadow:0 4px 16px rgba(59,130,246,0.12);">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#3b82f6,#2563eb);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+                      📅
+                    </div>
+                    <div>
+                      <div style="font-size:28px;font-weight:700;color:var(--text);" id="activeWeekCount">-</div>
+                      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Diese Woche aktiv</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Diesen Monat -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(168,85,247,0.12), rgba(147,51,234,0.06));border-left:4px solid #a855f7;border-radius:12px;box-shadow:0 4px 16px rgba(168,85,247,0.12);">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#a855f7,#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(168,85,247,0.3);">
+                      📆
+                    </div>
+                    <div>
+                      <div style="font-size:28px;font-weight:700;color:var(--text);" id="activeMonthCount">-</div>
+                      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Diesen Monat aktiv</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Inaktiv -->
+                <div class="card" style="background:linear-gradient(135deg, rgba(239,68,68,0.12), rgba(220,38,38,0.06));border-left:4px solid #ef4444;border-radius:12px;box-shadow:0 4px 16px rgba(239,68,68,0.12);">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#ef4444,#dc2626);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(239,68,68,0.3);">
+                      ⏰
+                    </div>
+                    <div>
+                      <div style="font-size:28px;font-weight:700;color:var(--text);" id="inactiveCount">-</div>
+                      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Länger inaktiv (>30 Tage)</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -12684,10 +12875,15 @@
                     Erstellt von ${escapeHtml(folder.createdByName)}${isOwner ? ' <span style="color:var(--accent);">(Du)</span>' : ''}
                   </div>
                 </div>
-                <div style="display:flex;gap:8px;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   ${listsCount >= 2 ? `
                     <button class="small-btn" onclick="openFolderListComparisonModal('${folderId}')" style="background:var(--accent-2);">
                       🔄 Listen vergleichen
+                    </button>
+                  ` : ''}
+                  ${listsCount > 0 && (isOwner || isAdmin) ? `
+                    <button class="small-btn" onclick="refreshComparisonFolderLists('${folderId}')" style="background:linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.1));border:1px solid #22c55e;">
+                      🔄 Listen aktualisieren
                     </button>
                   ` : ''}
                   <button class="small-btn" onclick="openAddListToFolderModal('${folderId}')" style="background:var(--accent);">
@@ -12857,12 +13053,57 @@
           return;
         }
         
-        // Lade persönliche Beobachtungen und filtere sie nach Listen-Kriterien
-        const allObservations = await getPersonalObservationsWithDetails();
-        const filteredObservations = await filterObservationsByList(allObservations, list);
+        // NEU: Lade SOWOHL private ALS AUCH Gruppen-Beobachtungen
+        const privateObservations = await getPersonalObservationsWithDetails();
+        const privateFiltered = await filterObservationsByList(privateObservations, list);
         
-        // WICHTIG: Übertrage ALLE Beobachtungen (auch nicht-tickbare), damit sie überall sichtbar sind
-        console.log(`📊 Liste "${list.name}": ${filteredObservations.length} Beobachtungen (inkl. nicht-tickbare)`);
+        // Lade Gruppen-Beobachtungen falls eine Gruppe ausgewählt ist
+        let groupFiltered = [];
+        if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal') {
+          const groupSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/observations`).once('value');
+          const groupObservations = groupSnapshot.val() ? Object.values(groupSnapshot.val()) : [];
+          
+          // Filtere Gruppen-Beobachtungen nach aktuellen User
+          const currentUserEmail = window.FBA.currentUser.email;
+          const currentUserId = window.FBA.currentUser.uid;
+          const userGroupObs = groupObservations.filter(o => 
+            o.userEmail === currentUserEmail || o.userId === currentUserId
+          );
+          
+          groupFiltered = await filterObservationsByList(userGroupObs, list);
+        }
+        
+        // Zähle tickbare Arten in beiden Listen
+        const privateTickable = privateFiltered.filter(obs => obs.tickable !== false);
+        const groupTickable = groupFiltered.filter(obs => obs.tickable !== false);
+        
+        const privateSpeciesCount = countUniqueSpecies(privateTickable);
+        const groupSpeciesCount = countUniqueSpecies(groupTickable);
+        
+        console.log(`📊 Private Liste: ${privateFiltered.length} Beobachtungen, ${privateSpeciesCount} tickbare Arten`);
+        console.log(`📊 Gruppen-Liste: ${groupFiltered.length} Beobachtungen, ${groupSpeciesCount} tickbare Arten`);
+        
+        // Wähle die Liste mit mehr Arten (oder bei Gleichstand: mehr Beobachtungen)
+        let chosenObservations;
+        let sourceType;
+        
+        if (groupSpeciesCount > privateSpeciesCount) {
+          chosenObservations = groupFiltered;
+          sourceType = 'Gruppe';
+          console.log(`✅ Verwende Gruppen-Liste (mehr Arten: ${groupSpeciesCount} vs ${privateSpeciesCount})`);
+        } else if (privateSpeciesCount > groupSpeciesCount) {
+          chosenObservations = privateFiltered;
+          sourceType = 'Privat';
+          console.log(`✅ Verwende Private Liste (mehr Arten: ${privateSpeciesCount} vs ${groupSpeciesCount})`);
+        } else if (groupFiltered.length > privateFiltered.length) {
+          chosenObservations = groupFiltered;
+          sourceType = 'Gruppe';
+          console.log(`✅ Verwende Gruppen-Liste (gleich viele Arten, aber mehr Beobachtungen)`);
+        } else {
+          chosenObservations = privateFiltered;
+          sourceType = 'Privat';
+          console.log(`✅ Verwende Private Liste (Standard)`);
+        }
         
         const user = window.FBA.currentUser;
         
@@ -12876,21 +13117,289 @@
           userId: user.uid,
           userName: user.displayName || user.email.split('@')[0],
           userEmail: user.email,
-          observations: filteredObservations, // ALLE Beobachtungen (inkl. nicht-tickbare)
+          observations: chosenObservations, // Gewählte Beobachtungen (mit mehr Arten)
+          sourceType: sourceType, // NEU: Speichere Quelle für Transparenz
           addedAt: firebase.database.ServerValue.TIMESTAMP
         };
         
         // Füge Liste zum Ordner hinzu
         await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders/${currentComparisonFolderId}/lists`).push(listData);
         
-        const tickableCount = filteredObservations.filter(obs => obs.tickable !== false).length;
-        showNotification(`✅ Liste "${list.name}" mit ${filteredObservations.length} Beobachtungen hinzugefügt (${tickableCount} tickbar)!`, 3000);
+        const tickableCount = chosenObservations.filter(obs => obs.tickable !== false).length;
+        const chosenSpeciesCount = countUniqueSpecies(tickableCount > 0 ? chosenObservations.filter(obs => obs.tickable !== false) : []);
+        showNotification(`✅ Liste "${list.name}" hinzugefügt (${sourceType}): ${chosenObservations.length} Beobachtungen, ${chosenSpeciesCount} tickbare Arten`, 4000);
         closeAddListToFolderModal();
         await renderComparisonFolders();
         
       } catch (error) {
         console.error('Fehler beim Hinzufügen der Liste:', error);
         showNotification('❌ Fehler beim Hinzufügen: ' + error.message, 3000);
+      }
+    }
+    
+    // NEU: Aktualisiere ALLE Listen in ALLEN Vergleichsordnern
+    async function refreshAllComparisonFolders() {
+      if (!window.FBA || !window.FBA.currentUser) return;
+      if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+        showNotification('❌ Bitte wähle eine Gruppe aus', 3000);
+        return;
+      }
+      
+      try {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        
+        // Zeige Loading-Status
+        button.innerHTML = '⏳ Aktualisiere...';
+        button.disabled = true;
+        button.style.opacity = '0.7';
+        
+        console.log('🔄 Aktualisiere alle Vergleichsordner...');
+        
+        // Lade alle Ordner
+        const foldersSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders`).once('value');
+        const folders = foldersSnapshot.val();
+        
+        if (!folders) {
+          showNotification('ℹ️ Keine Ordner zum Aktualisieren gefunden', 3000);
+          button.innerHTML = originalText;
+          button.disabled = false;
+          button.style.opacity = '1';
+          return;
+        }
+        
+        let totalUpdated = 0;
+        const folderIds = Object.keys(folders);
+        
+        for (const folderId of folderIds) {
+          try {
+            console.log(`🔄 Aktualisiere Ordner: ${folders[folderId].name}`);
+            
+            // Rufe refresh-Funktion für jeden Ordner auf
+            const listsSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists`).once('value');
+            const lists = listsSnapshot.val();
+            
+            if (!lists) continue;
+            
+            const updates = {};
+            
+            for (const [firebaseListId, savedList] of Object.entries(lists)) {
+              // Nur eigene Listen
+              if (savedList.userId !== window.FBA.currentUser.uid) continue;
+              
+              // Lade Original-Liste
+              const originalList = await getFromIndexedDB('lists', savedList.listId);
+              if (!originalList) continue;
+              
+              // Lade beide Versionen
+              const privateObservations = await getPersonalObservationsWithDetails();
+              const privateFiltered = await filterObservationsByList(privateObservations, originalList);
+              
+              const groupSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/observations`).once('value');
+              const groupObservations = groupSnapshot.val() ? Object.values(groupSnapshot.val()) : [];
+              
+              const currentUserEmail = window.FBA.currentUser.email;
+              const currentUserId = window.FBA.currentUser.uid;
+              const userGroupObs = groupObservations.filter(o => 
+                o.userEmail === currentUserEmail || o.userId === currentUserId
+              );
+              
+              const groupFiltered = await filterObservationsByList(userGroupObs, originalList);
+              
+              // Zähle Arten
+              const privateTickable = privateFiltered.filter(obs => obs.tickable !== false);
+              const groupTickable = groupFiltered.filter(obs => obs.tickable !== false);
+              
+              const privateSpeciesCount = countUniqueSpecies(privateTickable);
+              const groupSpeciesCount = countUniqueSpecies(groupTickable);
+              
+              const oldSpeciesCount = countUniqueSpecies((savedList.observations || []).filter(obs => obs.tickable !== false));
+              
+              // Wähle beste Version
+              let chosenObservations;
+              let sourceType;
+              
+              if (groupSpeciesCount > privateSpeciesCount) {
+                chosenObservations = groupFiltered;
+                sourceType = 'Gruppe';
+              } else if (privateSpeciesCount > groupSpeciesCount) {
+                chosenObservations = privateFiltered;
+                sourceType = 'Privat';
+              } else if (groupFiltered.length > privateFiltered.length) {
+                chosenObservations = groupFiltered;
+                sourceType = 'Gruppe';
+              } else {
+                chosenObservations = privateFiltered;
+                sourceType = 'Privat';
+              }
+              
+              const newSpeciesCount = countUniqueSpecies(chosenObservations.filter(obs => obs.tickable !== false));
+              
+              // Update wenn nötig
+              if (newSpeciesCount !== oldSpeciesCount || chosenObservations.length !== savedList.observations.length) {
+                updates[`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists/${firebaseListId}/observations`] = chosenObservations;
+                updates[`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists/${firebaseListId}/sourceType`] = sourceType;
+                updates[`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists/${firebaseListId}/lastUpdated`] = firebase.database.ServerValue.TIMESTAMP;
+                
+                console.log(`✅ "${savedList.listName}" (${folders[folderId].name}): ${oldSpeciesCount} → ${newSpeciesCount} Arten`);
+                totalUpdated++;
+              }
+            }
+            
+            // Batch-Update für diesen Ordner
+            if (Object.keys(updates).length > 0) {
+              await window.FBD.ref().update(updates);
+            }
+            
+          } catch (err) {
+            console.error(`Fehler bei Ordner ${folderId}:`, err);
+          }
+        }
+        
+        // Zeige Erfolg
+        button.innerHTML = '✅ Aktualisiert!';
+        button.style.background = '#22c55e';
+        
+        if (totalUpdated > 0) {
+          showNotification(`✅ ${totalUpdated} Liste(n) in ${folderIds.length} Ordner(n) aktualisiert`, 4000);
+          await renderComparisonFolders();
+        } else {
+          showNotification('✓ Alle Listen sind bereits aktuell', 3000);
+        }
+        
+        // Zurück zum Original
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.disabled = false;
+          button.style.opacity = '1';
+          button.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.1))';
+        }, 2000);
+        
+        console.log(`✅ Alle Ordner aktualisiert: ${totalUpdated} Listen geändert`);
+        
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren aller Ordner:', error);
+        showNotification('❌ Fehler: ' + error.message, 3000);
+        
+        const button = event.target;
+        button.innerHTML = '❌ Fehler';
+        button.style.background = 'var(--danger)';
+        
+        setTimeout(() => {
+          button.innerHTML = '🔄 Alle Ordner aktualisieren';
+          button.disabled = false;
+          button.style.opacity = '1';
+          button.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.1))';
+        }, 2000);
+      }
+    }
+    
+    // NEU: Aktualisiere ALLE Listen in einem Vergleichsordner (wählt jeweils die Version mit mehr Arten)
+    async function refreshComparisonFolderLists(folderId) {
+      if (!window.FBA || !window.FBA.currentUser) return;
+      if (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal') return;
+      
+      try {
+        console.log(`🔄 Aktualisiere Listen in Ordner ${folderId}...`);
+        
+        // Lade alle Listen im Ordner
+        const listsSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists`).once('value');
+        const lists = listsSnapshot.val();
+        
+        if (!lists) {
+          console.log('Keine Listen zum Aktualisieren gefunden');
+          return;
+        }
+        
+        let updated = 0;
+        const updates = {};
+        
+        for (const [firebaseListId, savedList] of Object.entries(lists)) {
+          // Nur eigene Listen aktualisieren
+          if (savedList.userId !== window.FBA.currentUser.uid) {
+            console.log(`⏭️ Überspringe fremde Liste: ${savedList.listName}`);
+            continue;
+          }
+          
+          // Lade die Original-Liste aus IndexedDB
+          const originalList = await getFromIndexedDB('lists', savedList.listId);
+          if (!originalList) {
+            console.log(`⚠️ Liste ${savedList.listId} nicht mehr in IndexedDB gefunden`);
+            continue;
+          }
+          
+          // Lade private und Gruppen-Beobachtungen
+          const privateObservations = await getPersonalObservationsWithDetails();
+          const privateFiltered = await filterObservationsByList(privateObservations, originalList);
+          
+          const groupSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/observations`).once('value');
+          const groupObservations = groupSnapshot.val() ? Object.values(groupSnapshot.val()) : [];
+          
+          const currentUserEmail = window.FBA.currentUser.email;
+          const currentUserId = window.FBA.currentUser.uid;
+          const userGroupObs = groupObservations.filter(o => 
+            o.userEmail === currentUserEmail || o.userId === currentUserId
+          );
+          
+          const groupFiltered = await filterObservationsByList(userGroupObs, originalList);
+          
+          // Zähle tickbare Arten
+          const privateTickable = privateFiltered.filter(obs => obs.tickable !== false);
+          const groupTickable = groupFiltered.filter(obs => obs.tickable !== false);
+          
+          const privateSpeciesCount = countUniqueSpecies(privateTickable);
+          const groupSpeciesCount = countUniqueSpecies(groupTickable);
+          
+          const oldSpeciesCount = countUniqueSpecies((savedList.observations || []).filter(obs => obs.tickable !== false));
+          
+          console.log(`📊 "${savedList.listName}": Aktuell=${oldSpeciesCount}, Privat=${privateSpeciesCount}, Gruppe=${groupSpeciesCount}`);
+          
+          // Wähle die beste Version
+          let chosenObservations;
+          let sourceType;
+          
+          if (groupSpeciesCount > privateSpeciesCount) {
+            chosenObservations = groupFiltered;
+            sourceType = 'Gruppe';
+          } else if (privateSpeciesCount > groupSpeciesCount) {
+            chosenObservations = privateFiltered;
+            sourceType = 'Privat';
+          } else if (groupFiltered.length > privateFiltered.length) {
+            chosenObservations = groupFiltered;
+            sourceType = 'Gruppe';
+          } else {
+            chosenObservations = privateFiltered;
+            sourceType = 'Privat';
+          }
+          
+          const newSpeciesCount = countUniqueSpecies(chosenObservations.filter(obs => obs.tickable !== false));
+          
+          // Aktualisiere nur wenn sich etwas geändert hat
+          if (newSpeciesCount !== oldSpeciesCount || chosenObservations.length !== savedList.observations.length) {
+            updates[`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists/${firebaseListId}/observations`] = chosenObservations;
+            updates[`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists/${firebaseListId}/sourceType`] = sourceType;
+            updates[`groups/${window.currentSelectedGroup}/comparisonFolders/${folderId}/lists/${firebaseListId}/lastUpdated`] = firebase.database.ServerValue.TIMESTAMP;
+            
+            console.log(`✅ "${savedList.listName}" wird aktualisiert: ${oldSpeciesCount} → ${newSpeciesCount} Arten (${sourceType})`);
+            updated++;
+          } else {
+            console.log(`✓ "${savedList.listName}" ist aktuell (${newSpeciesCount} Arten)`);
+          }
+        }
+        
+        if (updated > 0) {
+          await window.FBD.ref().update(updates);
+          showNotification(`✅ ${updated} Liste(n) aktualisiert`, 3000);
+          await renderComparisonFolders();
+        } else {
+          showNotification('✓ Alle Listen sind aktuell', 2000);
+        }
+        
+        console.log(`✅ Listenaktualisierung abgeschlossen: ${updated} aktualisiert`);
+        
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren der Listen:', error);
+        showNotification('❌ Fehler beim Aktualisieren: ' + error.message, 3000);
       }
     }
     
@@ -16554,9 +17063,32 @@
           document.documentElement.classList.remove('map-full');
         }
 
-        document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
+        // Verstecke ALLE Sections explizit
+        const allSectionIds = [
+          'home', 'profil', 'beobachtungen', 'eingabe', 'diagramme', 
+          'statistiken', 'erweiterte-stats', 'karte', 'listen', 'arten', 
+          'tools', 'challenges', 'group-compare'
+        ];
+        
+        console.log(`🔄 Wechsle zu Seite: ${page}`);
+        console.log('🔄 Verstecke alle Sections...');
+        
+        allSectionIds.forEach(id => {
+          const section = document.getElementById(id);
+          if (section) {
+            section.style.display = 'none';
+            console.log(`  ✅ ${id} ausgeblendet`);
+          }
+        });
+        
+        // Zeige die gewählte Section
         const el = document.getElementById(page);
-        if (el) el.style.display = 'block';
+        if (el) {
+          el.style.display = 'block';
+          console.log(`✅ ${page} angezeigt`);
+        } else {
+          console.error(`❌ Section "${page}" nicht gefunden!`);
+        }
         
         // Reset group compare tabs when leaving group-compare page (happens in background)
         if (page !== 'group-compare') {
@@ -16575,6 +17107,15 @@
             obsTab.style.border = '2px solid #06b6d4';
             obsTab.style.transform = 'scale(1.02)';
           }
+          
+          // WICHTIG: Verstecke alle Compare-Views wenn wir group-compare verlassen
+          document.getElementById('compareObservationsView').style.display = 'none';
+          document.getElementById('compareMembersView').style.display = 'none';
+          document.getElementById('compareListsView').style.display = 'none';
+          document.getElementById('compareRarity2026View').style.display = 'none';
+          document.getElementById('compareAchievementsView').style.display = 'none';
+          document.getElementById('compareStatsView').style.display = 'none';
+          document.getElementById('compareActivityView').style.display = 'none';
         } else {
           // When entering group-compare page, show observations view and hide others
           document.getElementById('compareObservationsView').style.display = 'block';
@@ -16583,6 +17124,7 @@
           document.getElementById('compareRarity2026View').style.display = 'none';
           document.getElementById('compareAchievementsView').style.display = 'none';
           document.getElementById('compareStatsView').style.display = 'none';
+          document.getElementById('compareActivityView').style.display = 'none';
         }
 
         if (page === 'diagramme') {
@@ -21302,7 +21844,21 @@
     }
     
     async function getDetailedStatistics() {
-      const allObservations = await getAllObservationsWithDetails();
+      let allObservations = await getAllObservationsWithDetails();
+      
+      // Im Gruppenmodus: Nur eigene Beobachtungen für persönliche Stats
+      if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal') {
+        const currentUser = firebase.auth().currentUser;
+        if (currentUser) {
+          const currentUserId = currentUser.uid;
+          const currentUserEmail = currentUser.email;
+          // Filtere nach eigenem userId ODER userEmail
+          allObservations = allObservations.filter(obs => {
+            return (obs.userId && obs.userId === currentUserId) || (obs.userEmail && obs.userEmail === currentUserEmail);
+          });
+        }
+      }
+      
       // Filter: Nur tickbare Beobachtungen UND keine Nullmeldungen für Statistiken
       const observations = allObservations.filter(obs => 
         obs.tickable !== false && isValidObservation(obs)
@@ -21541,23 +22097,86 @@
         if (greetingEl) greetingEl.textContent = greeting + '!';
         if (dateEl) dateEl.textContent = dateStr;
         
-        // Hero Quick Stats
+        // Hero Quick Stats - GRUPPENDATEN wenn im Gruppenmodus
         const heroTotalEl = document.getElementById('heroTotalObs');
         const heroSpeciesEl = document.getElementById('heroSpeciesCount');
         const heroWeekEl = document.getElementById('heroThisWeek');
         const heroStreakEl = document.getElementById('heroStreak');
         
-        if (heroTotalEl) heroTotalEl.textContent = stats.totalObservations.toLocaleString();
-        if (heroSpeciesEl) heroSpeciesEl.textContent = stats.uniqueSpecies;
+        // Prüfe ob im Gruppenmodus
+        const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
         
-        // Diese Woche
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekAgo);
-        if (heroWeekEl) heroWeekEl.textContent = thisWeekObs.length;
-        
-        // Streak (vereinfacht - könnte verbessert werden)
-        if (heroStreakEl) heroStreakEl.textContent = calculateStreak(observations);
+        if (isGroupMode) {
+          try {
+            // Lade Gruppendaten für Hero Stats
+            const groupData = await loadGroupData();
+            const allUsers = Object.values(groupData.userStats);
+            
+            // Berechne Gruppensummen
+            const groupTotalObs = allUsers.reduce((sum, user) => sum + user.totalCount, 0);
+            const allGroupSpecies = new Set();
+            allUsers.forEach(user => {
+              user.species.forEach(species => allGroupSpecies.add(species));
+            });
+            const groupSpeciesCount = allGroupSpecies.size;
+            
+            // Diese Woche für die Gruppe
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            let groupThisWeekCount = 0;
+            allUsers.forEach(user => {
+              const weekObs = user.observations.filter(o => {
+                if (!o.date) return false;
+                const obsDate = new Date(o.date);
+                return obsDate >= weekAgo && o.tickable !== false;
+              });
+              groupThisWeekCount += weekObs.length;
+            });
+            
+            // Gruppen-Streak (nimm den längsten Streak eines Mitglieds)
+            let maxStreak = 0;
+            allUsers.forEach(user => {
+              const userStreak = calculateStreak(user.observations.filter(o => o.tickable !== false));
+              if (userStreak > maxStreak) maxStreak = userStreak;
+            });
+            
+            // Setze Hero Stats mit Gruppendaten
+            if (heroTotalEl) heroTotalEl.textContent = groupTotalObs.toLocaleString();
+            if (heroSpeciesEl) heroSpeciesEl.textContent = groupSpeciesCount;
+            if (heroWeekEl) heroWeekEl.textContent = groupThisWeekCount;
+            if (heroStreakEl) heroStreakEl.textContent = maxStreak;
+            
+            console.log('📊 Gruppen-Hero-Stats aktualisiert:', {
+              total: groupTotalObs,
+              species: groupSpeciesCount,
+              thisWeek: groupThisWeekCount,
+              streak: maxStreak
+            });
+          } catch (error) {
+            console.error('Fehler beim Laden der Gruppendaten für Hero Stats:', error);
+            // Fallback zu persönlichen Daten
+            if (heroTotalEl) heroTotalEl.textContent = stats.totalObservations.toLocaleString();
+            if (heroSpeciesEl) heroSpeciesEl.textContent = stats.uniqueSpecies;
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekAgo);
+            if (heroWeekEl) heroWeekEl.textContent = thisWeekObs.length;
+            if (heroStreakEl) heroStreakEl.textContent = calculateStreak(observations);
+          }
+        } else {
+          // Persönliche Daten im privaten Modus
+          if (heroTotalEl) heroTotalEl.textContent = stats.totalObservations.toLocaleString();
+          if (heroSpeciesEl) heroSpeciesEl.textContent = stats.uniqueSpecies;
+          
+          // Diese Woche
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekAgo);
+          if (heroWeekEl) heroWeekEl.textContent = thisWeekObs.length;
+          
+          // Streak (vereinfacht - könnte verbessert werden)
+          if (heroStreakEl) heroStreakEl.textContent = calculateStreak(observations);
+        }
         
         // === AKTIVITÄT HEUTE ===
         const todayActivityEl = document.getElementById('todayActivity');
@@ -24798,19 +25417,37 @@ document.addEventListener('DOMContentLoaded', function() {
         // Verstecke das aside-Element mit der Karte
         const mapAside = document.querySelector('main > aside');
         if (mapAside) mapAside.style.display = 'none';
-        // Sections umschalten - INSTANT ohne Animation
-        document.querySelectorAll('main section').forEach(s => {
-          if (s.id === page) {
-            s.style.display = 'block';
-          } else {
-            s.style.display = 'none';
+        
+        // Sections umschalten - EXPLIZITE Liste für Zuverlässigkeit
+        const allSectionIds = [
+          'home', 'profil', 'beobachtungen', 'eingabe', 'diagramme', 
+          'statistiken', 'erweiterte-stats', 'karte', 'listen', 'arten', 
+          'tools', 'challenges', 'group-compare'
+        ];
+        
+        console.log(`🔄 [TOUCH] Wechsle zu Seite: ${page}`);
+        
+        allSectionIds.forEach(id => {
+          const section = document.getElementById(id);
+          if (section) {
+            if (id === page) {
+              section.style.display = 'block';
+              console.log(`  ✅ [TOUCH] ${id} angezeigt`);
+            } else {
+              section.style.display = 'none';
+              console.log(`  ✅ [TOUCH] ${id} ausgeblendet`);
+            }
           }
         });
         
         // Reset group compare tabs when leaving group-compare page
         if (page !== 'group-compare') {
-          // WICHTIG: Verstecke alle Compare-Views explizit
-          const compareViews = ['compareObservationsView', 'compareListsView', 'compareRarity2026View', 'compareAchievementsView', 'compareStatsView'];
+          // WICHTIG: Verstecke ALLE Compare-Views explizit
+          const compareViews = [
+            'compareObservationsView', 'compareMembersView', 'compareListsView', 
+            'compareRarity2026View', 'compareAchievementsView', 'compareStatsView', 
+            'compareActivityView'
+          ];
           compareViews.forEach(viewId => {
             const view = document.getElementById(viewId);
             if (view) view.style.display = 'none';
@@ -24832,12 +25469,14 @@ document.addEventListener('DOMContentLoaded', function() {
             obsTab.style.transform = 'scale(1.02)';
           }
         } else {
-          // When entering group-compare page, show observations view and hide others
+          // When entering group-compare page, show observations view and hide ALL others
           document.getElementById('compareObservationsView').style.display = 'block';
+          document.getElementById('compareMembersView').style.display = 'none';
           document.getElementById('compareListsView').style.display = 'none';
           document.getElementById('compareRarity2026View').style.display = 'none';
           document.getElementById('compareAchievementsView').style.display = 'none';
           document.getElementById('compareStatsView').style.display = 'none';
+          document.getElementById('compareActivityView').style.display = 'none';
         }
       }
       
@@ -26603,6 +27242,7 @@ function switchCompareTab(tab) {
   document.getElementById('compareRarity2026View').style.display = 'none';
   document.getElementById('compareAchievementsView').style.display = 'none';
   document.getElementById('compareStatsView').style.display = 'none';
+  document.getElementById('compareActivityView').style.display = 'none';
   
   if (tab === 'observations') {
     document.getElementById('compareObsTab').classList.add('active');
@@ -26643,6 +27283,13 @@ function switchCompareTab(tab) {
     document.getElementById('compareStatsTab').style.border = '2px solid #06b6d4';
     document.getElementById('compareStatsTab').style.transform = 'scale(1.02)';
     document.getElementById('compareStatsView').style.display = 'block';
+  } else if (tab === 'activity') {
+    document.getElementById('compareActivityTab').classList.add('active');
+    document.getElementById('compareActivityTab').style.background = 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.1))';
+    document.getElementById('compareActivityTab').style.border = '2px solid #3b82f6';
+    document.getElementById('compareActivityTab').style.transform = 'scale(1.02)';
+    document.getElementById('compareActivityView').style.display = 'block';
+    renderActivityOverview(); // Lade Aktivitäts-Übersicht
   }
 }
 
@@ -26666,6 +27313,29 @@ async function renderMembersProfiles() {
     return;
   }
   
+  // Lade auch Listen-Beobachtungen aus comparisonFolders
+  let listObservations = [];
+  try {
+    const foldersSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders`).once('value');
+    if (foldersSnapshot.exists()) {
+      foldersSnapshot.forEach(folderSnap => {
+        const folder = folderSnap.val();
+        if (folder.lists) {
+          Object.values(folder.lists).forEach(list => {
+            if (list.observations) {
+              Object.values(list.observations).forEach(obs => {
+                listObservations.push(obs);
+              });
+            }
+          });
+        }
+      });
+    }
+    console.log(`📋 ${listObservations.length} Beobachtungen aus Listen geladen`);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Listen-Beobachtungen:', error);
+  }
+  
   // Berechne Stats für jedes Mitglied
   const memberStats = await Promise.all(members.map(async (member) => {
     // Sichere Werte mit Fallbacks
@@ -26673,8 +27343,24 @@ async function renderMembersProfiles() {
     const memberEmail = member.email || member.userEmail || 'unknown@example.com';
     const memberUsername = member.username || member.name || memberEmail.split('@')[0];
     
-    const memberObs = (group.observations || []).filter(o => o.userId === memberId || o.userEmail === memberEmail);
-    const uniqueSpecies = new Set(memberObs.map(o => o.bird).filter(Boolean)).size;
+    console.log(`👤 Berechne Stats für ${memberUsername} (ID: ${memberId}, Email: ${memberEmail})`);
+    
+    // Kombiniere Beobachtungen aus group.observations UND aus Listen - MIT ROBUSTER FILTERUNG
+    const groupObs = (group.observations || []).filter(o => {
+      return (o.userId && o.userId === memberId) || (o.userEmail && o.userEmail === memberEmail);
+    });
+    const listObs = listObservations.filter(o => {
+      return (o.userId && o.userId === memberId) || (o.userEmail && o.userEmail === memberEmail);
+    });
+    const memberObs = [...groupObs, ...listObs];
+    
+    console.log(`   📊 ${groupObs.length} Gruppenbeobachtungen + ${listObs.length} Listenbeobachtungen = ${memberObs.length} total`);
+    
+    // Nur tickbare Beobachtungen für die Arten-Zählung verwenden
+    const tickableMemberObs = memberObs.filter(o => o.tickable !== false);
+    const uniqueSpecies = new Set(tickableMemberObs.map(o => o.bird).filter(Boolean)).size;
+    
+    console.log(`   🐦 ${uniqueSpecies} tickbare Arten`);
     
     // Streak berechnen
     const dates = [...new Set(memberObs.map(o => o.date))].sort();
@@ -26763,7 +27449,7 @@ async function renderMembersProfiles() {
           
           <div style="flex: 1;">
             <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: var(--text); word-break: break-word;">${(member.username || member.email.split('@')[0]).replace(/'/g, "&#39;")}</h4>
-            <p style="margin: 0; font-size: 12px; color: var(--muted); word-break: break-all;">${member.email}</p>
+            ${member.email !== 'unknown@example.com' ? `<p style="margin: 0; font-size: 12px; color: var(--muted); word-break: break-all;">${member.email}</p>` : ''}
             <div style="margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
               <span style="font-size: 11px; color: #fbbf24; font-weight: 600;">Level ${member.level}</span>
               <span style="color: var(--muted);">•</span>
@@ -26798,6 +27484,281 @@ async function renderMembersProfiles() {
   }).join('');
   
   console.log(`✅ ${memberStats.length} Mitglieder-Profile gerendert`);
+}
+
+// Aktivitäts-Übersicht rendern
+async function renderActivityOverview() {
+  console.log('🕐 === LADE AKTIVITÄTS-ÜBERSICHT START ===');
+  
+  try {
+    // Prüfe ob activityTableBody existiert
+    const tableBody = document.getElementById('activityTableBody');
+    if (!tableBody) {
+      console.error('❌ activityTableBody Element nicht gefunden!');
+      return;
+    }
+    
+    if (!window.currentGroup) {
+      console.log('⚠️ Keine Gruppe geladen');
+      tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);">Keine Gruppe geladen</td></tr>';
+      return;
+    }
+    
+    const group = window.currentGroup;
+    console.log('✅ Gruppe geladen:', group.name || 'Unbenannt');
+    
+    const members = group.members || [];
+    console.log(`📊 Anzahl Mitglieder: ${members.length}`);
+    
+    if (members.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);">Keine Mitglieder in der Gruppe</td></tr>';
+      return;
+    }
+    
+    console.log(`📊 Verarbeite ${members.length} Mitglieder...`);
+  
+  // Berechne Aktivitätsdaten für jedes Mitglied
+  const now = new Date();
+  const memberActivities = members.map(member => {
+    const memberId = member.id || member.userId || 'unknown';
+    const memberEmail = member.email || member.userEmail || 'unknown@example.com';
+    const memberUsername = member.username || member.name || memberEmail.split('@')[0];
+    
+    // Finde alle Beobachtungen des Mitglieds
+    const memberObs = (group.observations || []).filter(o => 
+      o.userId === memberId || o.userEmail === memberEmail
+    );
+    
+    // Zähle nur tickbare Arten (ohne unbestimmte Großmöwen, Bastarde, etc.)
+    const tickableSpecies = memberObs
+      .map(o => o.bird)
+      .filter(bird => {
+        if (!bird) return false;
+        // Prüfe ob Art nicht-tickbar ist (verwende dieselbe Logik wie im Rest der App)
+        const normalized = bird.trim();
+        const AUTO_NON_TICKABLE = [
+          'Großmöwe, unbestimmt',
+          'Silber- / Mittelmeer- / Steppenmöwe',
+          'Silber-_oder_Mittelmeer-_oder_Steppenmöwe',
+          'Stockente, fehlfarben, bastard',
+          'Stockente, Bastard, fehlfarben'
+        ];
+        const isNonTickable = AUTO_NON_TICKABLE.some(species => 
+          normalized === species || 
+          normalized.toLowerCase() === species.toLowerCase()
+        );
+        return !isNonTickable;
+      });
+    
+    const uniqueSpecies = new Set(tickableSpecies).size;
+    
+    // Finde letzte Aktivität (neueste Beobachtung)
+    let lastActivity = null;
+    let lastActivityTime = null;
+    let lastActivityText = 'Nie';
+    let lastActivityColor = '#ef4444'; // Rot für inaktiv
+    
+    if (memberObs.length > 0) {
+      // Sortiere nach Datum und Zeit (createdAt oder updatedAt oder date+time)
+      const sortedObs = [...memberObs].sort((a, b) => {
+        // Versuche createdAt (enthält volle Zeitstempel)
+        const timeA = a.createdAt || a.updatedAt || `${a.date}T${a.time || '12:00:00'}`;
+        const timeB = b.createdAt || b.updatedAt || `${b.date}T${b.time || '12:00:00'}`;
+        return new Date(timeB) - new Date(timeA);
+      });
+      
+      const latestObs = sortedObs[0];
+      lastActivityTime = new Date(latestObs.createdAt || latestObs.updatedAt || `${latestObs.date}T${latestObs.time || '12:00:00'}`);
+      
+      // Berechne Zeitdifferenz
+      const diffMs = now - lastActivityTime;
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const diffWeeks = Math.floor(diffDays / 7);
+      const diffMonths = Math.floor(diffDays / 30);
+      
+      // Formatiere Zeit-String
+      if (diffMinutes < 1) {
+        lastActivityText = 'Gerade eben';
+        lastActivityColor = '#22c55e'; // Grün
+      } else if (diffMinutes < 60) {
+        lastActivityText = `Vor ${diffMinutes} Min.`;
+        lastActivityColor = '#22c55e'; // Grün
+      } else if (diffHours < 24) {
+        lastActivityText = `Vor ${diffHours} Std.`;
+        lastActivityColor = '#22c55e'; // Grün
+      } else if (diffDays === 1) {
+        lastActivityText = 'Gestern';
+        lastActivityColor = '#3b82f6'; // Blau
+      } else if (diffDays < 7) {
+        lastActivityText = `Vor ${diffDays} Tagen`;
+        lastActivityColor = '#3b82f6'; // Blau
+      } else if (diffWeeks < 4) {
+        lastActivityText = `Vor ${diffWeeks} Wochen`;
+        lastActivityColor = '#a855f7'; // Lila
+      } else if (diffMonths < 12) {
+        lastActivityText = `Vor ${diffMonths} Monaten`;
+        lastActivityColor = '#f59e0b'; // Orange
+      } else {
+        const years = Math.floor(diffDays / 365);
+        lastActivityText = `Vor ${years} Jahr${years > 1 ? 'en' : ''}`;
+        lastActivityColor = '#ef4444'; // Rot
+      }
+      
+      // Genaue Zeit für Tooltip
+      lastActivity = lastActivityTime.toLocaleString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+    
+    return {
+      id: memberId,
+      email: memberEmail,
+      username: memberUsername,
+      observations: memberObs.length,
+      species: uniqueSpecies,
+      lastActivity,
+      lastActivityText,
+      lastActivityColor,
+      lastActivityTime,
+      diffDays: lastActivityTime ? Math.floor((now - lastActivityTime) / (1000 * 60 * 60 * 24)) : 999999
+    };
+  });
+  
+  // Sortiere nach letzter Aktivität (neueste zuerst)
+  memberActivities.sort((a, b) => {
+    if (!a.lastActivityTime && !b.lastActivityTime) return 0;
+    if (!a.lastActivityTime) return 1;
+    if (!b.lastActivityTime) return -1;
+    return b.lastActivityTime - a.lastActivityTime;
+  });
+  
+  console.log('✅ Aktivitätsdaten berechnet:', memberActivities.length);
+  
+  // Berechne Summary-Statistiken
+  const now_date = new Date();
+  const today_start = new Date(now_date.getFullYear(), now_date.getMonth(), now_date.getDate());
+  const week_ago = new Date(now_date - 7 * 24 * 60 * 60 * 1000);
+  const month_ago = new Date(now_date - 30 * 24 * 60 * 60 * 1000);
+  
+  let activeToday = 0;
+  let activeWeek = 0;
+  let activeMonth = 0;
+  let inactive = 0;
+  
+  memberActivities.forEach(m => {
+    if (m.lastActivityTime) {
+      if (m.lastActivityTime >= today_start) activeToday++;
+      if (m.lastActivityTime >= week_ago) activeWeek++;
+      if (m.lastActivityTime >= month_ago) activeMonth++;
+      if (m.diffDays > 30) inactive++;
+    } else {
+      inactive++;
+    }
+  });
+  
+  // Update Summary Cards
+  const activeTodayEl = document.getElementById('activeTodayCount');
+  const activeWeekEl = document.getElementById('activeWeekCount');
+  const activeMonthEl = document.getElementById('activeMonthCount');
+  const inactiveEl = document.getElementById('inactiveCount');
+  
+  if (activeTodayEl) activeTodayEl.textContent = activeToday;
+  if (activeWeekEl) activeWeekEl.textContent = activeWeek;
+  if (activeMonthEl) activeMonthEl.textContent = activeMonth;
+  if (inactiveEl) inactiveEl.textContent = inactive;
+  
+  console.log(`📊 Summary: Heute=${activeToday}, Woche=${activeWeek}, Monat=${activeMonth}, Inaktiv=${inactive}`);
+  
+  // Rendere Tabelle (tableBody wurde bereits oben deklariert)
+  tableBody.innerHTML = memberActivities.map((member, index) => {
+    // Status Badge
+    let statusEmoji = '⏰';
+    let statusText = 'Inaktiv';
+    let statusColor = '#ef4444';
+    
+    if (member.diffDays <= 1) {
+      statusEmoji = '✅';
+      statusText = 'Sehr aktiv';
+      statusColor = '#22c55e';
+    } else if (member.diffDays <= 7) {
+      statusEmoji = '🟢';
+      statusText = 'Aktiv';
+      statusColor = '#3b82f6';
+    } else if (member.diffDays <= 30) {
+      statusEmoji = '🟡';
+      statusText = 'Gelegentlich';
+      statusColor = '#a855f7';
+    } else if (member.diffDays <= 90) {
+      statusEmoji = '🟠';
+      statusText = 'Selten';
+      statusColor = '#f59e0b';
+    }
+    
+    return `
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background=''">
+        <td style="padding:16px 20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">
+              👤
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--text);">${member.username}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">${member.email}</div>
+            </div>
+          </div>
+        </td>
+        <td style="padding:16px 20px;text-align:center;">
+          <div title="${member.lastActivity || 'Nie'}">
+            <div style="font-weight:600;font-size:14px;color:${member.lastActivityColor};">
+              ${member.lastActivityText}
+            </div>
+            ${member.lastActivity ? `<div style="font-size:10px;color:var(--muted);margin-top:2px;">${member.lastActivity}</div>` : ''}
+          </div>
+        </td>
+        <td style="padding:16px 20px;text-align:center;">
+          <div style="font-size:18px;font-weight:700;color:var(--accent);">${member.observations}</div>
+        </td>
+        <td style="padding:16px 20px;text-align:center;">
+          <div style="font-size:18px;font-weight:700;color:var(--accent-2);">${member.species}</div>
+        </td>
+        <td style="padding:16px 20px;text-align:center;">
+          <div style="display:inline-block;padding:6px 12px;background:${statusColor}22;border:1px solid ${statusColor}44;border-radius:8px;font-size:12px;font-weight:600;color:${statusColor};">
+            <span style="font-size:14px;margin-right:4px;">${statusEmoji}</span>
+            ${statusText}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
+  console.log('✅ Aktivitäts-Tabelle gerendert');
+  console.log('✅ === AKTIVITÄTS-ÜBERSICHT ERFOLGREICH GELADEN ===');
+  
+  } catch (error) {
+    console.error('❌ === FEHLER IN AKTIVITÄTS-ÜBERSICHT ===');
+    console.error('❌ Error:', error);
+    console.error('❌ Stack:', error.stack);
+    
+    const tableBody = document.getElementById('activityTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="padding:40px 20px;text-align:center;">
+            <div style="font-size:48px;margin-bottom:16px;">❌</div>
+            <div style="color:var(--danger);font-weight:600;margin-bottom:8px;">Fehler beim Laden</div>
+            <div style="color:var(--muted);font-size:12px;">${error.message}</div>
+          </td>
+        </tr>
+      `;
+    }
+  }
 }
 
 // Mitgliederprofil im Modal anzeigen (global verfügbar)
@@ -26933,12 +27894,63 @@ window.showMemberProfile = async function(memberId, memberEmail) {
   
   // Berechne detaillierte Stats
   console.log('📊 Berechne Stats...');
-  const memberObs = (group.observations || []).filter(o => o.userId === safeMemberId || o.userEmail === safeEmail);
-  const uniqueSpecies = new Set(memberObs.map(o => o.bird).filter(Boolean));
-  console.log('✅ Beobachtungen:', memberObs.length, 'Arten:', uniqueSpecies.size);
+  console.log('📊 Filtere nach - safeMemberId:', safeMemberId, 'safeEmail:', safeEmail);
   
-  // Streak berechnen
-  const dates = [...new Set(memberObs.map(o => o.date))].sort();
+  // Lade auch Listen-Beobachtungen
+  let listObservations = [];
+  try {
+    const foldersSnapshot = await window.FBD.ref(`groups/${window.currentSelectedGroup}/comparisonFolders`).once('value');
+    if (foldersSnapshot.exists()) {
+      foldersSnapshot.forEach(folderSnap => {
+        const folder = folderSnap.val();
+        if (folder.lists) {
+          Object.values(folder.lists).forEach(list => {
+            if (list.observations) {
+              Object.values(list.observations).forEach(obs => {
+                listObservations.push(obs);
+              });
+            }
+          });
+        }
+      });
+    }
+    console.log(`📋 ${listObservations.length} Beobachtungen aus Listen geladen`);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Listen-Beobachtungen:', error);
+  }
+  
+  // Debug: Zeige ein paar Beispiel-Beobachtungen
+  console.log('📊 Beispiel group.observations:', (group.observations || []).slice(0, 3).map(o => ({ 
+    bird: o.bird, 
+    userId: o.userId, 
+    userEmail: o.userEmail 
+  })));
+  
+  // Kombiniere Beobachtungen aus group.observations UND aus Listen - MIT ROBUSTER FILTERUNG
+  const groupObs = (group.observations || []).filter(o => {
+    const matches = (o.userId && o.userId === safeMemberId) || (o.userEmail && o.userEmail === safeEmail);
+    if (matches) {
+      console.log('✓ Match gefunden:', o.bird, 'userId:', o.userId, 'userEmail:', o.userEmail);
+    }
+    return matches;
+  });
+  
+  const memberListObs = listObservations.filter(o => {
+    return (o.userId && o.userId === safeMemberId) || (o.userEmail && o.userEmail === safeEmail);
+  });
+  
+  const memberObs = [...groupObs, ...memberListObs];
+  
+  console.log(`📊 Gefilterte Beobachtungen: ${groupObs.length} aus Gruppe + ${memberListObs.length} aus Listen = ${memberObs.length} total`);
+  
+  // Nur tickbare Beobachtungen für die Arten-Zählung
+  const tickableMemberObs = memberObs.filter(o => o.tickable !== false);
+  const uniqueSpecies = new Set(tickableMemberObs.map(o => o.bird).filter(Boolean));
+  
+  console.log('✅ Beobachtungen:', memberObs.length, 'Tickbare Arten:', uniqueSpecies.size);
+  
+  // Streak berechnen (basierend auf tickbaren Beobachtungen)
+  const dates = [...new Set(tickableMemberObs.map(o => o.date))].sort();
   let currentStreak = 0;
   let streakDate = new Date();
   
@@ -26985,14 +27997,14 @@ window.showMemberProfile = async function(memberId, memberEmail) {
     };
   }
   
-  // Erste & letzte Beobachtung
-  const sortedObs = [...memberObs].sort((a, b) => new Date(a.date) - new Date(b.date));
+  // Erste & letzte Beobachtung (basierend auf tickbaren Beobachtungen)
+  const sortedObs = [...tickableMemberObs].sort((a, b) => new Date(a.date) - new Date(b.date));
   const firstDate = sortedObs[0] ? new Date(sortedObs[0].date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt';
   const lastDate = sortedObs[sortedObs.length - 1] ? new Date(sortedObs[sortedObs.length - 1].date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt';
   
-  // Top 5 Arten
+  // Top 5 Arten (nur tickbare)
   const speciesCount = {};
-  memberObs.forEach(o => {
+  tickableMemberObs.forEach(o => {
     if (o.bird) {
       speciesCount[o.bird] = (speciesCount[o.bird] || 0) + 1;
     }
@@ -30352,6 +31364,8 @@ window.renderComparisonFolders = renderComparisonFolders;
 window.openAddListToFolderModal = openAddListToFolderModal;
 window.closeAddListToFolderModal = closeAddListToFolderModal;
 window.addListToComparisonFolder = addListToComparisonFolder;
+window.refreshComparisonFolderLists = refreshComparisonFolderLists;
+window.refreshAllComparisonFolders = refreshAllComparisonFolders;
 
 // ==================== ARTEN-DATENBANK FUNKTIONEN ====================
 
@@ -33937,13 +34951,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // NEU: Initialisiere Mobile-Ansicht
   initMobileView();
   
-  const navButtons = document.querySelectorAll('.nav button');
-  navButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      console.log('Nav-Button geklickt - Schließe Menü');
-      closeMobileMenu();
-    });
-  });
+  // ENTFERNT: Die Nav-Button Click-Listener sind bereits oben definiert (Zeile ~16659)
+  // und rufen closeMobileMenu() wenn nötig auf
   
   // NEU: Schließe Sidebar beim Resize auf Desktop
   window.addEventListener('resize', function() {
@@ -35947,9 +36956,22 @@ function renderDayMonthHeatmap(observations, container) {
 // Hilfsfunktion: Hole Beobachtungen für Statistiken (im Gruppenmodus alle Gruppenbeobachtungen, sonst nur eigene)
 async function getOwnObservationsForStats() {
   if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal') {
-    // Im Gruppenmodus: ALLE Gruppenbeobachtungen (nicht nur eigene)
+    // Im Gruppenmodus: NUR EIGENE Beobachtungen
     const allGroupObs = await getAllObservationsWithDetails();
-    return allGroupObs.filter(obs => obs.tickable !== false && isValidObservation(obs));
+    const currentUser = firebase.auth().currentUser;
+    if (!currentUser) {
+      console.warn('Kein angemeldeter User gefunden');
+      return [];
+    }
+    const currentUserId = currentUser.uid;
+    const currentUserEmail = currentUser.email;
+    
+    // Filtere nach eigenem userId ODER userEmail
+    return allGroupObs.filter(obs => {
+      const isOwn = (obs.userId && obs.userId === currentUserId) || (obs.userEmail && obs.userEmail === currentUserEmail);
+      const isValid = obs.tickable !== false && isValidObservation(obs);
+      return isOwn && isValid;
+    });
   } else {
     // Im persönlichen Modus: Nur eigene
     const allObs = await getAllObservationsWithDetails();
