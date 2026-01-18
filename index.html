@@ -7265,6 +7265,14 @@
                     Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
                     <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
                   </div>
+                  
+                  <!-- MOBILE IMPORT BUTTON -->
+                  <button class="small-btn" onclick="showMobileOrnithoImport()" style="width:100%;background:linear-gradient(135deg, var(--accent), var(--accent-2));text-align:center;cursor:pointer;margin-top:8px;font-weight:600;">
+                    📱 Mobiler Import (Copy & Paste)
+                  </button>
+                  <div style="font-size:11px;color:var(--soft);margin-top:6px;text-align:center;background:rgba(6,182,212,0.1);padding:6px;border-radius:4px;">
+                    💡 <strong>Für Handy empfohlen!</strong> Funktioniert auf allen Geräten
+                  </div>
                 </div>
                 <button class="small-btn" onclick="backupData()" style="margin-top:12px;width:100%;">💾 Backup erstellen</button>
                 <button class="small-btn" onclick="restoreBackup()" style="margin-top:4px;width:100%;">🔧 Backup wiederherstellen</button>
@@ -41312,6 +41320,7 @@ window.showDayMonthObservations = showDayMonthObservations;
 
 <!-- =============================================== -->
 <!-- MOBILE ORNITHO IMPORT FIX - Hinzugefügt 2026-01-18 -->
+<!-- Erweitert die bestehende Import-Funktion um mobile Copy-Paste -->
 <!-- =============================================== -->
 <script>
 (function() {
@@ -41319,149 +41328,252 @@ window.showDayMonthObservations = showDayMonthObservations;
   
   console.log('📱 Mobile Ornitho Import Patch wird geladen...');
   
-  // Warte bis DOM bereit ist
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMobileImportFix);
-  } else {
-    initMobileImportFix();
-  }
-  
-  function initMobileImportFix() {
-    console.log('🔧 Initialisiere Mobile Import Fix...');
+  // Erstelle Mobile Import Dialog
+  window.showMobileOrnithoImport = function() {
+    // Erstelle Modal
+    const modal = document.createElement('div');
+    modal.id = 'mobile-ornitho-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2,6,23,0.95);
+      backdrop-filter: blur(8px);
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    `;
     
-    // Finde den Ornitho Import Bereich im Settings
-    const settingsContent = document.querySelector('.settings-content');
-    if (!settingsContent) {
-      console.warn('Settings-Bereich nicht gefunden');
-      return;
-    }
-    
-    // Suche nach dem Import-Bereich
-    const importSection = Array.from(settingsContent.querySelectorAll('.card')).find(card => {
-      return card.textContent.includes('ornithoFile') || 
-             card.innerHTML.includes('importOrnithoData');
-    });
-    
-    if (!importSection) {
-      console.warn('Import-Bereich nicht gefunden');
-      return;
-    }
-    
-    // Ersetze den Import-Bereich mit Mobile-freundlicher Version
-    const mobileImportHTML = `
-      <div style="background: var(--card); border: 1px solid rgba(6,182,212,0.2); border-radius: 12px; padding: 20px;">
+    modal.innerHTML = `
+      <div style="
+        background: var(--card);
+        border: 2px solid rgba(6,182,212,0.3);
+        border-radius: 20px;
+        padding: 24px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 24px 80px rgba(6,182,212,0.4);
+      ">
+        <button onclick="closeMobileOrnithoModal()" style="
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: transparent;
+          border: none;
+          color: var(--muted);
+          cursor: pointer;
+          font-size: 32px;
+          line-height: 1;
+          padding: 4px 8px;
+          z-index: 1;
+        ">×</button>
+        
+        <h3 style="margin: 0 0 20px 0; font-size: 22px; color: var(--text);">
+          🔄 Ornitho Import
+        </h3>
         
         <!-- Tabs -->
         <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
           <button 
             class="small-btn mobile-import-tab" 
-            data-method="paste"
-            style="flex: 1; min-width: 100px; padding: 10px; background: var(--accent); border: 2px solid var(--accent);">
+            onclick="switchMobileImportTab('paste')"
+            id="tab-paste"
+            style="flex: 1; min-width: 100px; padding: 12px; background: var(--accent); border: 2px solid var(--accent); font-weight: 600;">
             📋 Einfügen
           </button>
           <button 
             class="small-btn mobile-import-tab" 
-            data-method="file"
-            style="flex: 1; min-width: 100px; padding: 10px; background: var(--surface); border: 2px solid rgba(6,182,212,0.2);">
+            onclick="switchMobileImportTab('file')"
+            id="tab-file"
+            style="flex: 1; min-width: 100px; padding: 12px; background: var(--surface); border: 2px solid rgba(6,182,212,0.2);">
             📂 Datei
           </button>
           <button 
             class="small-btn mobile-import-tab" 
-            data-method="url"
-            style="flex: 1; min-width: 100px; padding: 10px; background: var(--surface); border: 2px solid rgba(6,182,212,0.2);">
+            onclick="switchMobileImportTab('url')"
+            id="tab-url"
+            style="flex: 1; min-width: 100px; padding: 12px; background: var(--surface); border: 2px solid rgba(6,182,212,0.2);">
             🔗 URL
           </button>
         </div>
         
         <!-- Paste Method -->
-        <div class="import-method" data-method="paste" style="display: block;">
+        <div class="import-method-content" id="method-paste" style="display: block;">
           <label style="display: block; margin-bottom: 16px; font-size: 14px; color: var(--soft);">
-            📋 CSV-Inhalt einfügen:
+            📋 CSV-Inhalt hier einfügen:
             <textarea 
               id="ornitho-paste-area" 
-              style="width: 100%; min-height: 250px; margin-top: 8px; padding: 12px; background: var(--surface); border: 2px dashed rgba(6,182,212,0.4); border-radius: 8px; color: var(--text); font-family: monospace; font-size: 12px; resize: vertical;" 
-              placeholder="1. Öffne CSV mit Texteditor auf dem Handy
-2. Alles markieren und kopieren (Strg+A, Strg+C)
-3. Hier einfügen (langes Drücken → Einfügen)
+              style="
+                width: 100%; 
+                min-height: 250px; 
+                margin-top: 8px; 
+                padding: 12px; 
+                background: var(--surface); 
+                border: 2px dashed rgba(6,182,212,0.4); 
+                border-radius: 8px; 
+                color: var(--text); 
+                font-family: 'Courier New', monospace; 
+                font-size: 12px; 
+                resize: vertical;
+                line-height: 1.4;
+              " 
+              placeholder="1. Öffne deine CSV-Datei mit Notizen/Texteditor
+2. Alles markieren (langes Drücken → Alles auswählen)
+3. Kopieren
+4. Hier einfügen (langes Drücken → Einfügen)
 
 Beispiel:
 Art;Datum;Zeit;Anzahl;Ort
-Amsel;15.01.2024;08:30;2;Garten"></textarea>
+Amsel;15.01.2024;08:30;2;Garten
+Blaumeise;15.01.2024;09:00;5;Park"></textarea>
           </label>
-          <button class="btn" onclick="mobileImportFromPaste()" style="width: 100%; padding: 14px; font-weight: 700;">
+          <button class="btn" onclick="mobileImportFromPaste()" style="
+            width: 100%; 
+            padding: 14px; 
+            font-size: 16px; 
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+          ">
             🚀 Daten importieren
           </button>
-          <div style="margin-top: 12px; padding: 12px; background: rgba(6,182,212,0.1); border-left: 3px solid var(--accent); border-radius: 4px; font-size: 12px; color: var(--soft);">
-            💡 <strong>Für Handy am besten geeignet!</strong><br>
-            Öffne die CSV in Notizen/Editor, kopiere alles und füge es hier ein.
+          <div style="
+            margin-top: 16px; 
+            padding: 12px; 
+            background: rgba(6,182,212,0.1); 
+            border-left: 3px solid var(--accent); 
+            border-radius: 6px;
+            font-size: 12px; 
+            color: var(--soft);
+            line-height: 1.6;
+          ">
+            💡 <strong>Am besten für Mobilgeräte!</strong><br>
+            Diese Methode funktioniert auf allen Handys zuverlässig.
           </div>
         </div>
         
         <!-- File Method -->
-        <div class="import-method" data-method="file" style="display: none;">
+        <div class="import-method-content" id="method-file" style="display: none;">
           <label style="display: block; margin-bottom: 16px; font-size: 14px; color: var(--soft);">
             📂 CSV-Datei auswählen:
-            <input type="file" accept=".csv,.txt" id="ornitho-file-input" style="margin-top: 8px; width: 100%; padding: 12px; background: var(--surface); border: 2px solid rgba(6,182,212,0.3); border-radius: 8px;">
+            <input 
+              type="file" 
+              accept=".csv,.txt" 
+              id="ornitho-file-input" 
+              style="
+                margin-top: 8px; 
+                width: 100%; 
+                padding: 12px; 
+                background: var(--surface); 
+                border: 2px solid rgba(6,182,212,0.3); 
+                border-radius: 8px;
+                color: var(--text);
+              ">
           </label>
-          <button class="btn" onclick="mobileImportFromFile()" style="width: 100%; padding: 14px; font-weight: 700;">
+          <button class="btn" onclick="mobileImportFromFile()" style="
+            width: 100%; 
+            padding: 14px; 
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+          ">
             🚀 Datei importieren
           </button>
-          <p style="font-size: 12px; color: var(--muted); margin-top: 12px;">
-            Falls nicht funktioniert, nutze die 📋 Einfügen-Methode.
+          <p style="font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
+            Wähle deine Ornitho CSV-Datei aus. Falls dies nicht funktioniert, nutze die <strong>📋 Einfügen</strong>-Methode.
           </p>
         </div>
         
         <!-- URL Method -->
-        <div class="import-method" data-method="url" style="display: none;">
+        <div class="import-method-content" id="method-url" style="display: none;">
           <label style="display: block; margin-bottom: 16px; font-size: 14px; color: var(--soft);">
-            🔗 CSV-URL:
-            <input type="url" id="ornitho-url-input" style="width: 100%; margin-top: 8px; padding: 12px; background: var(--surface); border: 2px solid rgba(6,182,212,0.3); border-radius: 8px; color: var(--text);" placeholder="https://example.com/daten.csv">
+            🔗 Öffentliche CSV-URL:
+            <input 
+              type="url" 
+              id="ornitho-url-input" 
+              style="
+                width: 100%; 
+                margin-top: 8px; 
+                padding: 12px; 
+                background: var(--surface); 
+                border: 2px solid rgba(6,182,212,0.3); 
+                border-radius: 8px; 
+                color: var(--text);
+                font-size: 14px;
+              " 
+              placeholder="https://example.com/meine-daten.csv">
           </label>
-          <button class="btn" onclick="mobileImportFromUrl()" style="width: 100%; padding: 14px; font-weight: 700;">
+          <button class="btn" onclick="mobileImportFromUrl()" style="
+            width: 100%; 
+            padding: 14px; 
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+          ">
             🚀 Von URL importieren
           </button>
-          <p style="font-size: 12px; color: var(--muted); margin-top: 12px;">
-            Lade die CSV auf Google Drive/Dropbox hoch und füge den öffentlichen Link ein.
-          </p>
+          <div style="
+            margin-top: 16px; 
+            padding: 12px; 
+            background: rgba(6,182,212,0.1); 
+            border-left: 3px solid var(--accent); 
+            border-radius: 6px;
+            font-size: 12px; 
+            color: var(--soft);
+            line-height: 1.6;
+          ">
+            💡 <strong>Tipp:</strong><br>
+            Lade deine CSV auf Google Drive/Dropbox hoch und teile den öffentlichen Link.
+          </div>
         </div>
         
       </div>
     `;
     
-    // Finde die Überschrift und ersetze den Bereich
-    const titleElement = Array.from(settingsContent.querySelectorAll('.section-title, h3')).find(h => 
-      h.textContent.includes('Ornitho')
-    );
+    document.body.appendChild(modal);
     
-    if (titleElement && titleElement.nextElementSibling) {
-      titleElement.nextElementSibling.innerHTML = mobileImportHTML;
-      console.log('✅ Import-Bereich erfolgreich ersetzt');
-      
-      // Event Listener für Tabs
-      document.querySelectorAll('.mobile-import-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-          const method = this.dataset.method;
-          
-          // Reset alle Tabs
-          document.querySelectorAll('.mobile-import-tab').forEach(t => {
-            t.style.background = 'var(--surface)';
-            t.style.borderColor = 'rgba(6,182,212,0.2)';
-          });
-          
-          // Aktiviere gewählten Tab
-          this.style.background = 'var(--accent)';
-          this.style.borderColor = 'var(--accent)';
-          
-          // Zeige entsprechende Methode
-          document.querySelectorAll('.import-method').forEach(m => {
-            m.style.display = m.dataset.method === method ? 'block' : 'none';
-          });
-        });
-      });
-    }
-  }
+    // Click outside to close
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeMobileOrnithoModal();
+      }
+    });
+  };
   
-  // Import Funktionen
+  // Tab Switching
+  window.switchMobileImportTab = function(method) {
+    // Update tabs
+    ['paste', 'file', 'url'].forEach(m => {
+      const tab = document.getElementById(`tab-${m}`);
+      const content = document.getElementById(`method-${m}`);
+      if (tab && content) {
+        if (m === method) {
+          tab.style.background = 'var(--accent)';
+          tab.style.borderColor = 'var(--accent)';
+          content.style.display = 'block';
+        } else {
+          tab.style.background = 'var(--surface)';
+          tab.style.borderColor = 'rgba(6,182,212,0.2)';
+          content.style.display = 'none';
+        }
+      }
+    });
+  };
+  
+  // Close Modal
+  window.closeMobileOrnithoModal = function() {
+    const modal = document.getElementById('mobile-ornitho-modal');
+    if (modal) {
+      modal.remove();
+    }
+  };
+  
+  // Import from Paste
   window.mobileImportFromPaste = async function() {
     const textarea = document.getElementById('ornitho-paste-area');
     if (!textarea || !textarea.value.trim()) {
@@ -41472,15 +41584,17 @@ Amsel;15.01.2024;08:30;2;Garten"></textarea>
     showNotification('📊 Importiere Daten...', 0);
     
     try {
-      await processMobileOrnithoCSV(textarea.value);
+      const count = await processMobileOrnithoCSV(textarea.value);
       textarea.value = '';
-      showNotification('✅ Import erfolgreich!', 3000);
+      closeMobileOrnithoModal();
+      showNotification(`✅ ${count} Beobachtungen importiert!`, 3000);
     } catch (error) {
       console.error('Import Fehler:', error);
       showNotification('❌ Import fehlgeschlagen: ' + error.message, 5000);
     }
   };
   
+  // Import from File
   window.mobileImportFromFile = async function() {
     const fileInput = document.getElementById('ornitho-file-input');
     if (!fileInput || !fileInput.files[0]) {
@@ -41493,9 +41607,10 @@ Amsel;15.01.2024;08:30;2;Garten"></textarea>
     const reader = new FileReader();
     reader.onload = async function(e) {
       try {
-        await processMobileOrnithoCSV(e.target.result);
+        const count = await processMobileOrnithoCSV(e.target.result);
         fileInput.value = '';
-        showNotification('✅ Import erfolgreich!', 3000);
+        closeMobileOrnithoModal();
+        showNotification(`✅ ${count} Beobachtungen importiert!`, 3000);
       } catch (error) {
         console.error('Import Fehler:', error);
         showNotification('❌ Import fehlgeschlagen: ' + error.message, 5000);
@@ -41504,6 +41619,7 @@ Amsel;15.01.2024;08:30;2;Garten"></textarea>
     reader.readAsText(fileInput.files[0]);
   };
   
+  // Import from URL
   window.mobileImportFromUrl = async function() {
     const urlInput = document.getElementById('ornitho-url-input');
     if (!urlInput || !urlInput.value.trim()) {
@@ -41511,23 +41627,24 @@ Amsel;15.01.2024;08:30;2;Garten"></textarea>
       return;
     }
     
-    showNotification('📡 Lade Daten...', 0);
+    showNotification('📡 Lade Daten von URL...', 0);
     
     try {
       const response = await fetch(urlInput.value);
-      if (!response.ok) throw new Error('Laden fehlgeschlagen');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const csvContent = await response.text();
-      await processMobileOrnithoCSV(csvContent);
+      const count = await processMobileOrnithoCSV(csvContent);
       urlInput.value = '';
-      showNotification('✅ Import erfolgreich!', 3000);
+      closeMobileOrnithoModal();
+      showNotification(`✅ ${count} Beobachtungen importiert!`, 3000);
     } catch (error) {
       console.error('URL Import Fehler:', error);
       showNotification('❌ Laden fehlgeschlagen: ' + error.message, 5000);
     }
   };
   
-  // CSV Verarbeitung
+  // CSV Processing
   async function processMobileOrnithoCSV(csvContent) {
     const lines = csvContent.trim().split('\n');
     if (lines.length < 2) {
@@ -41536,70 +41653,86 @@ Amsel;15.01.2024;08:30;2;Garten"></textarea>
     
     // Parse Header
     const headers = lines[0].split(';').map(h => h.trim().replace(/^"|"$/g, ''));
-    console.log('Header:', headers);
+    console.log('📋 Header gefunden:', headers);
     
-    // Finde Spalten
+    // Find Columns
     const cols = {
       art: headers.findIndex(h => /^(Art|species)$/i.test(h)),
       datum: headers.findIndex(h => /^(Datum|date)$/i.test(h)),
       zeit: headers.findIndex(h => /^(Zeit|time)$/i.test(h)),
-      anzahl: headers.findIndex(h => /^(Anzahl|count)$/i.test(h)),
-      ort: headers.findIndex(h => /^(Ort|location)$/i.test(h)),
+      anzahl: headers.findIndex(h => /^(Anzahl|count|number)$/i.test(h)),
+      ort: headers.findIndex(h => /^(Ort|location|place)$/i.test(h)),
       lat: headers.findIndex(h => /lat/i.test(h)),
       lng: headers.findIndex(h => /(lon|lng)/i.test(h))
     };
     
-    let imported = 0;
+    console.log('📍 Spalten-Indizes:', cols);
     
-    // Verarbeite Zeilen
+    if (cols.art < 0 || cols.datum < 0) {
+      throw new Error('Spalten "Art" und "Datum" sind erforderlich');
+    }
+    
+    let imported = 0;
+    let skipped = 0;
+    
+    // Process Lines
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
       const values = line.split(';').map(v => v.trim().replace(/^"|"$/g, ''));
       
-      const species = cols.art >= 0 ? values[cols.art] : '';
-      const dateStr = cols.datum >= 0 ? values[cols.datum] : '';
+      const species = values[cols.art] || '';
+      const dateStr = values[cols.datum] || '';
       
-      if (!species || !dateStr) continue;
+      if (!species || !dateStr) {
+        skipped++;
+        continue;
+      }
       
-      // Konvertiere Datum
+      // Convert Date
       let date;
       if (dateStr.includes('.')) {
-        const [day, month, year] = dateStr.split('.');
-        date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        const parts = dateStr.split('.');
+        if (parts.length === 3) {
+          date = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        } else {
+          skipped++;
+          continue;
+        }
       } else {
         date = dateStr;
       }
       
+      // Create Observation
       const obs = {
         id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
         bird: species,
         date: date,
-        time: cols.zeit >= 0 ? values[cols.zeit] : '',
-        count: cols.anzahl >= 0 ? parseInt(values[cols.anzahl]) || 1 : 1,
-        location: cols.ort >= 0 ? values[cols.ort] : '',
+        time: cols.zeit >= 0 ? (values[cols.zeit] || '') : '',
+        count: cols.anzahl >= 0 ? (parseInt(values[cols.anzahl]) || 1) : 1,
+        location: cols.ort >= 0 ? (values[cols.ort] || '') : '',
         lat: cols.lat >= 0 ? parseFloat(values[cols.lat]) : null,
         lng: cols.lng >= 0 ? parseFloat(values[cols.lng]) : null,
-        behavior: 'Importiert von Ornitho (Mobile)',
+        behavior: 'Importiert von Ornitho (Mobile Import)',
         imported: true,
         importDate: new Date().toISOString()
       };
       
-      // Speichere
+      // Save
       if (window.dbOps && typeof window.dbOps.saveObservation === 'function') {
         await window.dbOps.saveObservation(obs);
       } else {
-        console.warn('dbOps nicht verfügbar, speichere in localStorage');
-        const existingData = JSON.parse(localStorage.getItem('birdcount_observations') || '[]');
-        existingData.push(obs);
-        localStorage.setItem('birdcount_observations', JSON.stringify(existingData));
+        console.warn('⚠️ dbOps nicht verfügbar, verwende localStorage');
+        const existing = JSON.parse(localStorage.getItem('birdcount_observations') || '[]');
+        existing.push(obs);
+        localStorage.setItem('birdcount_observations', JSON.stringify(existing));
       }
       
       imported++;
     }
     
-    console.log(`✅ ${imported} Beobachtungen importiert`);
+    console.log(`✅ Import abgeschlossen: ${imported} importiert, ${skipped} übersprungen`);
     
     // Reload UI
     if (typeof loadAllObservations === 'function') {
@@ -41609,7 +41742,8 @@ Amsel;15.01.2024;08:30;2;Garten"></textarea>
     return imported;
   }
   
-  console.log('✅ Mobile Ornitho Import Patch geladen!');
+  console.log('✅ Mobile Ornitho Import Patch erfolgreich geladen!');
+  console.log('💡 Verwende showMobileOrnithoImport() um den Dialog zu öffnen');
 })();
 </script>
 
