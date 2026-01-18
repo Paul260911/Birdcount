@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>BirdCount – Professionelles Beobachtungssystem</title>
-  <!-- VERBESSERT v2.0 - Konsistenz Desktop/Mobile - 2026-01-18 -->
+  <!-- VERBESSERT v2.3.1 - Mobile Ornitho-Import Fix - 2026-01-18 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes" />
   
   <!-- PWA Meta Tags -->
@@ -7220,8 +7220,8 @@
                   <button class="small-btn" onclick="document.getElementById('importFile').click()" style="flex:1;">Daten importieren</button>
                 </div>
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-                  <input type="file" id="ornithoImportFile" accept=".txt" style="display:none;">
-                  <button class="small-btn" onclick="document.getElementById('ornithoImportFile').click()" style="width:100%;background:var(--accent);text-align:center;cursor:pointer;">
+                  <input type="file" id="ornithoImportFile" accept=".txt,text/plain" style="display:none;" capture="environment">
+                  <button class="small-btn" onclick="triggerOrnithoImport()" style="width:100%;background:var(--accent);text-align:center;cursor:pointer;">
                     🦅 Ornitho.de Import
                   </button>
                   <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;">
@@ -7271,6 +7271,9 @@
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
                   <button class="small-btn" onclick="showSyncDebugInfo()" style="width:100%;background:rgba(124,58,237,0.2);font-size:11px;">
                     🔍 Debug-Informationen anzeigen
+                  </button>
+                  <button class="small-btn" onclick="testOrnithoImportAvailability()" style="width:100%;background:rgba(239,68,68,0.2);font-size:11px;margin-top:6px;">
+                    🧪 Test Ornitho-Import (Mobile)
                   </button>
                 </div>
               </div>
@@ -7330,7 +7333,7 @@
                   </div>
                   <div style="display:flex;justify-content:space-between;margin-top:4px;">
                     <span>Version:</span>
-                    <span>2.2.0 (Sync Fix)</span>
+                    <span>2.3.1 (Mobile Fix)</span>
                   </div>
                 </div>
                 <button class="small-btn" onclick="clearCache()" style="margin-top:12px;width:100%;background:var(--danger);">🧹 Cache leeren</button>
@@ -24365,19 +24368,80 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     // Event Listener für Ornitho.de Import
-    document.getElementById('ornithoImportFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        // Prüfe ob im Gruppenmodus
-        const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
-        
-        // Zeige Import-Optionen-Dialog
-        showOrnithoImportOptions(file, isGroupMode);
-        
-        // Reset file input
-        this.value = '';
+    // WICHTIG: In DOMContentLoaded wrappen für Mobile-Kompatibilität
+    function initOrnithoImportListener() {
+      const ornithoInput = document.getElementById('ornithoImportFile');
+      if (!ornithoInput) {
+        console.warn('⚠️ Ornitho Import Input nicht gefunden');
+        return;
       }
-    });
+      
+      ornithoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          console.log('📁 Ornitho-Datei ausgewählt:', file.name);
+          
+          // Prüfe ob im Gruppenmodus
+          const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+          
+          // Zeige Import-Optionen-Dialog
+          showOrnithoImportOptions(file, isGroupMode);
+          
+          // Reset file input
+          this.value = '';
+        }
+      });
+      
+      console.log('✅ Ornitho Import Event Listener initialisiert');
+    }
+    
+    // Initialisiere beim DOM-Load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initOrnithoImportListener);
+    } else {
+      // DOM bereits geladen
+      initOrnithoImportListener();
+    }
+    
+    // Sichere Funktion zum Triggern des Ornitho-Imports (Mobile-freundlich)
+    window.triggerOrnithoImport = function() {
+      console.log('🔍 triggerOrnithoImport aufgerufen');
+      console.log('   Device:', navigator.userAgent);
+      console.log('   Touch-Support:', 'ontouchstart' in window);
+      
+      const ornithoInput = document.getElementById('ornithoImportFile');
+      console.log('   Input Element gefunden:', !!ornithoInput);
+      
+      if (!ornithoInput) {
+        showNotification('❌ Import-Funktion nicht verfügbar. Bitte Seite neu laden.', 3000);
+        console.error('❌ Ornitho Import Input Element nicht gefunden');
+        
+        // Liste alle verfügbaren Input-Elemente
+        const allInputs = document.querySelectorAll('input[type="file"]');
+        console.log('   Verfügbare File-Inputs:', allInputs.length);
+        allInputs.forEach((inp, i) => {
+          console.log(`      ${i}: id="${inp.id}" accept="${inp.accept}"`);
+        });
+        
+        return;
+      }
+      
+      console.log('   Input Details:', {
+        id: ornithoInput.id,
+        accept: ornithoInput.accept,
+        style: ornithoInput.style.cssText,
+        disabled: ornithoInput.disabled
+      });
+      
+      // Trigger file selection
+      try {
+        ornithoInput.click();
+        console.log('✅ File-Auswahl-Dialog geöffnet');
+      } catch (error) {
+        console.error('❌ Fehler beim Öffnen des File-Dialogs:', error);
+        showNotification('❌ Fehler beim Öffnen der Dateiauswahl: ' + error.message, 5000);
+      }
+    };
     
     // NEU: Zeige Import-Optionen Dialog
     async function showOrnithoImportOptions(file, isGroupMode) {
@@ -32499,44 +32563,53 @@ window.clearAllSpeciesFilters = clearAllSpeciesFilters;
 
 // Toggle Tickable Status
 // NEU: Markiere alle Beobachtungen einer Art als nicht tickbar
+// ERWEITERT: Synchronisiert in ALLEN Gruppen + privatem Bereich
 async function markAllSpeciesAsNonTickable(birdName, groupId = null, isFirebaseMode = false) {
   try {
     console.log(`🔄 Markiere alle "${birdName}"-Beobachtungen als nicht tickbar...`);
     let updatedCount = 0;
     
     if (isFirebaseMode && groupId) {
-      // Firebase-Modus: Alle Beobachtungen dieser Art in der Gruppe markieren
+      // Firebase-Modus: Alle Beobachtungen dieser Art in ALLEN Gruppen + IndexedDB markieren
+      
+      // 1. Aktualisiere die aktuelle Gruppe
+      console.log(`   📁 Aktualisiere aktuelle Gruppe...`);
       const groupObsRef = window.FBD.ref(`groups/${groupId}/observations`);
       const snapshot = await groupObsRef.once('value');
       
-      if (!snapshot.exists()) {
-        console.log('Keine Beobachtungen in der Gruppe gefunden');
-        return 0;
-      }
-      
-      const observations = snapshot.val();
-      const updates = {};
-      
-      // Finde alle Beobachtungen dieser Art
-      for (const [obsId, obs] of Object.entries(observations)) {
-        if (obs.bird === birdName && obs.tickable !== false) {
-          updates[`groups/${groupId}/observations/${obsId}/tickable`] = false;
-          updates[`groups/${groupId}/observations/${obsId}/updatedAt`] = new Date().toISOString();
-          updatedCount++;
+      if (snapshot.exists()) {
+        const observations = snapshot.val();
+        const updates = {};
+        
+        // Finde alle Beobachtungen dieser Art in der aktuellen Gruppe
+        for (const [obsId, obs] of Object.entries(observations)) {
+          if (obs.bird === birdName && obs.tickable !== false) {
+            updates[`groups/${groupId}/observations/${obsId}/tickable`] = false;
+            updates[`groups/${groupId}/observations/${obsId}/updatedAt`] = new Date().toISOString();
+            updatedCount++;
+          }
+        }
+        
+        // Batch-Update für aktuelle Gruppe
+        if (Object.keys(updates).length > 0) {
+          await window.FBD.ref().update(updates);
+          console.log(`      ✅ ${Object.keys(updates).length / 2} Beobachtungen in aktueller Gruppe aktualisiert`);
         }
       }
       
-      // Batch-Update
-      if (Object.keys(updates).length > 0) {
-        await window.FBD.ref().update(updates);
-        console.log(`✅ ${updatedCount} Firebase-Beobachtungen aktualisiert`);
-        
-        // Synchronisiere auch zu IndexedDB
-        await syncAllSpeciesTickableToIndexedDB(birdName, false);
-      }
+      // 2. Synchronisiere zu IndexedDB (privater Bereich)
+      console.log(`   💾 Synchronisiere zu IndexedDB (privater Bereich)...`);
+      const indexedDBCount = await syncAllSpeciesTickableToIndexedDB(birdName, false);
+      updatedCount += indexedDBCount;
+      
+      // 3. Synchronisiere zu ALLEN anderen Gruppen (außer der aktuellen)
+      console.log(`   👥 Synchronisiere zu allen anderen Gruppen...`);
+      const otherGroupsCount = await syncAllSpeciesTickableToAllOtherGroups(birdName, false, groupId);
+      updatedCount += otherGroupsCount;
       
     } else {
       // IndexedDB-Modus: Alle lokalen Beobachtungen dieser Art markieren
+      console.log(`   💾 Aktualisiere IndexedDB (privater Bereich)...`);
       const observations = await getAllFromIndexedDB('observations');
       
       for (const obs of observations) {
@@ -32548,17 +32621,96 @@ async function markAllSpeciesAsNonTickable(birdName, groupId = null, isFirebaseM
         }
       }
       
-      console.log(`✅ ${updatedCount} IndexedDB-Beobachtungen aktualisiert`);
+      console.log(`      ✅ ${updatedCount} IndexedDB-Beobachtungen aktualisiert`);
       
-      // Synchronisiere auch zu Firebase falls verbunden
+      // Synchronisiere auch zu Firebase (ALLE Gruppen) falls verbunden
+      console.log(`   👥 Synchronisiere zu allen Gruppen...`);
       await syncAllSpeciesTickableToFirebase(birdName, false);
     }
     
+    console.log(`✅ GESAMT: ${updatedCount} "${birdName}"-Beobachtungen als nicht tickbar markiert`);
     return updatedCount;
     
   } catch (error) {
     console.error('Fehler beim Markieren aller Beobachtungen:', error);
     throw error;
+  }
+}
+
+// NEU: Synchronisiere zu allen anderen Gruppen (außer der aktuellen)
+async function syncAllSpeciesTickableToAllOtherGroups(birdName, tickableStatus, excludeGroupId) {
+  try {
+    if (!window.FBA || !window.FBA.currentUser || !window.FBD) {
+      return 0;
+    }
+    
+    const userId = window.FBA.currentUser.uid;
+    const userEmail = window.FBA.currentUser.email;
+    
+    // Lade alle Gruppen
+    const groupsSnapshot = await window.FBD.ref('groups').once('value');
+    if (!groupsSnapshot.exists()) {
+      return 0;
+    }
+    
+    const groups = groupsSnapshot.val();
+    let totalCount = 0;
+    
+    // Durchsuche ALLE Gruppen (außer der aktuellen)
+    for (const [groupKey, groupData] of Object.entries(groups)) {
+      // Überspringe die aktuelle Gruppe
+      if (groupKey === excludeGroupId) continue;
+      
+      // Prüfe ob Benutzer Mitglied ist
+      if (!groupData.members) continue;
+      const isMember = Object.values(groupData.members).some(member => 
+        member.uid === userId || member.id === userId
+      );
+      
+      if (!isMember) continue;
+      
+      console.log(`      👥 Synchronisiere Gruppe: ${groupData.name || groupKey}`);
+      
+      // Lade Beobachtungen dieser Gruppe
+      const groupObsRef = window.FBD.ref(`groups/${groupKey}/observations`);
+      const snapshot = await groupObsRef.once('value');
+      
+      if (!snapshot.exists()) continue;
+      
+      const observations = snapshot.val();
+      const updates = {};
+      
+      // Durchsuche alle Beobachtungen dieser Gruppe
+      for (const [obsId, obs] of Object.entries(observations)) {
+        // Nur Beobachtungen des aktuellen Benutzers
+        const isOwnObservation = 
+          obs.userId === userId || 
+          obs.createdBy === userEmail ||
+          (obs.userName && obs.userName === userEmail);
+        
+        if (!isOwnObservation) continue;
+        
+        // Prüfe ob es die gesuchte Vogelart ist UND Status unterschiedlich ist
+        if (obs.bird === birdName && obs.tickable !== tickableStatus) {
+          updates[`groups/${groupKey}/observations/${obsId}/tickable`] = tickableStatus;
+          updates[`groups/${groupKey}/observations/${obsId}/updatedAt`] = new Date().toISOString();
+        }
+      }
+      
+      // Batch-Update für diese Gruppe
+      if (Object.keys(updates).length > 0) {
+        await window.FBD.ref().update(updates);
+        const count = Object.keys(updates).length / 2; // Jede Beobachtung hat 2 Updates (tickable + updatedAt)
+        console.log(`         ✅ ${count} Beobachtungen synchronisiert`);
+        totalCount += count;
+      }
+    }
+    
+    return totalCount;
+    
+  } catch (error) {
+    console.error('Fehler beim Sync zu anderen Gruppen:', error);
+    return 0;
   }
 }
 
@@ -32578,41 +32730,98 @@ async function syncAllSpeciesTickableToIndexedDB(birdName, tickableStatus) {
     }
     
     if (syncCount > 0) {
-      console.log(`🔄 ${syncCount} Beobachtungen in IndexedDB synchronisiert`);
+      console.log(`      🔄 ${syncCount} Beobachtungen in IndexedDB synchronisiert`);
     }
+    
+    return syncCount; // NEU: Return count
   } catch (error) {
     console.warn('Fehler beim Sync zu IndexedDB:', error);
+    return 0;
   }
 }
 
 // Hilfsfunktion: Synchronisiere alle Beobachtungen einer Art zu Firebase
+// NEU: Synchronisiert in ALLEN Gruppen des Benutzers, nicht nur der aktuellen
 async function syncAllSpeciesTickableToFirebase(birdName, tickableStatus) {
   try {
-    if (!window.FBA || !window.FBA.currentUser || !window.currentSelectedGroup || window.currentSelectedGroup === 'personal') {
+    if (!window.FBA || !window.FBA.currentUser || !window.FBD) {
+      console.log('   ℹ️ Firebase nicht verfügbar - Sync übersprungen');
       return; // Kein Firebase-Modus
     }
     
-    const groupId = window.currentSelectedGroup;
-    const groupObsRef = window.FBD.ref(`groups/${groupId}/observations`);
-    const snapshot = await groupObsRef.once('value');
+    const userId = window.FBA.currentUser.uid;
+    const userEmail = window.FBA.currentUser.email;
     
-    if (!snapshot.exists()) return;
+    console.log(`🔄 Synchronisiere "${birdName}" (tickable=${tickableStatus}) zu Firebase in ALLEN Gruppen...`);
     
-    const observations = snapshot.val();
-    const updates = {};
-    let syncCount = 0;
+    // Lade alle Gruppen
+    const groupsSnapshot = await window.FBD.ref('groups').once('value');
+    if (!groupsSnapshot.exists()) {
+      console.log('   ℹ️ Keine Gruppen gefunden');
+      return;
+    }
     
-    for (const [obsId, obs] of Object.entries(observations)) {
-      if (obs.bird === birdName && obs.tickable !== tickableStatus) {
-        updates[`groups/${groupId}/observations/${obsId}/tickable`] = tickableStatus;
-        updates[`groups/${groupId}/observations/${obsId}/updatedAt`] = new Date().toISOString();
-        syncCount++;
+    const groups = groupsSnapshot.val();
+    let totalSyncCount = 0;
+    
+    // Durchsuche ALLE Gruppen in denen der Benutzer Mitglied ist
+    for (const [groupKey, groupData] of Object.entries(groups)) {
+      // Prüfe ob Benutzer Mitglied ist
+      if (!groupData.members) continue;
+      const isMember = Object.values(groupData.members).some(member => 
+        member.uid === userId || member.id === userId
+      );
+      
+      if (!isMember) continue;
+      
+      console.log(`   👥 Synchronisiere Gruppe: ${groupData.name || groupKey}`);
+      
+      // Lade Beobachtungen dieser Gruppe
+      const groupObsRef = window.FBD.ref(`groups/${groupKey}/observations`);
+      const snapshot = await groupObsRef.once('value');
+      
+      if (!snapshot.exists()) {
+        console.log(`      ℹ️ Keine Beobachtungen in Gruppe`);
+        continue;
+      }
+      
+      const observations = snapshot.val();
+      const updates = {};
+      let groupSyncCount = 0;
+      
+      // Durchsuche alle Beobachtungen dieser Gruppe
+      for (const [obsId, obs] of Object.entries(observations)) {
+        // Nur Beobachtungen des aktuellen Benutzers
+        const isOwnObservation = 
+          obs.userId === userId || 
+          obs.createdBy === userEmail ||
+          (obs.userName && obs.userName === userEmail);
+        
+        if (!isOwnObservation) continue;
+        
+        // Prüfe ob es die gesuchte Vogelart ist UND Status unterschiedlich ist
+        if (obs.bird === birdName && obs.tickable !== tickableStatus) {
+          updates[`groups/${groupKey}/observations/${obsId}/tickable`] = tickableStatus;
+          updates[`groups/${groupKey}/observations/${obsId}/updatedAt`] = new Date().toISOString();
+          groupSyncCount++;
+        }
+      }
+      
+      // Batch-Update für diese Gruppe
+      if (Object.keys(updates).length > 0) {
+        await window.FBD.ref().update(updates);
+        console.log(`      ✅ ${groupSyncCount} Beobachtungen in Gruppe "${groupData.name || groupKey}" synchronisiert`);
+        totalSyncCount += groupSyncCount;
+      } else {
+        console.log(`      ℹ️ Keine passenden Beobachtungen in Gruppe gefunden`);
       }
     }
     
-    if (Object.keys(updates).length > 0) {
-      await window.FBD.ref().update(updates);
-      console.log(`🔄 ${syncCount} Beobachtungen in Firebase synchronisiert`);
+    if (totalSyncCount > 0) {
+      console.log(`✅ Gesamt: ${totalSyncCount} Beobachtungen in allen Gruppen synchronisiert`);
+      showNotification(`✅ ${totalSyncCount} Beobachtungen in Gruppen synchronisiert`, 3000);
+    } else {
+      console.log('   ℹ️ Keine passenden Beobachtungen in Gruppen gefunden');
     }
   } catch (error) {
     console.warn('Fehler beim Sync zu Firebase:', error);
@@ -32717,7 +32926,7 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
       if (newTickable === false) {
         setTimeout(() => {
           const birdName = obs.bird;
-          const confirmMessage = `Möchtest du ALLE Beobachtungen von "${birdName}" als nicht tickbar markieren?`;
+          const confirmMessage = `Möchtest du ALLE Beobachtungen von "${birdName}" als nicht tickbar markieren?\n\n✅ In dieser Gruppe\n✅ In ALLEN anderen Gruppen\n✅ Im privaten Bereich\n\nDies betrifft nur deine eigenen Beobachtungen.`;
           
           if (confirm(confirmMessage)) {
             markAllSpeciesAsNonTickable(birdName, groupId, true).then(async (count) => {
@@ -32813,7 +33022,7 @@ async function toggleTickable(observationId, forcePersonalMode = false) {
       if (obs.tickable === false) {
         setTimeout(() => {
           const birdName = obs.bird;
-          const confirmMessage = `Möchtest du ALLE Beobachtungen von "${birdName}" als nicht tickbar markieren?`;
+          const confirmMessage = `Möchtest du ALLE Beobachtungen von "${birdName}" als nicht tickbar markieren?\n\n✅ Im privaten Bereich\n✅ In ALLEN deinen Gruppen\n\nDies betrifft nur deine eigenen Beobachtungen.`;
           
           if (confirm(confirmMessage)) {
             markAllSpeciesAsNonTickable(birdName, null, false).then(async (count) => {
@@ -36469,6 +36678,99 @@ function updateSyncStatus(message) {
     }, 3000);
   }
 }
+
+// Test Ornitho-Import Verfügbarkeit (Debug-Funktion für Mobile)
+window.testOrnithoImportAvailability = async function() {
+  console.log('🧪 ORNITHO-IMPORT TEST GESTARTET');
+  
+  const results = [];
+  
+  // 1. Prüfe File API Support
+  const fileApiSupported = !!(window.File && window.FileReader && window.FileList && window.Blob);
+  results.push(`📁 File API: ${fileApiSupported ? '✅ Unterstützt' : '❌ NICHT unterstützt'}`);
+  console.log('   File API Support:', fileApiSupported);
+  
+  // 2. Prüfe Input Element
+  const ornithoInput = document.getElementById('ornithoImportFile');
+  results.push(`🎯 Input Element: ${ornithoInput ? '✅ Gefunden' : '❌ NICHT gefunden'}`);
+  console.log('   Input Element:', ornithoInput);
+  
+  if (ornithoInput) {
+    results.push(`   - ID: ${ornithoInput.id}`);
+    results.push(`   - Accept: ${ornithoInput.accept}`);
+    results.push(`   - Type: ${ornithoInput.type}`);
+    results.push(`   - Disabled: ${ornithoInput.disabled ? 'Ja' : 'Nein'}`);
+    results.push(`   - Display: ${window.getComputedStyle(ornithoInput).display}`);
+  }
+  
+  // 3. Prüfe Event Listener
+  const hasListener = ornithoInput && ornithoInput._listeners && ornithoInput._listeners.change;
+  results.push(`🎧 Event Listener: ${hasListener ? '✅ Registriert' : '⚠️ Status unbekannt'}`);
+  
+  // 4. Prüfe Button
+  const buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
+    btn.textContent.includes('Ornitho.de Import')
+  );
+  results.push(`🔘 Import Button: ${buttons.length > 0 ? '✅ Gefunden (' + buttons.length + ')' : '❌ NICHT gefunden'}`);
+  
+  if (buttons.length > 0) {
+    buttons.forEach((btn, i) => {
+      results.push(`   Button ${i + 1}:`);
+      results.push(`   - onclick: ${btn.onclick ? 'Ja' : 'Nein'}`);
+      results.push(`   - disabled: ${btn.disabled ? 'Ja' : 'Nein'}`);
+    });
+  }
+  
+  // 5. Prüfe triggerOrnithoImport Funktion
+  results.push(`⚡ Trigger-Funktion: ${typeof window.triggerOrnithoImport === 'function' ? '✅ Definiert' : '❌ NICHT definiert'}`);
+  
+  // 6. Mobile-spezifische Checks
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  results.push(`📱 Mobile Gerät: ${isMobile ? 'Ja' : 'Nein'}`);
+  results.push(`👆 Touch Support: ${'ontouchstart' in window ? 'Ja' : 'Nein'}`);
+  
+  // 7. Browser Info
+  results.push(`🌐 Browser: ${navigator.userAgent.match(/(chrome|safari|firefox|edge|opera)/i)?.[0] || 'Unbekannt'}`);
+  
+  // 8. Test File Input Click
+  if (ornithoInput) {
+    try {
+      // Versuche Click zu simulieren
+      const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      const dispatched = ornithoInput.dispatchEvent(clickEvent);
+      results.push(`🖱️ Click Test: ${dispatched ? '✅ Erfolgreich' : '⚠️ Event nicht dispatched'}`);
+      console.log('   Click Test Result:', dispatched);
+    } catch (error) {
+      results.push(`🖱️ Click Test: ❌ Fehler - ${error.message}`);
+      console.error('   Click Test Error:', error);
+    }
+  }
+  
+  // Zeige Ergebnisse
+  const message = `
+🧪 ORNITHO-IMPORT TEST ERGEBNISSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${results.join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${fileApiSupported && ornithoInput ? 
+  '✅ Grundfunktionalität sollte funktionieren!' : 
+  '❌ Problem gefunden - siehe Details oben'}
+
+${isMobile && fileApiSupported && ornithoInput ?
+  '\n💡 TIPP (Mobile): Falls der Button nicht reagiert,\nversuche einen Hard-Refresh (Seite neu laden).' :
+  ''}
+  `;
+  
+  alert(message);
+  console.log('🧪 Test abgeschlossen. Siehe Alert für Details.');
+};
 
 // Initialisiere Sync-Info beim Laden
 document.addEventListener('DOMContentLoaded', async () => {
