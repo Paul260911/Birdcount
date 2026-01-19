@@ -9691,6 +9691,446 @@
         </div>
       </div>
       
+      <!-- NEU: Landkreis-Filter -->
+      <div class="form-group">
+        <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+          🏘️ Landkreis-Filter
+          <span style="font-size: 11px; color: var(--muted); font-weight: normal;">Durchsuchbar</span>
+        </label>
+        <div style="background: var(--glass); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);">
+          <input 
+            type="text" 
+            id="listDistrictFilter" 
+            class="input" 
+            list="germanDistricts"
+            placeholder="Landkreis suchen..." 
+            style="width: 100%;"
+            autocomplete="off">
+          <datalist id="germanDistricts">
+            <option value="">Alle Landkreise</option>
+            <!-- Baden-Württemberg -->
+            <option value="Alb-Donau-Kreis">Alb-Donau-Kreis</option>
+            <option value="Baden-Baden">Baden-Baden</option>
+            <option value="Biberach">Biberach</option>
+            <option value="Böblingen">Böblingen</option>
+            <option value="Bodenseekreis">Bodenseekreis</option>
+            <option value="Breisgau-Hochschwarzwald">Breisgau-Hochschwarzwald</option>
+            <option value="Calw">Calw</option>
+            <option value="Emmendingen">Emmendingen</option>
+            <option value="Enzkreis">Enzkreis</option>
+            <option value="Esslingen">Esslingen</option>
+            <option value="Freiburg im Breisgau">Freiburg im Breisgau</option>
+            <option value="Freudenstadt">Freudenstadt</option>
+            <option value="Göppingen">Göppingen</option>
+            <option value="Heidelberg">Heidelberg</option>
+            <option value="Heidenheim">Heidenheim</option>
+            <option value="Heilbronn">Heilbronn</option>
+            <option value="Hohenlohekreis">Hohenlohekreis</option>
+            <option value="Karlsruhe">Karlsruhe</option>
+            <option value="Konstanz">Konstanz</option>
+            <option value="Lörrach">Lörrach</option>
+            <option value="Ludwigsburg">Ludwigsburg</option>
+            <option value="Main-Tauber-Kreis">Main-Tauber-Kreis</option>
+            <option value="Mannheim">Mannheim</option>
+            <option value="Neckar-Odenwald-Kreis">Neckar-Odenwald-Kreis</option>
+            <option value="Ortenaukreis">Ortenaukreis</option>
+            <option value="Ostalbkreis">Ostalbkreis</option>
+            <option value="Pforzheim">Pforzheim</option>
+            <option value="Rastatt">Rastatt</option>
+            <option value="Ravensburg">Ravensburg</option>
+            <option value="Rems-Murr-Kreis">Rems-Murr-Kreis</option>
+            <option value="Reutlingen">Reutlingen</option>
+            <option value="Rhein-Neckar-Kreis">Rhein-Neckar-Kreis</option>
+            <option value="Rottweil">Rottweil</option>
+            <option value="Schwäbisch Hall">Schwäbisch Hall</option>
+            <option value="Schwarzwald-Baar-Kreis">Schwarzwald-Baar-Kreis</option>
+            <option value="Sigmaringen">Sigmaringen</option>
+            <option value="Stuttgart">Stuttgart</option>
+            <option value="Tübingen">Tübingen</option>
+            <option value="Tuttlingen">Tuttlingen</option>
+            <option value="Ulm">Ulm</option>
+            <option value="Waldshut">Waldshut</option>
+            <option value="Zollernalbkreis">Zollernalbkreis</option>
+            
+            <!-- Bayern -->
+            <option value="Aichach-Friedberg">Aichach-Friedberg</option>
+            <option value="Altötting">Altötting</option>
+            <option value="Amberg">Amberg</option>
+            <option value="Amberg-Sulzbach">Amberg-Sulzbach</option>
+            <option value="Ansbach">Ansbach</option>
+            <option value="Aschaffenburg">Aschaffenburg</option>
+            <option value="Augsburg">Augsburg</option>
+            <option value="Bad Kissingen">Bad Kissingen</option>
+            <option value="Bad Tölz-Wolfratshausen">Bad Tölz-Wolfratshausen</option>
+            <option value="Bamberg">Bamberg</option>
+            <option value="Bayreuth">Bayreuth</option>
+            <option value="Berchtesgadener Land">Berchtesgadener Land</option>
+            <option value="Cham">Cham</option>
+            <option value="Coburg">Coburg</option>
+            <option value="Dachau">Dachau</option>
+            <option value="Deggendorf">Deggendorf</option>
+            <option value="Dillingen an der Donau">Dillingen an der Donau</option>
+            <option value="Dingolfing-Landau">Dingolfing-Landau</option>
+            <option value="Donau-Ries">Donau-Ries</option>
+            <option value="Ebersberg">Ebersberg</option>
+            <option value="Eichstätt">Eichstätt</option>
+            <option value="Erding">Erding</option>
+            <option value="Erlangen">Erlangen</option>
+            <option value="Erlangen-Höchstadt">Erlangen-Höchstadt</option>
+            <option value="Forchheim">Forchheim</option>
+            <option value="Freising">Freising</option>
+            <option value="Freyung-Grafenau">Freyung-Grafenau</option>
+            <option value="Fürstenfeldbruck">Fürstenfeldbruck</option>
+            <option value="Fürth">Fürth</option>
+            <option value="Garmisch-Partenkirchen">Garmisch-Partenkirchen</option>
+            <option value="Günzburg">Günzburg</option>
+            <option value="Haßberge">Haßberge</option>
+            <option value="Hof">Hof</option>
+            <option value="Ingolstadt">Ingolstadt</option>
+            <option value="Kaufbeuren">Kaufbeuren</option>
+            <option value="Kelheim">Kelheim</option>
+            <option value="Kempten">Kempten</option>
+            <option value="Kitzingen">Kitzingen</option>
+            <option value="Kronach">Kronach</option>
+            <option value="Kulmbach">Kulmbach</option>
+            <option value="Landsberg am Lech">Landsberg am Lech</option>
+            <option value="Landshut">Landshut</option>
+            <option value="Lichtenfels">Lichtenfels</option>
+            <option value="Lindau">Lindau</option>
+            <option value="Main-Spessart">Main-Spessart</option>
+            <option value="Memmingen">Memmingen</option>
+            <option value="Miesbach">Miesbach</option>
+            <option value="Miltenberg">Miltenberg</option>
+            <option value="Mühldorf am Inn">Mühldorf am Inn</option>
+            <option value="München">München</option>
+            <option value="Neuburg-Schrobenhausen">Neuburg-Schrobenhausen</option>
+            <option value="Neumarkt in der Oberpfalz">Neumarkt in der Oberpfalz</option>
+            <option value="Neustadt an der Aisch-Bad Windsheim">Neustadt an der Aisch-Bad Windsheim</option>
+            <option value="Neustadt an der Waldnaab">Neustadt an der Waldnaab</option>
+            <option value="Neu-Ulm">Neu-Ulm</option>
+            <option value="Nürnberg">Nürnberg</option>
+            <option value="Nürnberger Land">Nürnberger Land</option>
+            <option value="Oberallgäu">Oberallgäu</option>
+            <option value="Ostallgäu">Ostallgäu</option>
+            <option value="Passau">Passau</option>
+            <option value="Pfaffenhofen an der Ilm">Pfaffenhofen an der Ilm</option>
+            <option value="Regen">Regen</option>
+            <option value="Regensburg">Regensburg</option>
+            <option value="Rhön-Grabfeld">Rhön-Grabfeld</option>
+            <option value="Rosenheim">Rosenheim</option>
+            <option value="Roth">Roth</option>
+            <option value="Rottal-Inn">Rottal-Inn</option>
+            <option value="Schwabach">Schwabach</option>
+            <option value="Schwandorf">Schwandorf</option>
+            <option value="Schweinfurt">Schweinfurt</option>
+            <option value="Starnberg">Starnberg</option>
+            <option value="Straubing">Straubing</option>
+            <option value="Straubing-Bogen">Straubing-Bogen</option>
+            <option value="Tirschenreuth">Tirschenreuth</option>
+            <option value="Traunstein">Traunstein</option>
+            <option value="Unterallgäu">Unterallgäu</option>
+            <option value="Weilheim-Schongau">Weilheim-Schongau</option>
+            <option value="Weißenburg-Gunzenhausen">Weißenburg-Gunzenhausen</option>
+            <option value="Weiden in der Oberpfalz">Weiden in der Oberpfalz</option>
+            <option value="Würzburg">Würzburg</option>
+            <option value="Wunsiedel im Fichtelgebirge">Wunsiedel im Fichtelgebirge</option>
+            
+            <!-- Berlin -->
+            <option value="Berlin">Berlin</option>
+            
+            <!-- Brandenburg -->
+            <option value="Barnim">Barnim</option>
+            <option value="Brandenburg an der Havel">Brandenburg an der Havel</option>
+            <option value="Cottbus">Cottbus</option>
+            <option value="Dahme-Spreewald">Dahme-Spreewald</option>
+            <option value="Elbe-Elster">Elbe-Elster</option>
+            <option value="Frankfurt (Oder)">Frankfurt (Oder)</option>
+            <option value="Havelland">Havelland</option>
+            <option value="Märkisch-Oderland">Märkisch-Oderland</option>
+            <option value="Oberhavel">Oberhavel</option>
+            <option value="Oberspreewald-Lausitz">Oberspreewald-Lausitz</option>
+            <option value="Oder-Spree">Oder-Spree</option>
+            <option value="Ostprignitz-Ruppin">Ostprignitz-Ruppin</option>
+            <option value="Potsdam">Potsdam</option>
+            <option value="Potsdam-Mittelmark">Potsdam-Mittelmark</option>
+            <option value="Prignitz">Prignitz</option>
+            <option value="Spree-Neiße">Spree-Neiße</option>
+            <option value="Teltow-Fläming">Teltow-Fläming</option>
+            <option value="Uckermark">Uckermark</option>
+            
+            <!-- Bremen -->
+            <option value="Bremen">Bremen</option>
+            <option value="Bremerhaven">Bremerhaven</option>
+            
+            <!-- Hamburg -->
+            <option value="Hamburg">Hamburg</option>
+            
+            <!-- Hessen -->
+            <option value="Bergstraße">Bergstraße</option>
+            <option value="Darmstadt">Darmstadt</option>
+            <option value="Darmstadt-Dieburg">Darmstadt-Dieburg</option>
+            <option value="Frankfurt am Main">Frankfurt am Main</option>
+            <option value="Fulda">Fulda</option>
+            <option value="Gießen">Gießen</option>
+            <option value="Groß-Gerau">Groß-Gerau</option>
+            <option value="Hersfeld-Rotenburg">Hersfeld-Rotenburg</option>
+            <option value="Hochtaunuskreis">Hochtaunuskreis</option>
+            <option value="Kassel">Kassel</option>
+            <option value="Lahn-Dill-Kreis">Lahn-Dill-Kreis</option>
+            <option value="Limburg-Weilburg">Limburg-Weilburg</option>
+            <option value="Main-Kinzig-Kreis">Main-Kinzig-Kreis</option>
+            <option value="Main-Taunus-Kreis">Main-Taunus-Kreis</option>
+            <option value="Marburg-Biedenkopf">Marburg-Biedenkopf</option>
+            <option value="Odenwaldkreis">Odenwaldkreis</option>
+            <option value="Offenbach">Offenbach</option>
+            <option value="Offenbach am Main">Offenbach am Main</option>
+            <option value="Rheingau-Taunus-Kreis">Rheingau-Taunus-Kreis</option>
+            <option value="Schwalm-Eder-Kreis">Schwalm-Eder-Kreis</option>
+            <option value="Vogelsbergkreis">Vogelsbergkreis</option>
+            <option value="Waldeck-Frankenberg">Waldeck-Frankenberg</option>
+            <option value="Werra-Meißner-Kreis">Werra-Meißner-Kreis</option>
+            <option value="Wetteraukreis">Wetteraukreis</option>
+            <option value="Wiesbaden">Wiesbaden</option>
+            
+            <!-- Mecklenburg-Vorpommern -->
+            <option value="Landkreis Rostock">Landkreis Rostock</option>
+            <option value="Ludwigslust-Parchim">Ludwigslust-Parchim</option>
+            <option value="Mecklenburgische Seenplatte">Mecklenburgische Seenplatte</option>
+            <option value="Nordwestmecklenburg">Nordwestmecklenburg</option>
+            <option value="Rostock">Rostock</option>
+            <option value="Schwerin">Schwerin</option>
+            <option value="Vorpommern-Greifswald">Vorpommern-Greifswald</option>
+            <option value="Vorpommern-Rügen">Vorpommern-Rügen</option>
+            
+            <!-- Niedersachsen -->
+            <option value="Ammerland">Ammerland</option>
+            <option value="Aurich">Aurich</option>
+            <option value="Braunschweig">Braunschweig</option>
+            <option value="Celle">Celle</option>
+            <option value="Cloppenburg">Cloppenburg</option>
+            <option value="Cuxhaven">Cuxhaven</option>
+            <option value="Delmenhorst">Delmenhorst</option>
+            <option value="Diepholz">Diepholz</option>
+            <option value="Emden">Emden</option>
+            <option value="Emsland">Emsland</option>
+            <option value="Friesland">Friesland</option>
+            <option value="Gifhorn">Gifhorn</option>
+            <option value="Goslar">Goslar</option>
+            <option value="Göttingen">Göttingen</option>
+            <option value="Grafschaft Bentheim">Grafschaft Bentheim</option>
+            <option value="Hameln-Pyrmont">Hameln-Pyrmont</option>
+            <option value="Hannover">Hannover</option>
+            <option value="Region Hannover">Region Hannover</option>
+            <option value="Harburg">Harburg</option>
+            <option value="Heidekreis">Heidekreis</option>
+            <option value="Helmstedt">Helmstedt</option>
+            <option value="Hildesheim">Hildesheim</option>
+            <option value="Holzminden">Holzminden</option>
+            <option value="Landkreis Schaumburg">Landkreis Schaumburg</option>
+            <option value="Leer">Leer</option>
+            <option value="Lüchow-Dannenberg">Lüchow-Dannenberg</option>
+            <option value="Lüneburg">Lüneburg</option>
+            <option value="Nienburg (Weser)">Nienburg (Weser)</option>
+            <option value="Northeim">Northeim</option>
+            <option value="Oldenburg">Oldenburg</option>
+            <option value="Oldenburg (Oldenburg)">Oldenburg (Oldenburg)</option>
+            <option value="Osnabrück">Osnabrück</option>
+            <option value="Osterholz">Osterholz</option>
+            <option value="Peine">Peine</option>
+            <option value="Region Hannover">Region Hannover</option>
+            <option value="Rotenburg (Wümme)">Rotenburg (Wümme)</option>
+            <option value="Salzgitter">Salzgitter</option>
+            <option value="Stade">Stade</option>
+            <option value="Uelzen">Uelzen</option>
+            <option value="Vechta">Vechta</option>
+            <option value="Verden">Verden</option>
+            <option value="Wesermarsch">Wesermarsch</option>
+            <option value="Wilhelmshaven">Wilhelmshaven</option>
+            <option value="Wittmund">Wittmund</option>
+            <option value="Wolfenbüttel">Wolfenbüttel</option>
+            <option value="Wolfsburg">Wolfsburg</option>
+            
+            <!-- Nordrhein-Westfalen -->
+            <option value="Aachen">Aachen</option>
+            <option value="Bielefeld">Bielefeld</option>
+            <option value="Bochum">Bochum</option>
+            <option value="Bonn">Bonn</option>
+            <option value="Borken">Borken</option>
+            <option value="Bottrop">Bottrop</option>
+            <option value="Coesfeld">Coesfeld</option>
+            <option value="Dortmund">Dortmund</option>
+            <option value="Duisburg">Duisburg</option>
+            <option value="Düren">Düren</option>
+            <option value="Düsseldorf">Düsseldorf</option>
+            <option value="Ennepe-Ruhr-Kreis">Ennepe-Ruhr-Kreis</option>
+            <option value="Essen">Essen</option>
+            <option value="Euskirchen">Euskirchen</option>
+            <option value="Gelsenkirchen">Gelsenkirchen</option>
+            <option value="Gütersloh">Gütersloh</option>
+            <option value="Hagen">Hagen</option>
+            <option value="Hamm">Hamm</option>
+            <option value="Heinsberg">Heinsberg</option>
+            <option value="Herford">Herford</option>
+            <option value="Herne">Herne</option>
+            <option value="Hochsauerlandkreis">Hochsauerlandkreis</option>
+            <option value="Höxter">Höxter</option>
+            <option value="Kleve">Kleve</option>
+            <option value="Köln">Köln</option>
+            <option value="Krefeld">Krefeld</option>
+            <option value="Leverkusen">Leverkusen</option>
+            <option value="Lippe">Lippe</option>
+            <option value="Märkischer Kreis">Märkischer Kreis</option>
+            <option value="Mettmann">Mettmann</option>
+            <option value="Minden-Lübbecke">Minden-Lübbecke</option>
+            <option value="Mönchengladbach">Mönchengladbach</option>
+            <option value="Mülheim an der Ruhr">Mülheim an der Ruhr</option>
+            <option value="Münster">Münster</option>
+            <option value="Oberbergischer Kreis">Oberbergischer Kreis</option>
+            <option value="Oberhausen">Oberhausen</option>
+            <option value="Olpe">Olpe</option>
+            <option value="Paderborn">Paderborn</option>
+            <option value="Recklinghausen">Recklinghausen</option>
+            <option value="Remscheid">Remscheid</option>
+            <option value="Rhein-Erft-Kreis">Rhein-Erft-Kreis</option>
+            <option value="Rhein-Kreis Neuss">Rhein-Kreis Neuss</option>
+            <option value="Rhein-Sieg-Kreis">Rhein-Sieg-Kreis</option>
+            <option value="Rheinisch-Bergischer Kreis">Rheinisch-Bergischer Kreis</option>
+            <option value="Siegen-Wittgenstein">Siegen-Wittgenstein</option>
+            <option value="Soest">Soest</option>
+            <option value="Solingen">Solingen</option>
+            <option value="Steinfurt">Steinfurt</option>
+            <option value="Unna">Unna</option>
+            <option value="Viersen">Viersen</option>
+            <option value="Warendorf">Warendorf</option>
+            <option value="Wesel">Wesel</option>
+            <option value="Wuppertal">Wuppertal</option>
+            
+            <!-- Rheinland-Pfalz -->
+            <option value="Ahrweiler">Ahrweiler</option>
+            <option value="Altenkirchen (Westerwald)">Altenkirchen (Westerwald)</option>
+            <option value="Alzey-Worms">Alzey-Worms</option>
+            <option value="Bad Dürkheim">Bad Dürkheim</option>
+            <option value="Bad Kreuznach">Bad Kreuznach</option>
+            <option value="Bernkastel-Wittlich">Bernkastel-Wittlich</option>
+            <option value="Birkenfeld">Birkenfeld</option>
+            <option value="Cochem-Zell">Cochem-Zell</option>
+            <option value="Donnersbergkreis">Donnersbergkreis</option>
+            <option value="Eifelkreis Bitburg-Prüm">Eifelkreis Bitburg-Prüm</option>
+            <option value="Frankenthal (Pfalz)">Frankenthal (Pfalz)</option>
+            <option value="Germersheim">Germersheim</option>
+            <option value="Kaiserslautern">Kaiserslautern</option>
+            <option value="Koblenz">Koblenz</option>
+            <option value="Kusel">Kusel</option>
+            <option value="Landau in der Pfalz">Landau in der Pfalz</option>
+            <option value="Ludwigshafen am Rhein">Ludwigshafen am Rhein</option>
+            <option value="Mainz">Mainz</option>
+            <option value="Mainz-Bingen">Mainz-Bingen</option>
+            <option value="Mayen-Koblenz">Mayen-Koblenz</option>
+            <option value="Neustadt an der Weinstraße">Neustadt an der Weinstraße</option>
+            <option value="Neuwied">Neuwied</option>
+            <option value="Pirmasens">Pirmasens</option>
+            <option value="Rhein-Hunsrück-Kreis">Rhein-Hunsrück-Kreis</option>
+            <option value="Rhein-Lahn-Kreis">Rhein-Lahn-Kreis</option>
+            <option value="Rhein-Pfalz-Kreis">Rhein-Pfalz-Kreis</option>
+            <option value="Speyer">Speyer</option>
+            <option value="Südliche Weinstraße">Südliche Weinstraße</option>
+            <option value="Südwestpfalz">Südwestpfalz</option>
+            <option value="Trier">Trier</option>
+            <option value="Trier-Saarburg">Trier-Saarburg</option>
+            <option value="Vulkaneifel">Vulkaneifel</option>
+            <option value="Westerwaldkreis">Westerwaldkreis</option>
+            <option value="Worms">Worms</option>
+            <option value="Zweibrücken">Zweibrücken</option>
+            
+            <!-- Saarland -->
+            <option value="Merzig-Wadern">Merzig-Wadern</option>
+            <option value="Neunkirchen">Neunkirchen</option>
+            <option value="Regionalverband Saarbrücken">Regionalverband Saarbrücken</option>
+            <option value="Saarlouis">Saarlouis</option>
+            <option value="Saarpfalz-Kreis">Saarpfalz-Kreis</option>
+            <option value="St. Wendel">St. Wendel</option>
+            
+            <!-- Sachsen -->
+            <option value="Bautzen">Bautzen</option>
+            <option value="Chemnitz">Chemnitz</option>
+            <option value="Dresden">Dresden</option>
+            <option value="Erzgebirgskreis">Erzgebirgskreis</option>
+            <option value="Görlitz">Görlitz</option>
+            <option value="Leipzig">Leipzig</option>
+            <option value="Meißen">Meißen</option>
+            <option value="Mittelsachsen">Mittelsachsen</option>
+            <option value="Nordsachsen">Nordsachsen</option>
+            <option value="Sächsische Schweiz-Osterzgebirge">Sächsische Schweiz-Osterzgebirge</option>
+            <option value="Vogtlandkreis">Vogtlandkreis</option>
+            <option value="Zwickau">Zwickau</option>
+            
+            <!-- Sachsen-Anhalt -->
+            <option value="Altmarkkreis Salzwedel">Altmarkkreis Salzwedel</option>
+            <option value="Anhalt-Bitterfeld">Anhalt-Bitterfeld</option>
+            <option value="Börde">Börde</option>
+            <option value="Burgenlandkreis">Burgenlandkreis</option>
+            <option value="Dessau-Roßlau">Dessau-Roßlau</option>
+            <option value="Halle (Saale)">Halle (Saale)</option>
+            <option value="Harz">Harz</option>
+            <option value="Jerichower Land">Jerichower Land</option>
+            <option value="Magdeburg">Magdeburg</option>
+            <option value="Mansfeld-Südharz">Mansfeld-Südharz</option>
+            <option value="Saalekreis">Saalekreis</option>
+            <option value="Salzlandkreis">Salzlandkreis</option>
+            <option value="Stendal">Stendal</option>
+            <option value="Wittenberg">Wittenberg</option>
+            
+            <!-- Schleswig-Holstein -->
+            <option value="Dithmarschen">Dithmarschen</option>
+            <option value="Flensburg">Flensburg</option>
+            <option value="Herzogtum Lauenburg">Herzogtum Lauenburg</option>
+            <option value="Kiel">Kiel</option>
+            <option value="Lübeck">Lübeck</option>
+            <option value="Neumünster">Neumünster</option>
+            <option value="Nordfriesland">Nordfriesland</option>
+            <option value="Ostholstein">Ostholstein</option>
+            <option value="Pinneberg">Pinneberg</option>
+            <option value="Plön">Plön</option>
+            <option value="Rendsburg-Eckernförde">Rendsburg-Eckernförde</option>
+            <option value="Schleswig-Flensburg">Schleswig-Flensburg</option>
+            <option value="Segeberg">Segeberg</option>
+            <option value="Steinburg">Steinburg</option>
+            <option value="Stormarn">Stormarn</option>
+            
+            <!-- Thüringen -->
+            <option value="Altenburger Land">Altenburger Land</option>
+            <option value="Eichsfeld">Eichsfeld</option>
+            <option value="Eisenach">Eisenach</option>
+            <option value="Erfurt">Erfurt</option>
+            <option value="Gera">Gera</option>
+            <option value="Gotha">Gotha</option>
+            <option value="Greiz">Greiz</option>
+            <option value="Hildburghausen">Hildburghausen</option>
+            <option value="Ilm-Kreis">Ilm-Kreis</option>
+            <option value="Jena">Jena</option>
+            <option value="Kyffhäuserkreis">Kyffhäuserkreis</option>
+            <option value="Nordhausen">Nordhausen</option>
+            <option value="Saale-Holzland-Kreis">Saale-Holzland-Kreis</option>
+            <option value="Saale-Orla-Kreis">Saale-Orla-Kreis</option>
+            <option value="Saalfeld-Rudolstadt">Saalfeld-Rudolstadt</option>
+            <option value="Schmalkalden-Meiningen">Schmalkalden-Meiningen</option>
+            <option value="Sömmerda">Sömmerda</option>
+            <option value="Sonneberg">Sonneberg</option>
+            <option value="Suhl">Suhl</option>
+            <option value="Unstrut-Hainich-Kreis">Unstrut-Hainich-Kreis</option>
+            <option value="Wartburgkreis">Wartburgkreis</option>
+            <option value="Weimar">Weimar</option>
+            <option value="Weimarer Land">Weimarer Land</option>
+          </datalist>
+          <div style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+            Tippe um zu suchen, oder scrolle durch alle deutschen Landkreise
+          </div>
+          <div style="font-size: 11px; color: var(--accent); margin-top: 8px; padding: 8px; background: rgba(6, 182, 212, 0.1); border-radius: 6px; border-left: 3px solid var(--accent);">
+            ℹ️ <strong>Hinweis:</strong> Beim ersten Erstellen einer Liste mit Landkreis-Filter werden die Landkreise automatisch für deine Beobachtungen ermittelt. Dies kann einige Minuten dauern. Öffne die Browser-Konsole (F12), um den Fortschritt zu sehen.
+          </div>
+        </div>
+      </div>
+      
       <!-- NEU: Beobachtungsmodus -->
       <div class="form-group">
         <label class="form-label" style="display: flex; align-items: center;">
@@ -15149,7 +15589,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const store = transaction.objectStore(storeName);
         const request = store.put(data);
         
-        request.onsuccess = () => resolve(request.result);
+        request.onsuccess = () => {
+          // Invalidiere Cache wenn Daten gespeichert werden
+          if (storeName === 'observations' || storeName === 'folders') {
+            performanceCache.clear();
+            window.forceReload = true;
+          }
+          resolve(request.result);
+        };
         request.onerror = () => reject(request.error);
       });
     }
@@ -15172,6 +15619,59 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     // Alle Einträge aus einem Store laden
+    // ===== PERFORMANCE-OPTIMIERUNGEN =====
+    
+    // Debounce für häufige Updates
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Cache für berechnete Werte
+    const performanceCache = {
+      data: new Map(),
+      
+      set(key, value, ttl = 60000) {
+        this.data.set(key, {
+          value,
+          expires: Date.now() + ttl
+        });
+      },
+      
+      get(key) {
+        const item = this.data.get(key);
+        if (!item) return null;
+        if (Date.now() > item.expires) {
+          this.data.delete(key);
+          return null;
+        }
+        return item.value;
+      },
+      
+      clear() {
+        this.data.clear();
+      }
+    };
+    
+    // Lazy Update für Charts
+    function scheduleChartUpdate(updateFn) {
+      if (window.chartUpdateScheduled) return;
+      window.chartUpdateScheduled = true;
+      requestAnimationFrame(() => {
+        updateFn();
+        window.chartUpdateScheduled = false;
+      });
+    }
+    
+    // ===== ENDE PERFORMANCE-OPTIMIERUNGEN =====
+    
     function getAllFromIndexedDB(storeName, indexName = null, range = null) {
       return new Promise((resolve, reject) => {
         if (!db) {
@@ -16799,6 +17299,86 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
       }
       
+      // NEU: Filter nach Landkreis
+      if (list.filters && list.filters.district) {
+        console.log(`🏘️ Filtere nach Landkreis: "${list.filters.district}"`);
+        console.log(`📊 Anzahl Beobachtungen vor Landkreis-Filter: ${filtered.length}`);
+        
+        // Zähle wie viele Beobachtungen bereits Landkreis-Daten haben
+        const obsWithDistrict = filtered.filter(obs => obs.district).length;
+        console.log(`📍 Beobachtungen mit Landkreis-Daten: ${obsWithDistrict}/${filtered.length}`);
+        
+        // Prüfe ob Geocoding bereits fehlgeschlagen ist
+        const corsFailed = sessionStorage.getItem('geocoding_cors_failed');
+        if (corsFailed === 'true') {
+          console.warn('⚠️ Geocoding nicht verfügbar - filtere nur nach vorhandenen Landkreis-Daten');
+          // Zeige nur Beobachtungen, die bereits einen Landkreis haben
+          filtered = filtered.filter(obs => {
+            const match = obs.district && obs.district.toLowerCase().trim() === list.filters.district.toLowerCase().trim();
+            if (match) {
+              console.log(`  ✅ Match: "${obs.bird}" in "${obs.district}"`);
+            }
+            return match;
+          });
+        } else {
+          console.log('🔍 Geocoding verfügbar - ermittle fehlende Landkreise...');
+          // Wir müssen hier für jede Beobachtung den Landkreis ermitteln
+          const districtFiltered = [];
+          let processed = 0;
+          
+          for (const obs of filtered) {
+            processed++;
+            
+            if (obs.lat && obs.lng) {
+              // Prüfe ob bereits gespeichert
+              let obsDistrict = obs.district;
+              
+              // Falls noch nicht gespeichert, hole es vom Server
+              if (!obsDistrict) {
+                console.log(`  🔍 [${processed}/${filtered.length}] Ermittle Landkreis für "${obs.bird}" (${obs.lat}, ${obs.lng})...`);
+                try {
+                  obsDistrict = await getDistrictFromCoordinates(
+                    parseFloat(obs.lat),
+                    parseFloat(obs.lng)
+                  );
+                  
+                  // Speichere den Landkreis in der Beobachtung für zukünftige Verwendung
+                  if (obsDistrict) {
+                    obs.district = obsDistrict;
+                    await saveToIndexedDB('observations', obs);
+                    console.log(`    ✅ Landkreis ermittelt: "${obsDistrict}"`);
+                  } else {
+                    console.log(`    ⚠️ Kein Landkreis gefunden`);
+                  }
+                  
+                  // Verzögerung um API-Limits zu respektieren (nur bei neuen Abfragen)
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                  console.warn('    ❌ Fehler beim Ermitteln des Landkreises:', error);
+                  obsDistrict = null;
+                }
+              } else {
+                console.log(`  📍 [${processed}/${filtered.length}] "${obs.bird}" hat bereits Landkreis: "${obsDistrict}"`);
+              }
+              
+              // Vergleiche mit Filter (case-insensitive und normalisiert)
+              if (obsDistrict && obsDistrict.toLowerCase().trim() === list.filters.district.toLowerCase().trim()) {
+                console.log(`    ✅ MATCH! "${obs.bird}" liegt in "${obsDistrict}"`);
+                districtFiltered.push(obs);
+              } else if (obsDistrict) {
+                console.log(`    ❌ Kein Match: "${obsDistrict}" !== "${list.filters.district}"`);
+              }
+            } else {
+              console.log(`  ⚠️ [${processed}/${filtered.length}] "${obs.bird}" hat keine Koordinaten`);
+            }
+          }
+          
+          filtered = districtFiltered;
+        }
+        
+        console.log(`📊 Anzahl Beobachtungen nach Landkreis-Filter: ${filtered.length}`);
+      }
+      
       // NEU: Filter nach Polygon - KORRIGIERT
       if (list.polygon && Array.isArray(list.polygon) && list.polygon.length >= 3) {
         filtered = filterObservationsByPolygon(filtered, list.polygon);
@@ -16910,6 +17490,19 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // ---------- Modifizierte loadData Funktion ----------
     async function loadData() {
       try {
+        console.time('⏱️ loadData');
+        
+        // Check cache zuerst
+        const cacheKey = 'loadData_' + (window.currentSelectedGroup || 'personal');
+        const cached = performanceCache.get(cacheKey);
+        if (cached && !window.forceReload) {
+          console.log('📦 Verwende gecachte Daten');
+          updateUIWithData(cached.folderMap);
+          updateMarkersFromData();
+          console.timeEnd('⏱️ loadData');
+          return;
+        }
+        
         // Lade Daten aus IndexedDB
         const folders = await getAllFromIndexedDB('folders');
         const observations = await getAllObservationsWithDetails();
@@ -16928,12 +17521,22 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           folderMap[obs.folderId].observations.push(obs);
         });
         
-        // UI aktualisieren
+        // Cache speichern
+        performanceCache.set(cacheKey, { folderMap }, 30000); // 30 Sekunden
+        window.forceReload = false;
+        
+        // UI sofort aktualisieren
         updateUIWithData(folderMap);
         updateMarkersFromData();
-        updateChart();
-        updateAdvancedStatistics();
-        updateDashboard();
+        
+        // Charts/Statistiken lazy laden
+        scheduleChartUpdate(() => updateChart());
+        setTimeout(() => {
+          updateAdvancedStatistics();
+          updateDashboard();
+        }, 100);
+        
+        console.timeEnd('⏱️ loadData');
         
       } catch (error) {
         console.error('Fehler beim Laden der Daten:', error);
@@ -18661,8 +19264,170 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       // NEU: Bundesland-Filter zurücksetzen
       document.getElementById('listStateFilter').value = '';
       
+      // NEU: Landkreis-Filter zurücksetzen (jetzt ein Input-Feld)
+      document.getElementById('listDistrictFilter').value = '';
+      
       // NEU: Polygon-Anzeige initialisieren
       updatePolygonDisplay();
+    }
+    
+    // NEU: Befülle Landkreis-Filter Dropdown für Listen
+    async function populateListDistrictFilter() {
+      console.log('🔍 populateListDistrictFilter wird aufgerufen...');
+      
+      const select = document.getElementById('listDistrictFilter');
+      if (!select) {
+        console.error('❌ listDistrictFilter Element nicht gefunden!');
+        return;
+      }
+      
+      console.log('✅ Select-Element gefunden:', select);
+      
+      select.innerHTML = '<option value="">Alle Landkreise</option>';
+      
+      try {
+        // Hole alle Beobachtungen (sowohl lokal als auch aus Gruppen)
+        let observations = [];
+        
+        console.log('🔍 Lade persönliche Beobachtungen...');
+        // Persönliche Beobachtungen
+        try {
+          const personalObs = await getAllFromIndexedDB('observations');
+          observations = [...personalObs];
+          console.log(`✅ ${personalObs.length} persönliche Beobachtungen geladen`);
+        } catch (error) {
+          console.error('❌ Fehler beim Laden persönlicher Beobachtungen:', error);
+        }
+        
+        // Gruppen-Beobachtungen falls verfügbar
+        if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal') {
+          console.log('🔍 Lade Gruppen-Beobachtungen...');
+          try {
+            const groupData = await loadGroupData();
+            if (groupData && groupData.observations) {
+              observations = [...observations, ...groupData.observations];
+              console.log(`✅ ${groupData.observations.length} Gruppen-Beobachtungen hinzugefügt`);
+            }
+          } catch (error) {
+            console.log('⚠️ Keine Gruppen-Beobachtungen verfügbar:', error);
+          }
+        }
+        
+        console.log(`📊 Gesamt: ${observations.length} Beobachtungen`);
+        
+        // Sammle einzigartige Landkreise
+        const districts = new Set();
+        let obsWithDistrict = 0;
+        
+        observations.forEach(obs => {
+          if (obs.district) {
+            districts.add(obs.district);
+            obsWithDistrict++;
+          }
+        });
+        
+        console.log(`📍 ${obsWithDistrict} Beobachtungen haben Landkreis-Daten`);
+        console.log(`📍 Gefundene eindeutige Landkreise: ${districts.size}`);
+        console.log(`📍 Landkreise:`, Array.from(districts));
+        
+        // Sortiere alphabetisch
+        const sortedDistricts = Array.from(districts).sort();
+        
+        // Füge Optionen hinzu
+        sortedDistricts.forEach(district => {
+          const option = document.createElement('option');
+          option.value = district;
+          option.textContent = district;
+          select.appendChild(option);
+          console.log(`  ✅ Option hinzugefügt: ${district}`);
+        });
+        
+        if (sortedDistricts.length === 0) {
+          console.warn('⚠️ KEINE LANDKREISE GEFUNDEN!');
+          console.warn('   Tipp: Klicke auf "Landkreise für Beobachtungen aktualisieren"');
+          
+          // Zeige Hinweis
+          const hint = document.getElementById('districtFilterHint');
+          if (hint) hint.style.display = 'block';
+          
+        } else {
+          console.log(`✅ ${sortedDistricts.length} Landkreise erfolgreich hinzugefügt!`);
+          
+          // Verstecke Hinweis
+          const hint = document.getElementById('districtFilterHint');
+          if (hint) hint.style.display = 'none';
+        }
+        
+      } catch (error) {
+        console.error('❌ FEHLER beim Befüllen des Landkreis-Filters:', error);
+        console.error('   Stack:', error.stack);
+      }
+    }
+    
+    // NEU: Aktualisiere Landkreise für alle Beobachtungen (manuell vom Benutzer auslösbar)
+    async function updateAllDistrictsForObservations() {
+      const button = event.target;
+      const originalText = button.textContent;
+      
+      try {
+        button.disabled = true;
+        button.textContent = '⏳ Aktualisiere...';
+        
+        const observations = await getAllFromIndexedDB('observations');
+        let updatedCount = 0;
+        let totalToUpdate = observations.filter(obs => obs.lat && obs.lng && !obs.district).length;
+        
+        if (totalToUpdate === 0) {
+          showNotification('✅ Alle Beobachtungen haben bereits Landkreis-Informationen!', 3000);
+          button.disabled = false;
+          button.textContent = originalText;
+          return;
+        }
+        
+        showNotification(`🔄 Aktualisiere ${totalToUpdate} Beobachtungen...`, 3000);
+        
+        for (const obs of observations) {
+          if (obs.lat && obs.lng && !obs.district) {
+            try {
+              const district = await getDistrictFromCoordinates(
+                parseFloat(obs.lat),
+                parseFloat(obs.lng)
+              );
+              
+              if (district) {
+                obs.district = district;
+                obs.updatedAt = new Date().toISOString();
+                await saveToIndexedDB('observations', obs);
+                updatedCount++;
+                
+                // Update Button Text mit Fortschritt
+                button.textContent = `⏳ ${updatedCount}/${totalToUpdate}...`;
+              }
+              
+              // Verzögerung um API-Limits zu respektieren
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            } catch (error) {
+              console.error('Fehler beim Aktualisieren:', error);
+            }
+          }
+        }
+        
+        button.disabled = false;
+        button.textContent = originalText;
+        
+        if (updatedCount > 0) {
+          showNotification(`✅ ${updatedCount} Beobachtungen mit Landkreis-Information aktualisiert!`, 4000);
+          // Aktualisiere das Dropdown
+          await populateListDistrictFilter();
+        } else {
+          showNotification('⚠️ Keine Landkreise konnten geladen werden. Prüfe die Internetverbindung.', 4000);
+        }
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren der Landkreise:', error);
+        button.disabled = false;
+        button.textContent = originalText;
+        showNotification('❌ Fehler beim Aktualisieren der Landkreise', 3000);
+      }
     }
     
     function closeCreateListModal() {
@@ -18800,6 +19565,12 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const selectedState = document.getElementById('listStateFilter').value;
       if (selectedState) {
         filters.state = selectedState;
+      }
+      
+      // NEU: Landkreis-Filter hinzufügen
+      const selectedDistrict = document.getElementById('listDistrictFilter').value;
+      if (selectedDistrict) {
+        filters.district = selectedDistrict;
       }
       
       listData.filters = filters;
@@ -19359,6 +20130,16 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       } else {
         document.getElementById('listTimeRangeFrom').value = '';
         document.getElementById('listTimeRangeTo').value = '';
+      }
+      
+      // NEU: Bundesland-Filter setzen
+      if (list.filters && list.filters.state) {
+        document.getElementById('listStateFilter').value = list.filters.state;
+      }
+      
+      // NEU: Landkreis-Filter setzen
+      if (list.filters && list.filters.district) {
+        document.getElementById('listDistrictFilter').value = list.filters.district;
       }
       
       showNotification('Liste zum Bearbeiten geladen', 2000);
@@ -21308,6 +22089,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const timeRangeSlider = document.getElementById('timeRangeSlider');
       const timeRangeValue = document.getElementById('timeRangeValue');
       
+      // Erstelle debounced Version von updateChart für Slider
+      const debouncedUpdateChart = debounce(updateChart, 300);
+      
       timeRangeSlider.addEventListener('input', function() {
         chartSettings.customDays = parseInt(this.value);
         chartSettings.mode = 'custom';
@@ -21320,7 +22104,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           timeRangeValue.textContent = `${chartSettings.customDays} Tage`;
         }
         
-        updateChart();
+        debouncedUpdateChart();
       });
     }
     
@@ -21332,6 +22116,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     async function updateChart() {
+      console.time('⏱️ updateChart');
+      
       const canvas = document.getElementById('chartCanvas');
       const ctx = canvas.getContext('2d');
       
@@ -21348,10 +22134,15 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const onlySelffound = selffoundFilterCheckbox ? selffoundFilterCheckbox.checked : false;
       const onlyNewSpecies = newSpeciesFilterCheckbox ? newSpeciesFilterCheckbox.checked : false;
       
-      // Daten sammeln mit Status-Filtern
-      const allObservations = await getAllObservationsWithDetails();
-      // NEU: Filtere Nullmeldungen grundsätzlich aus
-      let observations = allObservations.filter(obs => isValidObservation(obs));
+      // Cache-Key basierend auf Filtern
+      const cacheKey = `chartData_${onlyTickable}_${onlySelffound}_${onlyNewSpecies}_${document.getElementById('timeRangeSlider')?.value}`;
+      let observations = performanceCache.get(cacheKey);
+      
+      if (!observations) {
+        // Daten sammeln mit Status-Filtern
+        const allObservations = await getAllObservationsWithDetails();
+        // NEU: Filtere Nullmeldungen grundsätzlich aus
+        observations = allObservations.filter(obs => isValidObservation(obs));
       
       // NEU: Filter für nur neue Arten (Erstbeobachtungen im Zeitraum)
       if (onlyNewSpecies) {
@@ -21415,6 +22206,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       if (onlySelffound) {
         observations = observations.filter(obs => obs.selffound === true);
       }
+      
+      // Cache gefilterte Daten
+      performanceCache.set(cacheKey, observations, 30000);
+    } // Ende if (!observations) - wenn gecacht, überspringen wir alles oben
       
       // Update Status-Filter Info
       const statusFilterInfo = document.getElementById('statusFilterInfo');
@@ -21568,6 +22363,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           }
         }
       });
+      
+      console.timeEnd('⏱️ updateChart');
     }
     
     function getChartData(observations) {
@@ -26645,6 +27442,12 @@ var updateUI=function(u){
   var select = document.getElementById("fbGroupSelect");
   if(select && !window.groupSelectListenerAdded){
     select.addEventListener("change", function(){
+      // WICHTIG: Ignoriere change-Event wenn wir gerade eine gespeicherte Auswahl wiederherstellen
+      if(window.restoringGroupSelection){
+        console.log("⏭️ Ignoriere change-Event (Wiederherstellung läuft)");
+        return;
+      }
+      
       var selectedGroup = select.value;
       console.log("🔄 Gruppe gewechselt zu:", selectedGroup);
       
@@ -26897,8 +27700,13 @@ var loadUserGroups=function(u){
     // Stelle gespeicherte Auswahl wieder her
     if(validSavedGroup && savedGroup !== "personal"){
       console.log("🔄 Stelle gespeicherte Gruppe wieder her:", savedGroup);
+      
+      // WICHTIG: Setze Flag um zu verhindern, dass der change-Listener triggert
+      window.restoringGroupSelection = true;
       select.value = savedGroup;
       window.currentSelectedGroup = savedGroup;
+      setTimeout(() => { window.restoringGroupSelection = false; }, 100);
+      
       console.log("💾 window.currentSelectedGroup gesetzt auf:", savedGroup);
       
       // Prüfe ob User Admin ist und zeige Löschen/Umbenennen-Button
