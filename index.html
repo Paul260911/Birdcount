@@ -13437,14 +13437,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           
           if (folder.lists) {
             for (const [listId, list] of Object.entries(folder.lists)) {
-              // NEU: Nur tickable Beobachtungen zählen (konsistent mit addListToComparisonFolder)
-              const tickableObs = (list.observations || []).filter(obs => obs.tickable !== false);
-              const obsCount = tickableObs.length;
-              const speciesCount = countUniqueSpecies(tickableObs);
+              // Zähle ALLE Beobachtungen und Arten (auch nicht-tickbare)
+              const allObs = list.observations || [];
+              const obsCount = allObs.length;
+              const speciesCount = countUniqueSpecies(allObs);
               
               totalObservations += obsCount;
               // Füge normalisierte Arten zum Gesamt-Set hinzu
-              tickableObs.forEach(obs => {
+              allObs.forEach(obs => {
                 const normalized = normalizeBirdName(obs.bird);
                 if (normalized) totalSpecies.add(normalized);
               });
@@ -13602,8 +13602,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         for (const list of lists) {
           // Berechne Statistiken für diese Liste
           const filteredObs = await filterObservationsByList(observations, list);
-          const tickableObs = filteredObs.filter(o => o.tickable !== false);
-          const speciesCount = countUniqueSpecies(tickableObs);
+          // Zähle ALLE Arten (auch nicht-tickbare)
+          const speciesCount = countUniqueSpecies(filteredObs);
           
           html += `
             <div class="card" style="cursor:pointer;transition:all 0.2s;" onclick="addListToComparisonFolder('${list.id}')">
@@ -14536,8 +14536,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const observations = listData.observations || [];
         // NEU: Filtere Nullmeldungen aus
         const validObs = observations.filter(o => isValidObservation(o));
-        const tickableObs = validObs.filter(o => o.tickable !== false);
-        const speciesCount = countUniqueSpecies(tickableObs);
+        // Zähle ALLE Arten (auch nicht-tickbare)
+        const speciesCount = countUniqueSpecies(validObs);
         const daysCount = new Set(validObs.map(o => o.date)).size;
         
         document.getElementById('comparisonListObsCount').textContent = validObs.length;
@@ -19209,12 +19209,11 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         
         const filteredObs = await filterObservationsByList(observations, list);
         
-        // Zähle nur tickbare Arten für speciesCount
-        const tickableObs = filteredObs.filter(o => o.tickable !== false);
+        // Zähle ALLE Arten (auch nicht-tickbare) für speciesCount
         
         return {
           observationCount: filteredObs.length, // Alle Beobachtungen
-          speciesCount: countUniqueSpecies(tickableObs), // Normalisierte Zählung
+          speciesCount: countUniqueSpecies(filteredObs), // Alle Arten (auch nicht-tickbare)
           daysCount: new Set(filteredObs.map(o => o.date)).size
         };
       } catch (error) {
@@ -22938,23 +22937,24 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       // im Gruppenmodus ALLE Gruppen-Beobachtungen lädt (nicht nur eigene)
       let allObservations = await getAllObservationsWithDetails();
       
-      // Filter: Nur tickbare Beobachtungen UND keine Nullmeldungen für Statistiken
-      const observations = allObservations.filter(obs => 
-        obs.tickable !== false && isValidObservation(obs)
-      );
+      // Filter: Keine Nullmeldungen für Statistiken
+      const validObservations = allObservations.filter(obs => isValidObservation(obs));
+      
+      // Für Beobachtungszahlen: Nur tickbare
+      const tickableObservations = validObservations.filter(obs => obs.tickable !== false);
       
       const stats = {
-        totalObservations: observations.length,
-        uniqueSpecies: countUniqueSpecies(observations),
-        uniqueDates: new Set(observations.map(o => o.date)).size,
+        totalObservations: tickableObservations.length, // Nur tickbare Beobachtungen
+        uniqueSpecies: countUniqueSpecies(validObservations), // ALLE Arten (auch nicht-tickbare)
+        uniqueDates: new Set(tickableObservations.map(o => o.date)).size,
         byMonth: {},
         bySpecies: {},
         topSpecies: []
       };
       
-      if (observations.length === 0) return stats;
+      if (tickableObservations.length === 0) return stats;
       
-      observations.forEach(obs => {
+      tickableObservations.forEach(obs => {
         if (obs.date) {
           const month = obs.date.substring(5, 7);
           if (!stats.byMonth[month]) stats.byMonth[month] = 0;
@@ -22972,9 +22972,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         .slice(0, 5)
         .map(([name, count]) => ({ name, count }));
       
-      const uniqueDates = [...new Set(observations.map(o => o.date).filter(d => d))];
+      const uniqueDates = [...new Set(tickableObservations.map(o => o.date).filter(d => d))];
       stats.averagePerDay = uniqueDates.length > 0 ? 
-        (observations.length / uniqueDates.length).toFixed(1) : 0;
+        (tickableObservations.length / uniqueDates.length).toFixed(1) : 0;
       
       return stats;
     }
@@ -24652,12 +24652,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             
             userStats[userId].observations.push(obsWithId);
             
-            // Zähle nur tickbare Arten für species Set
-            if (obs.tickable !== false) {
-              const normalizedBirdName = normalizeBirdName(obs.bird);
-              if (normalizedBirdName) {
-                userStats[userId].species.add(normalizedBirdName);
-              }
+            // Zähle ALLE Arten (auch nicht-tickbare) für species Set
+            const normalizedBirdName = normalizeBirdName(obs.bird);
+            if (normalizedBirdName) {
+              userStats[userId].species.add(normalizedBirdName);
             }
             
             if (obs.photo) userStats[userId].photosCount++;
