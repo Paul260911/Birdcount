@@ -13436,15 +13436,20 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           let listStats = [];
           
           if (folder.lists) {
+            // Prüfe Modus einmal für alle Listen
+            const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+            
             for (const [listId, list] of Object.entries(folder.lists)) {
-              // Zähle ALLE Beobachtungen und Arten (auch nicht-tickbare)
               const allObs = list.observations || [];
+              // Im Gruppenmodus: alle Arten, im Privatmodus: nur tickbare
+              const relevantObs = isGroupMode ? allObs : allObs.filter(obs => obs.tickable !== false);
+              
               const obsCount = allObs.length;
-              const speciesCount = countUniqueSpecies(allObs);
+              const speciesCount = countUniqueSpecies(relevantObs);
               
               totalObservations += obsCount;
               // Füge normalisierte Arten zum Gesamt-Set hinzu
-              allObs.forEach(obs => {
+              relevantObs.forEach(obs => {
                 const normalized = normalizeBirdName(obs.bird);
                 if (normalized) totalSpecies.add(normalized);
               });
@@ -13602,8 +13607,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         for (const list of lists) {
           // Berechne Statistiken für diese Liste
           const filteredObs = await filterObservationsByList(observations, list);
-          // Zähle ALLE Arten (auch nicht-tickbare)
-          const speciesCount = countUniqueSpecies(filteredObs);
+          // Im Gruppenmodus: alle Arten, im Privatmodus: nur tickbare
+          const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+          const relevantObs = isGroupMode ? filteredObs : filteredObs.filter(o => o.tickable !== false);
+          const speciesCount = countUniqueSpecies(relevantObs);
           
           html += `
             <div class="card" style="cursor:pointer;transition:all 0.2s;" onclick="addListToComparisonFolder('${list.id}')">
@@ -14536,8 +14543,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const observations = listData.observations || [];
         // NEU: Filtere Nullmeldungen aus
         const validObs = observations.filter(o => isValidObservation(o));
-        // Zähle ALLE Arten (auch nicht-tickbare)
-        const speciesCount = countUniqueSpecies(validObs);
+        // Im Gruppenmodus: alle Arten, im Privatmodus: nur tickbare
+        const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+        const relevantObs = isGroupMode ? validObs : validObs.filter(o => o.tickable !== false);
+        const speciesCount = countUniqueSpecies(relevantObs);
         const daysCount = new Set(validObs.map(o => o.date)).size;
         
         document.getElementById('comparisonListObsCount').textContent = validObs.length;
@@ -19209,11 +19218,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         
         const filteredObs = await filterObservationsByList(observations, list);
         
-        // Zähle ALLE Arten (auch nicht-tickbare) für speciesCount
+        // Im Gruppenmodus: ALLE Arten zählen, im Privatmodus: nur tickbare Arten
+        const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+        const tickableObs = filteredObs.filter(o => o.tickable !== false);
         
         return {
           observationCount: filteredObs.length, // Alle Beobachtungen
-          speciesCount: countUniqueSpecies(filteredObs), // Alle Arten (auch nicht-tickbare)
+          speciesCount: countUniqueSpecies(isGroupMode ? filteredObs : tickableObs),
           daysCount: new Set(filteredObs.map(o => o.date)).size
         };
       } catch (error) {
@@ -22943,9 +22954,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       // Für Beobachtungszahlen: Nur tickbare
       const tickableObservations = validObservations.filter(obs => obs.tickable !== false);
       
+      // Prüfe ob im Gruppenmodus
+      const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+      
       const stats = {
         totalObservations: tickableObservations.length, // Nur tickbare Beobachtungen
-        uniqueSpecies: countUniqueSpecies(validObservations), // ALLE Arten (auch nicht-tickbare)
+        // Im Gruppenmodus: ALLE Arten zählen, im Privatmodus: nur tickbare Arten
+        uniqueSpecies: countUniqueSpecies(isGroupMode ? validObservations : tickableObservations),
         uniqueDates: new Set(tickableObservations.map(o => o.date)).size,
         byMonth: {},
         bySpecies: {},
