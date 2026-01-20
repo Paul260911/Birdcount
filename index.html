@@ -8854,10 +8854,13 @@
                   <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--accent),#0891b2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 4px 12px rgba(6,182,212,0.3);">
                     👥
                   </div>
-                  <div>
+                  <div style="flex:1;">
                     <h3 style="margin:0;font-size:20px;font-weight:700;">Mitglieder</h3>
                     <p style="margin:4px 0 0 0;font-size:13px;color:var(--muted);">Profile und Statistiken aller Gruppenmitglieder</p>
                   </div>
+                  <button class="small-btn" onclick="forceRefreshMemberStats()" style="background:var(--accent);padding:8px 16px;" title="Statistiken neu berechnen">
+                    🔄 Aktualisieren
+                  </button>
                 </div>
                 
                 <div id="membersProfileGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%, 320px),1fr));gap:16px;">
@@ -28402,6 +28405,31 @@ function switchCompareTab(tab) {
   }
 }
 
+// Force Refresh Member Stats - Neuberechnung erzwingen
+async function forceRefreshMemberStats() {
+  console.log('🔄 Force Refresh: Berechne Mitglieder-Statistiken neu...');
+  
+  const container = document.getElementById('membersProfileGrid');
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);"><div style="font-size:32px;margin-bottom:12px;">⏳</div>Statistiken werden neu berechnet...</div>';
+  
+  try {
+    // Lade Gruppendaten frisch von Firebase (kein Cache)
+    window.currentGroup = await loadFullGroupData();
+    
+    // Rendere Mitglieder-Profile neu
+    await renderMembersProfiles();
+    
+    if (typeof showNotification === 'function') {
+      showNotification('✅ Statistiken aktualisiert');
+    }
+    
+    console.log('✅ Mitglieder-Statistiken erfolgreich neu berechnet');
+  } catch (error) {
+    console.error('❌ Fehler beim Neu-Berechnen:', error);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger);">❌ Fehler beim Aktualisieren. Bitte versuche es erneut.</div>';
+  }
+}
+
 // Mitglieder-Profile rendern
 async function renderMembersProfiles() {
   console.log('👥 Lade Mitglieder-Profile...');
@@ -28466,6 +28494,9 @@ async function renderMembersProfiles() {
     console.log(`   📊 ${groupObs.length} Gruppenbeobachtungen + ${listObs.length} Listenbeobachtungen = ${memberObs.length} total`);
     
     // Nur gültige Beobachtungen für die Arten-Zählung verwenden (keine Nullmeldungen, nur tickbare Arten)
+    const nonTickableObs = memberObs.filter(o => o.tickable === false);
+    console.log(`   ⚠️ ${nonTickableObs.length} nicht-tickbare Beobachtungen gefunden:`, nonTickableObs.map(o => o.bird).slice(0, 5));
+    
     const validMemberObs = memberObs.filter(o => {
       // Prüfe ob es eine gültige Beobachtung ist (keine Nullmeldung)
       if (!isValidObservation(o)) return false;
@@ -28474,9 +28505,11 @@ async function renderMembersProfiles() {
       return true;
     });
     
+    const allSpeciesBeforeFilter = new Set(memberObs.map(o => o.bird).filter(Boolean)).size;
     const uniqueSpecies = new Set(validMemberObs.map(o => o.bird).filter(Boolean)).size;
     
     console.log(`   🐦 ${uniqueSpecies} tickbare Arten (ohne Nullmeldungen) von ${validMemberObs.length} gültigen Beobachtungen`);
+    console.log(`   📉 Gefiltert: ${allSpeciesBeforeFilter} Arten gesamt → ${uniqueSpecies} tickbare Arten (${allSpeciesBeforeFilter - uniqueSpecies} nicht-tickbare entfernt)`);
     
     // Streak berechnen - nur gültige Beobachtungen zählen
     const dates = [...new Set(validMemberObs.map(o => o.date).filter(Boolean))].sort();
