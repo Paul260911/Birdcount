@@ -6021,13 +6021,13 @@
                     <div style="font-size:28px;font-weight:700;color:var(--accent);" id="heroTotalObs">0</div>
                     <div style="font-size:12px;color:var(--soft);margin-top:4px;">Beobachtungen</div>
                   </div>
-                  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;">
+                  <div onclick="showAllSpeciesModal()" style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(124,58,237,0.3)';this.style.borderColor='rgba(124,58,237,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='rgba(255,255,255,0.1)'">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
                       <span style="font-size:14px;">👥</span>
                       <span style="background:rgba(124,58,237,0.2);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;color:var(--accent-2);text-transform:uppercase;letter-spacing:0.5px;border:1px solid rgba(124,58,237,0.4);">Gruppe</span>
                     </div>
                     <div style="font-size:28px;font-weight:700;color:var(--accent-2);" id="heroSpeciesCount">0</div>
-                    <div style="font-size:12px;color:var(--soft);margin-top:4px;">Arten gesichtet</div>
+                    <div style="font-size:12px;color:var(--soft);margin-top:4px;">Arten gesichtet 👁️</div>
                   </div>
                   <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:visible;">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
@@ -6950,6 +6950,16 @@
               <div class="feature-section">
                 <h3>🗺️ Deine Top-Beobachtungsstandorte</h3>
                 <p class="muted">Wo hast du die meisten Arten gesehen?</p>
+                
+                <!-- Sortier-Buttons -->
+                <div style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;">
+                  <button class="small-btn active" id="sortBySpeciesBtn" onclick="sortHotspots('species')" style="background: var(--accent); color: white;">
+                    🦅 Nach Arten
+                  </button>
+                  <button class="small-btn" id="sortByObservationsBtn" onclick="sortHotspots('observations')" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);">
+                    🔢 Nach Beobachtungen
+                  </button>
+                </div>
                 
                 <div id="hotspotsList" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
                   <!-- Wird dynamisch gefüllt -->
@@ -39003,7 +39013,10 @@ async function loadArtenTimeline() {
   container.innerHTML += '</div>';
 }
 
-// Hotspots
+// Hotspots - Globale Variable zum Speichern der Hotspot-Daten
+let globalHotspotsData = [];
+let currentHotspotSort = 'species'; // Default: Nach Arten sortiert
+
 async function loadHotspots() {
   const observations = (await getOwnObservationsForStats()).filter(obs => obs.location);
   
@@ -39025,13 +39038,57 @@ async function loadHotspots() {
     locationStats[o.location].species.add(o.bird);
   });
   
-  const hotspots = Object.values(locationStats).map(stat => ({
+  globalHotspotsData = Object.values(locationStats).map(stat => ({
     location: stat.location,
     count: stat.count,
     species: stat.species.size
-  })).sort((a, b) => b.species - a.species).slice(0, 10);
+  }));
   
+  // Rendere mit aktueller Sortierung
+  renderHotspots(currentHotspotSort);
+}
+
+// Funktion zum Sortieren der Hotspots
+function sortHotspots(sortBy) {
+  currentHotspotSort = sortBy;
+  
+  // Update Button-Styles
+  document.getElementById('sortBySpeciesBtn').className = 'small-btn';
+  document.getElementById('sortByObservationsBtn').className = 'small-btn';
+  
+  if (sortBy === 'species') {
+    document.getElementById('sortBySpeciesBtn').className = 'small-btn active';
+    document.getElementById('sortBySpeciesBtn').style.cssText = 'background: var(--accent); color: white;';
+    document.getElementById('sortByObservationsBtn').style.cssText = 'background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);';
+  } else {
+    document.getElementById('sortByObservationsBtn').className = 'small-btn active';
+    document.getElementById('sortByObservationsBtn').style.cssText = 'background: var(--accent); color: white;';
+    document.getElementById('sortBySpeciesBtn').style.cssText = 'background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);';
+  }
+  
+  renderHotspots(sortBy);
+}
+
+// Funktion zum Rendern der Hotspots
+function renderHotspots(sortBy) {
   const container = document.getElementById('hotspotsList');
+  
+  if (!globalHotspotsData || globalHotspotsData.length === 0) {
+    container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Standortdaten verfügbar</div>';
+    return;
+  }
+  
+  // Sortiere die Daten
+  let sortedHotspots = [...globalHotspotsData];
+  if (sortBy === 'species') {
+    sortedHotspots.sort((a, b) => b.species - a.species);
+  } else {
+    sortedHotspots.sort((a, b) => b.count - a.count);
+  }
+  
+  // Nehme nur die Top 10
+  const hotspots = sortedHotspots.slice(0, 10);
+  
   container.innerHTML = '';
   
   hotspots.forEach((hotspot, index) => {
@@ -39066,13 +39123,13 @@ async function loadHotspots() {
             📍 ${hotspot.location}
           </div>
           <div style="font-size: 13px; color: var(--muted);">
-            ${hotspot.count} Beobachtungen
+            ${hotspot.count} Beobachtungen · ${hotspot.species} Arten
           </div>
         </div>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 24px; font-weight: 700; color: var(--accent);">${hotspot.species}</div>
-        <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Arten</div>
+        <div style="font-size: 24px; font-weight: 700; color: var(--accent);">${sortBy === 'species' ? hotspot.species : hotspot.count}</div>
+        <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">${sortBy === 'species' ? 'Arten' : 'Beobachtungen'}</div>
       </div>
     `;
     
@@ -41320,6 +41377,220 @@ function closeHeatmapModal() {
     modal.style.display = 'none';
   }
 }
+
+// Modal zum Anzeigen aller gesichteten Arten
+async function showAllSpeciesModal() {
+  const allObservations = await getAllObservationsWithDetails();
+  const observations = allObservations.filter(obs => 
+    obs.tickable !== false && isValidObservation(obs)
+  );
+  
+  if (observations.length === 0) {
+    showNotification('Keine Beobachtungen verfügbar', 2000);
+    return;
+  }
+  
+  // Gruppiere nach Arten und sammle Statistiken
+  const speciesStats = {};
+  observations.forEach(obs => {
+    if (!speciesStats[obs.bird]) {
+      speciesStats[obs.bird] = {
+        name: obs.bird,
+        count: 0,
+        firstSeen: obs.date,
+        lastSeen: obs.date,
+        locations: new Set()
+      };
+    }
+    speciesStats[obs.bird].count++;
+    if (obs.date < speciesStats[obs.bird].firstSeen) {
+      speciesStats[obs.bird].firstSeen = obs.date;
+    }
+    if (obs.date > speciesStats[obs.bird].lastSeen) {
+      speciesStats[obs.bird].lastSeen = obs.date;
+    }
+    if (obs.location) {
+      speciesStats[obs.bird].locations.add(obs.location);
+    }
+  });
+  
+  // Sortiere nach Namen
+  const sortedSpecies = Object.values(speciesStats).sort((a, b) => 
+    a.name.localeCompare(b.name, 'de')
+  );
+  
+  // Modal erstellen
+  let modal = document.getElementById('allSpeciesModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'allSpeciesModal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2,6,23,0.95);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    `;
+    modal.onclick = (e) => {
+      if (e.target === modal) closeAllSpeciesModal();
+    };
+    document.body.appendChild(modal);
+  }
+  
+  // Modal-Inhalt erstellen
+  let html = `
+    <div style="background: var(--card); padding: 32px; border-radius: 20px; max-width: 1000px; width: 95%; max-height: 85vh; overflow-y: auto; position: relative; border: 2px solid rgba(124,58,237,0.3); box-shadow: 0 24px 80px rgba(124,58,237,0.4);">
+      <button onclick="closeAllSpeciesModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 32px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--muted)'; this.style.transform='rotate(0deg)'">×</button>
+      
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 48px; margin-bottom: 12px;">🦅</div>
+        <h3 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700;">Alle gesichteten Arten</h3>
+        <p style="margin: 0; font-size: 14px; color: var(--muted);">${sortedSpecies.length} verschiedene Arten beobachtet</p>
+      </div>
+      
+      <!-- Sortier-Buttons -->
+      <div style="display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
+        <button class="small-btn" id="sortSpeciesAlpha" onclick="sortSpeciesInModal('alpha')" style="background: var(--accent); color: white;">
+          🔤 Alphabetisch
+        </button>
+        <button class="small-btn" id="sortSpeciesCount" onclick="sortSpeciesInModal('count')" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);">
+          🔢 Nach Häufigkeit
+        </button>
+        <button class="small-btn" id="sortSpeciesFirst" onclick="sortSpeciesInModal('firstSeen')" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);">
+          📅 Zuerst gesehen
+        </button>
+        <button class="small-btn" id="sortSpeciesLast" onclick="sortSpeciesInModal('lastSeen')" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);">
+          🕐 Zuletzt gesehen
+        </button>
+      </div>
+      
+      <div id="speciesListContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px;">
+  `;
+  
+  sortedSpecies.forEach(species => {
+    const speciesInfo = birdDatabase[species.name] || {};
+    const rarity = getRarityStyle(species.name);
+    
+    html += `
+      <div style="background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05)); border: 1px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 16px; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(6,182,212,0.3)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+        <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+          ${rarity.rarityIcon}${species.name}
+        </div>
+        ${speciesInfo.scientific ? `<div style="font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 8px;">${speciesInfo.scientific}</div>` : ''}
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--soft); margin-top: 8px;">
+          <span style="background: rgba(6,182,212,0.2); padding: 3px 8px; border-radius: 6px;">🔢 ${species.count}× gesehen</span>
+          <span style="background: rgba(124,58,237,0.2); padding: 3px 8px; border-radius: 6px;">📍 ${species.locations.size} Orte</span>
+        </div>
+        <div style="font-size: 10px; color: var(--muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+          Erstmals: ${formatDateForDisplay(species.firstSeen)}
+          ${species.lastSeen !== species.firstSeen ? ` • Zuletzt: ${formatDateForDisplay(species.lastSeen)}` : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `
+      </div>
+      
+      <div style="margin-top: 24px; text-align: center;">
+        <button class="btn" onclick="closeAllSpeciesModal()" style="padding: 12px 32px;">Schließen</button>
+      </div>
+    </div>
+  `;
+  
+  modal.innerHTML = html;
+  modal.style.display = 'flex';
+  
+  // Speichere die Artenliste für Sortierung
+  window.currentSpeciesList = sortedSpecies;
+  window.currentSpeciesSort = 'alpha';
+}
+
+function closeAllSpeciesModal() {
+  const modal = document.getElementById('allSpeciesModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function sortSpeciesInModal(sortBy) {
+  if (!window.currentSpeciesList) return;
+  
+  window.currentSpeciesSort = sortBy;
+  
+  // Update Button-Styles
+  ['sortSpeciesAlpha', 'sortSpeciesCount', 'sortSpeciesFirst', 'sortSpeciesLast'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.style.cssText = 'background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--soft);';
+    }
+  });
+  
+  const activeBtn = document.getElementById('sortSpecies' + sortBy.charAt(0).toUpperCase() + sortBy.slice(1));
+  if (activeBtn) {
+    activeBtn.style.cssText = 'background: var(--accent); color: white;';
+  }
+  
+  // Sortiere die Liste
+  let sorted = [...window.currentSpeciesList];
+  switch(sortBy) {
+    case 'alpha':
+      sorted.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+      break;
+    case 'count':
+      sorted.sort((a, b) => b.count - a.count);
+      break;
+    case 'firstSeen':
+      sorted.sort((a, b) => a.firstSeen.localeCompare(b.firstSeen));
+      break;
+    case 'lastSeen':
+      sorted.sort((a, b) => b.lastSeen.localeCompare(a.lastSeen));
+      break;
+  }
+  
+  // Re-render nur den Container
+  const container = document.getElementById('speciesListContainer');
+  if (!container) return;
+  
+  let html = '';
+  sorted.forEach(species => {
+    const speciesInfo = birdDatabase[species.name] || {};
+    const rarity = getRarityStyle(species.name);
+    
+    html += `
+      <div style="background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05)); border: 1px solid rgba(6,182,212,0.3); border-radius: 12px; padding: 16px; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(6,182,212,0.3)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+        <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+          ${rarity.rarityIcon}${species.name}
+        </div>
+        ${speciesInfo.scientific ? `<div style="font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 8px;">${speciesInfo.scientific}</div>` : ''}
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--soft); margin-top: 8px;">
+          <span style="background: rgba(6,182,212,0.2); padding: 3px 8px; border-radius: 6px;">🔢 ${species.count}× gesehen</span>
+          <span style="background: rgba(124,58,237,0.2); padding: 3px 8px; border-radius: 6px;">📍 ${species.locations.size} Orte</span>
+        </div>
+        <div style="font-size: 10px; color: var(--muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+          Erstmals: ${formatDateForDisplay(species.firstSeen)}
+          ${species.lastSeen !== species.firstSeen ? ` • Zuletzt: ${formatDateForDisplay(species.lastSeen)}` : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// Globale Funktionen verfügbar machen
+window.showAllSpeciesModal = showAllSpeciesModal;
+window.closeAllSpeciesModal = closeAllSpeciesModal;
+window.sortSpeciesInModal = sortSpeciesInModal;
 
 // Globale Funktionen verfügbar machen
 window.showHeatmapObservations = showHeatmapObservations;
