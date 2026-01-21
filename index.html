@@ -9293,6 +9293,7 @@
             <div id="map" style="margin:12px 0;"></div>
             <div class="form-row" style="margin:12px 0;">
               <button id="heatmapToggleMap" class="small-btn" style="background:linear-gradient(135deg, #ef4444, #f97316);color:white;" onclick="toggleHeatmap()">🔥 Heatmap</button>
+              <button id="toggleClusterMode" class="small-btn" style="background:var(--accent);color:white;" onclick="toggleClusterMode()">📍 Alle Details zeigen</button>
               <button id="toggleMarkersLock" class="small-btn" style="background:var(--danger);" onclick="toggleMarkersLock()">🔒 Marker gesperrt</button>
               <button id="toggleDragMode" class="small-btn" style="background:var(--accent);">Verschieben: An</button>
               <button id="clearMarkers" class="small-btn">Alle löschen</button>
@@ -18630,7 +18631,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             if (marker) {
               // Aus dem Cluster entfernen
               if (window.markerCluster) {
-                window.markerCluster.removeLayer(marker);
+                window.markerCluster && window.markerCluster.removeLayer(marker);
               }
               // Von der Karte entfernen
               marker.remove();
@@ -20645,9 +20646,75 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         mapLayerSelect.value = savedLayer;
       }
       
-      // Marker Cluster
-      markerCluster = L.markerClusterGroup();
+      // Marker Cluster mit erweiterten Optionen
+      markerCluster = L.markerClusterGroup({
+        disableClusteringAtZoom: null, // Wird dynamisch gesetzt
+        maxClusterRadius: 80,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: true,
+        zoomToBoundsOnClick: true
+      });
+      window.markerCluster = markerCluster;
       window.mapObj.addLayer(markerCluster);
+      
+      // Cluster-Modus Toggle (alle Details zeigen vs. gruppieren)
+      let clusteringDisabled = false;
+      window.toggleClusterMode = function() {
+        clusteringDisabled = !clusteringDisabled;
+        const btn = document.getElementById('toggleClusterMode');
+        
+        if (clusteringDisabled) {
+          // Deaktiviere Clustering - zeige alle Marker einzeln
+          btn.textContent = '📦 Gruppierung aktivieren';
+          btn.style.background = 'var(--accent-2)';
+          
+          // Entferne und erstelle Cluster neu mit deaktiviertem Clustering
+          window.mapObj.removeLayer(markerCluster);
+          markerCluster = L.markerClusterGroup({
+            disableClusteringAtZoom: 1, // Deaktiviert Clustering auf allen Zoom-Stufen
+            maxClusterRadius: 0,
+            spiderfyOnMaxZoom: false,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: false
+          });
+          
+          // Füge alle Marker wieder hinzu
+          window.markers.forEach((marker) => {
+            if (marker) {
+              markerCluster.addLayer(marker);
+            }
+          });
+          
+          window.markerCluster = markerCluster;
+          window.mapObj.addLayer(markerCluster);
+          showNotification('Alle Marker einzeln angezeigt', 2000);
+        } else {
+          // Aktiviere Clustering - gruppiere nahe Marker
+          btn.textContent = '📍 Alle Details zeigen';
+          btn.style.background = 'var(--accent)';
+          
+          // Entferne und erstelle Cluster neu mit aktiviertem Clustering
+          window.mapObj.removeLayer(markerCluster);
+          markerCluster = L.markerClusterGroup({
+            disableClusteringAtZoom: null,
+            maxClusterRadius: 80,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: true,
+            zoomToBoundsOnClick: true
+          });
+          
+          // Füge alle Marker wieder hinzu
+          window.markers.forEach((marker) => {
+            if (marker) {
+              markerCluster.addLayer(marker);
+            }
+          });
+          
+          window.markerCluster = markerCluster;
+          window.mapObj.addLayer(markerCluster);
+          showNotification('Marker werden gruppiert', 2000);
+        }
+      };
       
       // Drag-Mode Toggle
       document.getElementById('toggleDragMode').addEventListener('click', function() {
@@ -20708,8 +20775,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             window.markers.clear();
             
             // Cluster leeren
-            if (markerCluster) {
-              markerCluster.clearLayers();
+            if (window.markerCluster) {
+              window.markerCluster.clearLayers();
             }
             
             // Lösche alle Beobachtungen aus IndexedDB
@@ -21162,7 +21229,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       });
       
       window.markers.set(id, marker);
-      markerCluster.addLayer(marker);
+      if (window.markerCluster) {
+        window.markerCluster.addLayer(marker);
+      }
       
       // Drag Event für Updates
       marker.on('dragend', function() {
@@ -21476,7 +21545,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         
         // Marker aus Cluster entfernen
         if (markerCluster) {
-          markerCluster.removeLayer(marker);
+          window.markerCluster && window.markerCluster.removeLayer(marker);
         }
         
         // Wenn es eine Zeile mit dieser ID gibt, dann entferne sie auch und lösche aus IndexedDB
@@ -21760,7 +21829,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     function updateMapWithFilteredObservations(observations) {
       // Entferne alle Marker
       if (markerCluster) {
-        markerCluster.clearLayers();
+        window.markerCluster && window.markerCluster.clearLayers();
       }
       window.markers.clear();
       
@@ -23810,7 +23879,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               const marker = window.markers.get(obs.id);
               if (marker) {
                 if (window.markerCluster) {
-                  window.markerCluster.removeLayer(marker);
+                  window.markerCluster && window.markerCluster.removeLayer(marker);
                 }
                 marker.remove();
                 window.markers.delete(obs.id);
@@ -23992,7 +24061,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const marker = window.markers.get(id);
         if (marker) {
           if (markerCluster) {
-            markerCluster.removeLayer(marker);
+            window.markerCluster && window.markerCluster.removeLayer(marker);
           }
           marker.remove();
           window.markers.delete(id);
@@ -24043,7 +24112,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const marker = window.markers.get(id);
         if (marker) {
           if (markerCluster) {
-            markerCluster.removeLayer(marker);
+            window.markerCluster && window.markerCluster.removeLayer(marker);
           }
           marker.remove();
           window.markers.delete(id);
@@ -24063,7 +24132,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // Neuen Marker-Cluster erstellen
       if (markerCluster) {
-        markerCluster.clearLayers();
+        window.markerCluster && window.markerCluster.clearLayers();
       }
       
       // Marker aus den Beobachtungen erstellen
@@ -24090,8 +24159,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // Custom Marker (temporäre) wieder hinzufügen
       window.markers.forEach((marker, id) => {
-        if (id.startsWith('custom_') && markerCluster) {
-          markerCluster.addLayer(marker);
+        if (id.startsWith('custom_') && window.markerCluster) {
+          window.markerCluster.addLayer(marker);
         }
       });
       
@@ -25571,7 +25640,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           if (marker) {
             // Aus dem Cluster entfernen
             if (markerCluster) {
-              markerCluster.removeLayer(marker);
+              window.markerCluster && window.markerCluster.removeLayer(marker);
             }
             // Von der Karte entfernen
             marker.remove();
@@ -28071,7 +28140,7 @@ var loadGroupObservations=function(groupId, user){
       
       // Lösche Marker von der Karte
       if(typeof markerCluster !== "undefined" && markerCluster){
-        markerCluster.clearLayers();
+        window.markerCluster && window.markerCluster.clearLayers();
       }
       if(typeof window.markers !== "undefined" && window.markers){
         window.markers.clear();
@@ -28243,7 +28312,7 @@ var updateMapWithGroupObservations=function(observations){
   
   // Lösche alle Marker
   if(typeof markerCluster !== "undefined" && markerCluster){
-    markerCluster.clearLayers();
+    window.markerCluster && window.markerCluster.clearLayers();
   }
   if(typeof window.markers !== "undefined" && window.markers){
     window.markers.clear();
@@ -35042,7 +35111,7 @@ async function deleteObservationFromManager(observationId) {
         const marker = window.markers.get(observationId);
         if (marker) {
           if (window.markerCluster) {
-            window.markerCluster.removeLayer(marker);
+            window.markerCluster && window.markerCluster.removeLayer(marker);
           }
           marker.remove();
           window.markers.delete(observationId);
