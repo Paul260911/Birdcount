@@ -6857,8 +6857,16 @@
                 </div>
                 
                 <!-- Jahres-Chart -->
-                <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px;">
-                  <canvas id="yearComparisonChart" style="height: 500px;"></canvas>
+                <div style="background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 24px; margin: 20px 0;">
+                  <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button id="toggleYAxisBtn" onclick="toggleChartYAxis()" class="btn ghost" style="padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+                      <span id="yAxisIcon">📊</span>
+                      <span id="yAxisLabel">Doppelte Y-Achse</span>
+                    </button>
+                  </div>
+                  <div style="position: relative; height: 700px; width: 100%;">
+                    <canvas id="yearComparisonChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
@@ -21190,8 +21198,16 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // NEU: Im Gruppenmodus - erstelle farbigen Marker basierend auf userId
       let markerIcon = null;
-      if (observationData.userId) {
+      const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+      
+      // Debug-Logging
+      if (isGroupMode && observationData.userId) {
+        console.log(`🎨 Erstelle Marker für User ${observationData.userId} (${observationData.userName || 'Unbekannt'})`);
+      }
+      
+      if (isGroupMode && observationData.userId) {
         const userColor = getUserColor(observationData.userId);
+        console.log(`   → Farbe: ${userColor}`);
         markerIcon = L.divIcon({
           className: 'custom-marker',
           html: `<div style="
@@ -21843,7 +21859,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             behavior: obs.behavior,
             weather: obs.weather,
             photo: obs.photo,
-            state: obs.state
+            state: obs.state,
+            userId: obs.userId,
+            userName: obs.userName
           };
           
           createMarker(obs.id, obs.lat, obs.lng, obs.bird, obs.date, observationData);
@@ -38048,6 +38066,47 @@ async function renderYearComparisonChart(yearObs) {
   console.warn('=== 📈 CHART RENDERING ENDE ===');
   
   const ctx = canvas.getContext('2d');
+  
+  // Entscheide ob duale Y-Achse oder einzelne Y-Achse
+  const yAxisConfig = useDualYAxis ? {
+    y: {
+      type: 'linear',
+      display: true,
+      position: 'left',
+      beginAtZero: true,
+      ticks: { color: 'rgba(6, 182, 212, 0.9)', precision: 0 },
+      grid: { color: 'rgba(255, 255, 255, 0.04)' },
+      title: { display: true, text: 'Beobachtungen', color: 'rgba(6, 182, 212, 0.9)' }
+    },
+    y1: {
+      type: 'linear',
+      display: true,
+      position: 'right',
+      beginAtZero: true,
+      ticks: { color: 'rgba(124, 58, 237, 0.9)', precision: 0 },
+      grid: { display: false },
+      title: { display: true, text: 'Arten (kumulativ)', color: 'rgba(124, 58, 237, 0.9)' }
+    },
+    x: {
+      ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+      grid: { display: false }
+    }
+  } : {
+    y: {
+      type: 'linear',
+      display: true,
+      position: 'left',
+      beginAtZero: true,
+      ticks: { color: 'rgba(255, 255, 255, 0.7)', precision: 0 },
+      grid: { color: 'rgba(255, 255, 255, 0.04)' },
+      title: { display: true, text: 'Anzahl', color: 'rgba(255, 255, 255, 0.7)' }
+    },
+    x: {
+      ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+      grid: { display: false }
+    }
+  };
+  
   advancedStatsCharts.yearComparison = new Chart(ctx, {
     type: 'line',
     data: {
@@ -38060,7 +38119,7 @@ async function renderYearComparisonChart(yearObs) {
           backgroundColor: 'rgba(6, 182, 212, 0.1)',
           fill: true,
           tension: 0.4,
-          yAxisID: 'y' // Beide nutzen die linke Y-Achse
+          yAxisID: 'y'
         },
         {
           label: 'Arten',
@@ -38069,8 +38128,8 @@ async function renderYearComparisonChart(yearObs) {
           backgroundColor: 'rgba(124, 58, 237, 0.1)',
           fill: true,
           tension: 0.4,
-          yAxisID: 'y', // Beide nutzen die linke Y-Achse
-          spanGaps: false // Keine Linie für undefined Werte
+          yAxisID: useDualYAxis ? 'y1' : 'y',
+          spanGaps: false
         }
       ]
     },
@@ -38086,21 +38145,7 @@ async function renderYearComparisonChart(yearObs) {
           labels: { color: 'rgba(255, 255, 255, 0.7)' }
         }
       },
-      scales: {
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          beginAtZero: true,
-          ticks: { color: 'rgba(255, 255, 255, 0.7)', precision: 0 },
-          grid: { color: 'rgba(255, 255, 255, 0.04)' },
-          title: { display: true, text: 'Anzahl', color: 'rgba(255, 255, 255, 0.7)' }
-        },
-        x: {
-          ticks: { color: 'rgba(255, 255, 255, 0.7)' },
-          grid: { display: false }
-        }
-      }
+      scales: yAxisConfig
     }
   });
 }
@@ -38115,6 +38160,36 @@ async function loadChartJS() {
     document.body.appendChild(script);
   });
 }
+
+// Toggle zwischen einfacher und doppelter Y-Achse
+let useDualYAxis = false;
+
+function toggleChartYAxis() {
+  useDualYAxis = !useDualYAxis;
+  
+  // Update button text and icon
+  const button = document.getElementById('toggleYAxisBtn');
+  const icon = document.getElementById('yAxisIcon');
+  const label = document.getElementById('yAxisLabel');
+  
+  if (useDualYAxis) {
+    icon.textContent = '📈';
+    label.textContent = 'Einfache Y-Achse';
+    button.style.background = 'var(--accent)';
+    button.style.color = 'white';
+  } else {
+    icon.textContent = '📊';
+    label.textContent = 'Doppelte Y-Achse';
+    button.style.background = 'transparent';
+    button.style.color = 'var(--soft)';
+  }
+  
+  // Re-render chart with correct function name
+  loadJahresvergleich();
+}
+
+window.toggleChartYAxis = toggleChartYAxis;
+
 
 // Heatmap
 async function updateHeatmap() {
