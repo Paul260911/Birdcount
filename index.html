@@ -2940,6 +2940,115 @@
       background: var(--card);
       border: 1px solid rgba(255,255,255,0.06);
     }
+    
+    /* Arten-Filter auf der Karte */
+    .map-species-filter {
+      position: absolute;
+      top: 80px;
+      right: 10px;
+      z-index: 1000;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.08);
+      min-width: 280px;
+      max-width: 350px;
+    }
+    
+    .map-species-filter h4 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .map-species-filter select {
+      width: 100%;
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+    
+    .map-species-filter select:hover {
+      border-color: var(--accent);
+      background: rgba(6,182,212,0.05);
+    }
+    
+    .map-species-filter select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(6,182,212,0.1);
+    }
+    
+    .map-species-filter option {
+      background: var(--card);
+      color: var(--text);
+      padding: 8px;
+    }
+    
+    .species-filter-stats {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .species-filter-stats .stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .reset-filter-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .reset-filter-btn:hover {
+      background: var(--accent-2);
+      transform: translateY(-1px);
+    }
+    
+    .reset-filter-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .date-preset-btn:active {
+      transform: scale(0.95);
+      background: rgba(6,182,212,0.2) !important;
+    }
+    
+    /* Verkleinere Leaflet Standard-Marker */
+    .leaflet-marker-icon {
+      transform: scale(0.75);
+      transform-origin: bottom center;
+    }
+    
+    .leaflet-marker-shadow {
+      transform: scale(0.75);
+      transform-origin: bottom center;
+    }
     .observation-popup {
       padding: 16px;
     }
@@ -9298,7 +9407,80 @@
               </div>
             </div>
             <p style="margin:0 0 12px 0; font-size:13px; color:var(--muted);">Klicke auf die Karte, um einen Vogel zu melden.</p>
-            <div id="map" style="margin:12px 0;"></div>
+            <div style="position: relative;">
+              <div id="map" style="margin:12px 0;"></div>
+              
+              <!-- Erweiterte Filter auf der Karte -->
+              <div class="map-species-filter" id="mapAdvancedFilter" style="display: none;">
+                <h4>
+                  🔍 Filter
+                  <button onclick="toggleFilterExpanded()" id="filterToggleBtn" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 16px; padding: 0 4px; margin-left: auto;" title="Erweitern/Minimieren">▼</button>
+                </h4>
+                
+                <div id="filterContent" style="display: block;">
+                  <!-- Vogelart -->
+                  <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🐦 Vogelart</label>
+                    <select id="mapFilterSpecies" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px;">
+                      <option value="">Alle Arten</option>
+                    </select>
+                  </div>
+                  
+                  <!-- Zeitraum -->
+                  <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">📅 Zeitraum</label>
+                    
+                    <!-- Quick Presets -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px;">
+                      <button onclick="setDatePreset('today')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Heute</button>
+                      <button onclick="setDatePreset('week')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">7 Tage</button>
+                      <button onclick="setDatePreset('month')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Monat</button>
+                      <button onclick="setDatePreset('year')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Jahr</button>
+                      <button onclick="setDatePreset('2025')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">2025</button>
+                      <button onclick="setDatePreset('2024')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">2024</button>
+                    </div>
+                    
+                    <!-- Datum-Eingaben -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                      <input type="date" id="mapFilterDateFrom" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px; color: var(--text); font-size: 11px;">
+                      <input type="date" id="mapFilterDateTo" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px; color: var(--text); font-size: 11px;">
+                    </div>
+                  </div>
+                  
+                  <!-- Wetter (optional) -->
+                  <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🌤️ Wetter</label>
+                    <select id="mapFilterWeather" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px;">
+                      <option value="">Alle</option>
+                      <option value="sunny">☀️ Sonnig</option>
+                      <option value="cloudy">☁️ Bewölkt</option>
+                      <option value="rainy">🌧️ Regnerisch</option>
+                      <option value="snowy">❄️ Schnee</option>
+                    </select>
+                  </div>
+                  
+                  <!-- Bundesland -->
+                  <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">📍 Bundesland</label>
+                    <select id="mapFilterState" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px;">
+                      <option value="">Alle Bundesländer</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <!-- Statistik & Buttons -->
+                <div class="species-filter-stats">
+                  <div class="stat">
+                    <span>📍</span>
+                    <span id="mapFilteredCount">0</span>
+                    <span>Marker</span>
+                  </div>
+                  <button class="reset-filter-btn" onclick="resetMapFilters()" id="mapResetFilterBtn">
+                    Zurücksetzen
+                  </button>
+                </div>
+              </div>
+            </div>
             <div class="form-row" style="margin:12px 0;">
               <button id="heatmapToggleMap" class="small-btn" style="background:linear-gradient(135deg, #ef4444, #f97316);color:white;" onclick="toggleHeatmap()">🔥 Heatmap</button>
               <button id="toggleClusterMode" class="small-btn" style="background:var(--accent);color:white;" onclick="toggleClusterMode()">📍 Alle Details zeigen</button>
@@ -20636,10 +20818,93 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       showNotification('Karten-Ansicht geändert: ' + layerType, 2000);
     }
     
+    // PRELOADING: Lade alle Marker einmalig beim Start
+    async function preloadAllMarkers() {
+      console.log('🚀 Preloading: Starte Laden aller Marker...');
+      console.time('⏱️ Marker Preload');
+      
+      try {
+        // Hole ALLE Beobachtungen
+        const observations = await getAllObservationsWithDetails();
+        const validObs = observations.filter(obs => obs.lat && obs.lng);
+        
+        console.log(`📊 Preloading: ${validObs.length} Marker werden geladen...`);
+        
+        // Batch-Modus aktivieren
+        window.batchAddingMarkers = true;
+        
+        // Erstelle alle Marker
+        const markersToAdd = [];
+        let processed = 0;
+        
+        for (const obs of validObs) {
+          const observationData = {
+            time: obs.time,
+            count: obs.count,
+            behavior: obs.behavior,
+            weather: obs.weather,
+            photo: obs.photo,
+            state: obs.state,
+            userId: obs.userId,
+            userName: obs.userName
+          };
+          
+          const marker = createMarker(obs.id, obs.lat, obs.lng, obs.bird, obs.date, observationData);
+          if (marker) {
+            markersToAdd.push(marker);
+          }
+          
+          processed++;
+          
+          // Update Fortschritt alle 500 Marker
+          if (processed % 500 === 0) {
+            showNotification(`🗺️ Lade Marker... ${processed}/${validObs.length}`, 0);
+          }
+        }
+        
+        // Batch-Modus deaktivieren
+        window.batchAddingMarkers = false;
+        
+        console.log(`✅ Preloading: ${markersToAdd.length} Marker erstellt, füge zum Cluster hinzu...`);
+        
+        // Füge ALLE Marker auf einmal zum Cluster hinzu
+        if (window.markerCluster && markersToAdd.length > 0) {
+          window.markerCluster.addLayers(markersToAdd);
+        }
+        
+        console.timeEnd('⏱️ Marker Preload');
+        console.log('✅ Preloading abgeschlossen - Karte ist bereit für schnelles Zoomen!');
+        
+        // Schließe Loading-Notification
+        showNotification('✅ Karte geladen! Bereit zum Zoomen.', 2000);
+        
+        // Aktualisiere Marker-Liste
+        updateMarkerList();
+        
+        // Setze Flag dass Preloading abgeschlossen ist
+        window.markersPreloaded = true;
+        
+      } catch (error) {
+        console.error('❌ Fehler beim Preloading:', error);
+        showNotification('⚠️ Fehler beim Laden der Marker', 3000);
+      }
+    }
+    
     function initMap() {
       if (window.mapObj) return;
       
-      window.mapObj = L.map('map').setView([51.2, 10.4], 6);
+      // Zeige Loading-Indikator
+      showNotification('🗺️ Karte wird geladen...', 0); // 0 = bleibt bis manuell geschlossen
+      
+      // PERFORMANCE: Map mit optimierten Optionen erstellen
+      window.mapObj = L.map('map', {
+        preferCanvas: true, // Canvas-Renderer für bessere Performance bei vielen Markern
+        zoomAnimation: true,
+        fadeAnimation: true,
+        markerZoomAnimation: true,
+        zoomSnap: 0.5, // Erlaubt sanfteres Zoomen
+        wheelPxPerZoomLevel: 120 // Schnelleres Zoomen mit Maus
+      }).setView([51.2, 10.4], 6);
       
       // Lade gespeicherte Karten-Layer-Einstellung
       const savedLayer = localStorage.getItem('mapLayer') || 'osm';
@@ -20654,16 +20919,27 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         mapLayerSelect.value = savedLayer;
       }
       
-      // Marker Cluster mit erweiterten Optionen
+      // Marker Cluster mit PERFORMANCE-OPTIMIERTEN Optionen
       markerCluster = L.markerClusterGroup({
         disableClusteringAtZoom: null, // Wird dynamisch gesetzt
-        maxClusterRadius: 80,
+        maxClusterRadius: 60, // Reduziert von 80 für schnelleres Clustering
         spiderfyOnMaxZoom: true,
-        showCoverageOnHover: true,
-        zoomToBoundsOnClick: true
+        showCoverageOnHover: false, // Deaktiviert für Performance
+        zoomToBoundsOnClick: true,
+        animate: true, // Schnellere Animationen
+        animateAddingMarkers: false, // Keine Animation beim Hinzufügen (schneller)
+        removeOutsideVisibleBounds: false, // GEÄNDERT: Behalte alle Marker im Speicher für schnelles Zoomen
+        chunkedLoading: true, // Lädt Marker in Chunks (performanter bei vielen Markern)
+        chunkInterval: 200, // GEÄNDERT: Größere Chunks für schnelleres initiiales Laden
+        chunkDelay: 1 // GEÄNDERT: Minimale Verzögerung
       });
       window.markerCluster = markerCluster;
       window.mapObj.addLayer(markerCluster);
+      
+      // PRELOADING: Lade ALLE Marker sofort nach Initialisierung
+      setTimeout(async () => {
+        await preloadAllMarkers();
+      }, 100);
       
       // Cluster-Modus Toggle (alle Details zeigen vs. gruppieren)
       let clusteringDisabled = false;
@@ -20705,10 +20981,16 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           window.mapObj.removeLayer(markerCluster);
           markerCluster = L.markerClusterGroup({
             disableClusteringAtZoom: null,
-            maxClusterRadius: 80,
+            maxClusterRadius: 60, // Reduziert für Performance
             spiderfyOnMaxZoom: true,
-            showCoverageOnHover: true,
-            zoomToBoundsOnClick: true
+            showCoverageOnHover: false, // Deaktiviert für Performance
+            zoomToBoundsOnClick: true,
+            animate: true,
+            animateAddingMarkers: false,
+            removeOutsideVisibleBounds: true,
+            chunkedLoading: true,
+            chunkInterval: 50,
+            chunkDelay: 50
           });
           
           // Füge alle Marker wieder hinzu
@@ -21211,17 +21493,17 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         markerIcon = L.divIcon({
           className: 'custom-marker',
           html: `<div style="
-            width: 25px;
-            height: 25px;
+            width: 18px;
+            height: 18px;
             background: ${userColor};
-            border: 3px solid white;
+            border: 2px solid white;
             border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             position: relative;
           "></div>`,
-          iconSize: [25, 25],
-          iconAnchor: [12, 12],
-          popupAnchor: [0, -12]
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+          popupAnchor: [0, -9]
         });
       }
       
@@ -21245,7 +21527,11 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       });
       
       window.markers.set(id, marker);
-      if (window.markerCluster) {
+      
+      // PERFORMANCE: Marker wird NICHT automatisch zum Cluster hinzugefügt
+      // Das passiert jetzt im Batch in updateMapWithFilteredObservations
+      // Nur hinzufügen wenn explizit gewünscht (z.B. beim manuellen Erstellen)
+      if (window.markerCluster && !window.batchAddingMarkers) {
         window.markerCluster.addLayer(marker);
       }
       
@@ -21843,13 +22129,18 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     
     // Hilfsfunktion: Karte mit gefilterten Beobachtungen aktualisieren
     function updateMapWithFilteredObservations(observations) {
-      // Entferne alle Marker
+      // Performance-Optimierung: Batch-Update
       if (markerCluster) {
         window.markerCluster && window.markerCluster.clearLayers();
       }
       window.markers.clear();
       
-      // Füge gefilterte Marker hinzu
+      // PERFORMANCE: Batch-Modus aktivieren
+      window.batchAddingMarkers = true;
+      
+      // PERFORMANCE: Sammle alle Marker zuerst, dann füge sie auf einmal hinzu
+      const markersToAdd = [];
+      
       observations.forEach(obs => {
         if (obs.lat && obs.lng) {
           // Sammle alle zusätzlichen Beobachtungsdaten
@@ -21864,9 +22155,21 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             userName: obs.userName
           };
           
-          createMarker(obs.id, obs.lat, obs.lng, obs.bird, obs.date, observationData);
+          const marker = createMarker(obs.id, obs.lat, obs.lng, obs.bird, obs.date, observationData);
+          if (marker) {
+            markersToAdd.push(marker);
+          }
         }
       });
+      
+      // PERFORMANCE: Batch-Modus deaktivieren
+      window.batchAddingMarkers = false;
+      
+      // PERFORMANCE: Batch-Add - alle Marker auf einmal hinzufügen
+      if (window.markerCluster && markersToAdd.length > 0) {
+        // Füge alle auf einmal hinzu (viel schneller als einzeln)
+        window.markerCluster.addLayers(markersToAdd);
+      }
       
       updateMarkerList();
     }
@@ -26607,7 +26910,22 @@ document.addEventListener('DOMContentLoaded', function() {
           mapAside.style.display = 'block';
           // Initialisiere Karte falls nötig
           if (typeof initMap === 'function' && !window.mapInitialized) {
-            setTimeout(() => initMap(), 100);
+            setTimeout(() => {
+              initMap();
+              // Initialisiere Karten-Filter nach Karte
+              setTimeout(() => {
+                if (typeof initMapFilters === 'function') {
+                  initMapFilters();
+                }
+              }, 500);
+            }, 100);
+          } else {
+            // Karte bereits initialisiert - nur Filter aktualisieren
+            setTimeout(() => {
+              if (typeof initMapFilters === 'function') {
+                initMapFilters();
+              }
+            }, 300);
           }
         }
       } else {
@@ -41952,6 +42270,325 @@ function showDayMonthObservations(monthIdx, dayIdx, monthName, dayNum, year) {
 
 window.showMonthYearObservations = showMonthYearObservations;
 window.showDayMonthObservations = showDayMonthObservations;
+
+// ========================================
+// Erweiterte Karten-Filter
+// ========================================
+
+let mapFilterExpanded = true;
+
+// Setze Datum-Preset
+function setDatePreset(preset) {
+  const today = new Date();
+  const dateFromInput = document.getElementById('mapFilterDateFrom');
+  const dateToInput = document.getElementById('mapFilterDateTo');
+  
+  let fromDate, toDate;
+  
+  switch(preset) {
+    case 'today':
+      // Heute
+      fromDate = toDate = today;
+      break;
+      
+    case 'week':
+      // Letzte 7 Tage
+      fromDate = new Date(today);
+      fromDate.setDate(today.getDate() - 7);
+      toDate = today;
+      break;
+      
+    case 'month':
+      // Dieser Monat
+      fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      toDate = today;
+      break;
+      
+    case 'year':
+      // Dieses Jahr
+      fromDate = new Date(today.getFullYear(), 0, 1);
+      toDate = today;
+      break;
+      
+    case '2025':
+      // Ganzes Jahr 2025
+      fromDate = new Date(2025, 0, 1);
+      toDate = new Date(2025, 11, 31);
+      break;
+      
+    case '2024':
+      // Ganzes Jahr 2024
+      fromDate = new Date(2024, 0, 1);
+      toDate = new Date(2024, 11, 31);
+      break;
+      
+    default:
+      return;
+  }
+  
+  // Formatiere Datum für Input (YYYY-MM-DD)
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  dateFromInput.value = formatDate(fromDate);
+  dateToInput.value = formatDate(toDate);
+  
+  // Wende Filter direkt an
+  applyMapFilters();
+  
+  // Visuelles Feedback
+  showNotification(`Zeitraum gesetzt: ${preset === 'today' ? 'Heute' : preset === 'week' ? 'Letzte 7 Tage' : preset === 'month' ? 'Dieser Monat' : preset === 'year' ? 'Dieses Jahr' : preset}`, 1500);
+}
+
+// Toggle Filter erweitern/minimieren
+function toggleFilterExpanded() {
+  const content = document.getElementById('filterContent');
+  const btn = document.getElementById('filterToggleBtn');
+  
+  mapFilterExpanded = !mapFilterExpanded;
+  
+  if (mapFilterExpanded) {
+    content.style.display = 'block';
+    btn.textContent = '▼';
+  } else {
+    content.style.display = 'none';
+    btn.textContent = '▶';
+  }
+}
+
+// Initialisiere Karten-Filter
+async function initMapFilters() {
+  const filterDiv = document.getElementById('mapAdvancedFilter');
+  
+  if (!filterDiv) return;
+  
+  // Hole alle Beobachtungen
+  const observations = await getAllObservationsWithDetails();
+  
+  // Initialisiere Arten-Select
+  const speciesSelect = document.getElementById('mapFilterSpecies');
+  if (speciesSelect) {
+    const species = new Set(observations.map(obs => obs.bird).filter(Boolean));
+    const sortedSpecies = Array.from(species).sort();
+    
+    speciesSelect.innerHTML = '<option value="">Alle Arten</option>';
+    sortedSpecies.forEach(bird => {
+      const option = document.createElement('option');
+      option.value = bird;
+      option.textContent = bird;
+      speciesSelect.appendChild(option);
+    });
+  }
+  
+  // Initialisiere Bundesländer-Select
+  const stateSelect = document.getElementById('mapFilterState');
+  if (stateSelect) {
+    const states = new Set(observations.map(obs => obs.state).filter(Boolean));
+    const sortedStates = Array.from(states).sort();
+    
+    stateSelect.innerHTML = '<option value="">Alle Bundesländer</option>';
+    sortedStates.forEach(state => {
+      const option = document.createElement('option');
+      option.value = state;
+      option.textContent = state;
+      stateSelect.appendChild(option);
+    });
+  }
+  
+  // Zeige Filter
+  filterDiv.style.display = 'block';
+  
+  // Aktualisiere Counter
+  updateMapFilterStats(observations.length);
+}
+
+// Wende Karten-Filter an
+async function applyMapFilters() {
+  const dateFrom = document.getElementById('mapFilterDateFrom').value;
+  const dateTo = document.getElementById('mapFilterDateTo').value;
+  const species = document.getElementById('mapFilterSpecies').value;
+  const weather = document.getElementById('mapFilterWeather').value;
+  const state = document.getElementById('mapFilterState').value;
+  
+  // PERFORMANCE: Wenn Marker bereits geladen sind, filtere nur die Sichtbarkeit
+  if (window.markersPreloaded && window.markers.size > 0) {
+    // SCHNELL: Verstecke/Zeige vorhandene Marker basierend auf Filter
+    await filterExistingMarkers(dateFrom, dateTo, species, weather, state);
+    return;
+  }
+  
+  // FALLBACK: Normale Filter-Logik (wenn noch nicht preloaded)
+  const observations = await getAllObservationsWithDetails();
+  
+  // Filtere Beobachtungen
+  let filtered = observations.filter(obs => {
+    // Filter nach Datum
+    if (dateFrom && obs.date < dateFrom) return false;
+    if (dateTo && obs.date > dateTo) return false;
+    
+    // Filter nach Art
+    if (species && obs.bird !== species) return false;
+    
+    // Filter nach Wetter
+    if (weather && obs.weather !== weather) return false;
+    
+    // Filter nach Bundesland
+    if (state && obs.state !== state) return false;
+    
+    return true;
+  });
+  
+  // Aktualisiere Karte mit gefilterten Beobachtungen
+  updateMapWithFilteredObservations(filtered);
+  
+  // Aktualisiere Counter
+  const filteredWithCoords = filtered.filter(obs => obs.lat && obs.lng);
+  updateMapFilterStats(filteredWithCoords.length);
+  
+  // Zoom zu gefilterten Markern wenn nur eine Art ausgewählt
+  if (species && filteredWithCoords.length > 0) {
+    zoomToFilteredObservations(filteredWithCoords);
+  }
+  
+  showNotification(`${filteredWithCoords.length} Marker angezeigt`, 2000);
+}
+
+// NEUE FUNKTION: Filtere vorhandene Marker ohne neu zu laden
+async function filterExistingMarkers(dateFrom, dateTo, species, weather, state) {
+  console.log('🎯 Schneller Filter: Nutze vorgeladene Marker');
+  
+  // Hole Beobachtungsdaten
+  const observations = await getAllObservationsWithDetails();
+  
+  // Erstelle Set der gefilterten IDs
+  const filteredIds = new Set();
+  
+  observations.forEach(obs => {
+    // Filter nach Datum
+    if (dateFrom && obs.date < dateFrom) return;
+    if (dateTo && obs.date > dateTo) return;
+    
+    // Filter nach Art
+    if (species && obs.bird !== species) return;
+    
+    // Filter nach Wetter
+    if (weather && obs.weather !== weather) return;
+    
+    // Filter nach Bundesland
+    if (state && obs.state !== state) return;
+    
+    if (obs.lat && obs.lng) {
+      filteredIds.add(obs.id);
+    }
+  });
+  
+  // Temporär Cluster leeren
+  if (window.markerCluster) {
+    window.markerCluster.clearLayers();
+  }
+  
+  // Füge nur gefilterte Marker wieder hinzu
+  const markersToShow = [];
+  window.markers.forEach((marker, id) => {
+    if (filteredIds.has(id)) {
+      markersToShow.push(marker);
+    }
+  });
+  
+  // Batch-add der gefilterten Marker
+  if (window.markerCluster && markersToShow.length > 0) {
+    window.markerCluster.addLayers(markersToShow);
+  }
+  
+  // Aktualisiere Stats
+  updateMapFilterStats(markersToShow.length);
+  
+  // Zoom wenn Art-Filter aktiv
+  if (species && markersToShow.length > 0) {
+    const filteredObs = observations.filter(obs => 
+      filteredIds.has(obs.id) && obs.lat && obs.lng
+    );
+    zoomToFilteredObservations(filteredObs);
+  }
+  
+  showNotification(`${markersToShow.length} Marker angezeigt`, 1500);
+}
+
+// Zoom zu gefilterten Beobachtungen
+function zoomToFilteredObservations(observations) {
+  if (!window.mapObj || observations.length === 0) return;
+  
+  if (observations.length === 1) {
+    // Einzelner Marker
+    const obs = observations[0];
+    window.mapObj.setView([obs.lat, obs.lng], 12);
+  } else {
+    // Mehrere Marker
+    const bounds = L.latLngBounds(observations.map(obs => [obs.lat, obs.lng]));
+    window.mapObj.fitBounds(bounds, { padding: [50, 50] });
+  }
+}
+
+// Aktualisiere Filter-Statistik
+function updateMapFilterStats(count) {
+  const countSpan = document.getElementById('mapFilteredCount');
+  if (countSpan) {
+    countSpan.textContent = count;
+  }
+}
+
+// Setze Karten-Filter zurück
+async function resetMapFilters() {
+  // Felder leeren
+  document.getElementById('mapFilterDateFrom').value = '';
+  document.getElementById('mapFilterDateTo').value = '';
+  document.getElementById('mapFilterSpecies').value = '';
+  document.getElementById('mapFilterWeather').value = '';
+  document.getElementById('mapFilterState').value = '';
+  
+  // PERFORMANCE: Wenn Marker preloaded sind, zeige einfach alle wieder
+  if (window.markersPreloaded && window.markers.size > 0) {
+    console.log('🎯 Schnelles Reset: Zeige alle vorgeladenen Marker');
+    
+    // Cluster leeren
+    if (window.markerCluster) {
+      window.markerCluster.clearLayers();
+    }
+    
+    // Alle Marker wieder hinzufügen
+    const allMarkers = Array.from(window.markers.values());
+    if (window.markerCluster && allMarkers.length > 0) {
+      window.markerCluster.addLayers(allMarkers);
+    }
+    
+    // Aktualisiere Counter
+    updateMapFilterStats(allMarkers.length);
+    
+    showNotification('Filter zurückgesetzt', 1500);
+    return;
+  }
+  
+  // FALLBACK: Normale Reset-Logik
+  const observations = await getAllObservationsWithDetails();
+  updateMapWithFilteredObservations(observations);
+  
+  // Aktualisiere Counter
+  const withCoords = observations.filter(obs => obs.lat && obs.lng);
+  updateMapFilterStats(withCoords.length);
+  
+  showNotification('Filter zurückgesetzt', 1500);
+}
+
+// Mache Funktionen global verfügbar
+window.toggleFilterExpanded = toggleFilterExpanded;
+window.initMapFilters = initMapFilters;
+window.applyMapFilters = applyMapFilters;
+window.resetMapFilters = resetMapFilters;
+window.setDatePreset = setDatePreset;
 
 </script>
 
