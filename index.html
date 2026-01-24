@@ -12560,6 +12560,13 @@
         'thrush_species': count === 1 ? 'Drosselart' : 'Drosselarten',
         'corvid_species': count === 1 ? 'Rabenvogelart' : 'Rabenvogelarten',
         'pigeon_species': count === 1 ? 'Taubenart' : 'Taubenarten',
+        // Lebensraum-basierte Challenges
+        'water_birds': count === 1 ? 'Wasservogel' : 'Wasservögel',
+        'songbirds': count === 1 ? 'Singvogel' : 'Singvögel',
+        'raptors': count === 1 ? 'Greifvogel' : 'Greifvögel',
+        'forest_birds': count === 1 ? 'Waldvogel' : 'Waldvögel',
+        'meadow_birds': count === 1 ? 'Wiesenvogel' : 'Wiesenvögel',
+        'woodpeckers': count === 1 ? 'Specht' : 'Spechte',
         // Verhalten & Eigenschaften
         'beak_diversity': count === 1 ? 'Schnabeltyp' : 'Schnabeltypen',
         'flight_behavior': count === 1 ? 'Flugverhalten' : 'Flugverhalten',
@@ -12576,7 +12583,17 @@
         'song_identification': count === 1 ? 'Gesangsidentifikation' : 'Gesangsidentifikationen',
         'nesting_sites': count === 1 ? 'Nistplatz' : 'Nistplätze',
         'scientific_observations': count === 1 ? 'wissenschaftliche Beobachtung' : 'wissenschaftliche Beobachtungen',
-        'community_shares': count === 1 ? 'geteilte Beobachtung' : 'geteilte Beobachtungen'
+        'community_shares': count === 1 ? 'geteilte Beobachtung' : 'geteilte Beobachtungen',
+        // Weitere spezielle Challenges
+        'seasonal_diversity': count === 1 ? 'Art' : 'Arten',
+        'weather_documented': count === 1 ? 'dokumentierte Beobachtung' : 'dokumentierte Beobachtungen',
+        'behavior_documented': count === 1 ? 'Beobachtung mit Verhalten' : 'Beobachtungen mit Verhalten',
+        'evening_observations': count === 1 ? 'Abend-Beobachtung' : 'Abend-Beobachtungen',
+        'group_observations': count === 1 ? 'Gruppenbeobachtung' : 'Gruppenbeobachtungen',
+        'habitat_diversity': count === 1 ? 'Lebensraum' : 'Lebensräume',
+        'breeding_behavior': count === 1 ? 'Brutverhalten' : 'Brutverhalten',
+        'daily_coverage': count === 1 ? 'Beobachtung' : 'Beobachtungen',
+        'color_diversity': count === 1 ? 'Farbe' : 'Farben'
       };
       
       return units[challengeType] || (count === 1 ? 'Eintrag' : 'Einträge');
@@ -13307,6 +13324,277 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           case 'community_shares':
             // Geteilte Beobachtungen - Platzhalter
             progress = observations.filter(obs => obs.shared === true).length;
+            break;
+            
+          // ========== LEBENSRAUM-BASIERTE CHALLENGES ==========
+          case 'water_birds':
+            // Wasservögel
+            const waterBirdSpecies = [
+              // Enten & Gänse
+              'Stockente', 'Reiherente', 'Tafelente', 'Schnatterente', 'Krickente',
+              'Löffelente', 'Pfeifente', 'Spießente', 'Knäkente', 'Schellente',
+              'Graugans', 'Kanadagans', 'Nilgans', 'Blässgans', 'Saatgans',
+              'Höckerschwan', 'Singschwan', 'Zwergschwan',
+              // Rallen & Taucher
+              'Blässhuhn', 'Teichhuhn', 'Wasserralle', 'Zwergtaucher', 'Haubentaucher',
+              'Rothalstaucher', 'Schwarzhalstaucher',
+              // Möwen & Seeschwalben
+              'Lachmöwe', 'Sturmmöwe', 'Silbermöwe', 'Mittelmeermöwe', 
+              'Mantelmöwe', 'Heringsmöwe', 'Schwarzkopfmöwe', 'Dreizehenmöwe',
+              'Flussseeschwalbe', 'Küstenseeschwalbe', 'Trauerseeschwalbe',
+              // Reiher & Kormorane
+              'Graureiher', 'Silberreiher', 'Purpurreiher', 'Nachtreiher',
+              'Kormoran', 'Zwergscharbe',
+              // Weitere Wasservögel
+              'Eisvogel', 'Austernfischer', 'Säbelschnäbler', 'Kiebitz',
+              'Bekassine', 'Uferschnepfe', 'Rotschenkel', 'Flussuferläufer',
+              'Gänsesäger', 'Mittelsäger', 'Zwergsäger'
+            ];
+            const foundWaterBirds = new Set();
+            observations.forEach(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              waterBirdSpecies.forEach(waterBird => {
+                if (birdLower.includes(waterBird.toLowerCase())) {
+                  foundWaterBirds.add(waterBird);
+                }
+              });
+            });
+            progress = foundWaterBirds.size;
+            break;
+            
+          case 'songbirds':
+            // Singvögel
+            const songbirdSpecies = [
+              // Drosseln
+              'Amsel', 'Singdrossel', 'Misteldrossel', 'Wacholderdrossel', 'Rotdrossel',
+              // Grasmücken & Laubsänger
+              'Mönchsgrasmücke', 'Gartengrasmücke', 'Klappergrasmücke', 'Dorngrasmücke',
+              'Fitis', 'Zilpzalp', 'Waldlaubsänger',
+              // Rohrsänger
+              'Teichrohrsänger', 'Sumpfrohrsänger', 'Schilfrohrsänger',
+              // Meisen
+              'Blaumeise', 'Kohlmeise', 'Tannenmeise', 'Sumpfmeise', 'Haubenmeise',
+              // Finken
+              'Buchfink', 'Bergfink', 'Grünfink', 'Stieglitz', 'Erlenzeisig',
+              'Birkenzeisig', 'Bluthänfling', 'Girlitz',
+              // Andere Singvögel
+              'Rotkehlchen', 'Nachtigall', 'Hausrotschwanz', 'Gartenrotschwanz',
+              'Heckenbraunelle', 'Zaunkönig', 'Star', 'Pirol'
+            ];
+            const foundSongbirds = new Set();
+            observations.forEach(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              songbirdSpecies.forEach(songbird => {
+                if (birdLower.includes(songbird.toLowerCase())) {
+                  foundSongbirds.add(songbird);
+                }
+              });
+            });
+            progress = foundSongbirds.size;
+            break;
+            
+          case 'raptors':
+            // Greifvögel (bereits implementiert, aber hier nochmal für Konsistenz)
+            const raptorsList = [
+              'Mäusebussard', 'Turmfalke', 'Sperber', 'Habicht', 'Rotmilan',
+              'Schwarzmilan', 'Wespenbussard', 'Rohrweihe', 'Kornweihe', 'Wiesenweihe',
+              'Fischadler', 'Seeadler', 'Steinadler', 'Schreiadler',
+              'Baumfalke', 'Merlin', 'Rotfußfalke', 'Wanderfalke'
+            ];
+            const foundRaptorsList = new Set();
+            observations.forEach(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              raptorsList.forEach(raptor => {
+                if (birdLower.includes(raptor.toLowerCase())) {
+                  foundRaptorsList.add(raptor);
+                }
+              });
+            });
+            progress = foundRaptorsList.size;
+            break;
+            
+          case 'forest_birds':
+            // Waldvögel
+            const forestBirdSpecies = [
+              // Spechte
+              'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht', 'Mittelspecht',
+              // Eulen
+              'Waldkauz', 'Waldohreule', 'Sperlingskauz', 'Raufußkauz', 'Uhu',
+              // Tauben
+              'Ringeltaube', 'Hohltaube', 'Turteltaube',
+              // Meisen
+              'Tannenmeise', 'Haubenmeise', 'Sumpfmeise', 'Weidenmeise',
+              // Finken
+              'Buchfink', 'Bergfink', 'Kernbeißer', 'Fichtenkreuzschnabel', 'Erlenzeisig',
+              // Drosseln
+              'Singdrossel', 'Misteldrossel', 'Ringdrossel',
+              // Weitere Waldvögel
+              'Eichelhäher', 'Tannenhäher', 'Kleiber', 'Waldbaumläufer', 'Gartenbaumläufer',
+              'Wintergoldhähnchen', 'Sommergoldhähnchen', 'Zaunkönig',
+              'Rotkehlchen', 'Gartenrotschwanz', 'Waldlaubsänger', 'Fitis'
+            ];
+            const foundForestBirds = new Set();
+            observations.forEach(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              forestBirdSpecies.forEach(forestBird => {
+                if (birdLower.includes(forestBird.toLowerCase())) {
+                  foundForestBirds.add(forestBird);
+                }
+              });
+            });
+            progress = foundForestBirds.size;
+            break;
+            
+          case 'meadow_birds':
+            // Wiesenvögel
+            const meadowBirdSpecies = [
+              'Feldlerche', 'Heidelerche', 'Wiesenpieper', 'Baumpieper',
+              'Schafstelze', 'Bachstelze', 'Gebirgsstelze',
+              'Kiebitz', 'Bekassine', 'Uferschnepfe', 'Großer Brachvogel',
+              'Rebhuhn', 'Wachtel', 'Fasan',
+              'Grauammer', 'Goldammer', 'Rohrammer',
+              'Neuntöter', 'Raubwürger', 'Schwarzkehlchen', 'Braunkehlchen',
+              'Wiesenschafstelze', 'Steinschmätzer'
+            ];
+            const foundMeadowBirds = new Set();
+            observations.forEach(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              meadowBirdSpecies.forEach(meadowBird => {
+                if (birdLower.includes(meadowBird.toLowerCase())) {
+                  foundMeadowBirds.add(meadowBird);
+                }
+              });
+            });
+            progress = foundMeadowBirds.size;
+            break;
+            
+          case 'woodpeckers':
+            // Spechte (vereinfachte Liste)
+            const woodpeckerList = [
+              'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht',
+              'Mittelspecht', 'Grauspecht', 'Wendehals', 'Dreizehenspecht'
+            ];
+            const foundWoodpeckerList = new Set();
+            observations.forEach(obs => {
+              const birdLower = obs.bird.toLowerCase();
+              woodpeckerList.forEach(woodpecker => {
+                if (birdLower.includes(woodpecker.toLowerCase())) {
+                  foundWoodpeckerList.add(woodpecker);
+                }
+              });
+            });
+            progress = foundWoodpeckerList.size;
+            break;
+            
+          // ========== WEITERE SPEZIELLE CHALLENGES ==========
+          case 'seasonal_diversity':
+            // Verschiedene Arten in verschiedenen Jahreszeiten
+            const seasonalObs = {};
+            observations.forEach(obs => {
+              if (obs.date) {
+                const month = new Date(obs.date).getMonth() + 1;
+                let season;
+                if (month >= 3 && month <= 5) season = 'spring';
+                else if (month >= 6 && month <= 8) season = 'summer';
+                else if (month >= 9 && month <= 11) season = 'fall';
+                else season = 'winter';
+                
+                if (!seasonalObs[season]) seasonalObs[season] = new Set();
+                seasonalObs[season].add(obs.bird);
+              }
+            });
+            // Zähle Gesamtanzahl Arten über alle Jahreszeiten
+            progress = Object.values(seasonalObs).reduce((sum, species) => sum + species.size, 0);
+            break;
+            
+          case 'weather_documented':
+            // Beobachtungen mit dokumentiertem Wetter
+            progress = observations.filter(obs => obs.weather && obs.weather.trim().length > 0).length;
+            break;
+            
+          case 'behavior_documented':
+            // Beobachtungen mit dokumentiertem Verhalten
+            progress = observations.filter(obs => obs.behavior && obs.behavior.trim().length > 0).length;
+            break;
+            
+          case 'evening_observations':
+            // Beobachtungen zwischen 18:00 und 20:00
+            progress = observations.filter(obs => {
+              if (!obs.time) return false;
+              const hour = parseInt(obs.time.split(':')[0]);
+              return hour >= 18 && hour < 20;
+            }).length;
+            break;
+            
+          case 'group_observations':
+            // Gruppenbeobachtungen (5+ Vögel)
+            progress = observations.filter(obs => 
+              obs.count && parseInt(obs.count) >= 5
+            ).length;
+            break;
+            
+          case 'habitat_diversity':
+            // Verschiedene Lebensräume
+            const habitats = new Set();
+            observations.forEach(obs => {
+              if (obs.habitat) habitats.add(obs.habitat);
+            });
+            progress = habitats.size;
+            break;
+            
+          case 'breeding_behavior':
+            // Brutverhalten dokumentiert
+            progress = observations.filter(obs => 
+              obs.notes && (
+                obs.notes.toLowerCase().includes('brut') ||
+                obs.notes.toLowerCase().includes('nest') ||
+                obs.notes.toLowerCase().includes('jungvögel') ||
+                obs.notes.toLowerCase().includes('fütter')
+              )
+            ).length;
+            break;
+            
+          case 'daily_coverage':
+            // Verschiedene Tageszeiten an einem Tag
+            const dailyCoverage = {};
+            observations.forEach(obs => {
+              if (obs.date && obs.time) {
+                const dateKey = obs.date;
+                const hour = parseInt(obs.time.split(':')[0]);
+                
+                if (!dailyCoverage[dateKey]) {
+                  dailyCoverage[dateKey] = { morning: new Set(), noon: new Set(), evening: new Set() };
+                }
+                
+                if (hour >= 5 && hour < 11) dailyCoverage[dateKey].morning.add(obs.bird);
+                else if (hour >= 11 && hour < 17) dailyCoverage[dateKey].noon.add(obs.bird);
+                else if (hour >= 17 && hour < 22) dailyCoverage[dateKey].evening.add(obs.bird);
+              }
+            });
+            
+            // Zähle Tage mit Beobachtungen zu allen 3 Zeiten
+            progress = Object.values(dailyCoverage).reduce((sum, day) => {
+              return sum + day.morning.size + day.noon.size + day.evening.size;
+            }, 0);
+            break;
+            
+          case 'color_diversity':
+            // Verschiedene Vogelfarben - vereinfachte Erkennung
+            const colors = new Set();
+            observations.forEach(obs => {
+              const bird = obs.bird.toLowerCase();
+              if (bird.includes('blau')) colors.add('Blau');
+              if (bird.includes('rot')) colors.add('Rot');
+              if (bird.includes('gelb') || bird.includes('gold')) colors.add('Gelb');
+              if (bird.includes('grün')) colors.add('Grün');
+              if (bird.includes('schwarz')) colors.add('Schwarz');
+              if (bird.includes('weiß') || bird.includes('silber')) colors.add('Weiß');
+              if (bird.includes('braun')) colors.add('Braun');
+              if (bird.includes('grau')) colors.add('Grau');
+              if (bird.includes('orange')) colors.add('Orange');
+              if (bird.includes('bunt')) colors.add('Bunt');
+            });
+            progress = colors.size;
             break;
         }
         
