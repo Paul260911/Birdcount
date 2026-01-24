@@ -16333,6 +16333,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         return;
       }
       
+      // Speichere aktuellen Modus
+      const currentMode = window.currentSelectedGroup || 'personal';
+      console.log('💾 Aktueller Modus vor manuellem Sync:', currentMode);
+      
       const btn = document.getElementById('cloudSyncBtn');
       if (btn) {
         btn.disabled = true;
@@ -16349,12 +16353,18 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         // Upload zu Cloud
         await syncAllLocalDataToFirebase();
         
-        // Aktualisiere UI
-        if (typeof loadData === 'function') await loadData();
-        if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
-        if (typeof updateChart === 'function') updateChart();
+        // WICHTIG: Stelle Modus wieder her
+        window.currentSelectedGroup = currentMode;
+        
+        // Aktualisiere UI NUR wenn im persönlichen Modus
+        if (currentMode === 'personal') {
+          if (typeof loadData === 'function') await loadData();
+          if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
+          if (typeof updateChart === 'function') updateChart();
+        }
         
         showNotification('✅ Cloud-Sync erfolgreich!', 3000);
+        console.log('✅ Manueller Sync abgeschlossen, Modus:', window.currentSelectedGroup);
         
         // Update Last-Sync-Zeit
         const now = new Date().toLocaleString('de-DE');
@@ -27871,6 +27881,10 @@ var setupEvents=function(){
         try {
           console.log('🔄 Starte Cloud-Synchronisation...');
           
+          // WICHTIG: Speichere aktuelle Gruppenauswahl VORHER
+          const currentMode = window.currentSelectedGroup || 'personal';
+          console.log('💾 Aktueller Modus vor Sync:', currentMode);
+          
           // Prüfe ob bereits Initial-Sync durchgeführt wurde
           const syncCompleted = localStorage.getItem('firebaseSyncCompleted_' + u.uid);
           
@@ -27883,10 +27897,15 @@ var setupEvents=function(){
             await loadFoldersFromFirebase();
             await syncAllLocalDataToFirebase();
             
-            // Aktualisiere UI nach Sync
-            if (typeof loadData === 'function') await loadData();
-            if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
-            if (typeof updateChart === 'function') updateChart();
+            // WICHTIG: Stelle Modus wieder her BEVOR UI aktualisiert wird
+            window.currentSelectedGroup = currentMode;
+            
+            // Aktualisiere UI nach Sync NUR wenn im persönlichen Modus
+            if (currentMode === 'personal') {
+              if (typeof loadData === 'function') await loadData();
+              if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
+              if (typeof updateChart === 'function') updateChart();
+            }
             
           } else {
             // Normaler Login: Nur Cloud-Daten laden (lokale Änderungen werden automatisch hochgeladen)
@@ -27894,12 +27913,17 @@ var setupEvents=function(){
             await loadObservationsFromFirebase();
             await loadFoldersFromFirebase();
             
-            // Aktualisiere UI nach Sync
-            if (typeof loadData === 'function') await loadData();
-            if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
+            // WICHTIG: Stelle Modus wieder her BEVOR UI aktualisiert wird
+            window.currentSelectedGroup = currentMode;
+            
+            // Aktualisiere UI nach Sync NUR wenn im persönlichen Modus
+            if (currentMode === 'personal') {
+              if (typeof loadData === 'function') await loadData();
+              if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
+            }
           }
           
-          console.log('✅ Cloud-Synchronisation abgeschlossen');
+          console.log('✅ Cloud-Synchronisation abgeschlossen, Modus:', window.currentSelectedGroup);
           
         } catch (error) {
           console.error('❌ Fehler bei Cloud-Sync:', error);
