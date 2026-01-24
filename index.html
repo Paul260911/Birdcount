@@ -12,9 +12,6 @@
   <meta name="apple-mobile-web-app-title" content="BirdCount" />
   <meta name="description" content="Professionelles Vogelbeobachtungssystem - Erfasse, verwalte und analysiere deine Vogelbeobachtungen" />
   
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json" />
-  
   <!-- Content Security Policy (Sicherheit - deaktiviert für Entwicklung) -->
   <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';"> -->
   
@@ -7426,81 +7423,17 @@
                   <button class="small-btn" onclick="document.getElementById('importFile').click()" style="flex:1;">Daten importieren</button>
                 </div>
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-                  <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text);">🦅 Ornitho.de Import</h3>
-                  
-                  <!-- VOLLSTÄNDIG SICHTBARER FILE INPUT - KEINE TRICKS -->
-                  <div style="margin-bottom:12px;">
-                    <input 
-                      type="file" 
-                      id="ornithoMobileInput" 
-                      accept=".txt,.csv,text/plain,text/csv,application/octet-stream,*/*"
-                      style="
-                        width: 100%;
-                        padding: 14px;
-                        background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.15));
-                        border: 2px solid var(--accent);
-                        border-radius: 10px;
-                        color: var(--text);
-                        font-size: 14px;
-                        cursor: pointer;
-                        font-family: inherit;
-                      "
-                    >
-                  </div>
-                  
-                  <!-- ZUSÄTZLICHER TRIGGER BUTTON -->
-                  <button 
-                    class="small-btn" 
-                    onclick="checkFileManually()" 
-                    style="width:100%;background:var(--accent-2);margin-bottom:12px;padding:12px;font-size:14px;"
-                  >
-                    ✅ Datei ausgewählt? Hier klicken zum Importieren
+                  <input type="file" id="ornithoImportFile" accept=".txt" style="display:none;">
+                  <button class="small-btn" onclick="document.getElementById('ornithoImportFile').click()" style="width:100%;background:var(--accent);text-align:center;cursor:pointer;">
+                    🦅 Ornitho.de Import
                   </button>
-                  
-                  <!-- STATUS -->
-                  <div id="mobileImportStatus" style="
-                    padding:10px;
-                    background:rgba(6,182,212,0.1);
-                    border-radius:8px;
-                    border:1px solid rgba(6,182,212,0.3);
-                    margin-bottom:12px;
-                    display:none;
-                  ">
-                    <div style="font-size:12px;color:var(--text);font-weight:600;" id="statusTitle">Status</div>
-                    <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="statusMessage">-</div>
-                  </div>
-                  
-                  <!-- HINWEIS -->
-                  <div style="background:rgba(249,115,22,0.1);padding:10px;border-radius:8px;border:1px solid rgba(249,115,22,0.3);margin-bottom:12px;">
-                    <div style="font-size:11px;color:var(--text);line-height:1.6;">
-                      📱 <strong>Wichtig:</strong> Nach Dateiauswahl auf den grünen Button klicken!<br>
-                      Manche Browser lösen keinen automatischen Import aus.
-                    </div>
-                  </div>
-                  
-                  <hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0;">
-                  
-                  <!-- ALTERNATIVE METHODE -->
-                  <div style="background:rgba(124,58,237,0.1);padding:12px;border-radius:8px;border:1px solid rgba(124,58,237,0.3);">
-                    <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">
-                      📋 Funktioniert nicht? Alternative Methode:
-                    </div>
-                    <button class="small-btn" onclick="showTextPasteMethod()" style="width:100%;background:rgba(124,58,237,0.3);">
-                      Text einfügen (100% zuverlässig)
-                    </button>
-                    <div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;">
-                      Öffne die Datei, kopiere den Inhalt, füge ihn hier ein
-                    </div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;">
+                    Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
+                    <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
                   </div>
                 </div>
                 <button class="small-btn" onclick="backupData()" style="margin-top:12px;width:100%;">💾 Backup erstellen</button>
                 <button class="small-btn" onclick="restoreBackup()" style="margin-top:4px;width:100%;">🔧 Backup wiederherstellen</button>
-                <button class="small-btn" onclick="manualCloudSync()" id="cloudSyncBtn" style="margin-top:4px;width:100%;background:var(--accent);display:none;">
-                  ☁️ Cloud-Sync jetzt
-                </button>
-                <div id="cloudSyncStatus" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;display:none;">
-                  Letzte Sync: <span id="lastSyncTime">-</span>
-                </div>
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
                   <button class="small-btn" onclick="deleteAllObservations()" style="width:100%;background:var(--danger);">
                     🗑️ Alle Beobachtungen löschen
@@ -7545,52 +7478,6 @@
                 <div style="display:flex;gap:8px;margin-top:8px;">
                   <button class="small-btn" id="heatmapToggleTools" onclick="toggleHeatmap()" style="flex:1;">🔥 Heatmap: Aus</button>
                   <button class="small-btn" onclick="showHeatmapOptions()" style="flex:1;">⚙️ Einstellungen</button>
-                </div>
-              </div>
-              
-              <!-- PWA & App-Einstellungen -->
-              <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05));">
-                <h3>📱 App-Installation</h3>
-                <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
-                  Installiere BirdCount als App auf deinem Handy!
-                </p>
-                
-                <!-- Status -->
-                <div id="pwaStatus" style="padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:12px;font-size:13px;">
-                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                    <span>App-Status:</span>
-                    <span id="pwaInstallStatus" style="color:var(--muted);">Wird geprüft...</span>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                    <span>Offline verfügbar:</span>
-                    <span id="pwaOfflineStatus" style="color:var(--muted);">-</span>
-                  </div>
-                  <div style="display:flex;justify-content:space-between;">
-                    <span>Benachrichtigungen:</span>
-                    <span id="pwaNotificationStatus" style="color:var(--muted);">-</span>
-                  </div>
-                </div>
-                
-                <!-- Actions -->
-                <button class="small-btn" id="pwaInstallBtn" onclick="triggerInstallPrompt()" style="width:100%;background:linear-gradient(135deg, #06b6d4, #0284c7);margin-bottom:8px;display:none;">
-                  📱 Jetzt installieren
-                </button>
-                
-                <button class="small-btn" onclick="requestNotificationPermission()" style="width:100%;margin-bottom:8px;">
-                  🔔 Benachrichtigungen aktivieren
-                </button>
-                
-                <button class="small-btn" onclick="sendTestNotification()" style="width:100%;">
-                  🧪 Test-Benachrichtigung
-                </button>
-                
-                <!-- iOS Hinweis -->
-                <div id="iOSHint" style="display:none;margin-top:12px;padding:10px;background:rgba(6,182,212,0.1);border-radius:8px;font-size:11px;border-left:3px solid var(--accent);">
-                  <strong>📱 iOS:</strong> Tippe auf <strong>Teilen ⬆️</strong> und dann auf <strong>"Zum Home-Bildschirm"</strong>
-                </div>
-                
-                <div style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center;">
-                  💡 Als App: Offline-Modus, Push-Benachrichtigungen & Schnellzugriff
                 </div>
               </div>
               
@@ -15993,22 +15880,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             performanceCache.clear();
             window.forceReload = true;
           }
-          
-          // NEU: Auto-Sync zu Firebase wenn User angemeldet ist UND im persönlichen Modus
-          if (storeName === 'observations' && window.FBA?.currentUser && 
-              (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal')) {
-            syncObservationToFirebase(data).catch(err => {
-              console.warn('⚠️ Firebase-Sync fehlgeschlagen (offline?):', err.message);
-            });
-          }
-          
-          if (storeName === 'folders' && window.FBA?.currentUser && 
-              (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal')) {
-            syncFolderToFirebase(data).catch(err => {
-              console.warn('⚠️ Firebase-Sync fehlgeschlagen (offline?):', err.message);
-            });
-          }
-          
           resolve(request.result);
         };
         request.onerror = () => reject(request.error);
@@ -16137,24 +16008,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const store = transaction.objectStore(storeName);
         const request = store.delete(key);
         
-        request.onsuccess = () => {
-          // NEU: Lösche auch aus Firebase wenn angemeldet
-          if (storeName === 'observations' && window.FBA?.currentUser && 
-              (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal')) {
-            deleteObservationFromFirebase(key).catch(err => {
-              console.warn('⚠️ Firebase-Löschung fehlgeschlagen:', err.message);
-            });
-          }
-          
-          if (storeName === 'folders' && window.FBA?.currentUser && 
-              (!window.currentSelectedGroup || window.currentSelectedGroup === 'personal')) {
-            deleteFolderFromFirebase(key).catch(err => {
-              console.warn('⚠️ Firebase-Löschung fehlgeschlagen:', err.message);
-            });
-          }
-          
-          resolve(true);
-        };
+        request.onsuccess = () => resolve(true);
         request.onerror = () => reject(request.error);
       });
     }
@@ -16165,268 +16019,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const transaction = db.transaction([storeName], mode);
       return transaction.objectStore(storeName);
     }
-    
-    // ========== FIREBASE CLOUD-SYNC für PRIVATE BEOBACHTUNGEN ==========
-    
-    // Sync einzelne Beobachtung zu Firebase
-    async function syncObservationToFirebase(observation) {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        throw new Error('Nicht angemeldet');
-      }
-      
-      const userId = window.FBA.currentUser.uid;
-      const obsPath = `users/${userId}/observations/${observation.id}`;
-      
-      // Entferne undefined-Werte für Firebase
-      const cleanObs = removeUndefinedFields(observation);
-      
-      // Füge Sync-Metadata hinzu
-      cleanObs.syncedAt = new Date().toISOString();
-      cleanObs.userId = userId;
-      
-      await window.FBD.ref(obsPath).set(cleanObs);
-      console.log('✅ Observation synced to Firebase:', observation.id);
-    }
-    
-    // Sync einzelnen Ordner zu Firebase
-    async function syncFolderToFirebase(folder) {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        throw new Error('Nicht angemeldet');
-      }
-      
-      const userId = window.FBA.currentUser.uid;
-      const folderPath = `users/${userId}/folders/${folder.id}`;
-      
-      const cleanFolder = removeUndefinedFields(folder);
-      cleanFolder.syncedAt = new Date().toISOString();
-      cleanFolder.userId = userId;
-      
-      await window.FBD.ref(folderPath).set(cleanFolder);
-      console.log('✅ Folder synced to Firebase:', folder.id);
-    }
-    
-    // Lade alle Beobachtungen von Firebase (beim Login)
-    async function loadObservationsFromFirebase() {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        console.log('⚠️ Nicht angemeldet - überspringe Firebase-Load');
-        return;
-      }
-      
-      const userId = window.FBA.currentUser.uid;
-      console.log('📥 Lade Beobachtungen von Firebase für User:', userId);
-      
-      try {
-        const snapshot = await window.FBD.ref(`users/${userId}/observations`).once('value');
-        
-        if (!snapshot.exists()) {
-          console.log('ℹ️ Keine Cloud-Beobachtungen gefunden');
-          return;
-        }
-        
-        const firebaseObs = snapshot.val();
-        const observations = Object.values(firebaseObs);
-        
-        console.log('📦 Gefundene Cloud-Beobachtungen:', observations.length);
-        
-        // Merge mit lokalen Daten
-        let newCount = 0;
-        let updatedCount = 0;
-        
-        for (const obs of observations) {
-          const localObs = await getFromIndexedDB('observations', obs.id);
-          
-          if (!localObs) {
-            // Neue Beobachtung von Cloud
-            await saveToIndexedDB('observations', obs);
-            newCount++;
-          } else if (obs.syncedAt && localObs.syncedAt) {
-            // Prüfe welche Version neuer ist
-            if (new Date(obs.syncedAt) > new Date(localObs.syncedAt)) {
-              await saveToIndexedDB('observations', obs);
-              updatedCount++;
-            }
-          }
-        }
-        
-        console.log(`✅ Sync abgeschlossen: ${newCount} neu, ${updatedCount} aktualisiert`);
-        
-        if (newCount > 0 || updatedCount > 0) {
-          showNotification(`☁️ ${newCount + updatedCount} Beobachtungen von Cloud synchronisiert`, 3000);
-        }
-        
-      } catch (error) {
-        console.error('❌ Fehler beim Laden von Firebase:', error);
-        throw error;
-      }
-    }
-    
-    // Lade alle Ordner von Firebase
-    async function loadFoldersFromFirebase() {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        return;
-      }
-      
-      const userId = window.FBA.currentUser.uid;
-      
-      try {
-        const snapshot = await window.FBD.ref(`users/${userId}/folders`).once('value');
-        
-        if (!snapshot.exists()) {
-          return;
-        }
-        
-        const firebaseFolders = snapshot.val();
-        const folders = Object.values(firebaseFolders);
-        
-        for (const folder of folders) {
-          const localFolder = await getFromIndexedDB('folders', folder.id);
-          
-          if (!localFolder) {
-            await saveToIndexedDB('folders', folder);
-          } else if (folder.syncedAt && localFolder.syncedAt) {
-            if (new Date(folder.syncedAt) > new Date(localFolder.syncedAt)) {
-              await saveToIndexedDB('folders', folder);
-            }
-          }
-        }
-        
-        console.log('✅ Ordner synchronisiert:', folders.length);
-        
-      } catch (error) {
-        console.error('❌ Fehler beim Laden von Ordnern:', error);
-      }
-    }
-    
-    // Sync ALLE lokalen Daten zu Firebase (einmalig beim ersten Login)
-    async function syncAllLocalDataToFirebase() {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        return;
-      }
-      
-      console.log('🔄 Starte vollständigen Upload zu Firebase...');
-      showNotification('☁️ Synchronisiere lokale Daten...', 2000);
-      
-      try {
-        // Sync alle Beobachtungen
-        const observations = await getAllFromIndexedDB('observations');
-        let syncedObs = 0;
-        
-        for (const obs of observations) {
-          try {
-            await syncObservationToFirebase(obs);
-            syncedObs++;
-            
-            if (syncedObs % 50 === 0) {
-              showNotification(`☁️ ${syncedObs}/${observations.length} Beobachtungen hochgeladen...`, 1000);
-            }
-          } catch (err) {
-            console.warn('Fehler bei Observation:', obs.id, err);
-          }
-        }
-        
-        // Sync alle Ordner
-        const folders = await getAllFromIndexedDB('folders');
-        for (const folder of folders) {
-          try {
-            await syncFolderToFirebase(folder);
-          } catch (err) {
-            console.warn('Fehler bei Folder:', folder.id, err);
-          }
-        }
-        
-        console.log(`✅ Upload abgeschlossen: ${syncedObs} Beobachtungen, ${folders.length} Ordner`);
-        showNotification(`✅ ${syncedObs} Beobachtungen in Cloud gesichert`, 3000);
-        
-        // Speichere dass Initial-Sync erfolgt ist
-        localStorage.setItem('firebaseSyncCompleted_' + window.FBA.currentUser.uid, 'true');
-        
-      } catch (error) {
-        console.error('❌ Fehler beim Upload:', error);
-        showNotification('⚠️ Cloud-Upload teilweise fehlgeschlagen', 3000);
-      }
-    }
-    
-    // Lösche Beobachtung aus Firebase
-    async function deleteObservationFromFirebase(observationId) {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        return;
-      }
-      
-      const userId = window.FBA.currentUser.uid;
-      await window.FBD.ref(`users/${userId}/observations/${observationId}`).remove();
-      console.log('🗑️ Observation deleted from Firebase:', observationId);
-    }
-    
-    // Lösche Ordner aus Firebase
-    async function deleteFolderFromFirebase(folderId) {
-      if (!window.FBA?.currentUser || !window.FBD) {
-        return;
-      }
-      
-      const userId = window.FBA.currentUser.uid;
-      await window.FBD.ref(`users/${userId}/folders/${folderId}`).remove();
-      console.log('🗑️ Folder deleted from Firebase:', folderId);
-    }
-    
-    // ========== ENDE FIREBASE CLOUD-SYNC ==========
-    
-    // Manuelle Cloud-Synchronisation (für Button)
-    window.manualCloudSync = async function() {
-      if (!window.FBA?.currentUser) {
-        showNotification('⚠️ Nicht angemeldet - bitte zuerst einloggen', 3000);
-        return;
-      }
-      
-      // Speichere aktuellen Modus
-      const currentMode = window.currentSelectedGroup || 'personal';
-      console.log('💾 Aktueller Modus vor manuellem Sync:', currentMode);
-      
-      const btn = document.getElementById('cloudSyncBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = '⏳ Synchronisiere...';
-      }
-      
-      try {
-        showNotification('☁️ Starte Synchronisation...', 2000);
-        
-        // Download von Cloud
-        await loadObservationsFromFirebase();
-        await loadFoldersFromFirebase();
-        
-        // Upload zu Cloud
-        await syncAllLocalDataToFirebase();
-        
-        // WICHTIG: Stelle Modus wieder her
-        window.currentSelectedGroup = currentMode;
-        
-        // Aktualisiere UI NUR wenn im persönlichen Modus
-        if (currentMode === 'personal') {
-          if (typeof loadData === 'function') await loadData();
-          if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
-          if (typeof updateChart === 'function') updateChart();
-        }
-        
-        showNotification('✅ Cloud-Sync erfolgreich!', 3000);
-        console.log('✅ Manueller Sync abgeschlossen, Modus:', window.currentSelectedGroup);
-        
-        // Update Last-Sync-Zeit
-        const now = new Date().toLocaleString('de-DE');
-        const timeSpan = document.getElementById('lastSyncTime');
-        if (timeSpan) {
-          timeSpan.textContent = now;
-        }
-        
-      } catch (error) {
-        console.error('❌ Cloud-Sync Fehler:', error);
-        showNotification('❌ Cloud-Sync fehlgeschlagen: ' + error.message, 5000);
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = '☁️ Cloud-Sync jetzt';
-        }
-      }
-    };
     
     // Datenbankstatistiken
     async function getDatabaseStats() {
@@ -25588,8 +25180,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // ---------- Ornitho.de Import ----------
     async function importOrnithoData(file) {
       try {
-        showNotification('📱 Import gestartet...', 2000);
-        console.log('🦅 Ornitho-Import gestartet:', file.name);
         showNotification('Lese Ornitho.de Datei...', 2000);
         
         // Initialisiere Batch-Arrays
@@ -25641,9 +25231,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         const text = await file.text();
-        console.log('📄 Datei erfolgreich gelesen, Größe:', text.length, 'Zeichen');
         const lines = text.split('\n');
-        console.log('📊 Anzahl Zeilen:', lines.length);
         
         if (lines.length < 3) {
           throw new Error('Datei ist zu kurz oder ungültig');
@@ -25764,7 +25352,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         // Parse Beobachtungen (ab Zeile 2, Zeile 1 ist deutscher Header)
-        console.log('🔄 Starte Parsing der Beobachtungen...');
         for (let i = 2; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
@@ -25932,13 +25519,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           
           // Zeige Fortschritt alle 25 Einträge (häufiger für besseres Feedback)
           if (importCount % 25 === 0) {
-            console.log(`📊 Fortschritt: ${importCount} Beobachtungen verarbeitet`);
             showNotification(`${importCount} Beobachtungen vorbereitet...`, 300);
           }
         }
-        
-        console.log('✅ Parsing abgeschlossen:', importCount, 'Beobachtungen');
-        showNotification('💾 Speichere Daten...', 1000);
         
         // NEU: Speichere alle Firebase-Beobachtungen in Chunks (für bessere Performance)
         if ((isGroupMode || shouldAlsoImportToGroup) && window.batchObservations && window.batchObservations.length > 0) {
@@ -26015,32 +25598,25 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         // Aktualisiere UI
-        try {
-          if (!isGroupMode) {
-            showNotification('📱 Aktualisiere Ansicht...', 1000);
-            await loadData();
-            await initFolderSelect();
-            updateMarkersFromData();
-            updateChart();
-            updateAdvancedStatistics();
-            updateDashboard();
-            await updateQuickStats();
-            
-            // NEU: Synchronisiere geteilte Listen (nur im lokalen Modus)
-            await syncSharedListsAfterNewObservation();
-          } else {
-            // Im Gruppenmodus: Raritäten-Challenge aktualisieren
-            showNotification('📱 Aktualisiere Gruppe...', 1000);
-            if (typeof renderRarityChallenge === 'function') {
-              await renderRarityChallenge();
-            }
-            if (typeof renderObservationManager === 'function') {
-              await renderObservationManager();
-            }
+        if (!isGroupMode) {
+          await loadData();
+          await initFolderSelect();
+          updateMarkersFromData();
+          updateChart();
+          updateAdvancedStatistics();
+          updateDashboard();
+          await updateQuickStats();
+          
+          // NEU: Synchronisiere geteilte Listen (nur im lokalen Modus)
+          await syncSharedListsAfterNewObservation();
+        } else {
+          // Im Gruppenmodus: Raritäten-Challenge aktualisieren
+          if (typeof renderRarityChallenge === 'function') {
+            await renderRarityChallenge();
           }
-        } catch (updateError) {
-          console.error('Fehler beim UI-Update:', updateError);
-          showNotification('⚠️ Daten importiert, aber UI-Update fehlgeschlagen. Bitte Seite neu laden.', 5000);
+          if (typeof renderObservationManager === 'function') {
+            await renderObservationManager();
+          }
         }
         
         // Erstelle detaillierte Erfolgsmeldung
@@ -26155,551 +25731,23 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
-    // ==========================================
-    // BULLETPROOF MOBILE ORNITHO IMPORT
-    // ==========================================
-    
-    const mobileFileInput = document.getElementById('ornithoMobileInput');
-    const mobileStatus = document.getElementById('mobileImportStatus');
-    const statusTitle = document.getElementById('statusTitle');
-    const statusMessage = document.getElementById('statusMessage');
-    
-    let lastCheckedFiles = null;
-    let fileCheckInterval = null;
-    
-    function showStatus(title, message, type = 'info') {
-      statusTitle.textContent = title;
-      statusMessage.textContent = message;
-      mobileStatus.style.display = 'block';
-      
-      // Farben basierend auf Typ
-      if (type === 'success') {
-        mobileStatus.style.background = 'rgba(16,185,129,0.1)';
-        mobileStatus.style.borderColor = 'rgba(16,185,129,0.3)';
-      } else if (type === 'error') {
-        mobileStatus.style.background = 'rgba(239,68,68,0.1)';
-        mobileStatus.style.borderColor = 'rgba(239,68,68,0.3)';
-      } else if (type === 'warning') {
-        mobileStatus.style.background = 'rgba(249,115,22,0.1)';
-        mobileStatus.style.borderColor = 'rgba(249,115,22,0.3)';
-      } else {
-        mobileStatus.style.background = 'rgba(6,182,212,0.1)';
-        mobileStatus.style.borderColor = 'rgba(6,182,212,0.3)';
+    // Event Listener für Ornitho.de Import
+    document.getElementById('ornithoImportFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Prüfe ob im Gruppenmodus
+        const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+        
+        // Zeige Import-Optionen-Dialog
+        showOrnithoImportOptions(file, isGroupMode);
+        
+        // Reset file input
+        this.value = '';
       }
-      
-      console.log(`📊 [${type.toUpperCase()}] ${title}: ${message}`);
-    }
-    
-    function hideStatus() {
-      mobileStatus.style.display = 'none';
-    }
-    
-    // METHODE 1: Standard Events (funktioniert manchmal)
-    if (mobileFileInput) {
-      console.log('✅ Mobile File Input gefunden');
-      
-      // Alle möglichen Events
-      ['change', 'input', 'blur'].forEach(eventType => {
-        mobileFileInput.addEventListener(eventType, function(e) {
-          console.log(`🔔 Event: ${eventType}`);
-          handleFileSelection(e);
-        }, false);
-      });
-      
-      // iOS Safari spezifisch
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        mobileFileInput.addEventListener('touchend', function() {
-          console.log('📱 iOS touchend - starte delayed check');
-          setTimeout(() => checkFileManually(), 1000);
-        }, false);
-      }
-      
-      // METHODE 2: Polling (als Backup)
-      // Starte Polling wenn Input fokussiert wird
-      mobileFileInput.addEventListener('focus', function() {
-        console.log('👁️ File Input fokussiert - starte Polling');
-        showStatus('Bereit', 'Wähle eine Datei aus...', 'info');
-        startFilePolling();
-      });
-      
-      mobileFileInput.addEventListener('blur', function() {
-        console.log('👁️ File Input verloren - stoppe Polling');
-        stopFilePolling();
-      });
-      
-    } else {
-      console.error('❌ Mobile File Input NICHT gefunden!');
-    }
-    
-    function startFilePolling() {
-      stopFilePolling(); // Stoppe altes Polling
-      
-      fileCheckInterval = setInterval(() => {
-        if (mobileFileInput && mobileFileInput.files && mobileFileInput.files.length > 0) {
-          const currentFiles = mobileFileInput.files;
-          
-          // Prüfe ob sich Dateien geändert haben
-          if (!lastCheckedFiles || currentFiles[0] !== lastCheckedFiles[0]) {
-            console.log('🔍 POLLING: Neue Datei erkannt!');
-            lastCheckedFiles = currentFiles;
-            stopFilePolling();
-            handleFileSelection({ target: mobileFileInput });
-          }
-        }
-      }, 500); // Check alle 500ms
-      
-      console.log('🔄 Polling gestartet');
-    }
-    
-    function stopFilePolling() {
-      if (fileCheckInterval) {
-        clearInterval(fileCheckInterval);
-        fileCheckInterval = null;
-        console.log('🛑 Polling gestoppt');
-      }
-    }
-    
-    function handleFileSelection(e) {
-      const files = e.target.files;
-      
-      console.log('📁 handleFileSelection aufgerufen');
-      console.log('📁 Files Array:', files);
-      console.log('📁 Anzahl Dateien:', files ? files.length : 0);
-      
-      if (!files || files.length === 0) {
-        console.log('⚠️ Keine Dateien gefunden');
-        return;
-      }
-      
-      const file = files[0];
-      console.log('✅ DATEI GEFUNDEN:');
-      console.log('  Name:', file.name);
-      console.log('  Größe:', file.size, 'bytes');
-      console.log('  Typ:', file.type);
-      
-      showStatus('✅ Datei erkannt', file.name + ' (' + Math.round(file.size/1024) + ' KB)', 'success');
-      showNotification('✅ Datei erkannt: ' + file.name, 2000);
-      
-      // Automatischer Import nach kurzer Verzögerung
-      setTimeout(() => {
-        processOrnithoFile(file);
-      }, 500);
-    }
-    
-    // METHODE 3: Manueller Check Button
-    window.checkFileManually = function() {
-      console.log('='.repeat(50));
-      console.log('🖱️ MANUELLER CHECK BUTTON GEKLICKT');
-      console.log('='.repeat(50));
-      
-      if (!mobileFileInput) {
-        console.error('❌ mobileFileInput ist NULL oder undefined');
-        showStatus('❌ Fehler', 'File Input nicht gefunden', 'error');
-        alert('❌ FEHLER: File Input Element nicht gefunden!\n\nBitte Seite neu laden.');
-        return;
-      }
-      
-      console.log('✅ mobileFileInput gefunden:', mobileFileInput);
-      console.log('📋 Input ID:', mobileFileInput.id);
-      console.log('📋 Input Type:', mobileFileInput.type);
-      console.log('📋 Input Accept:', mobileFileInput.accept);
-      
-      const files = mobileFileInput.files;
-      console.log('📁 Files Object:', files);
-      console.log('📁 Files Type:', typeof files);
-      console.log('📁 Files Length:', files ? files.length : 'NULL');
-      
-      if (files && files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-          console.log(`📄 File ${i}:`, {
-            name: files[i].name,
-            size: files[i].size,
-            type: files[i].type,
-            lastModified: new Date(files[i].lastModified)
-          });
-        }
-      }
-      
-      console.log('📋 Input Value:', mobileFileInput.value);
-      
-      if (!files || files.length === 0) {
-        console.warn('⚠️⚠️⚠️ KEINE DATEIEN GEFUNDEN');
-        showStatus('⚠️ Keine Datei', 'Bitte zuerst eine Datei auswählen', 'warning');
-        showNotification('⚠️ Bitte wähle zuerst eine Datei aus', 3000);
-        
-        alert(
-          '⚠️ Keine Datei ausgewählt!\n\n' +
-          'Bitte zuerst auf das Datei-Feld tippen und eine Datei auswählen.\n\n' +
-          'Falls das nicht funktioniert, nutze die "Text einfügen" Methode.'
-        );
-        
-        return;
-      }
-      
-      const file = files[0];
-      console.log('✅✅✅ DATEI GEFUNDEN:', file.name);
-      console.log('Dateigröße:', file.size, 'bytes (', Math.round(file.size/1024), 'KB )');
-      console.log('Dateityp:', file.type);
-      
-      showStatus('🚀 Import läuft', 'Verarbeite ' + file.name + '...', 'info');
-      showNotification('🚀 Starte Import von ' + file.name, 2000);
-      
-      console.log('📞 Rufe processOrnithoFile auf...');
-      processOrnithoFile(file);
-      console.log('📞 processOrnithoFile Aufruf abgeschlossen (async läuft weiter)');
-      
-      console.log('='.repeat(50));
-    };
-    
-    // Gemeinsame Verarbeitungsfunktion
-    function processOrnithoFile(file) {
-      console.log('='.repeat(50));
-      console.log('🦅 processOrnithoFile GESTARTET');
-      console.log('='.repeat(50));
-      console.log('📁 File Object:', file);
-      console.log('📁 File Name:', file.name);
-      console.log('📁 File Size:', file.size);
-      console.log('📁 File Type:', file.type);
-      
-      // ZEIGE LADE-OVERLAY
-      showLoadingOverlay('🦅 Import läuft...', 'Bitte warten, das kann einige Sekunden dauern...');
-      
-      showNotification('🦅 Import wird vorbereitet...', 2000);
-      
-      // Teste ob importOrnithoData existiert
-      console.log('🔍 Prüfe ob importOrnithoData existiert...');
-      console.log('  typeof importOrnithoData:', typeof importOrnithoData);
-      console.log('  typeof window.importOrnithoData:', typeof window.importOrnithoData);
-      
-      if (typeof importOrnithoData === 'undefined') {
-        console.error('❌ FEHLER: importOrnithoData ist nicht definiert!');
-        hideLoadingOverlay();
-        showStatus('❌ Fehler', 'Import-Funktion nicht gefunden', 'error');
-        alert('❌ FEHLER: Import-Funktion nicht gefunden!\n\nBitte die Seite neu laden.');
-        return;
-      }
-      
-      setTimeout(() => {
-        console.log('⏰ Timeout ausgeführt - zeige Confirm Dialog');
-        
-        updateLoadingOverlay('❓ Warte auf deine Antwort...', 'Beantworte die Frage im Popup');
-        
-        const selffound = confirm(
-          '🦅 Ornitho Import: ' + file.name + '\n\n' +
-          'Als "selbst gefunden" markieren?\n\n' +
-          '✅ JA = Alle Vögel selbst entdeckt\n' +
-          '❌ NEIN = Verschiedene Beobachter'
-        );
-        
-        console.log('👤 User hat gewählt - Selffound:', selffound);
-        
-        window.ornithoImportSelffound = selffound;
-        window.ornithoImportTargetGroup = null;
-        
-        console.log('🔧 Globale Variablen gesetzt:');
-        console.log('  window.ornithoImportSelffound:', window.ornithoImportSelffound);
-        console.log('  window.ornithoImportTargetGroup:', window.ornithoImportTargetGroup);
-        
-        updateLoadingOverlay('📖 Lese Datei...', 'Datei wird eingelesen...');
-        showStatus('⏳ Importiere', 'Bitte warten...', 'info');
-        
-        try {
-          console.log('🚀 RUFE importOrnithoData AUF...');
-          console.log('🚀 Mit File:', file.name, '(' + file.size + ' bytes)');
-          
-          updateLoadingOverlay('⚙️ Verarbeite Daten...', 'Dies kann bei großen Dateien länger dauern');
-          
-          // Rufe die Funktion auf und fange Promise Errors
-          const importPromise = importOrnithoData(file);
-          
-          console.log('📦 importPromise:', importPromise);
-          console.log('📦 Type:', typeof importPromise);
-          
-          if (importPromise && typeof importPromise.then === 'function') {
-            console.log('✅ Promise erkannt - warte auf Completion...');
-            
-            // Zeige Fortschritt während Import läuft
-            let dots = 0;
-            const progressInterval = setInterval(() => {
-              dots = (dots + 1) % 4;
-              const dotString = '.'.repeat(dots);
-              updateLoadingOverlay('⚙️ Import läuft' + dotString, 'Bitte Geduld, verarbeite Beobachtungen...');
-            }, 500);
-            
-            importPromise.then(() => {
-              clearInterval(progressInterval);
-              console.log('✅ Import Promise resolved');
-              updateLoadingOverlay('✅ Fertig!', 'Import erfolgreich abgeschlossen');
-              showStatus('✅ Import abgeschlossen', 'Beobachtungen wurden importiert', 'success');
-              showNotification('✅ Import erfolgreich!', 3000);
-              
-              setTimeout(() => {
-                hideLoadingOverlay();
-                hideStatus();
-              }, 2000);
-              
-            }).catch((error) => {
-              clearInterval(progressInterval);
-              console.error('❌ Import Promise rejected:', error);
-              console.error('Stack:', error.stack);
-              hideLoadingOverlay();
-              showStatus('❌ Fehler', error.message, 'error');
-              showNotification('❌ Import-Fehler: ' + error.message, 5000);
-              alert('❌ Import-Fehler:\n\n' + error.message);
-            });
-          } else {
-            console.warn('⚠️ Kein Promise zurückgegeben');
-            hideLoadingOverlay();
-          }
-          
-        } catch (error) {
-          console.error('❌❌❌ EXCEPTION in processOrnithoFile:', error);
-          console.error('Error Name:', error.name);
-          console.error('Error Message:', error.message);
-          console.error('Error Stack:', error.stack);
-          
-          hideLoadingOverlay();
-          showStatus('❌ Fehler', error.message, 'error');
-          showNotification('❌ Import-Fehler: ' + error.message, 5000);
-          
-          alert('❌ FEHLER beim Import:\n\n' + error.message + '\n\nSiehe Console für Details (F12)');
-        }
-        
-        // Reset Input
-        console.log('🔄 Resette File Input...');
-        mobileFileInput.value = '';
-        
-      }, 300);
-      
-      console.log('='.repeat(50));
-      console.log('🦅 processOrnithoFile ENDE (async läuft weiter)');
-      console.log('='.repeat(50));
-    }
-    
-    // LADE-OVERLAY FUNKTIONEN
-    function showLoadingOverlay(title, message) {
-      // Entferne altes Overlay falls vorhanden
-      const oldOverlay = document.getElementById('importLoadingOverlay');
-      if (oldOverlay) oldOverlay.remove();
-      
-      const overlay = document.createElement('div');
-      overlay.id = 'importLoadingOverlay';
-      overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 999999;
-        background: rgba(0,0,0,0.95);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      `;
-      
-      overlay.innerHTML = `
-        <div style="
-          background: var(--card);
-          border: 2px solid var(--accent);
-          border-radius: 16px;
-          padding: 32px;
-          max-width: 400px;
-          width: 100%;
-          text-align: center;
-        ">
-          <!-- Spinner -->
-          <div style="
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 24px auto;
-            border: 4px solid rgba(6,182,212,0.2);
-            border-top: 4px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-          "></div>
-          
-          <style>
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          </style>
-          
-          <h3 id="loadingTitle" style="
-            margin: 0 0 12px 0;
-            color: var(--text);
-            font-size: 20px;
-          ">${title}</h3>
-          
-          <p id="loadingMessage" style="
-            margin: 0;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.6;
-          ">${message}</p>
-          
-          <div style="
-            margin-top: 20px;
-            padding: 12px;
-            background: rgba(249,115,22,0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(249,115,22,0.3);
-          ">
-            <div style="font-size: 12px; color: var(--text);">
-              ⏱️ <strong>Große Dateien können 10-30 Sekunden dauern</strong>
-            </div>
-            <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">
-              Bitte nicht die Seite schließen oder neu laden!
-            </div>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(overlay);
-      console.log('📺 Lade-Overlay angezeigt');
-    }
-    
-    function updateLoadingOverlay(title, message) {
-      const titleEl = document.getElementById('loadingTitle');
-      const messageEl = document.getElementById('loadingMessage');
-      
-      if (titleEl) titleEl.textContent = title;
-      if (messageEl) messageEl.textContent = message;
-      
-      console.log('🔄 Overlay aktualisiert:', title);
-    }
-    
-    function hideLoadingOverlay() {
-      const overlay = document.getElementById('importLoadingOverlay');
-      if (overlay) {
-        overlay.style.opacity = '0';
-        overlay.style.transition = 'opacity 0.3s';
-        setTimeout(() => overlay.remove(), 300);
-        console.log('📺 Lade-Overlay versteckt');
-      }
-    }
-    
-    // TEXT PASTE ALTERNATIVE
-    window.showTextPasteMethod = function() {
-      const dialog = document.createElement('div');
-      dialog.style.cssText = `
-        position: fixed;
-        inset: 0;
-        z-index: 99999;
-        background: rgba(0,0,0,0.95);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        overflow-y: auto;
-      `;
-      
-      dialog.innerHTML = `
-        <div style="
-          background: var(--card);
-          border: 2px solid var(--accent);
-          border-radius: 16px;
-          padding: 24px;
-          max-width: 600px;
-          width: 100%;
-          max-height: 90vh;
-          overflow-y: auto;
-        ">
-          <h3 style="margin:0 0 16px 0;color:var(--text);">📋 Text einfügen</h3>
-          
-          <div style="background:rgba(16,185,129,0.1);padding:12px;border-radius:8px;margin-bottom:16px;border:1px solid rgba(16,185,129,0.3);">
-            <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">
-              ✅ Diese Methode funktioniert immer!
-            </div>
-            <ol style="font-size:11px;color:var(--muted);margin:0;padding-left:20px;line-height:1.8;">
-              <li>Finde die ornitho.de .txt Datei auf deinem Handy</li>
-              <li>Öffne sie mit einer Text/Notizen-App</li>
-              <li>Markiere ALLES (lange drücken → "Alles auswählen")</li>
-              <li>Kopiere (Strg+C oder lange drücken → "Kopieren")</li>
-              <li>Füge hier unten ein (Strg+V oder lange drücken → "Einfügen")</li>
-            </ol>
-          </div>
-          
-          <textarea id="pasteTextInput" placeholder="Füge hier den kompletten Datei-Inhalt ein..." style="
-            width: 100%;
-            min-height: 300px;
-            padding: 12px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: var(--text);
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            resize: vertical;
-            margin-bottom: 16px;
-          "></textarea>
-          
-          <div style="display:flex;gap:8px;">
-            <button onclick="processPastedOrnithoText()" style="
-              flex: 1;
-              padding: 14px;
-              background: var(--accent);
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-weight: 600;
-              cursor: pointer;
-            ">
-              🚀 Jetzt importieren
-            </button>
-            <button onclick="this.closest('div').parentElement.parentElement.remove()" style="
-              padding: 14px 24px;
-              background: rgba(255,255,255,0.05);
-              color: var(--muted);
-              border: 1px solid rgba(255,255,255,0.1);
-              border-radius: 8px;
-              cursor: pointer;
-            ">
-              Abbrechen
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(dialog);
-      setTimeout(() => document.getElementById('pasteTextInput').focus(), 100);
-    };
-    
-    window.processPastedOrnithoText = function() {
-      const text = document.getElementById('pasteTextInput').value.trim();
-      
-      if (!text) {
-        showNotification('⚠️ Bitte Text einfügen', 2000);
-        return;
-      }
-      
-      console.log('📋 Text eingefügt, Länge:', text.length);
-      showNotification('📋 Verarbeite eingefügten Text...', 2000);
-      
-      // Erstelle File aus Text
-      const blob = new Blob([text], { type: 'text/plain' });
-      const file = new File([blob], 'ornitho_paste.txt', { type: 'text/plain' });
-      
-      // Entferne Dialog
-      document.querySelector('div[style*="z-index: 99999"]').remove();
-      
-      // Import
-      processOrnithoFile(file);
-    };
-    
-    console.log('✅ Bulletproof Mobile Import initialisiert');
-    
-    // ALTE FUNKTIONEN ENTFERNT
-    
+    });
     
     // NEU: Zeige Import-Optionen Dialog
     async function showOrnithoImportOptions(file, isGroupMode) {
-      console.log('📱 showOrnithoImportOptions aufgerufen, Mobile:', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-      
-      // Mobile Fallback: Wenn Dialog-Probleme, nutze confirm/prompt
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      
       // Lade verfügbare Gruppen wenn im privaten Modus
       let availableGroups = [];
       if (!isGroupMode && window.FBA && window.FBA.currentUser) {
@@ -26726,83 +25774,34 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
       }
       
-      // MOBILE FALLBACK: Einfacher Confirm-Dialog
-      if (isMobile && window.useMobileFallback) {
-        console.log('📱 Verwende Mobile-Fallback (confirm/alert)');
-        
-        const selffound = confirm(
-          '🦅 Ornitho.de Import\n\n' +
-          'Datei: ' + file.name + '\n\n' +
-          'Als "selbst gefunden" markieren?\n\n' +
-          'JA = Alle Beobachtungen selbst entdeckt\n' +
-          'NEIN = Beobachtungen von verschiedenen Personen'
-        );
-        
-        window.ornithoImportSelffound = selffound;
-        window.ornithoImportTargetGroup = null;
-        
-        importOrnithoData(file);
-        return;
-      }
-      
       const dialogHtml = `
         <div id="ornithoImportDialog" style="
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          width: 100%;
-          height: 100%;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-          z-index: 99999;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-          background: rgba(0,0,0,0.85);
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: var(--card);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+          z-index: 10000;
+          min-width: 450px;
+          max-width: 90vw;
         ">
-          <div style="
-            background: var(--card);
-            border: 2px solid var(--accent);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 20px 60px rgba(6,182,212,0.5);
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-          " onclick="event.stopPropagation()">
-            
-            <!-- Close Button -->
-            <button onclick="closeOrnithoImportDialog()" style="
-              position: absolute;
-              top: 12px;
-              right: 12px;
-              background: rgba(255,255,255,0.1);
-              border: none;
-              width: 32px;
-              height: 32px;
-              border-radius: 50%;
-              color: var(--text);
-              cursor: pointer;
-              font-size: 20px;
-              line-height: 1;
-            ">×</button>
-            
-            <h3 style="margin: 0 0 16px 0; color: var(--text); font-size: 20px;">🦅 Ornitho.de Import</h3>
+          <h3 style="margin: 0 0 16px 0; color: var(--text);">🦅 Ornitho.de Import</h3>
           
-          <div style="background: rgba(6,182,212,0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(6,182,212,0.3);">
+          <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
             <div style="font-size: 14px; color: var(--text); margin-bottom: 4px;">
-              <strong>📁 Datei:</strong> ${file.name}
+              <strong>Datei:</strong> ${file.name}
             </div>
             ${isGroupMode ? `
               <div style="font-size: 13px; color: var(--muted);">
-                ➡️ Import in aktuelle Gruppe
+                Import in aktuelle Gruppe
               </div>
             ` : `
               <div style="font-size: 13px; color: var(--muted);">
-                ➡️ Import in Ordner "Ornitho.de Import"
+                Import in Ordner "Ornitho.de Import"
               </div>
             `}
           </div>
@@ -26812,9 +25811,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               <h4 style="margin: 0 0 12px 0; color: var(--text); font-size: 14px;">📤 Zusätzlich in Gruppe importieren:</h4>
               <select id="ornithoTargetGroupSelect" style="
                 width: 100%;
-                padding: 12px;
+                padding: 10px;
                 background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.1);
                 border-radius: 8px;
                 color: var(--text);
                 font-size: 14px;
@@ -26830,135 +25829,93 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           ` : ''}
           
           <div style="margin-bottom: 20px;">
-            <h4 style="margin: 0 0 12px 0; color: var(--text); font-size: 14px;">⚙️ Import-Optionen:</h4>
+            <h4 style="margin: 0 0 12px 0; color: var(--text); font-size: 14px;">Import-Optionen:</h4>
             
             <label style="
               display: flex;
               align-items: flex-start;
               gap: 10px;
               padding: 12px;
-              background: rgba(255,255,255,0.05);
+              background: rgba(255,255,255,0.02);
               border-radius: 8px;
               cursor: pointer;
-              border: 1px solid rgba(255,255,255,0.1);
-              -webkit-tap-highlight-color: rgba(6,182,212,0.2);
-            ">
-              <input type="checkbox" id="ornithoSelffoundOption" style="margin-top: 2px; cursor: pointer; width: 20px; height: 20px;" />
+              border: 1px solid rgba(255,255,255,0.05);
+              transition: all 0.2s;
+            " onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+              <input type="checkbox" id="ornithoSelffoundOption" style="margin-top: 2px; cursor: pointer;" />
               <div style="flex: 1;">
                 <div style="color: var(--text); font-weight: 600; margin-bottom: 4px;">
                   👤 Als "selbst gefunden" markieren
                 </div>
                 <div style="color: var(--muted); font-size: 12px; line-height: 1.4;">
                   Aktiviere diese Option nur, wenn <strong>alle</strong> Beobachtungen in dieser Datei 
-                  von dir selbst entdeckt wurden.
+                  von dir selbst entdeckt wurden. Wenn die Datei auch Beobachtungen von anderen 
+                  Personen enthält, lasse diese Option deaktiviert.
                 </div>
               </div>
             </label>
           </div>
           
-          <div style="font-size: 11px; color: var(--muted); padding: 10px; background: rgba(124,58,237,0.1); border-radius: 6px; margin-bottom: 20px; border: 1px solid rgba(124,58,237,0.3);">
-            💡 Du kannst die Markierung später im Beobachtungs-Manager für einzelne Beobachtungen ändern.
+          <div style="font-size: 12px; color: var(--muted); padding: 10px; background: rgba(124,58,237,0.1); border-radius: 6px; margin-bottom: 16px;">
+            💡 <strong>Tipp:</strong> Du kannst die Markierung später im Beobachtungs-Manager für einzelne 
+            Beobachtungen ändern.
           </div>
           
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button onclick="startOrnithoImport()" style="
-              background: linear-gradient(135deg, var(--accent), var(--accent-2));
-              border: none;
-              padding: 14px 20px;
-              border-radius: 10px;
-              color: white;
-              cursor: pointer;
-              font-weight: 700;
-              font-size: 15px;
-              box-shadow: 0 4px 12px rgba(6,182,212,0.4);
-              width: 100%;
-            ">✅ Jetzt importieren</button>
-            
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
             <button onclick="closeOrnithoImportDialog()" style="
-              background: transparent;
-              border: 1px solid rgba(255,255,255,0.2);
-              padding: 12px 20px;
-              border-radius: 10px;
+              background: rgba(255,255,255,0.05);
+              border: 1px solid rgba(255,255,255,0.1);
+              padding: 10px 20px;
+              border-radius: 8px;
               color: var(--text);
               cursor: pointer;
               font-weight: 600;
-              width: 100%;
-            ">❌ Abbrechen</button>
+            ">Abbrechen</button>
+            <button onclick="startOrnithoImport()" style="
+              background: var(--accent);
+              border: none;
+              padding: 10px 20px;
+              border-radius: 8px;
+              color: white;
+              cursor: pointer;
+              font-weight: 600;
+            ">Importieren</button>
           </div>
-          
-          <!-- Mobile Fallback Button -->
-          <button onclick="useMobileFallbackImport()" style="
-            background: rgba(255,165,0,0.2);
-            border: 1px solid rgba(255,165,0,0.4);
-            padding: 8px 12px;
-            border-radius: 8px;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 11px;
-            width: 100%;
-            margin-top: 12px;
-          ">⚠️ Dialog funktioniert nicht? Einfacher Import</button>
         </div>
-        </div>
+        <div id="ornithoImportBackdrop" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.7);
+          backdrop-filter: blur(4px);
+          z-index: 9999;
+        " onclick="closeOrnithoImportDialog()"></div>
       `;
       
       const dialogContainer = document.createElement('div');
       dialogContainer.innerHTML = dialogHtml;
       document.body.appendChild(dialogContainer);
       
-      // Verhindere Scrollen im Hintergrund (Mobile)
-      document.body.style.overflow = 'hidden';
-      
-      // Speichere Datei für später
+      // Speichere Datei für späteren Import
       window.pendingOrnithoImport = { file, isGroupMode };
-      
-      console.log('✅ Dialog erstellt und angezeigt');
     }
     
     // Schließe Ornitho Import Dialog
     window.closeOrnithoImportDialog = function() {
       const dialog = document.getElementById('ornithoImportDialog');
-      if (dialog) dialog.remove();
-      
-      // Erlaube wieder Scrollen
-      document.body.style.overflow = '';
-      
+      const backdrop = document.getElementById('ornithoImportBackdrop');
+      if (dialog) dialog.parentElement.remove();
+      if (backdrop) backdrop.remove();
       delete window.pendingOrnithoImport;
-      console.log('✅ Dialog geschlossen');
-    };
-    
-    // Mobile Fallback: Einfacher Import ohne Dialog
-    window.useMobileFallbackImport = function() {
-      console.log('📱 Mobile Fallback aktiviert');
-      
-      if (!window.pendingOrnithoImport) {
-        showNotification('⚠️ Keine Datei ausgewählt', 2000);
-        return;
-      }
-      
-      const { file } = window.pendingOrnithoImport;
-      
-      const selffound = confirm(
-        '🦅 Ornitho.de Import\n\n' +
-        'Datei: ' + file.name + '\n\n' +
-        'Als "selbst gefunden" markieren?\n\n' +
-        'OK = Alle Beobachtungen selbst entdeckt\n' +
-        'Abbrechen = Beobachtungen von verschiedenen Personen'
-      );
-      
-      window.ornithoImportSelffound = selffound;
-      window.ornithoImportTargetGroup = null;
-      
-      closeOrnithoImportDialog();
-      importOrnithoData(file);
     };
     
     // Starte Ornitho Import mit Optionen
     window.startOrnithoImport = function() {
       if (!window.pendingOrnithoImport) return;
       
-      const checkbox = document.getElementById('ornithoSelffoundOption');
-      const selffoundOption = checkbox ? checkbox.checked : false;
+      const selffoundOption = document.getElementById('ornithoSelffoundOption').checked;
       const { file, isGroupMode } = window.pendingOrnithoImport;
       
       // Hole ausgewählte Gruppe (falls vorhanden)
@@ -28429,62 +27386,6 @@ var setupEvents=function(){
       console.log("8️⃣ Auth State: Angemeldet als", u.email);
       hideModal();hideLoading();updateUI(u);
       if(typeof showNotification==="function"){showNotification("✅ Cloud-Sync aktiv!")}
-      
-      // NEU: Starte Cloud-Synchronisation für private Beobachtungen
-      setTimeout(async () => {
-        try {
-          console.log('🔄 Starte Cloud-Synchronisation...');
-          
-          // WICHTIG: Speichere aktuelle Gruppenauswahl VORHER
-          const currentMode = window.currentSelectedGroup || 'personal';
-          console.log('💾 Aktueller Modus vor Sync:', currentMode);
-          
-          // Prüfe ob bereits Initial-Sync durchgeführt wurde
-          const syncCompleted = localStorage.getItem('firebaseSyncCompleted_' + u.uid);
-          
-          if (!syncCompleted) {
-            // Erster Login: Lade Cloud-Daten UND uploade lokale Daten
-            console.log('📥 Erster Login - lade Cloud-Daten und uploade lokale Daten');
-            showNotification('☁️ Erste Synchronisation läuft...', 3000);
-            
-            await loadObservationsFromFirebase();
-            await loadFoldersFromFirebase();
-            await syncAllLocalDataToFirebase();
-            
-            // WICHTIG: Stelle Modus wieder her BEVOR UI aktualisiert wird
-            window.currentSelectedGroup = currentMode;
-            
-            // Aktualisiere UI nach Sync NUR wenn im persönlichen Modus
-            if (currentMode === 'personal') {
-              if (typeof loadData === 'function') await loadData();
-              if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
-              if (typeof updateChart === 'function') updateChart();
-            }
-            
-          } else {
-            // Normaler Login: Nur Cloud-Daten laden (lokale Änderungen werden automatisch hochgeladen)
-            console.log('📥 Lade Cloud-Daten...');
-            await loadObservationsFromFirebase();
-            await loadFoldersFromFirebase();
-            
-            // WICHTIG: Stelle Modus wieder her BEVOR UI aktualisiert wird
-            window.currentSelectedGroup = currentMode;
-            
-            // Aktualisiere UI nach Sync NUR wenn im persönlichen Modus
-            if (currentMode === 'personal') {
-              if (typeof loadData === 'function') await loadData();
-              if (typeof updateMarkersFromData === 'function') updateMarkersFromData();
-            }
-          }
-          
-          console.log('✅ Cloud-Synchronisation abgeschlossen, Modus:', window.currentSelectedGroup);
-          
-        } catch (error) {
-          console.error('❌ Fehler bei Cloud-Sync:', error);
-          showNotification('⚠️ Cloud-Sync teilweise fehlgeschlagen', 3000);
-        }
-      }, 1000); // 1 Sekunde Verzögerung damit UI geladen ist
-      
     }else{
       console.log("8️⃣ Auth State: Abgemeldet");
       var w=document.getElementById("fbWidget");
@@ -29032,16 +27933,6 @@ var updateUI=function(u){
   var editBtn = document.getElementById("fbEditNameBtn");
   if(editBtn) {
     editBtn.style.display = "block";
-  }
-  
-  // NEU: Zeige Cloud-Sync-Button
-  var cloudSyncBtn = document.getElementById("cloudSyncBtn");
-  var cloudSyncStatus = document.getElementById("cloudSyncStatus");
-  if(cloudSyncBtn) {
-    cloudSyncBtn.style.display = "block";
-  }
-  if(cloudSyncStatus) {
-    cloudSyncStatus.style.display = "block";
   }
   
   // Lade Gruppen
@@ -34179,6 +33070,7 @@ window.updateGoalValue = updateGoalValue;
 window.updateXPValue = updateXPValue;
 window.updateGoalHint = updateGoalHint;
 window.createCustomChallenge = createCustomChallenge;
+window.startChallenge = startChallenge;
 window.cancelChallenge = cancelChallenge;
 window.openCreateComparisonFolderModal = openCreateComparisonFolderModal;
 window.closeCreateComparisonFolderModal = closeCreateComparisonFolderModal;
@@ -43924,563 +42816,6 @@ window.initMapFilters = initMapFilters;
 window.applyMapFilters = applyMapFilters;
 window.resetMapFilters = resetMapFilters;
 window.setDatePreset = setDatePreset;
-
-// ========================================
-// PWA - Service Worker & Installation
-// ========================================
-
-// PWA Install Prompt
-let deferredPrompt;
-let installButton;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  console.log('💾 Install Prompt available');
-  // Verhindere automatisches Popup
-  e.preventDefault();
-  // Speichere Event für später
-  deferredPrompt = e;
-  
-  // Zeige Install Button
-  showInstallButton();
-});
-
-function showInstallButton() {
-  // Prüfe ob schon installiert
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('✅ App bereits installiert');
-    return;
-  }
-  
-  // Erstelle Install Button (wird nur angezeigt wenn möglich)
-  if (!installButton) {
-    installButton = document.createElement('button');
-    installButton.innerHTML = '📱 App installieren';
-    installButton.style.cssText = `
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, #06b6d4, #0284c7);
-      color: white;
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(6,182,212,0.4);
-      z-index: 10000;
-      transition: all 0.3s ease;
-      animation: slideInRight 0.5s ease;
-    `;
-    
-    installButton.onmouseover = () => {
-      installButton.style.transform = 'translateY(-2px)';
-      installButton.style.boxShadow = '0 6px 25px rgba(6,182,212,0.5)';
-    };
-    
-    installButton.onmouseout = () => {
-      installButton.style.transform = '';
-      installButton.style.boxShadow = '0 4px 20px rgba(6,182,212,0.4)';
-    };
-    
-    installButton.onclick = async () => {
-      if (!deferredPrompt) return;
-      
-      // Zeige Install Prompt
-      deferredPrompt.prompt();
-      
-      // Warte auf User-Entscheidung
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User ${outcome === 'accepted' ? 'accepted' : 'dismissed'} the install prompt`);
-      
-      if (outcome === 'accepted') {
-        showNotification('✅ BirdCount wird installiert...', 3000);
-        // Entferne Button
-        if (installButton && installButton.parentNode) {
-          installButton.remove();
-        }
-      }
-      
-      // Reset
-      deferredPrompt = null;
-    };
-    
-    document.body.appendChild(installButton);
-  }
-}
-
-// Für iOS - zeige Installations-Hinweis
-function showiOSInstallPrompt() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-  
-  if (isIOS && !isStandalone) {
-    // Zeige nur einmal
-    const hasSeeniOSPrompt = localStorage.getItem('hasSeeniOSInstallPrompt');
-    if (hasSeeniOSPrompt) return;
-    
-    setTimeout(() => {
-      const prompt = document.createElement('div');
-      prompt.style.cssText = `
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(180deg, rgba(6,182,212,0.95), rgba(2,132,199,0.98));
-        color: white;
-        padding: 20px;
-        text-align: center;
-        z-index: 10001;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-        animation: slideInUp 0.5s ease;
-      `;
-      
-      prompt.innerHTML = `
-        <div style="max-width: 400px; margin: 0 auto;">
-          <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
-          <div style="font-weight: 600; margin-bottom: 8px;">BirdCount als App installieren</div>
-          <div style="font-size: 13px; opacity: 0.9; margin-bottom: 12px;">
-            Tippe auf <strong>Teilen</strong> <span style="font-size: 16px;">⬆️</span> und dann auf <strong>"Zum Home-Bildschirm"</strong>
-          </div>
-          <button onclick="this.parentElement.parentElement.remove(); localStorage.setItem('hasSeeniOSInstallPrompt', 'true');" 
-                  style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;">
-            Verstanden
-          </button>
-        </div>
-      `;
-      
-      document.body.appendChild(prompt);
-    }, 3000);
-  }
-}
-
-// Zeige iOS Prompt nach Laden
-window.addEventListener('load', showiOSInstallPrompt);
-
-// Push Notifications
-async function requestNotificationPermission() {
-  if (!('Notification' in window)) {
-    console.log('❌ Notifications nicht unterstützt');
-    return false;
-  }
-  
-  if (Notification.permission === 'granted') {
-    console.log('✅ Notifications bereits erlaubt');
-    return true;
-  }
-  
-  if (Notification.permission !== 'denied') {
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      console.log('✅ Notifications erlaubt');
-      showNotification('🔔 Benachrichtigungen aktiviert!', 3000);
-      return true;
-    }
-  }
-  
-  console.log('❌ Notifications abgelehnt');
-  return false;
-}
-
-// Test-Benachrichtigung senden
-function sendTestNotification() {
-  if (Notification.permission === 'granted') {
-    new Notification('BirdCount', {
-      body: 'Benachrichtigungen funktionieren! 🐦',
-      icon: './icon-192.png',
-      badge: './icon-192.png',
-      vibrate: [200, 100, 200]
-    });
-  }
-}
-
-// Service Worker registrieren
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(registration => {
-        console.log('✅ Service Worker registriert:', registration.scope);
-        
-        // Check for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // Neue Version verfügbar
-              const updatePrompt = confirm('Neue Version verfügbar! Jetzt aktualisieren?');
-              if (updatePrompt) {
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                window.location.reload();
-              }
-            }
-          });
-        });
-        
-        // Offline/Online Status
-        window.addEventListener('online', () => {
-          showNotification('🌐 Wieder online!', 2000);
-        });
-        
-        window.addEventListener('offline', () => {
-          showNotification('📵 Offline-Modus aktiv', 3000);
-        });
-      })
-      .catch(err => {
-        console.log('❌ Service Worker Fehler:', err);
-      });
-  });
-}
-
-// Mache Funktionen global verfügbar
-window.requestNotificationPermission = requestNotificationPermission;
-window.sendTestNotification = sendTestNotification;
-
-// PWA Status updaten
-function updatePWAStatus() {
-  // Check if installed
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone || 
-                       document.referrer.includes('android-app://');
-  
-  const installStatusEl = document.getElementById('pwaInstallStatus');
-  if (installStatusEl) {
-    if (isStandalone) {
-      installStatusEl.textContent = '✅ Installiert';
-      installStatusEl.style.color = 'var(--success)';
-      // Verstecke Install Button
-      const installBtn = document.getElementById('pwaInstallBtn');
-      if (installBtn) installBtn.style.display = 'none';
-    } else {
-      installStatusEl.textContent = '📱 Nicht installiert';
-      installStatusEl.style.color = 'var(--muted)';
-    }
-  }
-  
-  // Check Service Worker
-  const offlineStatusEl = document.getElementById('pwaOfflineStatus');
-  if (offlineStatusEl) {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      offlineStatusEl.textContent = '✅ Aktiv';
-      offlineStatusEl.style.color = 'var(--success)';
-    } else {
-      offlineStatusEl.textContent = '❌ Inaktiv';
-      offlineStatusEl.style.color = 'var(--danger)';
-    }
-  }
-  
-  // Check Notifications
-  const notificationStatusEl = document.getElementById('pwaNotificationStatus');
-  if (notificationStatusEl) {
-    if (!('Notification' in window)) {
-      notificationStatusEl.textContent = '❌ Nicht unterstützt';
-      notificationStatusEl.style.color = 'var(--danger)';
-    } else if (Notification.permission === 'granted') {
-      notificationStatusEl.textContent = '✅ Erlaubt';
-      notificationStatusEl.style.color = 'var(--success)';
-    } else if (Notification.permission === 'denied') {
-      notificationStatusEl.textContent = '❌ Blockiert';
-      notificationStatusEl.style.color = 'var(--danger)';
-    } else {
-      notificationStatusEl.textContent = '⚠️ Nicht erlaubt';
-      notificationStatusEl.style.color = 'var(--muted)';
-    }
-  }
-  
-  // iOS Hinweis anzeigen
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const iOSHint = document.getElementById('iOSHint');
-  if (iOSHint && isIOS && !isStandalone) {
-    iOSHint.style.display = 'block';
-  }
-}
-
-// Trigger Install Prompt
-function triggerInstallPrompt() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choiceResult => {
-      if (choiceResult.outcome === 'accepted') {
-        showNotification('✅ BirdCount wird installiert...', 3000);
-      }
-      deferredPrompt = null;
-      updatePWAStatus();
-    });
-  } else {
-    showNotification('Installation bereits erfolgt oder nicht verfügbar', 3000);
-  }
-}
-
-// Update Status wenn Tools-Seite geöffnet wird
-window.addEventListener('load', () => {
-  setTimeout(updatePWAStatus, 1000);
-});
-
-// Update Status wenn Page wechselt
-const originalChangePage = window.changePage;
-window.changePage = function(page) {
-  if (originalChangePage) originalChangePage(page);
-  if (page === 'tools') {
-    setTimeout(updatePWAStatus, 100);
-  }
-};
-
-// Zeige Install Button wenn verfügbar
-window.addEventListener('beforeinstallprompt', (e) => {
-  const installBtn = document.getElementById('pwaInstallBtn');
-  if (installBtn) {
-    installBtn.style.display = 'block';
-  }
-  updatePWAStatus();
-});
-
-window.updatePWAStatus = updatePWAStatus;
-window.triggerInstallPrompt = triggerInstallPrompt;
-
-// PWA Install Prompt
-// deferredPrompt bereits weiter oben deklariert
-const installButton = document.createElement('button');
-installButton.id = 'pwaInstallBtn';
-installButton.innerHTML = '📱 App installieren';
-installButton.style.cssText = `
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 9999;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: white;
-  border: none;
-  padding: 14px 24px;
-  border-radius: 30px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(6,182,212,0.4);
-  display: none;
-  animation: slideInUp 0.5s ease, pulse 2s ease-in-out infinite;
-  font-family: 'Inter', sans-serif;
-`;
-
-// Animation für Install-Button
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideInUp {
-    from {
-      transform: translateY(100px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 8px 24px rgba(6,182,212,0.4);
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 8px 32px rgba(6,182,212,0.6);
-      transform: scale(1.02);
-    }
-  }
-  #pwaInstallBtn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 32px rgba(6,182,212,0.6);
-  }
-  #pwaInstallBtn:active {
-    transform: scale(0.98);
-  }
-`;
-document.head.appendChild(style);
-document.body.appendChild(installButton);
-
-// Fange beforeinstallprompt Event
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  // Zeige Install-Button (nur wenn nicht bereits installiert)
-  if (!window.matchMedia('(display-mode: standalone)').matches) {
-    installButton.style.display = 'block';
-  }
-});
-
-// Install-Button Click Handler
-installButton.addEventListener('click', async () => {
-  if (!deferredPrompt) {
-    // Bereits installiert oder nicht verfügbar
-    showInstallInstructions();
-    return;
-  }
-
-  // Zeige Install-Prompt
-  deferredPrompt.prompt();
-  
-  const { outcome } = await deferredPrompt.userChoice;
-  
-  if (outcome === 'accepted') {
-    console.log('✅ App wurde installiert');
-    showNotification('🎉 BirdCount wurde installiert!', 3000);
-  } else {
-    console.log('❌ Installation abgebrochen');
-  }
-  
-  deferredPrompt = null;
-  installButton.style.display = 'none';
-});
-
-// Verstecke Install-Button wenn bereits installiert
-window.addEventListener('appinstalled', () => {
-  console.log('✅ App installiert');
-  installButton.style.display = 'none';
-  deferredPrompt = null;
-  showNotification('🎉 BirdCount wurde erfolgreich installiert!', 3000);
-});
-
-// iOS Install-Anleitung
-function showInstallInstructions() {
-  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  
-  if (isIOS) {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed;
-      inset: 0;
-      background: rgba(2,6,23,0.95);
-      backdrop-filter: blur(8px);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.3s ease;
-    `;
-    
-    modal.innerHTML = `
-      <div style="
-        background: var(--card);
-        padding: 32px;
-        border-radius: 16px;
-        max-width: 400px;
-        border: 2px solid var(--accent);
-        box-shadow: 0 20px 60px rgba(6,182,212,0.3);
-      ">
-        <h2 style="margin: 0 0 20px 0; color: var(--text); font-size: 24px;">
-          📱 BirdCount installieren
-        </h2>
-        <p style="color: var(--muted); margin-bottom: 24px; line-height: 1.6;">
-          So installierst du BirdCount auf deinem iPhone:
-        </p>
-        <ol style="color: var(--text); line-height: 1.8; padding-left: 20px;">
-          <li>Tippe unten auf das <strong>Teilen-Symbol</strong> 
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-              <polyline points="16 6 12 2 8 6"></polyline>
-              <line x1="12" y1="2" x2="12" y2="15"></line>
-            </svg>
-          </li>
-          <li>Scrolle runter und wähle <strong>"Zum Home-Bildschirm"</strong></li>
-          <li>Tippe auf <strong>"Hinzufügen"</strong></li>
-        </ol>
-        <button onclick="this.parentElement.parentElement.remove()" style="
-          width: 100%;
-          margin-top: 24px;
-          background: var(--accent);
-          color: white;
-          border: none;
-          padding: 14px;
-          border-radius: 10px;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-        ">
-          Verstanden
-        </button>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.remove();
-    });
-  } else {
-    showNotification('BirdCount ist bereits installiert oder dein Browser unterstützt keine Installation', 3000);
-  }
-}
-
-// Zeige "App installieren" Hinweis nach 10 Sekunden (nur einmal)
-if (!localStorage.getItem('pwaInstallPromptShown') && !window.matchMedia('(display-mode: standalone)').matches) {
-  setTimeout(() => {
-    if (installButton.style.display !== 'block' && !deferredPrompt) {
-      // Auf iOS - zeige Anleitung
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        const hint = document.createElement('div');
-        hint.style.cssText = `
-          position: fixed;
-          bottom: 80px;
-          right: 20px;
-          z-index: 9999;
-          background: linear-gradient(135deg, rgba(6,182,212,0.95), rgba(124,58,237,0.95));
-          color: white;
-          padding: 16px 20px;
-          border-radius: 12px;
-          max-width: 300px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-          animation: slideInUp 0.5s ease;
-          font-size: 14px;
-          line-height: 1.5;
-        `;
-        hint.innerHTML = `
-          <div style="display: flex; align-items: start; gap: 12px;">
-            <div style="font-size: 24px;">📱</div>
-            <div style="flex: 1;">
-              <strong style="display: block; margin-bottom: 4px;">BirdCount als App nutzen!</strong>
-              <span style="font-size: 13px; opacity: 0.9;">
-                Tippe auf <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> 
-                und wähle "Zum Home-Bildschirm"
-              </span>
-            </div>
-            <button onclick="this.parentElement.parentElement.remove(); localStorage.setItem('pwaInstallPromptShown', 'true');" style="
-              background: rgba(255,255,255,0.2);
-              border: none;
-              color: white;
-              width: 24px;
-              height: 24px;
-              border-radius: 50%;
-              cursor: pointer;
-              font-size: 18px;
-              line-height: 1;
-            ">×</button>
-          </div>
-        `;
-        document.body.appendChild(hint);
-        
-        setTimeout(() => {
-          hint.style.animation = 'fadeOut 0.3s ease';
-          setTimeout(() => hint.remove(), 300);
-        }, 15000);
-      }
-    }
-    localStorage.setItem('pwaInstallPromptShown', 'true');
-  }, 10000);
-}
-
-// Prüfe ob App im Standalone-Modus läuft
-if (window.matchMedia('(display-mode: standalone)').matches) {
-  console.log('✅ App läuft im Standalone-Modus (installiert)');
-  // Optional: Zeige Badge oder Hinweis
-}
-
-// Offline/Online Status
-window.addEventListener('online', () => {
-  showNotification('📡 Wieder online!', 2000);
-});
-
-window.addEventListener('offline', () => {
-  showNotification('📴 Offline-Modus aktiv', 2000);
-});
-
-console.log('🚀 BirdCount PWA ready!');
 
 </script>
 
