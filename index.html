@@ -12,6 +12,9 @@
   <meta name="apple-mobile-web-app-title" content="BirdCount" />
   <meta name="description" content="Professionelles Vogelbeobachtungssystem - Erfasse, verwalte und analysiere deine Vogelbeobachtungen" />
   
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  
   <!-- Content Security Policy (Sicherheit - deaktiviert für Entwicklung) -->
   <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';"> -->
   
@@ -7481,6 +7484,52 @@
                 </div>
               </div>
               
+              <!-- PWA & App-Einstellungen -->
+              <div class="card" style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.05));">
+                <h3>📱 App-Installation</h3>
+                <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+                  Installiere BirdCount als App auf deinem Handy!
+                </p>
+                
+                <!-- Status -->
+                <div id="pwaStatus" style="padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:12px;font-size:13px;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                    <span>App-Status:</span>
+                    <span id="pwaInstallStatus" style="color:var(--muted);">Wird geprüft...</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                    <span>Offline verfügbar:</span>
+                    <span id="pwaOfflineStatus" style="color:var(--muted);">-</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;">
+                    <span>Benachrichtigungen:</span>
+                    <span id="pwaNotificationStatus" style="color:var(--muted);">-</span>
+                  </div>
+                </div>
+                
+                <!-- Actions -->
+                <button class="small-btn" id="pwaInstallBtn" onclick="triggerInstallPrompt()" style="width:100%;background:linear-gradient(135deg, #06b6d4, #0284c7);margin-bottom:8px;display:none;">
+                  📱 Jetzt installieren
+                </button>
+                
+                <button class="small-btn" onclick="requestNotificationPermission()" style="width:100%;margin-bottom:8px;">
+                  🔔 Benachrichtigungen aktivieren
+                </button>
+                
+                <button class="small-btn" onclick="sendTestNotification()" style="width:100%;">
+                  🧪 Test-Benachrichtigung
+                </button>
+                
+                <!-- iOS Hinweis -->
+                <div id="iOSHint" style="display:none;margin-top:12px;padding:10px;background:rgba(6,182,212,0.1);border-radius:8px;font-size:11px;border-left:3px solid var(--accent);">
+                  <strong>📱 iOS:</strong> Tippe auf <strong>Teilen ⬆️</strong> und dann auf <strong>"Zum Home-Bildschirm"</strong>
+                </div>
+                
+                <div style="margin-top:12px;font-size:11px;color:var(--muted);text-align:center;">
+                  💡 Als App: Offline-Modus, Push-Benachrichtigungen & Schnellzugriff
+                </div>
+              </div>
+              
               <!-- Systeminfo -->
               <div class="card">
                 <h3>⚙️ Systeminfo</h3>
@@ -12450,21 +12499,59 @@
         return;
       }
       
-      // Füge Challenge hinzu
+      // Füge Challenge hinzu (Progress wird gleich berechnet)
       activeChallenges.push({
         id: challengeId,
         startedAt: new Date().toISOString(),
-        progress: 0,
+        progress: 0, // Wird sofort neu berechnet
         goal: challenge.goal
       });
       
       await saveActiveChallenges(activeChallenges);
       
-      // WICHTIG: Prüfe sofort den Fortschritt, damit existierende Beobachtungen berücksichtigt werden
+      // RÜCKWIRKEND: Prüfe sofort den Fortschritt, damit alle existierenden Beobachtungen gezählt werden
       await checkChallengeProgress();
       
-      showNotification(`🎯 Challenge "${challenge.name}" gestartet!`, 3000);
+      // Lade aktualisierten Fortschritt für Notification
+      const updatedChallenges = await loadActiveChallenges();
+      const updatedChallenge = updatedChallenges.find(c => c.id === challengeId);
+      const retroactiveProgress = updatedChallenge ? updatedChallenge.progress : 0;
+      
+      if (retroactiveProgress > 0) {
+        showNotification(`🎯 Challenge "${challenge.name}" gestartet! ${retroactiveProgress} bestehende${retroactiveProgress === 1 ? '' : ''} ${getChallengeProgressUnit(challenge.type, retroactiveProgress)} gezählt.`, 4000);
+      } else {
+        showNotification(`🎯 Challenge "${challenge.name}" gestartet!`, 3000);
+      }
+      
       await renderChallenges();
+    }
+    
+    // Hilfsfunktion: Gibt die passende Einheit für den Challenge-Fortschritt zurück
+    function getChallengeProgressUnit(challengeType, count) {
+      const units = {
+        'species_count': count === 1 ? 'Art' : 'Arten',
+        'observation_count': count === 1 ? 'Beobachtung' : 'Beobachtungen',
+        'early_morning': count === 1 ? 'Frühbeobachtung' : 'Frühbeobachtungen',
+        'late_evening': count === 1 ? 'Abendbeobachtung' : 'Abendbeobachtungen',
+        'weekend_streak': count === 1 ? 'Wochenende' : 'Wochenenden',
+        'daily_streak': count === 1 ? 'Tag' : 'Tage',
+        'photo_count': count === 1 ? 'Foto' : 'Fotos',
+        'specific_bird': count === 1 ? 'Beobachtung' : 'Beobachtungen',
+        'location_count': count === 1 ? 'Standort' : 'Standorte',
+        'weather_diverse': count === 1 ? 'Wetterbedingung' : 'Wetterbedingungen',
+        'rare_species': count === 1 ? 'seltene Art' : 'seltene Arten',
+        'selffound_species': count === 1 ? 'Selffound-Art' : 'Selffound-Arten',
+        'bird_families': count === 1 ? 'Familie' : 'Familien',
+        'nocturnal_species': count === 1 ? 'nachtaktive Art' : 'nachtaktive Arten',
+        'weather_diversity': count === 1 ? 'Wettertyp' : 'Wettertypen',
+        'selffound_count': count === 1 ? 'Selffound' : 'Selffounds',
+        'season_diversity': count === 1 ? 'Jahreszeit' : 'Jahreszeiten',
+        'rare_species_count': count === 1 ? 'seltene Art' : 'seltene Arten',
+        'complete_observations': count === 1 ? 'vollständige Beobachtung' : 'vollständige Beobachtungen',
+        'challenges_completed': count === 1 ? 'Challenge' : 'Challenges'
+      };
+      
+      return units[challengeType] || (count === 1 ? 'Eintrag' : 'Einträge');
     }
     
     // Challenge abbrechen/deaktivieren
@@ -42816,6 +42903,563 @@ window.initMapFilters = initMapFilters;
 window.applyMapFilters = applyMapFilters;
 window.resetMapFilters = resetMapFilters;
 window.setDatePreset = setDatePreset;
+
+// ========================================
+// PWA - Service Worker & Installation
+// ========================================
+
+// PWA Install Prompt
+let deferredPrompt;
+let installButton;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('💾 Install Prompt available');
+  // Verhindere automatisches Popup
+  e.preventDefault();
+  // Speichere Event für später
+  deferredPrompt = e;
+  
+  // Zeige Install Button
+  showInstallButton();
+});
+
+function showInstallButton() {
+  // Prüfe ob schon installiert
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('✅ App bereits installiert');
+    return;
+  }
+  
+  // Erstelle Install Button (wird nur angezeigt wenn möglich)
+  if (!installButton) {
+    installButton = document.createElement('button');
+    installButton.innerHTML = '📱 App installieren';
+    installButton.style.cssText = `
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(6,182,212,0.4);
+      z-index: 10000;
+      transition: all 0.3s ease;
+      animation: slideInRight 0.5s ease;
+    `;
+    
+    installButton.onmouseover = () => {
+      installButton.style.transform = 'translateY(-2px)';
+      installButton.style.boxShadow = '0 6px 25px rgba(6,182,212,0.5)';
+    };
+    
+    installButton.onmouseout = () => {
+      installButton.style.transform = '';
+      installButton.style.boxShadow = '0 4px 20px rgba(6,182,212,0.4)';
+    };
+    
+    installButton.onclick = async () => {
+      if (!deferredPrompt) return;
+      
+      // Zeige Install Prompt
+      deferredPrompt.prompt();
+      
+      // Warte auf User-Entscheidung
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User ${outcome === 'accepted' ? 'accepted' : 'dismissed'} the install prompt`);
+      
+      if (outcome === 'accepted') {
+        showNotification('✅ BirdCount wird installiert...', 3000);
+        // Entferne Button
+        if (installButton && installButton.parentNode) {
+          installButton.remove();
+        }
+      }
+      
+      // Reset
+      deferredPrompt = null;
+    };
+    
+    document.body.appendChild(installButton);
+  }
+}
+
+// Für iOS - zeige Installations-Hinweis
+function showiOSInstallPrompt() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  
+  if (isIOS && !isStandalone) {
+    // Zeige nur einmal
+    const hasSeeniOSPrompt = localStorage.getItem('hasSeeniOSInstallPrompt');
+    if (hasSeeniOSPrompt) return;
+    
+    setTimeout(() => {
+      const prompt = document.createElement('div');
+      prompt.style.cssText = `
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(180deg, rgba(6,182,212,0.95), rgba(2,132,199,0.98));
+        color: white;
+        padding: 20px;
+        text-align: center;
+        z-index: 10001;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+        animation: slideInUp 0.5s ease;
+      `;
+      
+      prompt.innerHTML = `
+        <div style="max-width: 400px; margin: 0 auto;">
+          <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+          <div style="font-weight: 600; margin-bottom: 8px;">BirdCount als App installieren</div>
+          <div style="font-size: 13px; opacity: 0.9; margin-bottom: 12px;">
+            Tippe auf <strong>Teilen</strong> <span style="font-size: 16px;">⬆️</span> und dann auf <strong>"Zum Home-Bildschirm"</strong>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove(); localStorage.setItem('hasSeeniOSInstallPrompt', 'true');" 
+                  style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;">
+            Verstanden
+          </button>
+        </div>
+      `;
+      
+      document.body.appendChild(prompt);
+    }, 3000);
+  }
+}
+
+// Zeige iOS Prompt nach Laden
+window.addEventListener('load', showiOSInstallPrompt);
+
+// Push Notifications
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    console.log('❌ Notifications nicht unterstützt');
+    return false;
+  }
+  
+  if (Notification.permission === 'granted') {
+    console.log('✅ Notifications bereits erlaubt');
+    return true;
+  }
+  
+  if (Notification.permission !== 'denied') {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('✅ Notifications erlaubt');
+      showNotification('🔔 Benachrichtigungen aktiviert!', 3000);
+      return true;
+    }
+  }
+  
+  console.log('❌ Notifications abgelehnt');
+  return false;
+}
+
+// Test-Benachrichtigung senden
+function sendTestNotification() {
+  if (Notification.permission === 'granted') {
+    new Notification('BirdCount', {
+      body: 'Benachrichtigungen funktionieren! 🐦',
+      icon: './icon-192.png',
+      badge: './icon-192.png',
+      vibrate: [200, 100, 200]
+    });
+  }
+}
+
+// Service Worker registrieren
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('✅ Service Worker registriert:', registration.scope);
+        
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Neue Version verfügbar
+              const updatePrompt = confirm('Neue Version verfügbar! Jetzt aktualisieren?');
+              if (updatePrompt) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+              }
+            }
+          });
+        });
+        
+        // Offline/Online Status
+        window.addEventListener('online', () => {
+          showNotification('🌐 Wieder online!', 2000);
+        });
+        
+        window.addEventListener('offline', () => {
+          showNotification('📵 Offline-Modus aktiv', 3000);
+        });
+      })
+      .catch(err => {
+        console.log('❌ Service Worker Fehler:', err);
+      });
+  });
+}
+
+// Mache Funktionen global verfügbar
+window.requestNotificationPermission = requestNotificationPermission;
+window.sendTestNotification = sendTestNotification;
+
+// PWA Status updaten
+function updatePWAStatus() {
+  // Check if installed
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone || 
+                       document.referrer.includes('android-app://');
+  
+  const installStatusEl = document.getElementById('pwaInstallStatus');
+  if (installStatusEl) {
+    if (isStandalone) {
+      installStatusEl.textContent = '✅ Installiert';
+      installStatusEl.style.color = 'var(--success)';
+      // Verstecke Install Button
+      const installBtn = document.getElementById('pwaInstallBtn');
+      if (installBtn) installBtn.style.display = 'none';
+    } else {
+      installStatusEl.textContent = '📱 Nicht installiert';
+      installStatusEl.style.color = 'var(--muted)';
+    }
+  }
+  
+  // Check Service Worker
+  const offlineStatusEl = document.getElementById('pwaOfflineStatus');
+  if (offlineStatusEl) {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      offlineStatusEl.textContent = '✅ Aktiv';
+      offlineStatusEl.style.color = 'var(--success)';
+    } else {
+      offlineStatusEl.textContent = '❌ Inaktiv';
+      offlineStatusEl.style.color = 'var(--danger)';
+    }
+  }
+  
+  // Check Notifications
+  const notificationStatusEl = document.getElementById('pwaNotificationStatus');
+  if (notificationStatusEl) {
+    if (!('Notification' in window)) {
+      notificationStatusEl.textContent = '❌ Nicht unterstützt';
+      notificationStatusEl.style.color = 'var(--danger)';
+    } else if (Notification.permission === 'granted') {
+      notificationStatusEl.textContent = '✅ Erlaubt';
+      notificationStatusEl.style.color = 'var(--success)';
+    } else if (Notification.permission === 'denied') {
+      notificationStatusEl.textContent = '❌ Blockiert';
+      notificationStatusEl.style.color = 'var(--danger)';
+    } else {
+      notificationStatusEl.textContent = '⚠️ Nicht erlaubt';
+      notificationStatusEl.style.color = 'var(--muted)';
+    }
+  }
+  
+  // iOS Hinweis anzeigen
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const iOSHint = document.getElementById('iOSHint');
+  if (iOSHint && isIOS && !isStandalone) {
+    iOSHint.style.display = 'block';
+  }
+}
+
+// Trigger Install Prompt
+function triggerInstallPrompt() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choiceResult => {
+      if (choiceResult.outcome === 'accepted') {
+        showNotification('✅ BirdCount wird installiert...', 3000);
+      }
+      deferredPrompt = null;
+      updatePWAStatus();
+    });
+  } else {
+    showNotification('Installation bereits erfolgt oder nicht verfügbar', 3000);
+  }
+}
+
+// Update Status wenn Tools-Seite geöffnet wird
+window.addEventListener('load', () => {
+  setTimeout(updatePWAStatus, 1000);
+});
+
+// Update Status wenn Page wechselt
+const originalChangePage = window.changePage;
+window.changePage = function(page) {
+  if (originalChangePage) originalChangePage(page);
+  if (page === 'tools') {
+    setTimeout(updatePWAStatus, 100);
+  }
+};
+
+// Zeige Install Button wenn verfügbar
+window.addEventListener('beforeinstallprompt', (e) => {
+  const installBtn = document.getElementById('pwaInstallBtn');
+  if (installBtn) {
+    installBtn.style.display = 'block';
+  }
+  updatePWAStatus();
+});
+
+window.updatePWAStatus = updatePWAStatus;
+window.triggerInstallPrompt = triggerInstallPrompt;
+
+// PWA Install Prompt
+let deferredPrompt;
+const installButton = document.createElement('button');
+installButton.id = 'pwaInstallBtn';
+installButton.innerHTML = '📱 App installieren';
+installButton.style.cssText = `
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 9999;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(6,182,212,0.4);
+  display: none;
+  animation: slideInUp 0.5s ease, pulse 2s ease-in-out infinite;
+  font-family: 'Inter', sans-serif;
+`;
+
+// Animation für Install-Button
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideInUp {
+    from {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 8px 24px rgba(6,182,212,0.4);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 8px 32px rgba(6,182,212,0.6);
+      transform: scale(1.02);
+    }
+  }
+  #pwaInstallBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(6,182,212,0.6);
+  }
+  #pwaInstallBtn:active {
+    transform: scale(0.98);
+  }
+`;
+document.head.appendChild(style);
+document.body.appendChild(installButton);
+
+// Fange beforeinstallprompt Event
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Zeige Install-Button (nur wenn nicht bereits installiert)
+  if (!window.matchMedia('(display-mode: standalone)').matches) {
+    installButton.style.display = 'block';
+  }
+});
+
+// Install-Button Click Handler
+installButton.addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    // Bereits installiert oder nicht verfügbar
+    showInstallInstructions();
+    return;
+  }
+
+  // Zeige Install-Prompt
+  deferredPrompt.prompt();
+  
+  const { outcome } = await deferredPrompt.userChoice;
+  
+  if (outcome === 'accepted') {
+    console.log('✅ App wurde installiert');
+    showNotification('🎉 BirdCount wurde installiert!', 3000);
+  } else {
+    console.log('❌ Installation abgebrochen');
+  }
+  
+  deferredPrompt = null;
+  installButton.style.display = 'none';
+});
+
+// Verstecke Install-Button wenn bereits installiert
+window.addEventListener('appinstalled', () => {
+  console.log('✅ App installiert');
+  installButton.style.display = 'none';
+  deferredPrompt = null;
+  showNotification('🎉 BirdCount wurde erfolgreich installiert!', 3000);
+});
+
+// iOS Install-Anleitung
+function showInstallInstructions() {
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  
+  if (isIOS) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.95);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background: var(--card);
+        padding: 32px;
+        border-radius: 16px;
+        max-width: 400px;
+        border: 2px solid var(--accent);
+        box-shadow: 0 20px 60px rgba(6,182,212,0.3);
+      ">
+        <h2 style="margin: 0 0 20px 0; color: var(--text); font-size: 24px;">
+          📱 BirdCount installieren
+        </h2>
+        <p style="color: var(--muted); margin-bottom: 24px; line-height: 1.6;">
+          So installierst du BirdCount auf deinem iPhone:
+        </p>
+        <ol style="color: var(--text); line-height: 1.8; padding-left: 20px;">
+          <li>Tippe unten auf das <strong>Teilen-Symbol</strong> 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+              <polyline points="16 6 12 2 8 6"></polyline>
+              <line x1="12" y1="2" x2="12" y2="15"></line>
+            </svg>
+          </li>
+          <li>Scrolle runter und wähle <strong>"Zum Home-Bildschirm"</strong></li>
+          <li>Tippe auf <strong>"Hinzufügen"</strong></li>
+        </ol>
+        <button onclick="this.parentElement.parentElement.remove()" style="
+          width: 100%;
+          margin-top: 24px;
+          background: var(--accent);
+          color: white;
+          border: none;
+          padding: 14px;
+          border-radius: 10px;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+        ">
+          Verstanden
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  } else {
+    showNotification('BirdCount ist bereits installiert oder dein Browser unterstützt keine Installation', 3000);
+  }
+}
+
+// Zeige "App installieren" Hinweis nach 10 Sekunden (nur einmal)
+if (!localStorage.getItem('pwaInstallPromptShown') && !window.matchMedia('(display-mode: standalone)').matches) {
+  setTimeout(() => {
+    if (installButton.style.display !== 'block' && !deferredPrompt) {
+      // Auf iOS - zeige Anleitung
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        const hint = document.createElement('div');
+        hint.style.cssText = `
+          position: fixed;
+          bottom: 80px;
+          right: 20px;
+          z-index: 9999;
+          background: linear-gradient(135deg, rgba(6,182,212,0.95), rgba(124,58,237,0.95));
+          color: white;
+          padding: 16px 20px;
+          border-radius: 12px;
+          max-width: 300px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+          animation: slideInUp 0.5s ease;
+          font-size: 14px;
+          line-height: 1.5;
+        `;
+        hint.innerHTML = `
+          <div style="display: flex; align-items: start; gap: 12px;">
+            <div style="font-size: 24px;">📱</div>
+            <div style="flex: 1;">
+              <strong style="display: block; margin-bottom: 4px;">BirdCount als App nutzen!</strong>
+              <span style="font-size: 13px; opacity: 0.9;">
+                Tippe auf <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> 
+                und wähle "Zum Home-Bildschirm"
+              </span>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove(); localStorage.setItem('pwaInstallPromptShown', 'true');" style="
+              background: rgba(255,255,255,0.2);
+              border: none;
+              color: white;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 18px;
+              line-height: 1;
+            ">×</button>
+          </div>
+        `;
+        document.body.appendChild(hint);
+        
+        setTimeout(() => {
+          hint.style.animation = 'fadeOut 0.3s ease';
+          setTimeout(() => hint.remove(), 300);
+        }, 15000);
+      }
+    }
+    localStorage.setItem('pwaInstallPromptShown', 'true');
+  }, 10000);
+}
+
+// Prüfe ob App im Standalone-Modus läuft
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  console.log('✅ App läuft im Standalone-Modus (installiert)');
+  // Optional: Zeige Badge oder Hinweis
+}
+
+// Offline/Online Status
+window.addEventListener('online', () => {
+  showNotification('📡 Wieder online!', 2000);
+});
+
+window.addEventListener('offline', () => {
+  showNotification('📴 Offline-Modus aktiv', 2000);
+});
+
+console.log('🚀 BirdCount PWA ready!');
 
 </script>
 
