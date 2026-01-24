@@ -26288,43 +26288,96 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     
     // METHODE 3: Manueller Check Button
     window.checkFileManually = function() {
-      console.log('🖱️ Manueller Check Button geklickt');
+      console.log('='.repeat(50));
+      console.log('🖱️ MANUELLER CHECK BUTTON GEKLICKT');
+      console.log('='.repeat(50));
       
       if (!mobileFileInput) {
+        console.error('❌ mobileFileInput ist NULL oder undefined');
         showStatus('❌ Fehler', 'File Input nicht gefunden', 'error');
+        alert('❌ FEHLER: File Input Element nicht gefunden!\n\nBitte Seite neu laden.');
         return;
       }
       
+      console.log('✅ mobileFileInput gefunden:', mobileFileInput);
+      console.log('📋 Input ID:', mobileFileInput.id);
+      console.log('📋 Input Type:', mobileFileInput.type);
+      console.log('📋 Input Accept:', mobileFileInput.accept);
+      
       const files = mobileFileInput.files;
-      console.log('📁 Manueller Check - Files:', files);
-      console.log('📁 Anzahl:', files ? files.length : 0);
+      console.log('📁 Files Object:', files);
+      console.log('📁 Files Type:', typeof files);
+      console.log('📁 Files Length:', files ? files.length : 'NULL');
+      
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          console.log(`📄 File ${i}:`, {
+            name: files[i].name,
+            size: files[i].size,
+            type: files[i].type,
+            lastModified: new Date(files[i].lastModified)
+          });
+        }
+      }
+      
+      console.log('📋 Input Value:', mobileFileInput.value);
       
       if (!files || files.length === 0) {
+        console.warn('⚠️⚠️⚠️ KEINE DATEIEN GEFUNDEN');
         showStatus('⚠️ Keine Datei', 'Bitte zuerst eine Datei auswählen', 'warning');
         showNotification('⚠️ Bitte wähle zuerst eine Datei aus', 3000);
         
-        // Zeige Debug Info
-        console.log('🔍 Debug Info:');
-        console.log('  Input Value:', mobileFileInput.value);
-        console.log('  Files Object:', mobileFileInput.files);
+        alert(
+          '⚠️ Keine Datei ausgewählt!\n\n' +
+          'Bitte zuerst auf das Datei-Feld tippen und eine Datei auswählen.\n\n' +
+          'Falls das nicht funktioniert, nutze die "Text einfügen" Methode.'
+        );
         
         return;
       }
       
       const file = files[0];
-      console.log('✅ Datei aus manuellem Check:', file.name);
+      console.log('✅✅✅ DATEI GEFUNDEN:', file.name);
+      console.log('Dateigröße:', file.size, 'bytes (', Math.round(file.size/1024), 'KB )');
+      console.log('Dateityp:', file.type);
       
       showStatus('🚀 Import läuft', 'Verarbeite ' + file.name + '...', 'info');
+      showNotification('🚀 Starte Import von ' + file.name, 2000);
+      
+      console.log('📞 Rufe processOrnithoFile auf...');
       processOrnithoFile(file);
+      console.log('📞 processOrnithoFile Aufruf abgeschlossen (async läuft weiter)');
+      
+      console.log('='.repeat(50));
     };
     
     // Gemeinsame Verarbeitungsfunktion
     function processOrnithoFile(file) {
-      console.log('🦅 processOrnithoFile:', file.name);
+      console.log('='.repeat(50));
+      console.log('🦅 processOrnithoFile GESTARTET');
+      console.log('='.repeat(50));
+      console.log('📁 File Object:', file);
+      console.log('📁 File Name:', file.name);
+      console.log('📁 File Size:', file.size);
+      console.log('📁 File Type:', file.type);
       
       showNotification('🦅 Import wird vorbereitet...', 2000);
       
+      // Teste ob importOrnithoData existiert
+      console.log('🔍 Prüfe ob importOrnithoData existiert...');
+      console.log('  typeof importOrnithoData:', typeof importOrnithoData);
+      console.log('  typeof window.importOrnithoData:', typeof window.importOrnithoData);
+      
+      if (typeof importOrnithoData === 'undefined') {
+        console.error('❌ FEHLER: importOrnithoData ist nicht definiert!');
+        showStatus('❌ Fehler', 'Import-Funktion nicht gefunden', 'error');
+        alert('❌ FEHLER: Import-Funktion nicht gefunden!\n\nBitte die Seite neu laden.');
+        return;
+      }
+      
       setTimeout(() => {
+        console.log('⏰ Timeout ausgeführt - zeige Confirm Dialog');
+        
         const selffound = confirm(
           '🦅 Ornitho Import: ' + file.name + '\n\n' +
           'Als "selbst gefunden" markieren?\n\n' +
@@ -26332,32 +26385,66 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           '❌ NEIN = Verschiedene Beobachter'
         );
         
-        console.log('👤 Selffound:', selffound);
+        console.log('👤 User hat gewählt - Selffound:', selffound);
         
         window.ornithoImportSelffound = selffound;
         window.ornithoImportTargetGroup = null;
         
+        console.log('🔧 Globale Variablen gesetzt:');
+        console.log('  window.ornithoImportSelffound:', window.ornithoImportSelffound);
+        console.log('  window.ornithoImportTargetGroup:', window.ornithoImportTargetGroup);
+        
         showStatus('⏳ Importiere', 'Bitte warten...', 'info');
         
         try {
-          console.log('🚀 Rufe importOrnithoData auf...');
-          importOrnithoData(file);
+          console.log('🚀 RUFE importOrnithoData AUF...');
+          console.log('🚀 Mit File:', file.name, '(' + file.size + ' bytes)');
           
-          // Status wird von importOrnithoData aktualisiert
-          setTimeout(() => {
-            showStatus('✅ Import abgeschlossen', 'Beobachtungen wurden importiert', 'success');
-            setTimeout(hideStatus, 5000);
-          }, 1000);
+          // Rufe die Funktion auf und fange Promise Errors
+          const importPromise = importOrnithoData(file);
+          
+          console.log('📦 importPromise:', importPromise);
+          console.log('📦 Type:', typeof importPromise);
+          
+          if (importPromise && typeof importPromise.then === 'function') {
+            console.log('✅ Promise erkannt - warte auf Completion...');
+            
+            importPromise.then(() => {
+              console.log('✅ Import Promise resolved');
+              showStatus('✅ Import abgeschlossen', 'Beobachtungen wurden importiert', 'success');
+              showNotification('✅ Import erfolgreich!', 3000);
+              setTimeout(hideStatus, 5000);
+            }).catch((error) => {
+              console.error('❌ Import Promise rejected:', error);
+              console.error('Stack:', error.stack);
+              showStatus('❌ Fehler', error.message, 'error');
+              showNotification('❌ Import-Fehler: ' + error.message, 5000);
+            });
+          } else {
+            console.warn('⚠️ Kein Promise zurückgegeben');
+          }
           
         } catch (error) {
-          console.error('❌ Import Fehler:', error);
+          console.error('❌❌❌ EXCEPTION in processOrnithoFile:', error);
+          console.error('Error Name:', error.name);
+          console.error('Error Message:', error.message);
+          console.error('Error Stack:', error.stack);
+          
           showStatus('❌ Fehler', error.message, 'error');
           showNotification('❌ Import-Fehler: ' + error.message, 5000);
+          
+          alert('❌ FEHLER beim Import:\n\n' + error.message + '\n\nSiehe Console für Details (F12)');
         }
         
         // Reset Input
+        console.log('🔄 Resette File Input...');
         mobileFileInput.value = '';
+        
       }, 300);
+      
+      console.log('='.repeat(50));
+      console.log('🦅 processOrnithoFile ENDE (async läuft weiter)');
+      console.log('='.repeat(50));
     }
     
     // TEXT PASTE ALTERNATIVE
