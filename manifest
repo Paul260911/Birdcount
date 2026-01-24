@@ -1,0 +1,87 @@
+{
+  "name": "BirdCount - Vogelbeobachtungen",
+  "short_name": "BirdCount",
+  "description": "Dokumentiere und teile deine Vogelbeobachtungen mit der Community",
+  "start_url": "./birdcount_mit_arten_filter.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#06b6d4",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "de-DE",
+  "dir": "ltr",
+  "categories": ["education", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "./icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Neue Beobachtung",
+      "short_name": "Neu",
+      "description": "Füge eine neue Vogelbeobachtung hinzu",
+      "url": "./birdcount_mit_arten_filter.html?page=eingabe",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Karte",
+      "short_name": "Karte",
+      "description": "Zeige Beobachtungen auf der Karte",
+      "url": "./birdcount_mit_arten_filter.html?page=karte",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Statistiken",
+      "short_name": "Stats",
+      "description": "Zeige deine Statistiken",
+      "url": "./birdcount_mit_arten_filter.html?page=statistiken",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
