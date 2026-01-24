@@ -7434,6 +7434,20 @@
                     Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
                     <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
                   </div>
+                  <!-- DEBUG: Mobile Test Button -->
+                  <button class="small-btn" onclick="testMobileFileInput()" style="width:100%;background:rgba(255,165,0,0.3);margin-top:8px;font-size:11px;">
+                    🔧 Mobile Debug Test
+                  </button>
+                  <!-- ALTERNATIVE: Direkter File Input für Problemfälle -->
+                  <div id="alternativeFileInputContainer" style="display:none;margin-top:8px;padding:8px;background:rgba(239,68,68,0.1);border-radius:8px;">
+                    <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-align:center;">
+                      Alternative Methode (falls Button nicht funktioniert):
+                    </div>
+                    <input type="file" id="ornithoImportFileAlternative" accept=".txt" style="width:100%;padding:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text);font-size:12px;">
+                  </div>
+                  <button class="small-btn" onclick="toggleAlternativeFileInput()" style="width:100%;background:rgba(239,68,68,0.2);margin-top:4px;font-size:10px;">
+                    ⚠️ Alternative Import-Methode anzeigen
+                  </button>
                 </div>
                 <button class="small-btn" onclick="backupData()" style="margin-top:12px;width:100%;">💾 Backup erstellen</button>
                 <button class="small-btn" onclick="restoreBackup()" style="margin-top:4px;width:100%;">🔧 Backup wiederherstellen</button>
@@ -25796,20 +25810,129 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
-    // Event Listener für Ornitho.de Import
-    document.getElementById('ornithoImportFile').addEventListener('change', function(e) {
+    // Event Listener für Ornitho.de Import - MOBILE OPTIMIERT
+    const ornithoFileInput = document.getElementById('ornithoImportFile');
+    
+    // Mehrere Event-Listener für bessere Mobile-Kompatibilität
+    ornithoFileInput.addEventListener('change', handleOrnithoFileSelect, false);
+    ornithoFileInput.addEventListener('input', handleOrnithoFileSelect, false); // Fallback für iOS
+    
+    function handleOrnithoFileSelect(e) {
+      console.log('🔔 File Input Event ausgelöst!', e.type);
+      console.log('📁 Dateien:', e.target.files);
+      
       const file = e.target.files[0];
       if (file) {
+        console.log('✅ Datei erkannt:', file.name, 'Größe:', file.size);
+        
+        // Sofortige Benachrichtigung für Debugging
+        showNotification('📱 Datei ausgewählt: ' + file.name, 3000);
+        
         // Prüfe ob im Gruppenmodus
         const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
         
-        // Zeige Import-Optionen-Dialog
-        showOrnithoImportOptions(file, isGroupMode);
+        // WICHTIG: Verzögerung für iOS - gibt dem Browser Zeit das File-Picker-UI zu schließen
+        setTimeout(() => {
+          console.log('🚀 Starte Import-Dialog...');
+          try {
+            showOrnithoImportOptions(file, isGroupMode);
+          } catch (error) {
+            console.error('❌ Fehler beim Öffnen des Import-Dialogs:', error);
+            showNotification('❌ Fehler: ' + error.message, 5000);
+            
+            // Fallback: Direkter Import ohne Dialog
+            console.log('🔄 Versuche direkten Import...');
+            window.ornithoImportSelffound = false;
+            window.ornithoImportTargetGroup = null;
+            importOrnithoData(file);
+          }
+        }, 300); // 300ms Verzögerung für iOS
         
         // Reset file input
-        this.value = '';
+        setTimeout(() => {
+          this.value = '';
+        }, 500);
+      } else {
+        console.warn('⚠️ Keine Datei erkannt!');
+        showNotification('⚠️ Keine Datei ausgewählt', 2000);
       }
-    });
+    }
+    
+    // Mobile Debug-Funktion
+    window.testMobileFileInput = function() {
+      console.log('🔧 Mobile Debug Test gestartet');
+      const fileInput = document.getElementById('ornithoImportFile');
+      
+      const info = {
+        exists: !!fileInput,
+        type: fileInput?.type,
+        accept: fileInput?.accept,
+        files: fileInput?.files?.length || 0,
+        value: fileInput?.value,
+        events: {
+          onchange: !!fileInput?.onchange,
+          listeners: 'check console'
+        }
+      };
+      
+      console.log('📊 File Input Info:', info);
+      
+      showNotification(
+        '🔧 Debug: File Input ' + (info.exists ? 'gefunden' : 'NICHT GEFUNDEN') + 
+        ', Events: ' + (info.onchange ? 'OK' : 'CHECK CONSOLE'), 
+        5000
+      );
+      
+      // Zeige auch Browser-Info
+      const browserInfo = {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      };
+      
+      console.log('🌐 Browser Info:', browserInfo);
+    };
+    
+    // Alternative File Input Toggle
+    window.toggleAlternativeFileInput = function() {
+      const container = document.getElementById('alternativeFileInputContainer');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+        showNotification('📱 Verwende das Datei-Feld unten', 3000);
+      } else {
+        container.style.display = 'none';
+      }
+    };
+    
+    // Event Listener für alternative File Input
+    const altFileInput = document.getElementById('ornithoImportFileAlternative');
+    if (altFileInput) {
+      altFileInput.addEventListener('change', function(e) {
+        console.log('🔔 Alternative File Input Event!');
+        const file = e.target.files[0];
+        if (file) {
+          console.log('✅ Datei über Alternative erkannt:', file.name);
+          showNotification('📱 Datei erkannt: ' + file.name, 3000);
+          
+          const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+          
+          setTimeout(() => {
+            try {
+              showOrnithoImportOptions(file, isGroupMode);
+            } catch (error) {
+              console.error('❌ Fehler:', error);
+              // Direkter Import als letzter Ausweg
+              window.ornithoImportSelffound = false;
+              window.ornithoImportTargetGroup = null;
+              importOrnithoData(file);
+            }
+          }, 300);
+          
+          this.value = '';
+        }
+      });
+    }
+    
     
     // NEU: Zeige Import-Optionen Dialog
     async function showOrnithoImportOptions(file, isGroupMode) {
