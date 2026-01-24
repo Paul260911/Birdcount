@@ -7428,69 +7428,65 @@
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
                   <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text);">🦅 Ornitho.de Import</h3>
                   
-                  <!-- SOFORT-IMPORT: Datei auswählen = Import startet -->
-                  <div style="margin-bottom:12px;">
-                    <label for="ornithoImportFileInstant" style="
-                      display: block;
-                      width: 100%;
-                      padding: 16px;
-                      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-                      color: white;
-                      border-radius: 10px;
-                      text-align: center;
-                      cursor: pointer;
-                      font-weight: 600;
-                      font-size: 15px;
-                      box-shadow: 0 4px 12px rgba(6,182,212,0.3);
-                    ">
-                      📁 Datei auswählen & importieren
-                    </label>
-                    <input 
-                      type="file" 
-                      id="ornithoImportFileInstant" 
-                      accept="*/*"
-                      style="display:none;">
+                  <!-- DIREKTER SICHTBARER FILE INPUT -->
+                  <label for="ornithoImportFileDirect" style="
+                    display: block;
+                    width: 100%;
+                    padding: 16px;
+                    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+                    color: white;
+                    border-radius: 12px;
+                    text-align: center;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 15px;
+                    box-shadow: 0 4px 16px rgba(6,182,212,0.4);
+                    margin-bottom: 8px;
+                  ">
+                    📁 Datei auswählen & importieren
+                  </label>
+                  <input 
+                    type="file" 
+                    id="ornithoImportFileDirect" 
+                    accept=".txt,.csv,text/plain,text/csv,application/octet-stream,*/*"
+                    style="display: none;"
+                  >
+                  
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:12px;text-align:center;line-height:1.6;">
+                    ✅ Import startet automatisch nach Dateiauswahl<br>
+                    📸 Foto-URLs werden automatisch importiert
                   </div>
                   
-                  <div id="importStatus" style="
-                    padding: 12px;
-                    background: rgba(255,255,255,0.03);
-                    border-radius: 8px;
-                    border: 1px solid rgba(255,255,255,0.1);
-                    margin-bottom: 12px;
-                    display: none;
-                  ">
-                    <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:4px;">
-                      Status:
+                  <!-- STATUS ANZEIGE -->
+                  <div id="importStatus" style="display:none;padding:12px;background:rgba(6,182,212,0.1);border-radius:8px;border:1px solid rgba(6,182,212,0.3);margin-bottom:12px;">
+                    <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:4px;">
+                      📊 Import Status
                     </div>
-                    <div id="importStatusText" style="font-size:11px;color:var(--muted);font-family:monospace;">
+                    <div id="importStatusText" style="font-size:12px;color:var(--muted);">
                       Warte auf Datei...
                     </div>
                   </div>
                   
-                  <button class="small-btn" onclick="toggleImportDebug()" style="width:100%;background:rgba(255,165,0,0.3);margin-bottom:12px;">
-                    🔧 Debug-Info anzeigen
+                  <!-- ALTERNATIVE: TEXT PASTE -->
+                  <button class="small-btn" onclick="showSimplePasteDialog()" style="width:100%;background:rgba(124,58,237,0.3);margin-bottom:12px;">
+                    📋 Alternative: Text einfügen
                   </button>
                   
-                  <!-- ALTERNATIVE: Text-Import -->
-                  <div style="margin-top:12px;padding:12px;background:rgba(124,58,237,0.1);border-radius:8px;border:1px solid rgba(124,58,237,0.3);">
-                    <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">
-                      📋 Alternative: Text einfügen
+                  <!-- HILFE -->
+                  <details style="margin-top:12px;padding:10px;background:rgba(6,182,212,0.05);border-radius:8px;border:1px solid rgba(6,182,212,0.2);">
+                    <summary style="cursor:pointer;font-size:12px;color:var(--text);font-weight:600;">
+                      ❓ Import funktioniert nicht?
+                    </summary>
+                    <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6;">
+                      <strong>Wenn nach Dateiauswahl nichts passiert:</strong><br>
+                      1. Nutze "Text einfügen" stattdessen<br>
+                      2. Öffne die .txt Datei in einer Text-App<br>
+                      3. Kopiere alles (lange drücken → "Alles auswählen")<br>
+                      4. Füge es über "Text einfügen" ein<br>
+                      <br>
+                      <strong>Tipp:</strong> Prüfe in den Browser-Einstellungen, ob Dateizugriff erlaubt ist.
                     </div>
-                    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.6;">
-                      Falls der Datei-Import nicht funktioniert:<br>
-                      1. Öffne die .txt Datei in einer Notizen-App<br>
-                      2. Kopiere den gesamten Inhalt<br>
-                      3. Klicke unten auf "Text einfügen"
-                    </div>
-                    <button class="small-btn" onclick="showPasteImport()" style="width:100%;background:var(--accent-2);">
-                      📋 Text einfügen Import
-                    </button>
-                  </div>
-                  
-                  <div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center;">
-                    💡 Der Import startet sofort nach Dateiauswahl
-                  </div>
+                  </details>
                 </div>
                 <button class="small-btn" onclick="backupData()" style="margin-top:12px;width:100%;">💾 Backup erstellen</button>
                 <button class="small-btn" onclick="restoreBackup()" style="margin-top:4px;width:100%;">🔧 Backup wiederherstellen</button>
@@ -26155,145 +26151,107 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     // ==========================================
-    // INSTANT ORNITHO IMPORT - MOBILE OPTIMIERT
+    // ORNITHO INSTANT IMPORT - KEIN DIALOG
     // ==========================================
     
-    const instantFileInput = document.getElementById('ornithoImportFileInstant');
+    const ornithoFileInput = document.getElementById('ornithoImportFileDirect');
     const importStatus = document.getElementById('importStatus');
     const importStatusText = document.getElementById('importStatusText');
     
-    let debugMode = false;
-    
-    function updateStatus(message, isError = false) {
-      console.log('📊 Status:', message);
-      importStatus.style.display = 'block';
+    function updateStatus(message, show = true) {
       importStatusText.textContent = message;
-      importStatusText.style.color = isError ? 'var(--danger)' : 'var(--text)';
-      
-      if (!isError) {
-        showNotification(message, 2000);
-      }
+      importStatus.style.display = show ? 'block' : 'none';
+      console.log('📊 Status:', message);
     }
     
-    window.toggleImportDebug = function() {
-      debugMode = !debugMode;
-      if (debugMode) {
-        importStatus.style.display = 'block';
-        updateStatus('Debug-Modus aktiv - bereit für Import');
-      } else {
-        importStatus.style.display = 'none';
-      }
-    };
-    
-    // HAUPT-IMPORT-HANDLER
-    if (instantFileInput) {
-      // Multiple events für maximale Kompatibilität
-      const events = ['change', 'input'];
+    if (ornithoFileInput) {
+      // Verwende mehrere Events für maximale Kompatibilität
+      ornithoFileInput.addEventListener('change', handleInstantImport, false);
+      ornithoFileInput.addEventListener('input', handleInstantImport, false);
       
-      events.forEach(eventType => {
-        instantFileInput.addEventListener(eventType, async function(e) {
-          updateStatus(`Event: ${eventType} ausgelöst`);
-          
-          const files = e.target.files;
-          updateStatus(`Dateien gefunden: ${files ? files.length : 0}`);
-          
-          if (!files || files.length === 0) {
-            updateStatus('❌ Keine Datei ausgewählt', true);
-            return;
-          }
-          
-          const file = files[0];
-          updateStatus(`✅ Datei: ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-          
-          // Zeige Datei-Details
-          console.log('📁 DATEI-DETAILS:', {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            lastModified: new Date(file.lastModified)
-          });
-          
-          try {
-            // Lese Datei-Inhalt zur Validierung
-            updateStatus('📖 Lese Datei-Inhalt...');
-            
-            const text = await file.text();
-            const firstLines = text.split('\n').slice(0, 3).join('\n');
-            
-            console.log('📄 Erste Zeilen:', firstLines);
-            updateStatus(`✅ ${text.length} Zeichen gelesen`);
-            
-            // Prüfe ob es eine gültige Ornitho-Datei ist
-            if (!text.includes('Species') && !text.includes('Artname') && !text.includes('Date')) {
-              const proceed = confirm(
-                '⚠️ Warnung!\n\n' +
-                'Die Datei sieht nicht wie eine ornitho.de Export-Datei aus.\n\n' +
-                'Trotzdem importieren?'
-              );
-              
-              if (!proceed) {
-                updateStatus('❌ Import abgebrochen');
-                this.value = '';
-                return;
-              }
-            }
-            
-            // Frage nach "selbst gefunden"
-            updateStatus('❓ Warte auf Benutzer-Eingabe...');
-            
-            const selffound = confirm(
-              '🦅 Ornitho.de Import\n\n' +
-              'Datei: ' + file.name + '\n' +
-              'Größe: ' + (file.size/1024).toFixed(1) + ' KB\n\n' +
-              '❓ Als "selbst gefunden" markieren?\n\n' +
-              'JA = Alle Beobachtungen selbst entdeckt\n' +
-              'NEIN = Beobachtungen von verschiedenen Personen'
-            );
-            
-            // Setze Import-Parameter
-            window.ornithoImportSelffound = selffound;
-            window.ornithoImportTargetGroup = null;
-            
-            updateStatus('🚀 Starte Import...');
-            
-            // STARTE IMPORT
-            await importOrnithoData(file);
-            
-            updateStatus('✅ Import abgeschlossen!');
-            
-            // Reset nach 3 Sekunden
-            setTimeout(() => {
-              importStatus.style.display = debugMode ? 'block' : 'none';
-              this.value = '';
-            }, 3000);
-            
-          } catch (error) {
-            console.error('❌ IMPORT FEHLER:', error);
-            updateStatus('❌ Fehler: ' + error.message, true);
-            showNotification('❌ Import-Fehler: ' + error.message, 5000);
-            
-            // Zeige Fehler-Details
-            alert(
-              '❌ Import-Fehler\n\n' +
-              'Fehler: ' + error.message + '\n\n' +
-              'Bitte versuche:\n' +
-              '1. Text-Import (siehe unten)\n' +
-              '2. Datei neu herunterladen\n' +
-              '3. Console-Log überprüfen (F12)'
-            );
-          }
-        }, false);
+      console.log('✅ Instant Import aktiviert');
+      
+      // Debug: Log wenn File Input angeklickt wird
+      ornithoFileInput.addEventListener('click', function() {
+        console.log('🖱️ File Input wurde angeklickt');
+        updateStatus('Warte auf Dateiauswahl...');
       });
-      
-      console.log('✅ Instant File Input initialisiert');
-    } else {
-      console.error('❌ File Input nicht gefunden!');
     }
     
-    // PASTE IMPORT ALTERNATIVE
-    window.showPasteImport = function() {
+    function handleInstantImport(e) {
+      console.log('🔔 FILE INPUT EVENT:', e.type);
+      console.log('📁 Files Array:', e.target.files);
+      console.log('📁 Files Length:', e.target.files.length);
+      
+      const file = e.target.files[0];
+      
+      if (!file) {
+        console.warn('⚠️ Keine Datei ausgewählt');
+        updateStatus('❌ Keine Datei ausgewählt', true);
+        setTimeout(() => updateStatus('', false), 3000);
+        return;
+      }
+      
+      console.log('✅ DATEI ERKANNT:');
+      console.log('  - Name:', file.name);
+      console.log('  - Größe:', file.size, 'bytes');
+      console.log('  - Typ:', file.type);
+      console.log('  - Letzte Änderung:', new Date(file.lastModified));
+      
+      updateStatus('📁 Datei erkannt: ' + file.name);
+      showNotification('📁 ' + file.name + ' wird verarbeitet...', 2000);
+      
+      // SOFORTIGER IMPORT - KEIN KOMPLIZIERTER DIALOG
+      setTimeout(() => {
+        try {
+          updateStatus('🔄 Lese Datei...');
+          
+          // Prüfe ob im Gruppenmodus
+          const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+          
+          // EINFACHE ABFRAGE per confirm
+          updateStatus('❓ Warte auf Bestätigung...');
+          
+          const selffound = confirm(
+            '🦅 Ornitho Import: ' + file.name + '\n\n' +
+            'Als "selbst gefunden" markieren?\n\n' +
+            '✅ JA = Du hast alle Vögel selbst entdeckt\n' +
+            '❌ NEIN = Beobachtungen von verschiedenen Personen'
+          );
+          
+          console.log('👤 Selffound:', selffound);
+          
+          // Setze globale Variablen für Import
+          window.ornithoImportSelffound = selffound;
+          window.ornithoImportTargetGroup = null;
+          
+          // STARTE IMPORT DIREKT
+          updateStatus('🚀 Import läuft...');
+          console.log('🚀 Rufe importOrnithoData() auf...');
+          
+          importOrnithoData(file);
+          
+          // Status nach Import wird von importOrnithoData gesetzt
+          
+        } catch (error) {
+          console.error('❌ FEHLER beim Import:', error);
+          console.error('Stack:', error.stack);
+          updateStatus('❌ Fehler: ' + error.message, true);
+          showNotification('❌ Import-Fehler: ' + error.message, 5000);
+        }
+      }, 100);
+      
+      // Reset File Input
+      setTimeout(() => {
+        e.target.value = '';
+        console.log('🔄 File Input zurückgesetzt');
+      }, 500);
+    }
+    
+    // EINFACHER TEXT PASTE DIALOG
+    window.showSimplePasteDialog = function() {
       const dialog = document.createElement('div');
-      dialog.id = 'pasteImportDialog';
+      dialog.id = 'simplePasteDialog';
       dialog.style.cssText = `
         position: fixed;
         top: 0;
@@ -26319,11 +26277,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           width: 100%;
           max-height: 90vh;
           overflow-y: auto;
-        " onclick="event.stopPropagation()">
-          
+        ">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <h3 style="margin:0;color:var(--text);">📋 Text Import</h3>
-            <button onclick="this.closest('#pasteImportDialog').remove()" style="
+            <h3 style="margin:0;color:var(--text);">📋 Text einfügen</h3>
+            <button onclick="document.getElementById('simplePasteDialog').remove()" style="
               background: rgba(255,255,255,0.1);
               border: none;
               width: 32px;
@@ -26335,21 +26292,19 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             ">×</button>
           </div>
           
-          <div style="background:rgba(124,58,237,0.1);padding:12px;border-radius:8px;margin-bottom:16px;">
+          <div style="background:rgba(6,182,212,0.1);padding:12px;border-radius:8px;margin-bottom:16px;border:1px solid rgba(6,182,212,0.3);">
             <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">
               📱 Anleitung:
             </div>
             <ol style="font-size:11px;color:var(--muted);margin:0;padding-left:20px;line-height:1.8;">
-              <li>Finde die ornitho.de .txt Datei auf deinem Handy</li>
-              <li>Öffne sie mit einer Notizen-App oder Text-Editor</li>
+              <li>Öffne die ornitho.de .txt Datei in einem Text-Editor</li>
               <li>Markiere ALLES (lange drücken → "Alles auswählen")</li>
               <li>Kopiere den Text</li>
-              <li>Füge ihn hier unten ein (ins Textfeld tippen → "Einfügen")</li>
-              <li>Klicke auf "Import starten"</li>
+              <li>Füge ihn hier ein (lange drücken → "Einfügen")</li>
             </ol>
           </div>
           
-          <textarea id="pasteArea" placeholder="Füge hier den kompletten Inhalt der ornitho.de Datei ein..." style="
+          <textarea id="pasteArea" placeholder="Füge hier den kompletten Text ein..." style="
             width: 100%;
             min-height: 300px;
             padding: 12px;
@@ -26364,20 +26319,21 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           "></textarea>
           
           <div style="display:flex;gap:8px;">
-            <button onclick="processPastedText()" style="
+            <button onclick="processInstantPaste()" style="
               flex: 1;
-              padding: 12px;
+              padding: 14px;
               background: var(--accent);
               color: white;
               border: none;
               border-radius: 8px;
               font-weight: 600;
+              font-size: 14px;
               cursor: pointer;
             ">
-              🚀 Import starten
+              🚀 Importieren
             </button>
-            <button onclick="this.closest('#pasteImportDialog').remove()" style="
-              padding: 12px 20px;
+            <button onclick="document.getElementById('simplePasteDialog').remove()" style="
+              padding: 14px 24px;
               background: rgba(255,255,255,0.05);
               color: var(--muted);
               border: 1px solid rgba(255,255,255,0.1);
@@ -26392,63 +26348,55 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       document.body.appendChild(dialog);
       
-      dialog.addEventListener('click', (e) => {
-        if (e.target === dialog) dialog.remove();
+      // Click outside to close
+      dialog.addEventListener('click', function(e) {
+        if (e.target.id === 'simplePasteDialog') {
+          this.remove();
+        }
       });
       
+      // Focus textarea
       setTimeout(() => {
         document.getElementById('pasteArea').focus();
       }, 100);
     };
     
-    window.processPastedText = async function() {
-      const textarea = document.getElementById('pasteArea');
-      const text = textarea.value.trim();
+    window.processInstantPaste = function() {
+      const text = document.getElementById('pasteArea').value.trim();
       
       if (!text) {
         showNotification('⚠️ Bitte Text einfügen', 2000);
         return;
       }
       
-      console.log('📋 Verarbeite Text, Länge:', text.length);
+      console.log('📋 Text eingefügt, Länge:', text.length);
+      showNotification('📋 Verarbeite Text...', 2000);
       
-      // Frage nach "selbst gefunden"
-      const selffound = confirm(
-        '🦅 Ornitho.de Import\n\n' +
-        'Textlänge: ' + text.length + ' Zeichen\n\n' +
-        '❓ Als "selbst gefunden" markieren?\n\n' +
-        'JA = Selbst entdeckt\n' +
-        'NEIN = Von verschiedenen Personen'
-      );
-      
-      // Erstelle virtuelles File-Objekt
+      // Erstelle File aus Text
       const blob = new Blob([text], { type: 'text/plain' });
       const file = new File([blob], 'ornitho_paste.txt', { type: 'text/plain' });
       
-      // Setze Parameter
+      // Schließe Dialog
+      document.getElementById('simplePasteDialog').remove();
+      
+      // Frage selffound
+      const selffound = confirm(
+        '🦅 Ornitho Import\n\n' +
+        'Als "selbst gefunden" markieren?\n\n' +
+        '✅ JA = Selbst entdeckt\n' +
+        '❌ NEIN = Von verschiedenen Personen'
+      );
+      
       window.ornithoImportSelffound = selffound;
       window.ornithoImportTargetGroup = null;
       
-      // Schließe Dialog
-      document.getElementById('pasteImportDialog').remove();
-      
-      // Starte Import
-      showNotification('🚀 Starte Import...', 2000);
-      
-      try {
-        await importOrnithoData(file);
-        showNotification('✅ Import erfolgreich!', 3000);
-      } catch (error) {
-        console.error('Import-Fehler:', error);
-        showNotification('❌ Fehler: ' + error.message, 5000);
-      }
+      // Import starten
+      console.log('🚀 Starte Import von eingefügtem Text...');
+      importOrnithoData(file);
     };
     
-    // Event Listener für Ornitho.de Import - ALTE VERSION ENTFERNT
-    // Wird durch Instant Import ersetzt
-    
-    // Mobile Debug & Alternative Inputs - ENTFERNT
-    // Nicht mehr benötigt
+    // ALTE FUNKTIONEN ENTFERNEN
+    // Die alten Debug- und Alternative-Input-Funktionen werden nicht mehr benötigt
     
     
     // NEU: Zeige Import-Optionen Dialog
