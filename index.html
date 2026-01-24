@@ -25229,6 +25229,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // ---------- Ornitho.de Import ----------
     async function importOrnithoData(file) {
       try {
+        showNotification('📱 Import gestartet...', 2000);
+        console.log('🦅 Ornitho-Import gestartet:', file.name);
         showNotification('Lese Ornitho.de Datei...', 2000);
         
         // Initialisiere Batch-Arrays
@@ -25280,7 +25282,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         const text = await file.text();
+        console.log('📄 Datei erfolgreich gelesen, Größe:', text.length, 'Zeichen');
         const lines = text.split('\n');
+        console.log('📊 Anzahl Zeilen:', lines.length);
         
         if (lines.length < 3) {
           throw new Error('Datei ist zu kurz oder ungültig');
@@ -25401,6 +25405,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         // Parse Beobachtungen (ab Zeile 2, Zeile 1 ist deutscher Header)
+        console.log('🔄 Starte Parsing der Beobachtungen...');
         for (let i = 2; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
@@ -25568,9 +25573,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           
           // Zeige Fortschritt alle 25 Einträge (häufiger für besseres Feedback)
           if (importCount % 25 === 0) {
+            console.log(`📊 Fortschritt: ${importCount} Beobachtungen verarbeitet`);
             showNotification(`${importCount} Beobachtungen vorbereitet...`, 300);
           }
         }
+        
+        console.log('✅ Parsing abgeschlossen:', importCount, 'Beobachtungen');
+        showNotification('💾 Speichere Daten...', 1000);
         
         // NEU: Speichere alle Firebase-Beobachtungen in Chunks (für bessere Performance)
         if ((isGroupMode || shouldAlsoImportToGroup) && window.batchObservations && window.batchObservations.length > 0) {
@@ -25647,25 +25656,32 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         // Aktualisiere UI
-        if (!isGroupMode) {
-          await loadData();
-          await initFolderSelect();
-          updateMarkersFromData();
-          updateChart();
-          updateAdvancedStatistics();
-          updateDashboard();
-          await updateQuickStats();
-          
-          // NEU: Synchronisiere geteilte Listen (nur im lokalen Modus)
-          await syncSharedListsAfterNewObservation();
-        } else {
-          // Im Gruppenmodus: Raritäten-Challenge aktualisieren
-          if (typeof renderRarityChallenge === 'function') {
-            await renderRarityChallenge();
+        try {
+          if (!isGroupMode) {
+            showNotification('📱 Aktualisiere Ansicht...', 1000);
+            await loadData();
+            await initFolderSelect();
+            updateMarkersFromData();
+            updateChart();
+            updateAdvancedStatistics();
+            updateDashboard();
+            await updateQuickStats();
+            
+            // NEU: Synchronisiere geteilte Listen (nur im lokalen Modus)
+            await syncSharedListsAfterNewObservation();
+          } else {
+            // Im Gruppenmodus: Raritäten-Challenge aktualisieren
+            showNotification('📱 Aktualisiere Gruppe...', 1000);
+            if (typeof renderRarityChallenge === 'function') {
+              await renderRarityChallenge();
+            }
+            if (typeof renderObservationManager === 'function') {
+              await renderObservationManager();
+            }
           }
-          if (typeof renderObservationManager === 'function') {
-            await renderObservationManager();
-          }
+        } catch (updateError) {
+          console.error('Fehler beim UI-Update:', updateError);
+          showNotification('⚠️ Daten importiert, aber UI-Update fehlgeschlagen. Bitte Seite neu laden.', 5000);
         }
         
         // Erstelle detaillierte Erfolgsmeldung
