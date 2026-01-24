@@ -26361,6 +26361,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       console.log('📁 File Size:', file.size);
       console.log('📁 File Type:', file.type);
       
+      // ZEIGE LADE-OVERLAY
+      showLoadingOverlay('🦅 Import läuft...', 'Bitte warten, das kann einige Sekunden dauern...');
+      
       showNotification('🦅 Import wird vorbereitet...', 2000);
       
       // Teste ob importOrnithoData existiert
@@ -26370,6 +26373,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       if (typeof importOrnithoData === 'undefined') {
         console.error('❌ FEHLER: importOrnithoData ist nicht definiert!');
+        hideLoadingOverlay();
         showStatus('❌ Fehler', 'Import-Funktion nicht gefunden', 'error');
         alert('❌ FEHLER: Import-Funktion nicht gefunden!\n\nBitte die Seite neu laden.');
         return;
@@ -26377,6 +26381,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       setTimeout(() => {
         console.log('⏰ Timeout ausgeführt - zeige Confirm Dialog');
+        
+        updateLoadingOverlay('❓ Warte auf deine Antwort...', 'Beantworte die Frage im Popup');
         
         const selffound = confirm(
           '🦅 Ornitho Import: ' + file.name + '\n\n' +
@@ -26394,11 +26400,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         console.log('  window.ornithoImportSelffound:', window.ornithoImportSelffound);
         console.log('  window.ornithoImportTargetGroup:', window.ornithoImportTargetGroup);
         
+        updateLoadingOverlay('📖 Lese Datei...', 'Datei wird eingelesen...');
         showStatus('⏳ Importiere', 'Bitte warten...', 'info');
         
         try {
           console.log('🚀 RUFE importOrnithoData AUF...');
           console.log('🚀 Mit File:', file.name, '(' + file.size + ' bytes)');
+          
+          updateLoadingOverlay('⚙️ Verarbeite Daten...', 'Dies kann bei großen Dateien länger dauern');
           
           // Rufe die Funktion auf und fange Promise Errors
           const importPromise = importOrnithoData(file);
@@ -26409,19 +26418,38 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           if (importPromise && typeof importPromise.then === 'function') {
             console.log('✅ Promise erkannt - warte auf Completion...');
             
+            // Zeige Fortschritt während Import läuft
+            let dots = 0;
+            const progressInterval = setInterval(() => {
+              dots = (dots + 1) % 4;
+              const dotString = '.'.repeat(dots);
+              updateLoadingOverlay('⚙️ Import läuft' + dotString, 'Bitte Geduld, verarbeite Beobachtungen...');
+            }, 500);
+            
             importPromise.then(() => {
+              clearInterval(progressInterval);
               console.log('✅ Import Promise resolved');
+              updateLoadingOverlay('✅ Fertig!', 'Import erfolgreich abgeschlossen');
               showStatus('✅ Import abgeschlossen', 'Beobachtungen wurden importiert', 'success');
               showNotification('✅ Import erfolgreich!', 3000);
-              setTimeout(hideStatus, 5000);
+              
+              setTimeout(() => {
+                hideLoadingOverlay();
+                hideStatus();
+              }, 2000);
+              
             }).catch((error) => {
+              clearInterval(progressInterval);
               console.error('❌ Import Promise rejected:', error);
               console.error('Stack:', error.stack);
+              hideLoadingOverlay();
               showStatus('❌ Fehler', error.message, 'error');
               showNotification('❌ Import-Fehler: ' + error.message, 5000);
+              alert('❌ Import-Fehler:\n\n' + error.message);
             });
           } else {
             console.warn('⚠️ Kein Promise zurückgegeben');
+            hideLoadingOverlay();
           }
           
         } catch (error) {
@@ -26430,6 +26458,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           console.error('Error Message:', error.message);
           console.error('Error Stack:', error.stack);
           
+          hideLoadingOverlay();
           showStatus('❌ Fehler', error.message, 'error');
           showNotification('❌ Import-Fehler: ' + error.message, 5000);
           
@@ -26445,6 +26474,110 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       console.log('='.repeat(50));
       console.log('🦅 processOrnithoFile ENDE (async läuft weiter)');
       console.log('='.repeat(50));
+    }
+    
+    // LADE-OVERLAY FUNKTIONEN
+    function showLoadingOverlay(title, message) {
+      // Entferne altes Overlay falls vorhanden
+      const oldOverlay = document.getElementById('importLoadingOverlay');
+      if (oldOverlay) oldOverlay.remove();
+      
+      const overlay = document.createElement('div');
+      overlay.id = 'importLoadingOverlay';
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 999999;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      `;
+      
+      overlay.innerHTML = `
+        <div style="
+          background: var(--card);
+          border: 2px solid var(--accent);
+          border-radius: 16px;
+          padding: 32px;
+          max-width: 400px;
+          width: 100%;
+          text-align: center;
+        ">
+          <!-- Spinner -->
+          <div style="
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 24px auto;
+            border: 4px solid rgba(6,182,212,0.2);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          "></div>
+          
+          <style>
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          </style>
+          
+          <h3 id="loadingTitle" style="
+            margin: 0 0 12px 0;
+            color: var(--text);
+            font-size: 20px;
+          ">${title}</h3>
+          
+          <p id="loadingMessage" style="
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+          ">${message}</p>
+          
+          <div style="
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(249,115,22,0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(249,115,22,0.3);
+          ">
+            <div style="font-size: 12px; color: var(--text);">
+              ⏱️ <strong>Große Dateien können 10-30 Sekunden dauern</strong>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">
+              Bitte nicht die Seite schließen oder neu laden!
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(overlay);
+      console.log('📺 Lade-Overlay angezeigt');
+    }
+    
+    function updateLoadingOverlay(title, message) {
+      const titleEl = document.getElementById('loadingTitle');
+      const messageEl = document.getElementById('loadingMessage');
+      
+      if (titleEl) titleEl.textContent = title;
+      if (messageEl) messageEl.textContent = message;
+      
+      console.log('🔄 Overlay aktualisiert:', title);
+    }
+    
+    function hideLoadingOverlay() {
+      const overlay = document.getElementById('importLoadingOverlay');
+      if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.3s';
+        setTimeout(() => overlay.remove(), 300);
+        console.log('📺 Lade-Overlay versteckt');
+      }
     }
     
     // TEXT PASTE ALTERNATIVE
