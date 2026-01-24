@@ -7426,34 +7426,78 @@
                   <button class="small-btn" onclick="document.getElementById('importFile').click()" style="flex:1;">Daten importieren</button>
                 </div>
                 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-                  <input type="file" id="ornithoImportFile" accept=".txt" style="display:none;">
-                  <button class="small-btn" onclick="document.getElementById('ornithoImportFile').click()" style="width:100%;background:var(--accent);text-align:center;cursor:pointer;">
-                    🦅 Ornitho.de Import
-                  </button>
-                  <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;">
-                    Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
-                    <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
-                  </div>
-                  <!-- DEBUG: Mobile Test Button -->
-                  <button class="small-btn" onclick="testMobileFileInput()" style="width:100%;background:rgba(255,165,0,0.3);margin-top:8px;font-size:11px;">
-                    🔧 Mobile Debug Test
-                  </button>
-                  <!-- ALTERNATIVE: Direkter File Input für Problemfälle -->
-                  <div id="alternativeFileInputContainer" style="display:none;margin-top:8px;padding:8px;background:rgba(239,68,68,0.1);border-radius:8px;border:1px solid rgba(239,68,68,0.3);">
-                    <div style="font-size:11px;color:var(--text);margin-bottom:6px;text-align:center;font-weight:600;">
-                      ⚠️ Direkt-Import (ohne Dialog)
-                    </div>
-                    <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center;">
-                      Falls der Import-Dialog nicht erscheint, nutze diese Methode:
-                    </div>
-                    <input type="file" id="ornithoImportFileAlternative" accept=".txt" style="width:100%;padding:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:var(--text);font-size:13px;cursor:pointer;">
-                    <div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;">
-                      ✅ Import startet sofort nach Dateiauswahl
+                  <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text);">🦅 Ornitho.de Import - Wähle Methode:</h3>
+                  
+                  <!-- METHODE 1: Standard File Input -->
+                  <div style="margin-bottom:12px;">
+                    <input type="file" id="ornithoImportFile" accept=".txt,.csv,text/plain,text/csv,application/octet-stream,*/*" style="
+                      width:100%;
+                      padding:12px;
+                      background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(124,58,237,0.1));
+                      border:2px dashed var(--accent);
+                      border-radius:10px;
+                      color:var(--text);
+                      font-size:13px;
+                      cursor:pointer;
+                    ">
+                    <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;">
+                      📁 Methode 1: Datei direkt auswählen
                     </div>
                   </div>
-                  <button class="small-btn" onclick="toggleAlternativeFileInput()" style="width:100%;background:rgba(239,68,68,0.2);margin-top:4px;font-size:11px;border:1px solid rgba(239,68,68,0.4);">
-                    ⚠️ Probleme mit Import? Hier klicken
+                  
+                  <!-- METHODE 2: Drag & Drop Zone -->
+                  <div id="dropZone" style="
+                    margin-bottom:12px;
+                    padding:20px;
+                    background:rgba(6,182,212,0.05);
+                    border:2px dashed rgba(6,182,212,0.3);
+                    border-radius:10px;
+                    text-align:center;
+                    cursor:pointer;
+                    transition: all 0.2s;
+                  ">
+                    <div style="font-size:24px;margin-bottom:8px;">📂</div>
+                    <div style="font-size:13px;color:var(--text);font-weight:600;margin-bottom:4px;">
+                      Datei hierher ziehen
+                    </div>
+                    <div style="font-size:11px;color:var(--muted);">
+                      Methode 2: Drag & Drop (Desktop & moderne Browser)
+                    </div>
+                  </div>
+                  
+                  <!-- METHODE 3: Text Paste -->
+                  <button class="small-btn" onclick="showPasteImportDialog()" style="width:100%;background:rgba(124,58,237,0.3);margin-bottom:12px;">
+                    📋 Methode 3: Text einfügen
                   </button>
+                  
+                  <!-- METHODE 4: Share/Send to (Mobile) -->
+                  <button class="small-btn" id="shareImportBtn" onclick="enableShareImport()" style="width:100%;background:rgba(16,185,129,0.3);margin-bottom:12px;display:none;">
+                    📤 Methode 4: "Teilen mit" (Android)
+                  </button>
+                  
+                  <!-- METHODE 5: URL Import (Cloud) -->
+                  <button class="small-btn" onclick="showUrlImportDialog()" style="width:100%;background:rgba(249,115,22,0.3);margin-bottom:12px;">
+                    🌐 Methode 5: Von URL laden
+                  </button>
+                  
+                  <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center;">
+                    💡 Tipp: Falls eine Methode nicht funktioniert, probiere eine andere!
+                  </div>
+                  
+                  <!-- Info Box -->
+                  <div style="margin-top:12px;padding:10px;background:rgba(6,182,212,0.1);border-radius:8px;border:1px solid rgba(6,182,212,0.3);">
+                    <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:6px;">
+                      📱 Probleme auf dem Handy?
+                    </div>
+                    <div style="font-size:11px;color:var(--muted);line-height:1.6;">
+                      <strong>Am einfachsten:</strong><br>
+                      1. Öffne die ornitho.de Datei in einem Text-Editor<br>
+                      2. Kopiere den kompletten Inhalt<br>
+                      3. Nutze "Text einfügen" (Methode 3)<br>
+                      <br>
+                      <strong>Alternative:</strong> Lade die Datei in die Cloud (Dropbox/Drive) und nutze "Von URL laden"
+                    </div>
+                  </div>
                 </div>
                 <button class="small-btn" onclick="backupData()" style="margin-top:12px;width:100%;">💾 Backup erstellen</button>
                 <button class="small-btn" onclick="restoreBackup()" style="margin-top:4px;width:100%;">🔧 Backup wiederherstellen</button>
@@ -26117,134 +26161,389 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
-    // Event Listener für Ornitho.de Import - MOBILE OPTIMIERT
+    // ==========================================
+    // ORNITHO IMPORT - MEHRERE METHODEN
+    // ==========================================
+    
+    // METHODE 1: Standard File Input
     const ornithoFileInput = document.getElementById('ornithoImportFile');
     
-    // Mehrere Event-Listener für bessere Mobile-Kompatibilität
-    ornithoFileInput.addEventListener('change', handleOrnithoFileSelect, false);
-    ornithoFileInput.addEventListener('input', handleOrnithoFileSelect, false); // Fallback für iOS
-    
-    function handleOrnithoFileSelect(e) {
-      console.log('🔔 File Input Event ausgelöst!', e.type);
-      console.log('📁 Dateien:', e.target.files);
-      
-      const file = e.target.files[0];
-      if (file) {
-        console.log('✅ Datei erkannt:', file.name, 'Größe:', file.size);
-        
-        // Sofortige Benachrichtigung für Debugging
-        showNotification('📱 Datei ausgewählt: ' + file.name, 3000);
-        
-        // Prüfe ob im Gruppenmodus
-        const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
-        
-        // WICHTIG: Verzögerung für iOS - gibt dem Browser Zeit das File-Picker-UI zu schließen
-        setTimeout(() => {
-          console.log('🚀 Starte Import-Dialog...');
-          try {
-            showOrnithoImportOptions(file, isGroupMode);
-          } catch (error) {
-            console.error('❌ Fehler beim Öffnen des Import-Dialogs:', error);
-            showNotification('❌ Fehler: ' + error.message, 5000);
-            
-            // Fallback: Direkter Import ohne Dialog
-            console.log('🔄 Versuche direkten Import...');
-            window.ornithoImportSelffound = false;
-            window.ornithoImportTargetGroup = null;
-            importOrnithoData(file);
-          }
-        }, 300); // 300ms Verzögerung für iOS
-        
-        // Reset file input
-        setTimeout(() => {
-          this.value = '';
-        }, 500);
-      } else {
-        console.warn('⚠️ Keine Datei erkannt!');
-        showNotification('⚠️ Keine Datei ausgewählt', 2000);
-      }
-    }
-    
-    // Mobile Debug-Funktion
-    window.testMobileFileInput = function() {
-      console.log('🔧 Mobile Debug Test gestartet');
-      const fileInput = document.getElementById('ornithoImportFile');
-      
-      const info = {
-        exists: !!fileInput,
-        type: fileInput?.type,
-        accept: fileInput?.accept,
-        files: fileInput?.files?.length || 0,
-        value: fileInput?.value,
-        events: {
-          onchange: !!fileInput?.onchange,
-          listeners: 'check console'
-        }
-      };
-      
-      console.log('📊 File Input Info:', info);
-      
-      showNotification(
-        '🔧 Debug: File Input ' + (info.exists ? 'gefunden' : 'NICHT GEFUNDEN') + 
-        ', Events: ' + (info.onchange ? 'OK' : 'CHECK CONSOLE'), 
-        5000
-      );
-      
-      // Zeige auch Browser-Info
-      const browserInfo = {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      };
-      
-      console.log('🌐 Browser Info:', browserInfo);
-    };
-    
-    // Alternative File Input Toggle
-    window.toggleAlternativeFileInput = function() {
-      const container = document.getElementById('alternativeFileInputContainer');
-      if (container.style.display === 'none') {
-        container.style.display = 'block';
-        showNotification('📱 Verwende das Datei-Feld unten', 3000);
-      } else {
-        container.style.display = 'none';
-      }
-    };
-    
-    // Event Listener für alternative File Input - DIREKT-IMPORT ohne Dialog
-    const altFileInput = document.getElementById('ornithoImportFileAlternative');
-    if (altFileInput) {
-      altFileInput.addEventListener('change', function(e) {
-        console.log('🔔 DIREKT-IMPORT: Alternative File Input Event!');
+    if (ornithoFileInput) {
+      ornithoFileInput.addEventListener('change', function(e) {
+        console.log('📁 File Input Change Event');
         const file = e.target.files[0];
         if (file) {
-          console.log('✅ Datei erkannt:', file.name, '- Starte Direkt-Import');
-          showNotification('📱 Starte Direkt-Import: ' + file.name, 3000);
-          
-          // DIREKT-IMPORT: Keine Dialog-Anzeige, direkt importieren
-          // Nutzer wird per Confirm gefragt
-          setTimeout(() => {
-            const selffound = confirm(
-              '🦅 Ornitho.de Direkt-Import\n\n' +
-              'Datei: ' + file.name + '\n\n' +
-              '❓ Als "selbst gefunden" markieren?\n\n' +
-              'OK = Alle Beobachtungen selbst entdeckt\n' +
-              'Abbrechen = Beobachtungen von verschiedenen Personen'
-            );
-            
-            window.ornithoImportSelffound = selffound;
-            window.ornithoImportTargetGroup = null;
-            
-            console.log('🚀 Starte Import mit selffound =', selffound);
-            importOrnithoData(file);
-          }, 100);
-          
-          this.value = '';
+          handleOrnithoFile(file);
+          this.value = ''; // Reset
         }
       });
-    } else {
-      console.warn('⚠️ Alternative File Input nicht gefunden - wird beim ersten Aufruf initialisiert');
+      console.log('✅ File Input Listener attached');
     }
+    
+    // METHODE 2: Drag & Drop
+    const dropZone = document.getElementById('dropZone');
+    
+    if (dropZone) {
+      // Prevent default drag behaviors
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      // Highlight drop zone when item is dragged over it
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+      });
+      
+      function highlight(e) {
+        dropZone.style.background = 'rgba(6,182,212,0.15)';
+        dropZone.style.borderColor = 'var(--accent)';
+        dropZone.style.transform = 'scale(1.02)';
+      }
+      
+      function unhighlight(e) {
+        dropZone.style.background = 'rgba(6,182,212,0.05)';
+        dropZone.style.borderColor = 'rgba(6,182,212,0.3)';
+        dropZone.style.transform = 'scale(1)';
+      }
+      
+      // Handle dropped files
+      dropZone.addEventListener('drop', handleDrop, false);
+      
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+          console.log('📂 Drag & Drop:', files[0].name);
+          showNotification('📂 Datei erkannt: ' + files[0].name, 2000);
+          handleOrnithoFile(files[0]);
+        }
+      }
+      
+      // Click auf Drop Zone = File Picker
+      dropZone.addEventListener('click', function() {
+        ornithoFileInput.click();
+      });
+      
+      console.log('✅ Drag & Drop Zone aktiviert');
+    }
+    
+    // METHODE 3: Text Paste
+    window.showPasteImportDialog = function() {
+      const dialogHtml = `
+        <div id="pasteImportDialog" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 99999;
+          background: rgba(0,0,0,0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          overflow-y: auto;
+        " onclick="if(event.target.id==='pasteImportDialog') this.remove()">
+          <div style="
+            background: var(--card);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+          " onclick="event.stopPropagation()">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <h3 style="margin:0;color:var(--text);">📋 Text einfügen Import</h3>
+              <button onclick="document.getElementById('pasteImportDialog').remove()" style="
+                background: rgba(255,255,255,0.1);
+                border: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                color: var(--text);
+                cursor: pointer;
+                font-size: 20px;
+              ">×</button>
+            </div>
+            
+            <div style="background:rgba(6,182,212,0.1);padding:12px;border-radius:8px;margin-bottom:16px;border:1px solid rgba(6,182,212,0.3);">
+              <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">
+                📱 So geht's:
+              </div>
+              <ol style="font-size:11px;color:var(--muted);margin:0;padding-left:20px;line-height:1.8;">
+                <li>Öffne die ornitho.de Export-Datei (.txt) auf deinem Handy</li>
+                <li>Wähle "Öffnen mit" → Text-Editor / Notizen</li>
+                <li>Markiere ALLES (Strg+A / Cmd+A oder lange drücken)</li>
+                <li>Kopiere den Text (Strg+C / Cmd+C)</li>
+                <li>Füge ihn hier unten ein (Strg+V / Cmd+V oder lange drücken)</li>
+              </ol>
+            </div>
+            
+            <textarea id="pasteTextArea" placeholder="Füge hier den kompletten Inhalt der ornitho.de Datei ein..." style="
+              width: 100%;
+              min-height: 300px;
+              padding: 12px;
+              background: rgba(255,255,255,0.03);
+              border: 1px solid rgba(255,255,255,0.1);
+              border-radius: 8px;
+              color: var(--text);
+              font-family: monospace;
+              font-size: 11px;
+              resize: vertical;
+              margin-bottom: 16px;
+            "></textarea>
+            
+            <div style="display:flex;gap:8px;">
+              <button onclick="processPastedText()" style="
+                flex: 1;
+                padding: 12px;
+                background: var(--accent);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+              ">
+                🚀 Import starten
+              </button>
+              <button onclick="document.getElementById('pasteImportDialog').remove()" style="
+                padding: 12px 20px;
+                background: rgba(255,255,255,0.05);
+                color: var(--muted);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px;
+                cursor: pointer;
+              ">
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', dialogHtml);
+      
+      // Auto-focus textarea
+      setTimeout(() => {
+        document.getElementById('pasteTextArea').focus();
+      }, 100);
+    };
+    
+    window.processPastedText = function() {
+      const textarea = document.getElementById('pasteTextArea');
+      const text = textarea.value.trim();
+      
+      if (!text) {
+        showNotification('⚠️ Bitte Text einfügen', 2000);
+        return;
+      }
+      
+      console.log('📋 Verarbeite eingefügten Text, Länge:', text.length);
+      showNotification('📋 Verarbeite Text...', 1500);
+      
+      // Erstelle ein virtuelles File-Objekt aus dem Text
+      const blob = new Blob([text], { type: 'text/plain' });
+      const file = new File([blob], 'ornitho_paste.txt', { type: 'text/plain' });
+      
+      // Schließe Dialog
+      document.getElementById('pasteImportDialog').remove();
+      
+      // Starte Import
+      handleOrnithoFile(file);
+    };
+    
+    // METHODE 4: Share API (Android)
+    if (navigator.share && navigator.canShare) {
+      document.getElementById('shareImportBtn').style.display = 'block';
+      console.log('✅ Share API verfügbar');
+    }
+    
+    window.enableShareImport = function() {
+      showNotification('📤 Funktion in Entwicklung - nutze "Text einfügen"', 3000);
+      // TODO: Implement share target
+    };
+    
+    // METHODE 5: URL Import
+    window.showUrlImportDialog = function() {
+      const dialogHtml = `
+        <div id="urlImportDialog" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 99999;
+          background: rgba(0,0,0,0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        " onclick="if(event.target.id==='urlImportDialog') this.remove()">
+          <div style="
+            background: var(--card);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+          " onclick="event.stopPropagation()">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <h3 style="margin:0;color:var(--text);">🌐 Von URL laden</h3>
+              <button onclick="document.getElementById('urlImportDialog').remove()" style="
+                background: rgba(255,255,255,0.1);
+                border: none;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                color: var(--text);
+                cursor: pointer;
+                font-size: 20px;
+              ">×</button>
+            </div>
+            
+            <div style="background:rgba(249,115,22,0.1);padding:12px;border-radius:8px;margin-bottom:16px;border:1px solid rgba(249,115,22,0.3);">
+              <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">
+                📱 So geht's:
+              </div>
+              <ol style="font-size:11px;color:var(--muted);margin:0;padding-left:20px;line-height:1.8;">
+                <li>Lade deine ornitho.de Datei in die Cloud (Dropbox, Google Drive, etc.)</li>
+                <li>Erstelle einen öffentlichen/teilbaren Link</li>
+                <li>Füge die URL hier ein</li>
+              </ol>
+            </div>
+            
+            <input type="url" id="urlInput" placeholder="https://www.dropbox.com/..." style="
+              width: 100%;
+              padding: 12px;
+              background: rgba(255,255,255,0.03);
+              border: 1px solid rgba(255,255,255,0.1);
+              border-radius: 8px;
+              color: var(--text);
+              font-size: 13px;
+              margin-bottom: 16px;
+            ">
+            
+            <div style="display:flex;gap:8px;">
+              <button onclick="loadFromUrl()" style="
+                flex: 1;
+                padding: 12px;
+                background: var(--accent);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+              ">
+                🌐 Laden
+              </button>
+              <button onclick="document.getElementById('urlImportDialog').remove()" style="
+                padding: 12px 20px;
+                background: rgba(255,255,255,0.05);
+                color: var(--muted);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px;
+                cursor: pointer;
+              ">
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', dialogHtml);
+      
+      setTimeout(() => {
+        document.getElementById('urlInput').focus();
+      }, 100);
+    };
+    
+    window.loadFromUrl = async function() {
+      const url = document.getElementById('urlInput').value.trim();
+      
+      if (!url) {
+        showNotification('⚠️ Bitte URL eingeben', 2000);
+        return;
+      }
+      
+      showNotification('🌐 Lade Datei von URL...', 2000);
+      
+      try {
+        // Korrigiere Dropbox Links
+        let fetchUrl = url;
+        if (url.includes('dropbox.com')) {
+          fetchUrl = url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '').replace('?dl=1', '');
+        }
+        
+        const response = await fetch(fetchUrl);
+        
+        if (!response.ok) {
+          throw new Error('Fehler beim Laden: ' + response.status);
+        }
+        
+        const text = await response.text();
+        const blob = new Blob([text], { type: 'text/plain' });
+        const file = new File([blob], 'ornitho_url.txt', { type: 'text/plain' });
+        
+        document.getElementById('urlImportDialog').remove();
+        
+        showNotification('✅ Datei geladen!', 2000);
+        handleOrnithoFile(file);
+        
+      } catch (error) {
+        console.error('URL Import Fehler:', error);
+        showNotification('❌ Fehler beim Laden: ' + error.message, 5000);
+      }
+    };
+    
+    // Gemeinsame Handler-Funktion für alle Methoden
+    async function handleOrnithoFile(file) {
+      console.log('🦅 handleOrnithoFile:', file.name, 'Größe:', file.size);
+      showNotification('📁 Verarbeite: ' + file.name, 2000);
+      
+      // Prüfe ob im Gruppenmodus
+      const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+      
+      setTimeout(() => {
+        try {
+          showOrnithoImportOptions(file, isGroupMode);
+        } catch (error) {
+          console.error('❌ Fehler:', error);
+          
+          // Einfacher Fallback
+          const selffound = confirm(
+            '🦅 Ornitho.de Import\n\n' +
+            'Datei: ' + file.name + '\n\n' +
+            'Als "selbst gefunden" markieren?\n\n' +
+            'JA = Selbst entdeckt\n' +
+            'NEIN = Von verschiedenen Personen'
+          );
+          
+          window.ornithoImportSelffound = selffound;
+          window.ornithoImportTargetGroup = null;
+          importOrnithoData(file);
+        }
+      }, 200);
+    }
+    
+    // Event Listener für Ornitho.de Import - ALTE VERSION ENTFERNT
+    // Diese wird durch die neuen Methoden ersetzt
+    
+    // Mobile Debug-Funktion - ENTFERNT
+    // Alternative File Input - ENTFERNT
     
     
     // NEU: Zeige Import-Optionen Dialog
