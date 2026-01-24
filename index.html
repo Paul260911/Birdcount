@@ -13888,12 +13888,16 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // ============ Challenge Creator Funktionen ============
     
     // Challenge Details anzeigen
-    function showChallengeDetails(challengeId) {
+    async function showChallengeDetails(challengeId) {
       const challenge = CHALLENGES[challengeId];
       if (!challenge) {
         console.error('Challenge nicht gefunden:', challengeId);
         return;
       }
+      
+      // Lade Beobachtungen für Fortschrittsanalyse
+      const allObservations = await getAllObservationsWithDetails();
+      const observations = allObservations.filter(o => isValidObservation(o));
       
       // Schwierigkeitsgrad-Text und Farbe
       const difficultyInfo = {
@@ -13940,6 +13944,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         'tit_species': 'Beobachte verschiedene Meisenarten',
         'finch_species': 'Beobachte verschiedene Finkenarten',
         'gull_species': 'Beobachte verschiedene Möwenarten',
+        'raptor_species': 'Beobachte verschiedene Greifvogelarten',
+        'duck_species': 'Beobachte verschiedene Entenarten',
+        'warbler_species': 'Beobachte verschiedene Grasmückenarten',
+        'thrush_species': 'Beobachte verschiedene Drosselarten',
+        'corvid_species': 'Beobachte verschiedene Rabenvogelarten',
+        'pigeon_species': 'Beobachte verschiedene Taubenarten',
+        'woodpecker_species': 'Beobachte verschiedene Spechtarten',
         'beak_diversity': 'Beobachte Vögel mit verschiedenen Schnabelformen',
         'flight_behavior': 'Dokumentiere verschiedene Flugverhalten',
         'complete_profiles': 'Erstelle vollständige Artprofile',
@@ -13958,10 +13969,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       const typeDesc = typeDescriptions[challenge.type] || 'Erfülle die Challenge-Bedingungen';
       
+      // NEU: Berechne Artenliste für artenbasierte Challenges
+      const speciesProgressHTML = await getSpeciesProgressHTML(challenge, observations);
+      
       // Modal erstellen
       const modalHTML = `
         <div id="challengeDetailsModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,6,23,0.95);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;backdrop-filter:blur(8px);" onclick="if(event.target === this) this.remove()">
-          <div style="background:linear-gradient(180deg, ${diff.bg}, var(--card));padding:32px;border-radius:20px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:2px solid ${diff.color};box-shadow:0 20px 60px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
+          <div style="background:linear-gradient(180deg, ${diff.bg}, var(--card));padding:32px;border-radius:20px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:2px solid ${diff.color};box-shadow:0 20px 60px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
             
             <!-- Close Button -->
             <button onclick="document.getElementById('challengeDetailsModal').remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:var(--text);cursor:pointer;font-size:24px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.transform='rotate(90deg)';" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='rotate(0deg)';">×</button>
@@ -14004,6 +14018,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               
             </div>
             
+            ${speciesProgressHTML}
+            
             <!-- Challenge Typ -->
             <div style="background:rgba(124,58,237,0.1);padding:16px;border-radius:12px;margin-bottom:24px;border:1px solid rgba(124,58,237,0.3);">
               <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">🏷️ Challenge-Typ</div>
@@ -14036,6 +14052,200 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // Modal zum Body hinzufügen
       document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    
+    // NEU: Generiere HTML für Artenfortschritt bei artenbasierten Challenges
+    async function getSpeciesProgressHTML(challenge, observations) {
+      // Definiere welche Challenge-Typen Artenlisten haben
+      const speciesListTypes = {
+        'water_birds': [
+          'Stockente', 'Reiherente', 'Tafelente', 'Schnatterente', 'Krickente',
+          'Löffelente', 'Pfeifente', 'Spießente', 'Knäkente', 'Schellente',
+          'Graugans', 'Kanadagans', 'Nilgans', 'Blässgans', 'Saatgans',
+          'Höckerschwan', 'Singschwan', 'Zwergschwan',
+          'Blässhuhn', 'Teichhuhn', 'Wasserralle', 'Zwergtaucher', 'Haubentaucher',
+          'Rothalstaucher', 'Schwarzhalstaucher',
+          'Lachmöwe', 'Sturmmöwe', 'Silbermöwe', 'Mittelmeermöwe', 
+          'Mantelmöwe', 'Heringsmöwe', 'Schwarzkopfmöwe', 'Dreizehenmöwe',
+          'Flussseeschwalbe', 'Küstenseeschwalbe', 'Trauerseeschwalbe',
+          'Graureiher', 'Silberreiher', 'Purpurreiher', 'Nachtreiher',
+          'Kormoran', 'Zwergscharbe',
+          'Eisvogel', 'Austernfischer', 'Säbelschnäbler', 'Kiebitz',
+          'Bekassine', 'Uferschnepfe', 'Rotschenkel', 'Flussuferläufer',
+          'Gänsesäger', 'Mittelsäger', 'Zwergsäger'
+        ],
+        'songbirds': [
+          'Amsel', 'Singdrossel', 'Misteldrossel', 'Wacholderdrossel', 'Rotdrossel',
+          'Mönchsgrasmücke', 'Gartengrasmücke', 'Klappergrasmücke', 'Dorngrasmücke',
+          'Fitis', 'Zilpzalp', 'Waldlaubsänger',
+          'Teichrohrsänger', 'Sumpfrohrsänger', 'Schilfrohrsänger',
+          'Blaumeise', 'Kohlmeise', 'Tannenmeise', 'Sumpfmeise', 'Haubenmeise',
+          'Buchfink', 'Bergfink', 'Grünfink', 'Stieglitz', 'Erlenzeisig',
+          'Birkenzeisig', 'Bluthänfling', 'Girlitz',
+          'Rotkehlchen', 'Nachtigall', 'Hausrotschwanz', 'Gartenrotschwanz',
+          'Heckenbraunelle', 'Zaunkönig', 'Star', 'Pirol'
+        ],
+        'raptors': [
+          'Mäusebussard', 'Turmfalke', 'Sperber', 'Habicht', 'Rotmilan',
+          'Schwarzmilan', 'Wespenbussard', 'Rohrweihe', 'Kornweihe', 'Wiesenweihe',
+          'Fischadler', 'Seeadler', 'Steinadler', 'Schreiadler',
+          'Baumfalke', 'Merlin', 'Rotfußfalke', 'Wanderfalke'
+        ],
+        'raptor_species': [
+          'Mäusebussard', 'Turmfalke', 'Sperber', 'Habicht', 'Rotmilan',
+          'Schwarzmilan', 'Wespenbussard', 'Rohrweihe', 'Kornweihe', 'Wiesenweihe',
+          'Fischadler', 'Seeadler', 'Steinadler', 'Schreiadler',
+          'Baumfalke', 'Merlin', 'Rotfußfalke', 'Wanderfalke'
+        ],
+        'forest_birds': [
+          'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht', 'Mittelspecht',
+          'Waldkauz', 'Waldohreule', 'Sperlingskauz', 'Raufußkauz', 'Uhu',
+          'Ringeltaube', 'Hohltaube', 'Turteltaube',
+          'Tannenmeise', 'Haubenmeise', 'Sumpfmeise', 'Weidenmeise',
+          'Buchfink', 'Bergfink', 'Kernbeißer', 'Fichtenkreuzschnabel', 'Erlenzeisig',
+          'Singdrossel', 'Misteldrossel', 'Ringdrossel',
+          'Eichelhäher', 'Tannenhäher', 'Kleiber', 'Waldbaumläufer', 'Gartenbaumläufer',
+          'Wintergoldhähnchen', 'Sommergoldhähnchen', 'Zaunkönig',
+          'Rotkehlchen', 'Gartenrotschwanz', 'Waldlaubsänger', 'Fitis'
+        ],
+        'meadow_birds': [
+          'Feldlerche', 'Heidelerche', 'Wiesenpieper', 'Baumpieper',
+          'Schafstelze', 'Bachstelze', 'Gebirgsstelze',
+          'Kiebitz', 'Bekassine', 'Uferschnepfe', 'Großer Brachvogel',
+          'Rebhuhn', 'Wachtel', 'Fasan',
+          'Grauammer', 'Goldammer', 'Rohrammer',
+          'Neuntöter', 'Raubwürger', 'Schwarzkehlchen', 'Braunkehlchen',
+          'Wiesenschafstelze', 'Steinschmätzer'
+        ],
+        'tit_species': [
+          'Blaumeise', 'Kohlmeise', 'Tannenmeise', 'Sumpfmeise', 'Weidenmeise',
+          'Haubenmeise', 'Schwanzmeise', 'Bartmeise'
+        ],
+        'finch_species': [
+          'Buchfink', 'Bergfink', 'Grünfink', 'Stieglitz', 'Erlenzeisig',
+          'Birkenzeisig', 'Bluthänfling', 'Berghänfling', 'Girlitz', 'Kernbeißer'
+        ],
+        'gull_species': [
+          'Lachmöwe', 'Sturmmöwe', 'Silbermöwe', 'Mittelmeermöwe', 
+          'Mantelmöwe', 'Heringsmöwe', 'Schwarzkopfmöwe', 'Dreizehenmöwe'
+        ],
+        'duck_species': [
+          'Stockente', 'Reiherente', 'Tafelente', 'Schnatterente', 'Krickente',
+          'Löffelente', 'Pfeifente', 'Spießente', 'Knäkente', 'Schellente'
+        ],
+        'warbler_species': [
+          'Mönchsgrasmücke', 'Gartengrasmücke', 'Klappergrasmücke', 'Dorngrasmücke',
+          'Teichrohrsänger', 'Sumpfrohrsänger', 'Schilfrohrsänger', 'Fitis',
+          'Zilpzalp', 'Waldlaubsänger'
+        ],
+        'thrush_species': [
+          'Amsel', 'Singdrossel', 'Misteldrossel', 'Wacholderdrossel',
+          'Rotdrossel', 'Ringdrossel'
+        ],
+        'corvid_species': [
+          'Rabenkrähe', 'Nebelkrähe', 'Saatkrähe', 'Kolkrabe', 'Dohle',
+          'Eichelhäher', 'Elster', 'Tannenhäher', 'Alpendohle'
+        ],
+        'pigeon_species': [
+          'Ringeltaube', 'Türkentaube', 'Stadttaube', 'Hohltaube', 'Turteltaube'
+        ],
+        'woodpecker_species': [
+          'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht',
+          'Mittelspecht', 'Grauspecht', 'Wendehals', 'Dreizehenspecht'
+        ],
+        'woodpeckers': [
+          'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht',
+          'Mittelspecht', 'Grauspecht', 'Wendehals', 'Dreizehenspecht'
+        ]
+      };
+      
+      const speciesList = speciesListTypes[challenge.type];
+      
+      // Wenn keine Artenliste definiert ist, zeige nichts an
+      if (!speciesList) {
+        return '';
+      }
+      
+      // Finde gefundene Arten
+      const foundSpecies = new Set();
+      observations.forEach(obs => {
+        const birdLower = obs.bird.toLowerCase();
+        speciesList.forEach(species => {
+          if (birdLower.includes(species.toLowerCase())) {
+            foundSpecies.add(species);
+          }
+        });
+      });
+      
+      const missingSpecies = speciesList.filter(s => !foundSpecies.has(s));
+      const progress = foundSpecies.size;
+      const total = challenge.goal;
+      const percentage = Math.min((progress / total) * 100, 100);
+      
+      // Generiere HTML
+      return `
+        <!-- Artenfortschritt -->
+        <div style="background:rgba(16,185,129,0.1);padding:20px;border-radius:12px;margin-bottom:24px;border:2px solid rgba(16,185,129,0.3);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;">
+              📊 Dein Fortschritt
+            </h3>
+            <div style="font-size:18px;font-weight:700;color:#10b981;">
+              ${progress} / ${total}
+            </div>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div style="width:100%;height:12px;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+            <div style="height:100%;background:linear-gradient(90deg,#10b981,#22c55e);width:${percentage}%;transition:width 0.5s ease;border-radius:6px;"></div>
+          </div>
+          
+          <!-- Gefundene Arten -->
+          ${foundSpecies.size > 0 ? `
+            <div style="margin-bottom:16px;">
+              <div style="font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:600;display:flex;align-items:center;gap:6px;">
+                <span style="display:inline-block;width:8px;height:8px;background:#10b981;border-radius:50%;"></span>
+                Bereits gefunden (${foundSpecies.size})
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                ${Array.from(foundSpecies).sort().map(species => `
+                  <span style="background:rgba(16,185,129,0.2);color:#10b981;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid rgba(16,185,129,0.4);">
+                    ✓ ${species}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Fehlende Arten -->
+          ${missingSpecies.length > 0 ? `
+            <div>
+              <div style="font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:600;display:flex;align-items:center;gap:6px;">
+                <span style="display:inline-block;width:8px;height:8px;background:rgba(255,255,255,0.3);border-radius:50%;"></span>
+                Noch zu finden (${missingSpecies.length})
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto;padding:4px;">
+                ${missingSpecies.sort().map(species => `
+                  <span style="background:rgba(255,255,255,0.05);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:12px;border:1px solid rgba(255,255,255,0.1);">
+                    ${species}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          ${foundSpecies.size >= total ? `
+            <div style="margin-top:16px;padding:12px;background:rgba(16,185,129,0.2);border-radius:8px;text-align:center;border:2px solid #10b981;">
+              <div style="font-size:14px;font-weight:700;color:#10b981;">
+                🎉 Challenge abgeschlossen!
+              </div>
+              <div style="font-size:12px;color:var(--soft);margin-top:4px;">
+                Du hast alle ${total} Arten gefunden!
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
     }
     
     // Hilfsfunktion für Challenge-spezifische Tipps
