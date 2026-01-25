@@ -3013,30 +3013,83 @@
       border: 1px solid rgba(255,255,255,0.06);
     }
     
-    /* Arten-Filter auf der Karte */
+    /* Arten-Filter auf der Karte - Ein- und ausklappbar */
     .map-species-filter {
       position: absolute;
-      top: 80px;
+      top: 10px;
       right: 10px;
       z-index: 1000;
-      background: var(--card);
+      background: linear-gradient(180deg, rgba(15,23,36,0.98), rgba(11,18,32,0.98));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-radius: 12px;
-      padding: 12px 16px;
-      box-shadow: 0 8px 24px rgba(2,6,23,0.6);
-      border: 1px solid rgba(255,255,255,0.08);
-      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(2,6,23,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      min-width: 320px;
       max-width: 350px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    
+    .map-species-filter.collapsed {
+      max-height: 56px;
+    }
+    
+    .map-species-filter.expanded {
+      max-height: 700px;
     }
     
     .map-species-filter h4 {
-      margin: 0 0 12px 0;
+      margin: 0;
+      padding: 12px 16px;
       font-size: 14px;
       font-weight: 600;
       color: var(--text);
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.02);
+    }
+    
+    .map-species-filter.collapsed h4 {
+      border-bottom: none;
+    }
+    
+    .map-species-filter h4:hover {
+      background: rgba(6,182,212,0.05);
+    }
+    
+    .map-species-filter h4 .filter-title {
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
+    
+    .filter-toggle-icon {
+      font-size: 14px;
+      transition: transform 0.3s ease;
+      color: var(--accent);
+    }
+    
+    .map-species-filter.collapsed .filter-toggle-icon {
+      transform: rotate(-90deg);
+    }
+    
+    #filterContent {
+      padding: 12px 16px;
+      display: block;
+      transition: opacity 0.2s ease;
+    }
+    
+    .map-species-filter.collapsed #filterContent {
+      display: none;
+      opacity: 0;
+    }
+    
     
     .map-species-filter select {
       width: 100%;
@@ -9537,13 +9590,13 @@
               <div id="map" style="margin:12px 0;"></div>
               
               <!-- Erweiterte Filter auf der Karte -->
-              <div class="map-species-filter" id="mapAdvancedFilter" style="display: none;">
-                <h4>
-                  🔍 Filter
-                  <button onclick="toggleFilterExpanded()" id="filterToggleBtn" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 16px; padding: 0 4px; margin-left: auto;" title="Erweitern/Minimieren">▼</button>
+              <div class="map-species-filter collapsed" id="mapAdvancedFilter">
+                <h4 onclick="toggleMapFilter()">
+                  <span class="filter-title">🔍 Erweiterte Filter</span>
+                  <span class="filter-toggle-icon">▼</span>
                 </h4>
                 
-                <div id="filterContent" style="display: block;">
+                <div id="filterContent">
                   <!-- Vogelart -->
                   <div style="margin-bottom: 12px;">
                     <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🐦 Vogelart</label>
@@ -9592,18 +9645,26 @@
                       <option value="">Alle Bundesländer</option>
                     </select>
                   </div>
-                </div>
-                
-                <!-- Statistik & Buttons -->
-                <div class="species-filter-stats">
-                  <div class="stat">
-                    <span>📍</span>
-                    <span id="mapFilteredCount">0</span>
-                    <span>Marker</span>
+                  
+                  <!-- Landkreis -->
+                  <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🏘️ Landkreis</label>
+                    <select id="mapFilterDistrict" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px;">
+                      <option value="">Alle Landkreise</option>
+                    </select>
                   </div>
-                  <button class="reset-filter-btn" onclick="resetMapFilters()" id="mapResetFilterBtn">
-                    Zurücksetzen
-                  </button>
+                  
+                  <!-- Statistik & Buttons -->
+                  <div class="species-filter-stats">
+                    <div class="stat">
+                      <span>📍</span>
+                      <span id="mapFilteredCount">0</span>
+                      <span>Marker</span>
+                    </div>
+                    <button class="reset-filter-btn" onclick="resetMapFilters()" id="mapResetFilterBtn">
+                      Zurücksetzen
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -9631,55 +9692,7 @@
             </div>
           </div>
 
-          <!-- Erweiterte Filter -->
-          <div class="card filter-system" style="margin-top:12px;">
-            <h3 style="margin-top:0;">🔍 Erweiterte Filter</h3>
-            
-            <div class="filter-group">
-              <label>Zeitraum:</label>
-              <div class="form-row">
-                <input type="date" id="filterDateFrom" style="flex:1;">
-                <input type="date" id="filterDateTo" style="flex:1;">
-              </div>
-            </div>
-            
-            <div class="filter-group">
-              <label>Vogelart:</label>
-              <select id="filterSpecies" style="width:100%;">
-                <option value="">Alle Arten</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>Wetterbedingungen:</label>
-              <select id="filterWeather" style="width:100%;">
-                <option value="">Alle</option>
-                <option value="sunny">Sonnig</option>
-                <option value="cloudy">Bewölkt</option>
-                <option value="rainy">Regnerisch</option>
-                <option value="snowy">Schnee</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>Bundesland:</label>
-              <select id="filterState" style="width:100%;">
-                <option value="">Alle Bundesländer</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>Landkreis:</label>
-              <select id="filterDistrict" style="width:100%;">
-                <option value="">Alle Landkreise</option>
-              </select>
-            </div>
-            
-            <div class="form-row">
-              <button class="small-btn" onclick="applyFilters()" style="flex:1;background:var(--accent);">Filter anwenden</button>
-              <button class="small-btn" onclick="resetFilters()">Zurücksetzen</button>
-            </div>
-          </div>
+
 
           <!-- Quick Stats -->
           <div class="card" style="margin-top:12px;">
@@ -11213,6 +11226,20 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+    // ---------- Filter Toggle Funktion (muss früh definiert sein) ----------
+    function toggleMapFilter() {
+      const filterDiv = document.getElementById('mapAdvancedFilter');
+      if (filterDiv) {
+        if (filterDiv.classList.contains('collapsed')) {
+          filterDiv.classList.remove('collapsed');
+          filterDiv.classList.add('expanded');
+        } else {
+          filterDiv.classList.add('collapsed');
+          filterDiv.classList.remove('expanded');
+        }
+      }
+    }
+    
     // ---------- IndexedDB Implementation ----------
     const DB_NAME = 'VogelzaehlungDB';
     const DB_VERSION = 6; // Erhöht von 3 auf 6 (muss höher als existierende Version 5 sein)
@@ -13718,7 +13745,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           const percentage = (progress / challenge.goal) * 100;
           
           html += `
-            <div class="card" style="background:linear-gradient(135deg, ${challenge.color}15, ${challenge.color}05);border-left:3px solid ${challenge.color};">
+            <div class="card" style="background:linear-gradient(135deg, ${challenge.color}15, ${challenge.color}05);border-left:3px solid ${challenge.color};cursor:pointer;transition:all 0.2s;" 
+                 onclick="showActiveChallengeDetails('${activeChallenge.id}')"
+                 onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
+                 onmouseout="this.style.transform='';this.style.boxShadow='';">
               <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
                 <div style="display:flex;align-items:center;gap:12px;">
                   <div style="font-size:32px;">${challenge.icon}</div>
@@ -13731,7 +13761,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
                   <div style="font-size:11px;color:var(--muted);padding:4px 8px;background:rgba(255,255,255,0.05);border-radius:6px;">
                     🏅 ${challenge.tier}
                   </div>
-                  <button class="small-btn" onclick="cancelChallenge('${activeChallenge.id}')" 
+                  <button class="small-btn" onclick="event.stopPropagation();cancelChallenge('${activeChallenge.id}')" 
                           style="background:var(--danger);padding:4px 8px;font-size:11px;" 
                           title="Challenge abbrechen">
                     ❌
@@ -13888,6 +13918,129 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // ============ Challenge Creator Funktionen ============
     
     // Challenge Details anzeigen
+    // NEU: Zeige Details für aktive Challenge (mit aktuellem Fortschritt)
+    async function showActiveChallengeDetails(challengeId) {
+      const challenge = CHALLENGES[challengeId];
+      if (!challenge) {
+        console.error('Challenge nicht gefunden:', challengeId);
+        return;
+      }
+      
+      // Lade aktive Challenges um aktuellen Fortschritt zu bekommen
+      const activeChallenges = await loadActiveChallenges();
+      const activeChallenge = activeChallenges.find(c => c.id === challengeId);
+      
+      // Lade Beobachtungen für Fortschrittsanalyse
+      const allObservations = await getAllObservationsWithDetails();
+      const observations = allObservations.filter(o => isValidObservation(o));
+      
+      // Schwierigkeitsgrad-Text und Farbe
+      const difficultyInfo = {
+        'easy': { text: '🟢 Einfach', color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
+        'medium': { text: '🟡 Mittel', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+        'hard': { text: '🟠 Schwer', color: '#f97316', bg: 'rgba(249,115,22,0.1)' },
+        'expert': { text: '🔴 Experte', color: '#ef4444', bg: 'rgba(239,68,68,0.1)' }
+      };
+      
+      const diff = difficultyInfo[challenge.difficulty] || difficultyInfo['easy'];
+      
+      const currentProgress = activeChallenge ? activeChallenge.progress : 0;
+      const progressPercentage = Math.min((currentProgress / challenge.goal) * 100, 100);
+      
+      // NEU: Berechne Artenliste für artenbasierte Challenges
+      const speciesProgressHTML = await getSpeciesProgressHTML(challenge, observations);
+      
+      // Modal erstellen
+      const modalHTML = `
+        <div id="challengeDetailsModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,6,23,0.95);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;backdrop-filter:blur(8px);" onclick="if(event.target === this) this.remove()">
+          <div style="background:linear-gradient(180deg, ${diff.bg}, var(--card));padding:32px;border-radius:20px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:2px solid ${diff.color};box-shadow:0 20px 60px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
+            
+            <!-- Close Button -->
+            <button onclick="document.getElementById('challengeDetailsModal').remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:var(--text);cursor:pointer;font-size:24px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.transform='rotate(90deg)';" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='rotate(0deg)';">×</button>
+            
+            <!-- Header -->
+            <div style="text-align:center;margin-bottom:32px;">
+              <div style="font-size:72px;margin-bottom:16px;">${challenge.icon}</div>
+              <h2 style="margin:0 0 8px 0;font-size:28px;color:var(--text);">${challenge.name}</h2>
+              <div style="display:inline-flex;gap:8px;align-items:center;">
+                <div style="display:inline-block;background:${diff.bg};color:${diff.color};padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid ${diff.color};">
+                  ${diff.text}
+                </div>
+                <div style="display:inline-block;background:rgba(16,185,129,0.1);color:#10b981;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid rgba(16,185,129,0.3);">
+                  ⚡ Aktiv
+                </div>
+              </div>
+            </div>
+            
+            <!-- Aktueller Fortschritt (Prominent) -->
+            <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));padding:24px;border-radius:12px;margin-bottom:24px;border:2px solid rgba(16,185,129,0.3);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div style="font-size:14px;color:var(--muted);font-weight:600;">AKTUELLER FORTSCHRITT</div>
+                <div style="font-size:24px;font-weight:700;color:#10b981;">
+                  ${currentProgress} / ${challenge.goal}
+                </div>
+              </div>
+              <div style="width:100%;height:16px;background:rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
+                <div style="height:100%;background:linear-gradient(90deg,#10b981,#22c55e);width:${progressPercentage}%;transition:width 0.5s ease;border-radius:8px;${progressPercentage >= 100 ? 'animation:pulse 2s infinite;' : ''}"></div>
+              </div>
+              ${progressPercentage >= 100 ? `
+                <div style="margin-top:12px;text-align:center;font-size:14px;font-weight:700;color:#10b981;">
+                  🎉 Challenge abgeschlossen! Belohnung wird vergeben.
+                </div>
+              ` : `
+                <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--muted);">
+                  Noch ${challenge.goal - currentProgress} ${getChallengeProgressUnit(challenge.type, challenge.goal - currentProgress)} bis zum Abschluss
+                </div>
+              `}
+            </div>
+            
+            <!-- Description -->
+            <div style="background:rgba(255,255,255,0.03);padding:20px;border-radius:12px;margin-bottom:24px;border-left:4px solid ${challenge.color};">
+              <h3 style="margin:0 0 12px 0;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;">
+                📋 Beschreibung
+              </h3>
+              <p style="margin:0;font-size:15px;color:var(--soft);line-height:1.6;">
+                ${challenge.description}
+              </p>
+            </div>
+            
+            ${speciesProgressHTML}
+            
+            <!-- Details Grid -->
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px;">
+              
+              <!-- Ziel -->
+              <div style="background:rgba(6,182,212,0.1);padding:16px;border-radius:12px;border:1px solid rgba(6,182,212,0.3);">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">🎯 Ziel</div>
+                <div style="font-size:24px;font-weight:700;color:#06b6d4;">${challenge.goal}</div>
+              </div>
+              
+              <!-- XP Belohnung -->
+              <div style="background:rgba(245,158,11,0.1);padding:16px;border-radius:12px;border:1px solid rgba(245,158,11,0.3);">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">🎁 Belohnung</div>
+                <div style="font-size:24px;font-weight:700;color:#f59e0b;">+${challenge.xp} XP</div>
+              </div>
+              
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display:flex;gap:12px;">
+              <button onclick="document.getElementById('challengeDetailsModal').remove()" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';">
+                Schließen
+              </button>
+              <button onclick="document.getElementById('challengeDetailsModal').remove();if(confirm('Möchtest du diese Challenge wirklich abbrechen? Der Fortschritt geht verloren.')) cancelChallenge('${challenge.id}')" style="flex:1;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;padding:14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)';" onmouseout="this.style.background='rgba(239,68,68,0.1)';">
+                ❌ Abbrechen
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      `;
+      
+      // Modal zum Body hinzufügen
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    
     async function showChallengeDetails(challengeId) {
       const challenge = CHALLENGES[challengeId];
       if (!challenge) {
@@ -14244,6 +14397,214 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               </div>
             </div>
           ` : ''}
+        </div>
+      `;
+    }
+    
+    // NEU: Generiere HTML für Artenfortschritt bei artenbasierten Challenges
+    async function getSpeciesProgressHTML(challenge, observations) {
+      // Definiere welche Challenge-Typen Artenlisten haben
+      const speciesListTypes = {
+        'water_birds': [
+          'Stockente', 'Reiherente', 'Tafelente', 'Schnatterente', 'Krickente',
+          'Löffelente', 'Pfeifente', 'Spießente', 'Knäkente', 'Schellente',
+          'Graugans', 'Kanadagans', 'Nilgans', 'Blässgans', 'Saatgans',
+          'Höckerschwan', 'Singschwan', 'Zwergschwan',
+          'Blässhuhn', 'Teichhuhn', 'Wasserralle', 'Zwergtaucher', 'Haubentaucher',
+          'Rothalstaucher', 'Schwarzhalstaucher',
+          'Lachmöwe', 'Sturmmöwe', 'Silbermöwe', 'Mittelmeermöwe', 
+          'Mantelmöwe', 'Heringsmöwe', 'Schwarzkopfmöwe', 'Dreizehenmöwe',
+          'Flussseeschwalbe', 'Küstenseeschwalbe', 'Trauerseeschwalbe',
+          'Graureiher', 'Silberreiher', 'Purpurreiher', 'Nachtreiher',
+          'Kormoran', 'Zwergscharbe',
+          'Eisvogel', 'Austernfischer', 'Säbelschnäbler', 'Kiebitz',
+          'Bekassine', 'Uferschnepfe', 'Rotschenkel', 'Flussuferläufer',
+          'Gänsesäger', 'Mittelsäger', 'Zwergsäger'
+        ],
+        'songbirds': [
+          'Amsel', 'Singdrossel', 'Misteldrossel', 'Wacholderdrossel', 'Rotdrossel',
+          'Mönchsgrasmücke', 'Gartengrasmücke', 'Klappergrasmücke', 'Dorngrasmücke',
+          'Fitis', 'Zilpzalp', 'Waldlaubsänger',
+          'Teichrohrsänger', 'Sumpfrohrsänger', 'Schilfrohrsänger',
+          'Blaumeise', 'Kohlmeise', 'Tannenmeise', 'Sumpfmeise', 'Haubenmeise',
+          'Buchfink', 'Bergfink', 'Grünfink', 'Stieglitz', 'Erlenzeisig',
+          'Birkenzeisig', 'Bluthänfling', 'Girlitz',
+          'Rotkehlchen', 'Nachtigall', 'Hausrotschwanz', 'Gartenrotschwanz',
+          'Heckenbraunelle', 'Zaunkönig', 'Star', 'Pirol'
+        ],
+        'raptors': [
+          'Mäusebussard', 'Turmfalke', 'Sperber', 'Habicht', 'Rotmilan',
+          'Schwarzmilan', 'Wespenbussard', 'Rohrweihe', 'Kornweihe', 'Wiesenweihe',
+          'Fischadler', 'Seeadler', 'Steinadler', 'Schreiadler',
+          'Baumfalke', 'Merlin', 'Rotfußfalke', 'Wanderfalke'
+        ],
+        'raptor_species': [
+          'Mäusebussard', 'Turmfalke', 'Sperber', 'Habicht', 'Rotmilan',
+          'Schwarzmilan', 'Wespenbussard', 'Rohrweihe', 'Kornweihe', 'Wiesenweihe',
+          'Fischadler', 'Seeadler', 'Steinadler', 'Schreiadler',
+          'Baumfalke', 'Merlin', 'Rotfußfalke', 'Wanderfalke'
+        ],
+        'forest_birds': [
+          'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht', 'Mittelspecht',
+          'Waldkauz', 'Waldohreule', 'Sperlingskauz', 'Raufußkauz', 'Uhu',
+          'Ringeltaube', 'Hohltaube', 'Turteltaube',
+          'Tannenmeise', 'Haubenmeise', 'Sumpfmeise', 'Weidenmeise',
+          'Buchfink', 'Bergfink', 'Kernbeißer', 'Fichtenkreuzschnabel', 'Erlenzeisig',
+          'Singdrossel', 'Misteldrossel', 'Ringdrossel',
+          'Eichelhäher', 'Tannenhäher', 'Kleiber', 'Waldbaumläufer', 'Gartenbaumläufer',
+          'Wintergoldhähnchen', 'Sommergoldhähnchen', 'Zaunkönig',
+          'Rotkehlchen', 'Gartenrotschwanz', 'Waldlaubsänger', 'Fitis'
+        ],
+        'meadow_birds': [
+          'Feldlerche', 'Heidelerche', 'Wiesenpieper', 'Baumpieper',
+          'Schafstelze', 'Bachstelze', 'Gebirgsstelze',
+          'Kiebitz', 'Bekassine', 'Uferschnepfe', 'Großer Brachvogel',
+          'Rebhuhn', 'Wachtel', 'Fasan',
+          'Grauammer', 'Goldammer', 'Rohrammer',
+          'Neuntöter', 'Raubwürger', 'Schwarzkehlchen', 'Braunkehlchen',
+          'Wiesenschafstelze', 'Steinschmätzer'
+        ],
+        'tit_species': [
+          'Blaumeise', 'Kohlmeise', 'Tannenmeise', 'Sumpfmeise', 'Weidenmeise',
+          'Haubenmeise', 'Schwanzmeise', 'Bartmeise'
+        ],
+        'finch_species': [
+          'Buchfink', 'Bergfink', 'Grünfink', 'Stieglitz', 'Erlenzeisig',
+          'Birkenzeisig', 'Bluthänfling', 'Berghänfling', 'Girlitz', 'Kernbeißer'
+        ],
+        'gull_species': [
+          'Lachmöwe', 'Sturmmöwe', 'Silbermöwe', 'Mittelmeermöwe', 
+          'Mantelmöwe', 'Heringsmöwe', 'Schwarzkopfmöwe', 'Dreizehenmöwe'
+        ],
+        'duck_species': [
+          'Stockente', 'Reiherente', 'Tafelente', 'Schnatterente', 'Krickente',
+          'Löffelente', 'Pfeifente', 'Spießente', 'Knäkente', 'Schellente'
+        ],
+        'warbler_species': [
+          'Mönchsgrasmücke', 'Gartengrasmücke', 'Klappergrasmücke', 'Dorngrasmücke',
+          'Teichrohrsänger', 'Sumpfrohrsänger', 'Schilfrohrsänger', 'Fitis',
+          'Zilpzalp', 'Waldlaubsänger'
+        ],
+        'thrush_species': [
+          'Amsel', 'Singdrossel', 'Misteldrossel', 'Wacholderdrossel',
+          'Rotdrossel', 'Ringdrossel'
+        ],
+        'corvid_species': [
+          'Rabenkrähe', 'Nebelkrähe', 'Saatkrähe', 'Kolkrabe', 'Dohle',
+          'Eichelhäher', 'Elster', 'Tannenhäher', 'Alpendohle'
+        ],
+        'pigeon_species': [
+          'Ringeltaube', 'Türkentaube', 'Stadttaube', 'Hohltaube', 'Turteltaube'
+        ],
+        'woodpecker_species': [
+          'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht',
+          'Mittelspecht', 'Grauspecht', 'Wendehals', 'Dreizehenspecht'
+        ],
+        'woodpeckers': [
+          'Buntspecht', 'Grünspecht', 'Schwarzspecht', 'Kleinspecht',
+          'Mittelspecht', 'Grauspecht', 'Wendehals', 'Dreizehenspecht'
+        ]
+      };
+      
+      const speciesList = speciesListTypes[challenge.type];
+      
+      // Wenn keine Artenliste definiert ist, zeige nichts an
+      if (!speciesList) {
+        return '';
+      }
+      
+      // Finde welche Challenge-Arten ich bereits habe
+      const foundSpecies = new Set();
+      observations.forEach(obs => {
+        const birdLower = obs.bird.toLowerCase();
+        speciesList.forEach(species => {
+          if (birdLower.includes(species.toLowerCase())) {
+            foundSpecies.add(species);
+          }
+        });
+      });
+      
+      // Finde welche Challenge-Arten mir noch fehlen
+      const missingSpecies = speciesList.filter(s => !foundSpecies.has(s));
+      
+      const progress = foundSpecies.size;
+      const total = challenge.goal;
+      const percentage = Math.min((progress / total) * 100, 100);
+      
+      // Generiere HTML
+      return `
+        <!-- Artenfortschritt -->
+        <div style="background:rgba(16,185,129,0.1);padding:20px;border-radius:12px;margin-bottom:24px;border:2px solid rgba(16,185,129,0.3);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;">
+              📊 Deine Challenge-Arten
+            </h3>
+            <div style="font-size:18px;font-weight:700;color:#10b981;">
+              ${progress} / ${total}
+            </div>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div style="width:100%;height:12px;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+            <div style="height:100%;background:linear-gradient(90deg,#10b981,#22c55e);width:${percentage}%;transition:width 0.5s ease;border-radius:6px;"></div>
+          </div>
+          
+          <!-- Gefundene Arten -->
+          ${foundSpecies.size > 0 ? `
+            <div style="margin-bottom:${missingSpecies.length > 0 ? '20px' : '0'};">
+              <div style="font-size:14px;color:var(--text);margin-bottom:12px;font-weight:700;display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:2px solid rgba(16,185,129,0.3);">
+                <span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:50%;"></span>
+                Bereits beobachtet (${foundSpecies.size})
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 0;">
+                ${Array.from(foundSpecies).sort().map(species => `
+                  <span style="background:linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.15));color:#10b981;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;border:2px solid rgba(16,185,129,0.5);display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(16,185,129,0.2);">
+                    <span style="font-size:16px;">✓</span> ${species}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Fehlende Arten -->
+          ${missingSpecies.length > 0 ? `
+            <div>
+              <div style="font-size:14px;color:var(--text);margin-bottom:12px;font-weight:700;display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:2px solid rgba(255,255,255,0.1);">
+                <span style="display:inline-block;width:10px;height:10px;background:rgba(255,255,255,0.3);border-radius:50%;"></span>
+                Noch zu beobachten (${missingSpecies.length})
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;max-height:180px;overflow-y:auto;padding:8px 4px;">
+                ${missingSpecies.sort().map(species => `
+                  <span style="background:rgba(255,255,255,0.05);color:var(--soft);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.15)';">
+                    <span style="opacity:0.5;">○</span> ${species}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          ${foundSpecies.size >= total ? `
+            <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.15));border-radius:10px;text-align:center;border:2px solid #10b981;box-shadow:0 4px 16px rgba(16,185,129,0.3);">
+              <div style="font-size:16px;font-weight:700;color:#10b981;margin-bottom:4px;">
+                🎉 Challenge abgeschlossen!
+              </div>
+              <div style="font-size:13px;color:var(--soft);">
+                Du hast alle ${total} Arten gefunden!
+              </div>
+            </div>
+          ` : foundSpecies.size > 0 ? `
+            <div style="margin-top:16px;padding:12px;background:rgba(6,182,212,0.1);border-radius:8px;text-align:center;border:1px solid rgba(6,182,212,0.3);">
+              <div style="font-size:13px;color:var(--soft);">
+                💪 Noch ${missingSpecies.length} ${missingSpecies.length === 1 ? 'Art' : 'Arten'} zu finden!
+              </div>
+            </div>
+          ` : `
+            <div style="margin-top:16px;padding:12px;background:rgba(124,58,237,0.1);border-radius:8px;text-align:center;border:1px solid rgba(124,58,237,0.3);">
+              <div style="font-size:13px;color:var(--soft);">
+                🚀 Bereit? Finde deine ersten ${Math.min(5, total)} Arten!
+              </div>
+            </div>
+          `}
         </div>
       `;
     }
@@ -43556,35 +43917,77 @@ function setDatePreset(preset) {
 }
 
 // Toggle Filter erweitern/minimieren
-function toggleFilterExpanded() {
-  const content = document.getElementById('filterContent');
-  const btn = document.getElementById('filterToggleBtn');
+function toggleMapFilter() {
+  const filterDiv = document.getElementById('mapAdvancedFilter');
   
-  mapFilterExpanded = !mapFilterExpanded;
-  
-  if (mapFilterExpanded) {
-    content.style.display = 'block';
-    btn.textContent = '▼';
+  if (filterDiv.classList.contains('collapsed')) {
+    filterDiv.classList.remove('collapsed');
+    filterDiv.classList.add('expanded');
   } else {
-    content.style.display = 'none';
-    btn.textContent = '▶';
+    filterDiv.classList.add('collapsed');
+    filterDiv.classList.remove('expanded');
   }
+}
+
+// Legacy-Funktion für Rückwärtskompatibilität
+function toggleFilterExpanded() {
+  toggleMapFilter();
 }
 
 // Initialisiere Karten-Filter
 async function initMapFilters() {
+  console.log('🔍 initMapFilters aufgerufen');
+  
   const filterDiv = document.getElementById('mapAdvancedFilter');
   
-  if (!filterDiv) return;
+  if (!filterDiv) {
+    console.log('⚠️ mapAdvancedFilter nicht gefunden');
+    return;
+  }
   
-  // Hole alle Beobachtungen
-  const observations = await getAllObservationsWithDetails();
+  console.log('✅ Filter-Element gefunden');
+  
+  try {
+    // Hole alle Beobachtungen - nutze die gleiche Logik wie die Karte
+    let observations = [];
+    
+    if (window.currentGroupId) {
+      console.log('👥 Gruppenmodus aktiv, lade Gruppendaten für Filter');
+      
+      // Warte darauf, dass die DB verfügbar ist
+      if (!db) {
+        console.log('⏳ Warte auf DB-Initialisierung...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      if (!db) {
+        console.error('❌ DB nicht verfügbar');
+        return;
+      }
+      
+      // Im Gruppenmodus: Alle Gruppen-Beobachtungen laden
+      const tx = db.transaction(['observations'], 'readonly');
+      const store = tx.objectStore('observations');
+      const allObs = await store.getAll();
+      
+      console.log(`📦 ${allObs.length} Beobachtungen aus DB geladen`);
+      
+      // Filtere nach Gruppe
+      observations = allObs.filter(obs => obs.groupId === window.currentGroupId);
+    } else {
+      console.log('👤 Solo-Modus aktiv');
+      observations = await getAllObservationsWithDetails();
+    }
+    
+    console.log(`📊 ${observations.length} Beobachtungen geladen für Filter`);
   
   // Initialisiere Arten-Select
   const speciesSelect = document.getElementById('mapFilterSpecies');
   if (speciesSelect) {
     const species = new Set(observations.map(obs => obs.bird).filter(Boolean));
     const sortedSpecies = Array.from(species).sort();
+    
+    console.log(`🐦 ${sortedSpecies.length} Arten gefunden:`, sortedSpecies);
     
     speciesSelect.innerHTML = '<option value="">Alle Arten</option>';
     sortedSpecies.forEach(bird => {
@@ -43593,6 +43996,8 @@ async function initMapFilters() {
       option.textContent = bird;
       speciesSelect.appendChild(option);
     });
+  } else {
+    console.log('⚠️ mapFilterSpecies Element nicht gefunden');
   }
   
   // Initialisiere Bundesländer-Select
@@ -43610,11 +44015,33 @@ async function initMapFilters() {
     });
   }
   
-  // Zeige Filter
+  // Initialisiere Landkreis-Select
+  const districtSelect = document.getElementById('mapFilterDistrict');
+  if (districtSelect) {
+    const districts = new Set(observations.map(obs => obs.district).filter(Boolean));
+    const sortedDistricts = Array.from(districts).sort();
+    
+    districtSelect.innerHTML = '<option value="">Alle Landkreise</option>';
+    sortedDistricts.forEach(district => {
+      const option = document.createElement('option');
+      option.value = district;
+      option.textContent = district;
+      districtSelect.appendChild(option);
+    });
+  }
+  
+  // Zeige Filter (standardmäßig eingeklappt)
+  filterDiv.classList.remove('hidden');
+  filterDiv.classList.add('collapsed');
   filterDiv.style.display = 'block';
   
   // Aktualisiere Counter
   updateMapFilterStats(observations.length);
+  
+  console.log('✅ Filter erfolgreich initialisiert');
+  } catch (error) {
+    console.error('❌ Fehler bei Filter-Initialisierung:', error);
+  }
 }
 
 // Wende Karten-Filter an
@@ -43624,11 +44051,12 @@ async function applyMapFilters() {
   const species = document.getElementById('mapFilterSpecies').value;
   const weather = document.getElementById('mapFilterWeather').value;
   const state = document.getElementById('mapFilterState').value;
+  const district = document.getElementById('mapFilterDistrict').value;
   
   // PERFORMANCE: Wenn Marker bereits geladen sind, filtere nur die Sichtbarkeit
   if (window.markersPreloaded && window.markers.size > 0) {
     // SCHNELL: Verstecke/Zeige vorhandene Marker basierend auf Filter
-    await filterExistingMarkers(dateFrom, dateTo, species, weather, state);
+    await filterExistingMarkers(dateFrom, dateTo, species, weather, state, district);
     return;
   }
   
@@ -43650,6 +44078,9 @@ async function applyMapFilters() {
     // Filter nach Bundesland
     if (state && obs.state !== state) return false;
     
+    // Filter nach Landkreis
+    if (district && obs.district !== district) return false;
+    
     return true;
   });
   
@@ -43669,7 +44100,7 @@ async function applyMapFilters() {
 }
 
 // NEUE FUNKTION: Filtere vorhandene Marker ohne neu zu laden
-async function filterExistingMarkers(dateFrom, dateTo, species, weather, state) {
+async function filterExistingMarkers(dateFrom, dateTo, species, weather, state, district) {
   console.log('🎯 Schneller Filter: Nutze vorgeladene Marker');
   
   // Hole Beobachtungsdaten
@@ -43691,6 +44122,9 @@ async function filterExistingMarkers(dateFrom, dateTo, species, weather, state) 
     
     // Filter nach Bundesland
     if (state && obs.state !== state) return;
+    
+    // Filter nach Landkreis
+    if (district && obs.district !== district) return;
     
     if (obs.lat && obs.lng) {
       filteredIds.add(obs.id);
@@ -43760,6 +44194,7 @@ async function resetMapFilters() {
   document.getElementById('mapFilterSpecies').value = '';
   document.getElementById('mapFilterWeather').value = '';
   document.getElementById('mapFilterState').value = '';
+  document.getElementById('mapFilterDistrict').value = '';
   
   // PERFORMANCE: Wenn Marker preloaded sind, zeige einfach alle wieder
   if (window.markersPreloaded && window.markers.size > 0) {
@@ -43795,6 +44230,7 @@ async function resetMapFilters() {
 }
 
 // Mache Funktionen global verfügbar
+window.toggleMapFilter = toggleMapFilter;
 window.toggleFilterExpanded = toggleFilterExpanded;
 window.initMapFilters = initMapFilters;
 window.applyMapFilters = applyMapFilters;
