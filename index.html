@@ -174,14 +174,14 @@
     .muted { color:var(--muted); font-size:13px; }
 
     /* Map */
-    #map { height:420px; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); }
+    #map { height:500px; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); }
     #mapCard { padding:0; overflow:visible; }
 
     /* When map-full is active */
     .map-full .grid { grid-template-columns: 1fr; }
     .map-full .main > .grid > div:first-child { display:none; }
     .map-full aside { grid-column: 1 / -1; }
-    .map-full #map { height: calc(100vh - 180px); }
+    .map-full #map { height: calc(100vh - 220px); }
     /* Sidebar bleibt sichtbar */
 
     /* Forms */
@@ -9550,6 +9550,17 @@
               </div>
             </div>
             <p style="margin:0 0 12px 0; font-size:13px; color:var(--muted);">Klicke auf die Karte, um einen Vogel zu melden.</p>
+            
+            <!-- Karten-Buttons ÜBER der Karte -->
+            <div class="form-row" style="margin:0 0 8px 0; display: flex; flex-wrap: wrap; gap: 6px;">
+              <button id="heatmapToggleMap" class="small-btn" style="background:linear-gradient(135deg, #ef4444, #f97316);color:white;" onclick="toggleHeatmap()">🔥 Heatmap</button>
+              <button id="toggleClusterMode" class="small-btn" style="background:var(--accent);color:white;" onclick="toggleClusterMode()">📍 Alle Details zeigen</button>
+              <button id="toggleMarkersLock" class="small-btn" style="background:var(--danger);" onclick="toggleMarkersLock()">🔒 Marker gesperrt</button>
+              <button id="toggleDragMode" class="small-btn" style="background:var(--accent);">Verschieben: An</button>
+              <button id="clearMarkers" class="small-btn">Alle löschen</button>
+              <button id="exitMapView" class="small-btn" style="background:var(--accent); color:white;">← Zurück</button>
+            </div>
+            
             <div style="position: relative;">
               <div id="map" style="margin:12px 0;"></div>
               
@@ -9609,6 +9620,23 @@
                       <option value="">Alle Bundesländer</option>
                     </select>
                   </div>
+                  
+                  <!-- Polygon-Filter -->
+                  <div style="margin-bottom: 12px;">
+                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🗺️ Bereich</label>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                      <button id="togglePolygonDrawBtn" onclick="togglePolygonDraw()" style="flex: 1; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--accent); font-size: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <span>📐</span>
+                        <span>Polygon zeichnen</span>
+                      </button>
+                      <button id="clearPolygonBtn" onclick="clearPolygonFilter()" style="background: var(--danger); border: 1px solid rgba(239,68,68,0.3); border-radius: 6px; padding: 8px 12px; color: white; font-size: 12px; cursor: pointer; display: none;" title="Polygon löschen">
+                        🗑️
+                      </button>
+                    </div>
+                    <div id="polygonStatus" style="font-size: 10px; color: var(--muted); margin-top: 4px; display: none;">
+                      <span id="polygonStatusText"></span>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Statistik & Buttons -->
@@ -9623,36 +9651,9 @@
                   </button>
                 </div>
               </div>
-                  <div style="margin-bottom: 12px;">
-                    <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🏘️ Landkreis</label>
-                    <select id="mapFilterDistrict" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px;">
-                      <option value="">Alle Landkreise</option>
-                    </select>
-                  </div>
-                  
-                  <!-- Statistik & Buttons -->
-                  <div class="species-filter-stats">
-                    <div class="stat">
-                      <span>📍</span>
-                      <span id="mapFilteredCount">0</span>
-                      <span>Marker</span>
-                    </div>
-                    <button class="reset-filter-btn" onclick="resetMapFilters()" id="mapResetFilterBtn">
-                      Zurücksetzen
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
-            <div class="form-row" style="margin:12px 0;">
-              <button id="heatmapToggleMap" class="small-btn" style="background:linear-gradient(135deg, #ef4444, #f97316);color:white;" onclick="toggleHeatmap()">🔥 Heatmap</button>
-              <button id="toggleClusterMode" class="small-btn" style="background:var(--accent);color:white;" onclick="toggleClusterMode()">📍 Alle Details zeigen</button>
-              <button id="toggleMarkersLock" class="small-btn" style="background:var(--danger);" onclick="toggleMarkersLock()">🔒 Marker gesperrt</button>
-              <button id="toggleDragMode" class="small-btn" style="background:var(--accent);">Verschieben: An</button>
-              <button id="clearMarkers" class="small-btn">Alle löschen</button>
-              <button id="exitMapView" class="small-btn" style="background:var(--accent); color:white;">← Zurück</button>
-            </div>
-            <div id="markerLockHint" style="font-size: 12px; color: var(--danger); padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin-bottom: 12px; text-align: center;">
+          </div>
+          <div id="markerLockHint" style="font-size: 12px; color: var(--danger); padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin-bottom: 12px; text-align: center;">
               🔒 Marker sind gesperrt. Klicke auf "🔒 Marker gesperrt" zum Entsperren.
             </div>
             <div class="marker-list" id="markerList" style="margin:12px 0;">
@@ -11223,6 +11224,245 @@
     // Mache Funktion global verfügbar
     window.toggleFilterExpanded = toggleFilterExpanded;
     
+    // ---------- Polygon Filter Variablen ----------
+    let polygonDrawingMode = false;
+    let drawnPolygon = null;
+    let polygonLayer = null;
+    
+    // ---------- Polygon Filter Funktionen ----------
+    window.togglePolygonDraw = function() {
+      console.log('🗺️ Toggle Polygon Draw');
+      
+      const btn = document.getElementById('togglePolygonDrawBtn');
+      const status = document.getElementById('polygonStatus');
+      const statusText = document.getElementById('polygonStatusText');
+      
+      if (!window.mapObj) {
+        console.error('❌ Karte nicht verfügbar');
+        if (typeof showNotification === 'function') {
+          showNotification('Karte ist noch nicht geladen', 2000);
+        }
+        return;
+      }
+      
+      if (polygonDrawingMode) {
+        // Deaktiviere Zeichenmodus
+        polygonDrawingMode = false;
+        btn.innerHTML = '<span>📐</span><span>Polygon zeichnen</span>';
+        btn.style.background = 'var(--glass)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        
+        // Setze Cursor zurück
+        const mapContainer = window.mapObj.getContainer();
+        mapContainer.style.cursor = '';
+        
+        // Entferne Drawing-Handler
+        window.mapObj.off('click', onPolygonClick);
+        
+        if (typeof showNotification === 'function') {
+          showNotification('Zeichenmodus deaktiviert', 1500);
+        }
+      } else {
+        // Aktiviere Zeichenmodus
+        polygonDrawingMode = true;
+        btn.innerHTML = '<span>✏️</span><span>Zeichnen...</span>';
+        btn.style.background = 'rgba(6,182,212,0.2)';
+        btn.style.borderColor = 'var(--accent)';
+        
+        // Ändere Cursor auf Karte
+        const mapContainer = window.mapObj.getContainer();
+        mapContainer.style.cursor = 'crosshair';
+        
+        // Initialisiere Polygon
+        if (!polygonLayer) {
+          polygonLayer = L.featureGroup().addTo(window.mapObj);
+        }
+        
+        // Lösche altes Polygon
+        if (drawnPolygon) {
+          polygonLayer.clearLayers();
+          drawnPolygon = null;
+        }
+        
+        // Status anzeigen
+        status.style.display = 'block';
+        statusText.textContent = 'Klicke auf die Karte, um Eckpunkte zu setzen';
+        
+        // Starte Polygon-Zeichnung
+        const points = [];
+        let tempPolyline = null;
+        
+        const onPolygonClick = function(e) {
+          // Verhindere dass andere Click-Handler ausgeführt werden
+          if (e.originalEvent) {
+            e.originalEvent.stopPropagation();
+            e.originalEvent.preventDefault();
+          }
+          
+          points.push([e.latlng.lat, e.latlng.lng]);
+          
+          // Zeige temporäre Linie
+          if (tempPolyline) {
+            polygonLayer.removeLayer(tempPolyline);
+          }
+          
+          if (points.length > 0) {
+            tempPolyline = L.polyline(points, {
+              color: '#06b6d4',
+              weight: 2,
+              opacity: 0.8
+            }).addTo(polygonLayer);
+          }
+          
+          // Zeige Punkt
+          L.circleMarker(e.latlng, {
+            radius: 5,
+            fillColor: '#06b6d4',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 1
+          }).addTo(polygonLayer);
+          
+          statusText.textContent = `${points.length} Punkte gesetzt. Doppelklick zum Beenden.`;
+          
+          console.log(`📍 Punkt ${points.length} gesetzt:`, e.latlng);
+        };
+        
+        const onPolygonDblClick = function(e) {
+          e.originalEvent.preventDefault();
+          
+          if (points.length < 3) {
+            statusText.textContent = 'Mindestens 3 Punkte erforderlich!';
+            setTimeout(() => {
+              statusText.textContent = `${points.length} Punkte gesetzt. Doppelklick zum Beenden.`;
+            }, 2000);
+            return;
+          }
+          
+          // Beende Zeichenmodus
+          window.mapObj.off('click', onPolygonClick);
+          window.mapObj.off('dblclick', onPolygonDblClick);
+          
+          // Entferne temporäre Linie
+          if (tempPolyline) {
+            polygonLayer.removeLayer(tempPolyline);
+          }
+          
+          // Erstelle finales Polygon
+          drawnPolygon = L.polygon(points, {
+            color: '#06b6d4',
+            fillColor: '#06b6d4',
+            fillOpacity: 0.2,
+            weight: 2
+          }).addTo(polygonLayer);
+          
+          // UI Update
+          polygonDrawingMode = false;
+          btn.innerHTML = '<span>✅</span><span>Polygon aktiv</span>';
+          btn.style.background = 'rgba(16,185,129,0.2)';
+          btn.style.borderColor = '#10b981';
+          
+          // Setze Cursor zurück
+          const mapContainer = window.mapObj.getContainer();
+          mapContainer.style.cursor = '';
+          
+          statusText.textContent = `Polygon mit ${points.length} Punkten erstellt`;
+          
+          // Zeige Löschen-Button
+          document.getElementById('clearPolygonBtn').style.display = 'block';
+          
+          // Wende Filter an
+          if (typeof window.applyMapFilters === 'function') {
+            window.applyMapFilters();
+          }
+          
+          if (typeof showNotification === 'function') {
+            showNotification('Polygon-Filter aktiv', 2000);
+          }
+          
+          console.log('✅ Polygon erstellt:', points);
+        };
+        
+        window.mapObj.on('click', onPolygonClick);
+        window.mapObj.on('dblclick', onPolygonDblClick);
+        
+        if (typeof showNotification === 'function') {
+          showNotification('Klicke auf die Karte, Doppelklick zum Beenden', 3000);
+        }
+      }
+    };
+    
+    window.clearPolygonFilter = function() {
+      console.log('🗑️ Lösche Polygon-Filter');
+      
+      // Lösche Polygon
+      if (polygonLayer) {
+        polygonLayer.clearLayers();
+      }
+      drawnPolygon = null;
+      polygonDrawingMode = false;
+      
+      // UI Update
+      const btn = document.getElementById('togglePolygonDrawBtn');
+      btn.innerHTML = '<span>📐</span><span>Polygon zeichnen</span>';
+      btn.style.background = 'var(--glass)';
+      btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      
+      // Setze Cursor zurück
+      if (window.mapObj) {
+        const mapContainer = window.mapObj.getContainer();
+        mapContainer.style.cursor = '';
+      }
+      
+      document.getElementById('clearPolygonBtn').style.display = 'none';
+      document.getElementById('polygonStatus').style.display = 'none';
+      
+      // Wende Filter ohne Polygon an
+      if (typeof window.applyMapFilters === 'function') {
+        window.applyMapFilters();
+      }
+      
+      if (typeof showNotification === 'function') {
+        showNotification('Polygon-Filter entfernt', 1500);
+      }
+    };
+    
+    // Hilfsfunktion: Prüfe ob Punkt im Polygon liegt
+    window.isPointInPolygon = function(lat, lng) {
+      if (!drawnPolygon) return true; // Kein Polygon = alle Punkte erlaubt
+      
+      const point = L.latLng(lat, lng);
+      const bounds = drawnPolygon.getBounds();
+      
+      // Schneller Check: Ist Punkt überhaupt in Bounding Box?
+      if (!bounds.contains(point)) return false;
+      
+      // Genauer Check: Ist Punkt im Polygon?
+      const latlngs = drawnPolygon.getLatLngs()[0];
+      return isPointInPolygonHelper(point, latlngs);
+    };
+    
+    // Ray-Casting Algorithmus für Punkt-in-Polygon Test
+    function isPointInPolygonHelper(point, polygon) {
+      let inside = false;
+      const x = point.lat;
+      const y = point.lng;
+      
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].lat;
+        const yi = polygon[i].lng;
+        const xj = polygon[j].lat;
+        const yj = polygon[j].lng;
+        
+        const intersect = ((yi > y) !== (yj > y)) &&
+          (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        
+        if (intersect) inside = !inside;
+      }
+      
+      return inside;
+    }
+    
     // ---------- Filter Initialisierung (früh definiert für onclick) ----------
     async function initMapFilters() {
       console.log('🔍 initMapFilters aufgerufen (frühe Definition)');
@@ -11343,8 +11583,12 @@
       // PERFORMANCE: Wenn Marker bereits geladen sind, filtere nur die Sichtbarkeit
       if (window.markersPreloaded && window.markers && window.markers.size > 0) {
         console.log('🎯 Schneller Filter: Nutze vorgeladene Marker');
+        console.log('   Marker total:', window.markers.size);
+        console.log('   Filter - Art:', species, 'Datum:', dateFrom, '-', dateTo, 'Wetter:', weather, 'Bundesland:', state);
         
         const observations = await getAllObservationsWithDetails();
+        console.log('   Beobachtungen geladen:', observations.length);
+        
         const filteredIds = new Set();
         
         observations.forEach(obs => {
@@ -11361,10 +11605,14 @@
           // Filter nach Bundesland
           if (state && obs.state !== state) return;
           
+          // Filter nach Polygon
           if (obs.lat && obs.lng) {
+            if (drawnPolygon && !isPointInPolygon(obs.lat, obs.lng)) return;
             filteredIds.add(obs.id);
           }
         });
+        
+        console.log('   Gefilterte IDs:', filteredIds.size);
         
         // Cluster leeren
         if (window.markerCluster) {
@@ -11383,9 +11631,13 @@
           window.markerCluster.addLayers(markersToShow);
         }
         
-        // Update Counter
-        if (typeof updateMapFilterStats === 'function') {
-          updateMapFilterStats(filteredIds.size);
+        // Update Counter - DIREKT
+        const countSpan = document.getElementById('mapFilteredCount');
+        if (countSpan) {
+          countSpan.textContent = filteredIds.size;
+          console.log(`📊 Counter aktualisiert: ${filteredIds.size} Marker`);
+        } else {
+          console.warn('⚠️ mapFilteredCount Element nicht gefunden');
         }
         
         // Zoom wenn Art gewählt
@@ -11415,6 +11667,11 @@
         if (el) el.value = '';
       });
       
+      // Lösche Polygon
+      if (drawnPolygon) {
+        clearPolygonFilter();
+      }
+      
       // Zeige alle Marker wieder
       if (window.markersPreloaded && window.markers && window.markers.size > 0) {
         console.log('🎯 Schnelles Reset: Zeige alle vorgeladenen Marker');
@@ -11426,8 +11683,11 @@
             window.markerCluster.addLayers(allMarkers);
           }
           
-          if (typeof updateMapFilterStats === 'function') {
-            updateMapFilterStats(allMarkers.length);
+          // Update Counter - DIREKT
+          const countSpan = document.getElementById('mapFilteredCount');
+          if (countSpan) {
+            countSpan.textContent = allMarkers.length;
+            console.log(`📊 Counter zurückgesetzt: ${allMarkers.length} Marker`);
           }
         }
         
@@ -12896,6 +13156,9 @@
       
       return units[challengeType] || (count === 1 ? 'Eintrag' : 'Einträge');
     }
+    
+    // Mache startChallenge global verfügbar
+    window.startChallenge = startChallenge;
     
     // Challenge abbrechen/deaktivieren
     async function cancelChallenge(challengeId) {
@@ -15104,13 +15367,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
-    // NEU: Polygon-Variablen
-    let polygonDrawingMode = false;
-    let currentPolygonPoints = [];
-    let polygonMap = null;
-    let polygonLayer = null;
-    let polygonMarkers = [];
-    let currentPolygonForList = null;
+    // NEU: Polygon-Variablen (bereits weiter oben deklariert)
+    // let polygonDrawingMode = false;
+    // let currentPolygonPoints = [];
+    // let polygonMap = null;
+    // let polygonLayer = null;
+    // let polygonMarkers = [];
+    // let currentPolygonForList = null;
     
     // NEU: Temporäre Koordinaten-Container initialisieren
     if (!window.tempMapCoords) {
@@ -22782,6 +23045,12 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // MODIFIZIERT: Karten-Klick-Event mit Integration in Eingaben
       window.mapObj.on('click', async function(e) {
+        // WICHTIG: Blockiere Beobachtungs-Erstellung wenn Polygon-Modus aktiv ist
+        if (polygonDrawingMode) {
+          console.log('🚫 Beobachtungs-Click blockiert - Polygon-Modus aktiv');
+          return;
+        }
+        
         if (activeRowForMapClick !== null) {
           // Koordinaten in Tabellenzeile eintragen
           const row = activeRowForMapClick;
@@ -34680,16 +34949,16 @@ window.copySelectedObservationsToGroup = copySelectedObservationsToGroup;
 window.loadAvailableGroupsForCopy = loadAvailableGroupsForCopy;
 window.initializeCopyToGroupTool = initializeCopyToGroupTool;
 window.openDetailedMemberComparison = openDetailedMemberComparison;
-window.startChallenge = startChallenge;
-window.renderChallenges = renderChallenges;
-window.checkChallengeProgress = checkChallengeProgress;
-window.openChallengeCreator = openChallengeCreator;
-window.closeChallengeCreator = closeChallengeCreator;
-window.selectIcon = selectIcon;
-window.selectColor = selectColor;
-window.selectTier = selectTier;
-window.updateGoalValue = updateGoalValue;
-window.updateXPValue = updateXPValue;
+// window.startChallenge = startChallenge; // Wird früher zugewiesen
+window.renderChallenges = typeof renderChallenges !== 'undefined' ? renderChallenges : function() { console.warn('renderChallenges not defined'); };
+window.checkChallengeProgress = typeof checkChallengeProgress !== 'undefined' ? checkChallengeProgress : function() { console.warn('checkChallengeProgress not defined'); };
+window.openChallengeCreator = typeof openChallengeCreator !== 'undefined' ? openChallengeCreator : function() { console.warn('openChallengeCreator not defined'); };
+window.closeChallengeCreator = typeof closeChallengeCreator !== 'undefined' ? closeChallengeCreator : function() { console.warn('closeChallengeCreator not defined'); };
+window.selectIcon = typeof selectIcon !== 'undefined' ? selectIcon : function() { console.warn('selectIcon not defined'); };
+window.selectColor = typeof selectColor !== 'undefined' ? selectColor : function() { console.warn('selectColor not defined'); };
+window.selectTier = typeof selectTier !== 'undefined' ? selectTier : function() { console.warn('selectTier not defined'); };
+window.updateGoalValue = typeof updateGoalValue !== 'undefined' ? updateGoalValue : function() { console.warn('updateGoalValue not defined'); };
+window.updateXPValue = typeof updateXPValue !== 'undefined' ? updateXPValue : function() { console.warn('updateXPValue not defined'); };
 window.updateGoalHint = updateGoalHint;
 window.createCustomChallenge = createCustomChallenge;
 window.startChallenge = startChallenge;
@@ -44697,8 +44966,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.updatePWAStatus = updatePWAStatus;
 window.triggerInstallPrompt = triggerInstallPrompt;
 
-// PWA Install Prompt
-let deferredPrompt;
+// PWA Install Prompt (deferredPrompt bereits weiter oben deklariert)
+// let deferredPrompt;
 const installButton = document.createElement('button');
 installButton.id = 'pwaInstallBtn';
 installButton.innerHTML = '📱 App installieren';
