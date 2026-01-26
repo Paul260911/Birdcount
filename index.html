@@ -9593,7 +9593,10 @@
               <div class="map-species-filter collapsed" id="mapAdvancedFilter">
                 <h4 onclick="toggleMapFilter()">
                   <span class="filter-title">🔍 Erweiterte Filter</span>
-                  <span class="filter-toggle-icon">▼</span>
+                  <span style="display: flex; gap: 4px; align-items: center;">
+                    <button onclick="event.stopPropagation(); initMapFilters();" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 14px; padding: 4px;" title="Filter neu laden">🔄</button>
+                    <span class="filter-toggle-icon">▼</span>
+                  </span>
                 </h4>
                 
                 <div id="filterContent">
@@ -28334,20 +28337,26 @@ document.addEventListener('DOMContentLoaded', function() {
           if (typeof initMap === 'function' && !window.mapInitialized) {
             setTimeout(() => {
               initMap();
-              // Initialisiere Karten-Filter nach Karte
+              // Initialisiere Karten-Filter nach Karte - LÄNGERE WARTEZEIT
               setTimeout(() => {
+                console.log('⏰ Versuche Filter zu initialisieren (nach Karte)...');
                 if (typeof initMapFilters === 'function') {
                   initMapFilters();
+                } else {
+                  console.error('❌ initMapFilters Funktion nicht verfügbar');
                 }
-              }, 500);
+              }, 2000); // Erhöht von 500ms auf 2000ms
             }, 100);
           } else {
             // Karte bereits initialisiert - nur Filter aktualisieren
             setTimeout(() => {
+              console.log('⏰ Versuche Filter zu initialisieren (Karte existiert)...');
               if (typeof initMapFilters === 'function') {
                 initMapFilters();
+              } else {
+                console.error('❌ initMapFilters Funktion nicht verfügbar');
               }
-            }, 300);
+            }, 1000); // Erhöht von 300ms auf 1000ms
           }
         }
       } else {
