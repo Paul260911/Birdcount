@@ -9587,7 +9587,7 @@
                     <!-- Quick Presets -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px;">
                       <button onclick="setDatePreset('today')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Heute</button>
-                      <button onclick="setDatePreset('week')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">7 Tage</button>
+                      <button onclick="setDatePreset('week')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Woche</button>
                       <button onclick="setDatePreset('month')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Monat</button>
                       <button onclick="setDatePreset('year')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">Jahr</button>
                       <button onclick="setDatePreset('2025')" class="date-preset-btn" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 2px; color: var(--soft); font-size: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(6,182,212,0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--glass)'; this.style.borderColor='rgba(255,255,255,0.08)'">2025</button>
@@ -11442,7 +11442,7 @@
       return isPointInPolygonHelper(point, latlngs);
     };
     
-    // Ray-Casting Algorithmus für Punkt-in-Polygon Test
+    // Hilfsfunktion: Punkt-in-Polygon Test
     function isPointInPolygonHelper(point, polygon) {
       let inside = false;
       const x = point.lat;
@@ -11462,6 +11462,17 @@
       
       return inside;
     }
+    
+    // ---------- Wochenberechnung: Montag bis Sonntag ----------
+    // Hilfsfunktion: Gibt den Montag der Woche für ein Datum zurück
+    window.getMondayOfWeek = function(date) {
+      const d = new Date(date);
+      const day = d.getDay(); // 0 = Sonntag, 1 = Montag, ..., 6 = Samstag
+      const diff = day === 0 ? -6 : 1 - day; // Montag ist Tag 1, Sonntag wird zu vorheriger Woche
+      d.setDate(d.getDate() + diff);
+      d.setHours(0, 0, 0, 0); // Setze auf Mitternacht
+      return d;
+    };
     
     // ---------- Filter Initialisierung (früh definiert für onclick) ----------
     async function initMapFilters() {
@@ -11716,9 +11727,10 @@
           fromDate = toDate = today;
           break;
         case 'week':
-          fromDate = new Date(today);
-          fromDate.setDate(today.getDate() - 7);
-          toDate = today;
+          // Diese Kalenderwoche (Montag bis Sonntag)
+          fromDate = getMondayOfWeek(today);
+          toDate = new Date(fromDate);
+          toDate.setDate(fromDate.getDate() + 6); // Bis Sonntag
           break;
         case 'month':
           fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -13371,9 +13383,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               return day === 0 || day === 6; // Sonntag oder Samstag
             });
             const uniqueWeekends = new Set(weekendObs.map(obs => {
-              const date = new Date(obs.date);
-              const weekStart = new Date(date);
-              weekStart.setDate(date.getDate() - date.getDay());
+              const weekStart = getMondayOfWeek(obs.date);
               return weekStart.toISOString().split('T')[0];
             }));
             progress = uniqueWeekends.size;
@@ -20429,8 +20439,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const weekAgo = new Date(today);
-        weekAgo.setDate(weekAgo.getDate() - 7);
+        const weekStart = getMondayOfWeek(today); // Montag dieser Woche
         const monthAgo = new Date(today);
         monthAgo.setMonth(monthAgo.getMonth() - 1);
         const yearAgo = new Date(today);
@@ -20446,7 +20455,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           case 'week':
             filtered = observations.filter(obs => {
               const obsDate = new Date(obs.date);
-              return obsDate >= weekAgo;
+              return obsDate >= weekStart;
             });
             break;
           case 'month':
@@ -25217,20 +25226,24 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // Hilfsfunktion: Datum einer bestimmten Kalenderwoche
     function getDateOfISOWeek(week, year) {
       const simple = new Date(year, 0, 1 + (week - 1) * 7);
-      const dow = simple.getDay();
-      const ISOweekStart = simple;
-      if (dow <= 4) {
-        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-      } else {
-        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-      }
-      return ISOweekStart;
+      return getMondayOfWeek(simple);
     }
     
     function getWeekNumber(date) {
-      const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-      const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-      return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+      // ISO 8601: Woche startet am Montag
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      
+      // Finde den Donnerstag dieser Woche (ISO 8601)
+      const dayOfWeek = d.getDay();
+      const thursday = new Date(d);
+      thursday.setDate(d.getDate() + (4 - (dayOfWeek === 0 ? 7 : dayOfWeek)));
+      
+      // Erste Woche des Jahres ist die mit dem ersten Donnerstag
+      const yearStart = new Date(thursday.getFullYear(), 0, 1);
+      const weekNumber = Math.ceil(((thursday - yearStart) / 86400000 + 1) / 7);
+      
+      return weekNumber;
     }
     
     // ---------- STATISTIK-FUNKTIONEN ----------
@@ -25571,15 +25584,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             });
             const groupSpeciesCount = allGroupSpecies.size;
             
-            // Diese Woche für die Gruppe
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            // Diese Woche für die Gruppe (Kalenderwoche)
+            const weekStart = getMondayOfWeek(new Date()); // Montag dieser KW
             let groupThisWeekCount = 0;
             allUsers.forEach(user => {
               const weekObs = user.observations.filter(o => {
                 if (!o.date) return false;
                 const obsDate = new Date(o.date);
-                return obsDate >= weekAgo && o.tickable !== false;
+                return obsDate >= weekStart && o.tickable !== false;
               });
               groupThisWeekCount += weekObs.length;
             });
@@ -25608,9 +25620,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             // Fallback zu persönlichen Daten
             if (heroTotalEl) heroTotalEl.textContent = stats.totalObservations.toLocaleString();
             if (heroSpeciesEl) heroSpeciesEl.textContent = stats.uniqueSpecies;
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekAgo);
+            const weekStart = getMondayOfWeek(new Date()); // Montag dieser KW
+            const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekStart);
             if (heroWeekEl) heroWeekEl.textContent = thisWeekObs.length;
             if (heroStreakEl) heroStreakEl.textContent = calculateStreak(observations);
           }
@@ -25619,10 +25630,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           if (heroTotalEl) heroTotalEl.textContent = stats.totalObservations.toLocaleString();
           if (heroSpeciesEl) heroSpeciesEl.textContent = stats.uniqueSpecies;
           
-          // Diese Woche
-          const weekAgo = new Date();
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekAgo);
+          // Diese Woche (Kalenderwoche)
+          const weekStart = getMondayOfWeek(new Date()); // Montag dieser KW
+          const thisWeekObs = observations.filter(o => o.date && new Date(o.date) >= weekStart);
           if (heroWeekEl) heroWeekEl.textContent = thisWeekObs.length;
           
           // Streak (vereinfacht - könnte verbessert werden)
@@ -31176,7 +31186,7 @@ async function renderActivityOverview() {
   // Berechne Summary-Statistiken
   const now_date = new Date();
   const today_start = new Date(now_date.getFullYear(), now_date.getMonth(), now_date.getDate());
-  const week_ago = new Date(now_date - 7 * 24 * 60 * 60 * 1000);
+  const week_start = getMondayOfWeek(now_date); // Montag dieser KW
   const month_ago = new Date(now_date - 30 * 24 * 60 * 60 * 1000);
   
   let activeToday = 0;
@@ -31187,7 +31197,7 @@ async function renderActivityOverview() {
   memberActivities.forEach(m => {
     if (m.lastActivityTime) {
       if (m.lastActivityTime >= today_start) activeToday++;
-      if (m.lastActivityTime >= week_ago) activeWeek++;
+      if (m.lastActivityTime >= week_start) activeWeek++;
       if (m.lastActivityTime >= month_ago) activeMonth++;
       if (m.diffDays > 30) inactive++;
     } else {
@@ -33717,9 +33727,7 @@ async function renderChallengesDashboard(groupData) {
   }
   
   // Challenge 1: Wochenchallenge
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay()); // Montag dieser Woche
-  weekStart.setHours(0, 0, 0, 0);
+  const weekStart = getMondayOfWeek(now);
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + 7);
   const daysLeftWeek = Math.ceil((weekEnd - now) / (1000 * 60 * 60 * 24));
@@ -34014,9 +34022,7 @@ async function checkAndRewardGroupChallengeCompletions(groupData, userProgressDa
   
   // Berechne Perioden-Keys
   const now = new Date();
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay());
-  weekStart.setHours(0, 0, 0, 0);
+  const weekStart = getMondayOfWeek(now);
   const weekKey = `week_${weekStart.getFullYear()}_${weekStart.getMonth()}_${weekStart.getDate()}`;
   
   const monthKey = `month_${now.getFullYear()}_${now.getMonth()}`;
@@ -40668,7 +40674,7 @@ async function updateHeatmap() {
 }
 
 function renderHourWeekdayHeatmap(observations, container) {
-  const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']; // ISO 8601: Montag bis Sonntag
   const hours = Array.from({length: 24}, (_, i) => i);
   
   // Initialize matrix - jetzt speichern wir die Beobachtungen direkt
@@ -40807,8 +40813,10 @@ function renderHourWeekdayHeatmap(observations, container) {
     
     if (date && !isNaN(date.getTime())) {
       const day = date.getDay();
+      // Konvertiere US-Format (So=0, Mo=1) zu ISO-Format (Mo=0, So=6)
+      const isoDay = day === 0 ? 6 : day - 1;
       const hour = date.getHours();
-      matrix[day][hour].push(o); // Speichere die Beobachtung
+      matrix[isoDay][hour].push(o); // Speichere die Beobachtung
       processedCount++;
     } else {
       skippedCount++;
