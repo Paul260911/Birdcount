@@ -3014,80 +3014,29 @@
     }
     
     /* Arten-Filter auf der Karte - Ein- und ausklappbar */
+    /* Arten-Filter auf der Karte */
     .map-species-filter {
       position: absolute;
-      top: 10px;
+      top: 80px;
       right: 10px;
       z-index: 1000;
-      background: linear-gradient(180deg, rgba(15,23,36,0.98), rgba(11,18,32,0.98));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--card);
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(2,6,23,0.8);
-      border: 1px solid rgba(255,255,255,0.1);
-      min-width: 320px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.08);
+      min-width: 280px;
       max-width: 350px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
-    }
-    
-    .map-species-filter.collapsed {
-      max-height: 56px;
-    }
-    
-    .map-species-filter.expanded {
-      max-height: 700px;
     }
     
     .map-species-filter h4 {
-      margin: 0;
-      padding: 12px 16px;
+      margin: 0 0 12px 0;
       font-size: 14px;
       font-weight: 600;
       color: var(--text);
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 8px;
-      cursor: pointer;
-      user-select: none;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      background: rgba(255,255,255,0.02);
-    }
-    
-    .map-species-filter.collapsed h4 {
-      border-bottom: none;
-    }
-    
-    .map-species-filter h4:hover {
-      background: rgba(6,182,212,0.05);
-    }
-    
-    .map-species-filter h4 .filter-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .filter-toggle-icon {
-      font-size: 14px;
-      transition: transform 0.3s ease;
-      color: var(--accent);
-    }
-    
-    .map-species-filter.collapsed .filter-toggle-icon {
-      transform: rotate(-90deg);
-    }
-    
-    #filterContent {
-      padding: 12px 16px;
-      display: block;
-      transition: opacity 0.2s ease;
-    }
-    
-    .map-species-filter.collapsed #filterContent {
-      display: none;
-      opacity: 0;
     }
     
     
@@ -3147,6 +3096,21 @@
       cursor: pointer;
       font-weight: 600;
       transition: all 0.2s;
+    }
+    
+    .reset-filter-btn:hover {
+      background: var(--accent-2);
+      transform: translateY(-1px);
+    }
+    
+    .reset-filter-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .date-preset-btn:active {
+      transform: scale(0.95);
+      background: rgba(6,182,212,0.2) !important;
     }
     
     .reset-filter-btn:hover {
@@ -9590,16 +9554,13 @@
               <div id="map" style="margin:12px 0;"></div>
               
               <!-- Erweiterte Filter auf der Karte -->
-              <div class="map-species-filter collapsed" id="mapAdvancedFilter">
-                <h4 onclick="toggleMapFilter()">
-                  <span class="filter-title">🔍 Erweiterte Filter</span>
-                  <span style="display: flex; gap: 4px; align-items: center;">
-                    <button onclick="event.stopPropagation(); initMapFilters();" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 14px; padding: 4px;" title="Filter neu laden">🔄</button>
-                    <span class="filter-toggle-icon">▼</span>
-                  </span>
+              <div class="map-species-filter" id="mapAdvancedFilter" style="display: none;">
+                <h4>
+                  🔍 Filter
+                  <button onclick="toggleFilterExpanded()" id="filterToggleBtn" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 16px; padding: 0 4px; margin-left: auto;" title="Erweitern/Minimieren">▼</button>
                 </h4>
                 
-                <div id="filterContent">
+                <div id="filterContent" style="display: block;">
                   <!-- Vogelart -->
                   <div style="margin-bottom: 12px;">
                     <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🐦 Vogelart</label>
@@ -9648,8 +9609,20 @@
                       <option value="">Alle Bundesländer</option>
                     </select>
                   </div>
-                  
-                  <!-- Landkreis -->
+                </div>
+                
+                <!-- Statistik & Buttons -->
+                <div class="species-filter-stats">
+                  <div class="stat">
+                    <span>📍</span>
+                    <span id="mapFilteredCount">0</span>
+                    <span>Marker</span>
+                  </div>
+                  <button class="reset-filter-btn" onclick="resetMapFilters()" id="mapResetFilterBtn">
+                    Zurücksetzen
+                  </button>
+                </div>
+              </div>
                   <div style="margin-bottom: 12px;">
                     <label style="font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 600;">🏘️ Landkreis</label>
                     <select id="mapFilterDistrict" onchange="applyMapFilters()" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; color: var(--text); font-size: 13px;">
@@ -11230,18 +11203,313 @@
 
   <script>
     // ---------- Filter Toggle Funktion (muss früh definiert sein) ----------
-    function toggleMapFilter() {
-      const filterDiv = document.getElementById('mapAdvancedFilter');
-      if (filterDiv) {
-        if (filterDiv.classList.contains('collapsed')) {
-          filterDiv.classList.remove('collapsed');
-          filterDiv.classList.add('expanded');
-        } else {
-          filterDiv.classList.add('collapsed');
-          filterDiv.classList.remove('expanded');
-        }
+    let mapFilterExpanded = true;
+    
+    function toggleFilterExpanded() {
+      const content = document.getElementById('filterContent');
+      const btn = document.getElementById('filterToggleBtn');
+      
+      mapFilterExpanded = !mapFilterExpanded;
+      
+      if (mapFilterExpanded) {
+        content.style.display = 'block';
+        btn.textContent = '▼';
+      } else {
+        content.style.display = 'none';
+        btn.textContent = '▶';
       }
     }
+    
+    // Mache Funktion global verfügbar
+    window.toggleFilterExpanded = toggleFilterExpanded;
+    
+    // ---------- Filter Initialisierung (früh definiert für onclick) ----------
+    async function initMapFilters() {
+      console.log('🔍 initMapFilters aufgerufen (frühe Definition)');
+      
+      const filterDiv = document.getElementById('mapAdvancedFilter');
+      
+      if (!filterDiv) {
+        console.log('⚠️ mapAdvancedFilter noch nicht verfügbar');
+        return;
+      }
+      
+      console.log('✅ Filter-Element gefunden');
+      console.log('📍 Gruppenmodus:', window.currentSelectedGroup);
+      
+      try {
+        // Warte auf getAllObservationsWithDetails
+        if (typeof getAllObservationsWithDetails !== 'function') {
+          console.log('⏳ Warte auf getAllObservationsWithDetails...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        if (typeof getAllObservationsWithDetails !== 'function') {
+          console.error('❌ getAllObservationsWithDetails nicht verfügbar');
+          return;
+        }
+        
+        console.log('⏳ Lade Beobachtungen...');
+        const observations = await getAllObservationsWithDetails();
+        
+        console.log(`📊 ${observations.length} Beobachtungen geladen für Filter`);
+      
+        // Initialisiere Arten-Select
+        const speciesSelect = document.getElementById('mapFilterSpecies');
+        if (speciesSelect) {
+          const species = new Set(observations.map(obs => obs.bird).filter(Boolean));
+          const sortedSpecies = Array.from(species).sort();
+          
+          console.log(`🐦 ${sortedSpecies.length} Arten gefunden:`, sortedSpecies.slice(0, 10));
+          
+          speciesSelect.innerHTML = '<option value="">Alle Arten</option>';
+          sortedSpecies.forEach(bird => {
+            const option = document.createElement('option');
+            option.value = bird;
+            option.textContent = bird;
+            speciesSelect.appendChild(option);
+          });
+        } else {
+          console.log('⚠️ mapFilterSpecies Element nicht gefunden');
+        }
+        
+        // Initialisiere Bundesländer-Select
+        const stateSelect = document.getElementById('mapFilterState');
+        if (stateSelect) {
+          const states = new Set(observations.map(obs => obs.state).filter(Boolean));
+          const sortedStates = Array.from(states).sort();
+          
+          stateSelect.innerHTML = '<option value="">Alle Bundesländer</option>';
+          sortedStates.forEach(state => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateSelect.appendChild(option);
+          });
+        }
+        
+        // Initialisiere Landkreis-Select
+        const districtSelect = document.getElementById('mapFilterDistrict');
+        if (districtSelect) {
+          const districts = new Set(observations.map(obs => obs.district).filter(Boolean));
+          const sortedDistricts = Array.from(districts).sort();
+          
+          districtSelect.innerHTML = '<option value="">Alle Landkreise</option>';
+          sortedDistricts.forEach(district => {
+            const option = document.createElement('option');
+            option.value = district;
+            option.textContent = district;
+            districtSelect.appendChild(option);
+          });
+        }
+        
+        // Zeige Filter
+        filterDiv.style.display = 'block';
+        
+        // Aktualisiere Counter
+        if (typeof updateMapFilterStats === 'function') {
+          updateMapFilterStats(observations.length);
+        }
+        
+        console.log('✅ Filter erfolgreich initialisiert');
+      } catch (error) {
+        console.error('❌ Fehler bei Filter-Initialisierung:', error);
+      }
+    }
+    
+    // Mache Funktionen global verfügbar
+    window.initMapFilters = initMapFilters;
+    
+    // Platzhalter für Filter-Funktionen - DIREKTE IMPLEMENTIERUNG
+    window.applyMapFilters = async function() {
+      console.log('🎯 applyMapFilters - Direkte Ausführung');
+      
+      const dateFrom = document.getElementById('mapFilterDateFrom')?.value;
+      const dateTo = document.getElementById('mapFilterDateTo')?.value;
+      const species = document.getElementById('mapFilterSpecies')?.value;
+      const weather = document.getElementById('mapFilterWeather')?.value;
+      const state = document.getElementById('mapFilterState')?.value;
+      
+      // Prüfe ob Funktionen verfügbar sind
+      if (typeof getAllObservationsWithDetails !== 'function') {
+        console.log('⏳ getAllObservationsWithDetails noch nicht verfügbar, warte...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (typeof getAllObservationsWithDetails !== 'function') {
+          console.error('❌ getAllObservationsWithDetails nicht verfügbar');
+          return;
+        }
+      }
+      
+      // PERFORMANCE: Wenn Marker bereits geladen sind, filtere nur die Sichtbarkeit
+      if (window.markersPreloaded && window.markers && window.markers.size > 0) {
+        console.log('🎯 Schneller Filter: Nutze vorgeladene Marker');
+        
+        const observations = await getAllObservationsWithDetails();
+        const filteredIds = new Set();
+        
+        observations.forEach(obs => {
+          // Filter nach Datum
+          if (dateFrom && obs.date < dateFrom) return;
+          if (dateTo && obs.date > dateTo) return;
+          
+          // Filter nach Art
+          if (species && obs.bird !== species) return;
+          
+          // Filter nach Wetter
+          if (weather && obs.weather !== weather) return;
+          
+          // Filter nach Bundesland
+          if (state && obs.state !== state) return;
+          
+          if (obs.lat && obs.lng) {
+            filteredIds.add(obs.id);
+          }
+        });
+        
+        // Cluster leeren
+        if (window.markerCluster) {
+          window.markerCluster.clearLayers();
+        }
+        
+        // Nur gefilterte Marker hinzufügen
+        const markersToShow = [];
+        window.markers.forEach((marker, id) => {
+          if (filteredIds.has(id)) {
+            markersToShow.push(marker);
+          }
+        });
+        
+        if (window.markerCluster && markersToShow.length > 0) {
+          window.markerCluster.addLayers(markersToShow);
+        }
+        
+        // Update Counter
+        if (typeof updateMapFilterStats === 'function') {
+          updateMapFilterStats(filteredIds.size);
+        }
+        
+        // Zoom wenn Art gewählt
+        if (species && markersToShow.length > 0 && typeof zoomToFilteredObservations === 'function') {
+          const filtered = observations.filter(obs => filteredIds.has(obs.id));
+          zoomToFilteredObservations(filtered);
+        }
+        
+        if (typeof showNotification === 'function') {
+          showNotification(`${filteredIds.size} Marker angezeigt`, 2000);
+        }
+        
+        console.log(`✅ Filter angewendet: ${filteredIds.size} Marker`);
+        return;
+      }
+      
+      console.log('⚠️ Marker noch nicht preloaded - verwende Fallback');
+    };
+    
+    window.resetMapFilters = async function() {
+      console.log('🔄 resetMapFilters - Direkte Ausführung');
+      
+      // Felder leeren
+      const fields = ['mapFilterDateFrom', 'mapFilterDateTo', 'mapFilterSpecies', 'mapFilterWeather', 'mapFilterState'];
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      
+      // Zeige alle Marker wieder
+      if (window.markersPreloaded && window.markers && window.markers.size > 0) {
+        console.log('🎯 Schnelles Reset: Zeige alle vorgeladenen Marker');
+        
+        if (window.markerCluster) {
+          window.markerCluster.clearLayers();
+          const allMarkers = Array.from(window.markers.values());
+          if (allMarkers.length > 0) {
+            window.markerCluster.addLayers(allMarkers);
+          }
+          
+          if (typeof updateMapFilterStats === 'function') {
+            updateMapFilterStats(allMarkers.length);
+          }
+        }
+        
+        if (typeof showNotification === 'function') {
+          showNotification('Filter zurückgesetzt', 1500);
+        }
+      }
+    };
+    
+    window.setDatePreset = function(preset) {
+      console.log('📅 setDatePreset - Direkte Ausführung:', preset);
+      
+      const today = new Date();
+      const dateFromInput = document.getElementById('mapFilterDateFrom');
+      const dateToInput = document.getElementById('mapFilterDateTo');
+      
+      if (!dateFromInput || !dateToInput) {
+        console.error('❌ Datum-Felder nicht gefunden');
+        return;
+      }
+      
+      let fromDate, toDate;
+      
+      switch(preset) {
+        case 'today':
+          fromDate = toDate = today;
+          break;
+        case 'week':
+          fromDate = new Date(today);
+          fromDate.setDate(today.getDate() - 7);
+          toDate = today;
+          break;
+        case 'month':
+          fromDate = new Date(today.getFullYear(), today.getMonth(), 1);
+          toDate = today;
+          break;
+        case 'year':
+          fromDate = new Date(today.getFullYear(), 0, 1);
+          toDate = today;
+          break;
+        case '2025':
+          fromDate = new Date(2025, 0, 1);
+          toDate = new Date(2025, 11, 31);
+          break;
+        case '2024':
+          fromDate = new Date(2024, 0, 1);
+          toDate = new Date(2024, 11, 31);
+          break;
+        default:
+          return;
+      }
+      
+      // Format: YYYY-MM-DD
+      const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      
+      dateFromInput.value = formatDate(fromDate);
+      dateToInput.value = formatDate(toDate);
+      
+      // Wende Filter an
+      if (typeof window.applyMapFilters === 'function') {
+        window.applyMapFilters();
+      }
+      
+      // Visuelles Feedback
+      const presetNames = {
+        'today': 'Heute',
+        'week': 'Letzte 7 Tage',
+        'month': 'Dieser Monat',
+        'year': 'Dieses Jahr',
+        '2025': '2025',
+        '2024': '2024'
+      };
+      
+      if (typeof showNotification === 'function') {
+        showNotification(`Zeitraum gesetzt: ${presetNames[preset] || preset}`, 1500);
+      }
+    };
     
     // ---------- IndexedDB Implementation ----------
     const DB_NAME = 'VogelzaehlungDB';
@@ -43856,7 +44124,7 @@ window.showDayMonthObservations = showDayMonthObservations;
 // Erweiterte Karten-Filter
 // ========================================
 
-let mapFilterExpanded = true;
+// mapFilterExpanded ist bereits weiter oben definiert
 
 // Setze Datum-Preset
 function setDatePreset(preset) {
@@ -43925,133 +44193,7 @@ function setDatePreset(preset) {
   showNotification(`Zeitraum gesetzt: ${preset === 'today' ? 'Heute' : preset === 'week' ? 'Letzte 7 Tage' : preset === 'month' ? 'Dieser Monat' : preset === 'year' ? 'Dieses Jahr' : preset}`, 1500);
 }
 
-// Toggle Filter erweitern/minimieren
-function toggleMapFilter() {
-  const filterDiv = document.getElementById('mapAdvancedFilter');
-  
-  if (filterDiv.classList.contains('collapsed')) {
-    filterDiv.classList.remove('collapsed');
-    filterDiv.classList.add('expanded');
-  } else {
-    filterDiv.classList.add('collapsed');
-    filterDiv.classList.remove('expanded');
-  }
-}
-
-// Legacy-Funktion für Rückwärtskompatibilität
-function toggleFilterExpanded() {
-  toggleMapFilter();
-}
-
-// Initialisiere Karten-Filter
-async function initMapFilters() {
-  console.log('🔍 initMapFilters aufgerufen');
-  
-  const filterDiv = document.getElementById('mapAdvancedFilter');
-  
-  if (!filterDiv) {
-    console.log('⚠️ mapAdvancedFilter nicht gefunden');
-    return;
-  }
-  
-  console.log('✅ Filter-Element gefunden');
-  
-  try {
-    // Hole alle Beobachtungen - nutze die gleiche Logik wie die Karte
-    let observations = [];
-    
-    if (window.currentGroupId) {
-      console.log('👥 Gruppenmodus aktiv, lade Gruppendaten für Filter');
-      
-      // Warte darauf, dass die DB verfügbar ist
-      if (!db) {
-        console.log('⏳ Warte auf DB-Initialisierung...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-      
-      if (!db) {
-        console.error('❌ DB nicht verfügbar');
-        return;
-      }
-      
-      // Im Gruppenmodus: Alle Gruppen-Beobachtungen laden
-      const tx = db.transaction(['observations'], 'readonly');
-      const store = tx.objectStore('observations');
-      const allObs = await store.getAll();
-      
-      console.log(`📦 ${allObs.length} Beobachtungen aus DB geladen`);
-      
-      // Filtere nach Gruppe
-      observations = allObs.filter(obs => obs.groupId === window.currentGroupId);
-    } else {
-      console.log('👤 Solo-Modus aktiv');
-      observations = await getAllObservationsWithDetails();
-    }
-    
-    console.log(`📊 ${observations.length} Beobachtungen geladen für Filter`);
-  
-  // Initialisiere Arten-Select
-  const speciesSelect = document.getElementById('mapFilterSpecies');
-  if (speciesSelect) {
-    const species = new Set(observations.map(obs => obs.bird).filter(Boolean));
-    const sortedSpecies = Array.from(species).sort();
-    
-    console.log(`🐦 ${sortedSpecies.length} Arten gefunden:`, sortedSpecies);
-    
-    speciesSelect.innerHTML = '<option value="">Alle Arten</option>';
-    sortedSpecies.forEach(bird => {
-      const option = document.createElement('option');
-      option.value = bird;
-      option.textContent = bird;
-      speciesSelect.appendChild(option);
-    });
-  } else {
-    console.log('⚠️ mapFilterSpecies Element nicht gefunden');
-  }
-  
-  // Initialisiere Bundesländer-Select
-  const stateSelect = document.getElementById('mapFilterState');
-  if (stateSelect) {
-    const states = new Set(observations.map(obs => obs.state).filter(Boolean));
-    const sortedStates = Array.from(states).sort();
-    
-    stateSelect.innerHTML = '<option value="">Alle Bundesländer</option>';
-    sortedStates.forEach(state => {
-      const option = document.createElement('option');
-      option.value = state;
-      option.textContent = state;
-      stateSelect.appendChild(option);
-    });
-  }
-  
-  // Initialisiere Landkreis-Select
-  const districtSelect = document.getElementById('mapFilterDistrict');
-  if (districtSelect) {
-    const districts = new Set(observations.map(obs => obs.district).filter(Boolean));
-    const sortedDistricts = Array.from(districts).sort();
-    
-    districtSelect.innerHTML = '<option value="">Alle Landkreise</option>';
-    sortedDistricts.forEach(district => {
-      const option = document.createElement('option');
-      option.value = district;
-      option.textContent = district;
-      districtSelect.appendChild(option);
-    });
-  }
-  
-  // Zeige Filter (standardmäßig eingeklappt)
-  filterDiv.classList.remove('hidden');
-  filterDiv.classList.add('collapsed');
-  filterDiv.style.display = 'block';
-  
-  // Aktualisiere Counter
-  updateMapFilterStats(observations.length);
-  
-  console.log('✅ Filter erfolgreich initialisiert');
-  } catch (error) {
-    console.error('❌ Fehler bei Filter-Initialisierung:', error);
-  }
-}
+// toggleFilterExpanded ist bereits weiter oben definiert
 
 // Wende Karten-Filter an
 async function applyMapFilters() {
@@ -44060,12 +44202,11 @@ async function applyMapFilters() {
   const species = document.getElementById('mapFilterSpecies').value;
   const weather = document.getElementById('mapFilterWeather').value;
   const state = document.getElementById('mapFilterState').value;
-  const district = document.getElementById('mapFilterDistrict').value;
   
   // PERFORMANCE: Wenn Marker bereits geladen sind, filtere nur die Sichtbarkeit
   if (window.markersPreloaded && window.markers.size > 0) {
     // SCHNELL: Verstecke/Zeige vorhandene Marker basierend auf Filter
-    await filterExistingMarkers(dateFrom, dateTo, species, weather, state, district);
+    await filterExistingMarkers(dateFrom, dateTo, species, weather, state);
     return;
   }
   
@@ -44087,9 +44228,6 @@ async function applyMapFilters() {
     // Filter nach Bundesland
     if (state && obs.state !== state) return false;
     
-    // Filter nach Landkreis
-    if (district && obs.district !== district) return false;
-    
     return true;
   });
   
@@ -44109,7 +44247,7 @@ async function applyMapFilters() {
 }
 
 // NEUE FUNKTION: Filtere vorhandene Marker ohne neu zu laden
-async function filterExistingMarkers(dateFrom, dateTo, species, weather, state, district) {
+async function filterExistingMarkers(dateFrom, dateTo, species, weather, state) {
   console.log('🎯 Schneller Filter: Nutze vorgeladene Marker');
   
   // Hole Beobachtungsdaten
@@ -44131,9 +44269,6 @@ async function filterExistingMarkers(dateFrom, dateTo, species, weather, state, 
     
     // Filter nach Bundesland
     if (state && obs.state !== state) return;
-    
-    // Filter nach Landkreis
-    if (district && obs.district !== district) return;
     
     if (obs.lat && obs.lng) {
       filteredIds.add(obs.id);
@@ -44203,7 +44338,6 @@ async function resetMapFilters() {
   document.getElementById('mapFilterSpecies').value = '';
   document.getElementById('mapFilterWeather').value = '';
   document.getElementById('mapFilterState').value = '';
-  document.getElementById('mapFilterDistrict').value = '';
   
   // PERFORMANCE: Wenn Marker preloaded sind, zeige einfach alle wieder
   if (window.markersPreloaded && window.markers.size > 0) {
@@ -44238,13 +44372,19 @@ async function resetMapFilters() {
   showNotification('Filter zurückgesetzt', 1500);
 }
 
-// Mache Funktionen global verfügbar
-window.toggleMapFilter = toggleMapFilter;
-window.toggleFilterExpanded = toggleFilterExpanded;
-window.initMapFilters = initMapFilters;
+// Mache Funktionen global verfügbar (toggleMapFilter und initMapFilters bereits früher definiert)
+// Speichere interne Versionen für die Platzhalter
+window._applyMapFilters = applyMapFilters;
+window._resetMapFilters = resetMapFilters;
+window._setDatePreset = setDatePreset;
+
+// Überschreibe Platzhalter mit echten Funktionen
 window.applyMapFilters = applyMapFilters;
 window.resetMapFilters = resetMapFilters;
 window.setDatePreset = setDatePreset;
+window.toggleFilterExpanded = toggleFilterExpanded;
+
+console.log('✅ Alle Filter-Funktionen vollständig geladen');
 
 // ========================================
 // PWA - Service Worker & Installation
