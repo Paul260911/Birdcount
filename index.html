@@ -6867,6 +6867,20 @@
                 </button>
               </div>
               
+              <!-- NEU: Artenfilter -->
+              <div style="margin-bottom: 16px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                  <label style="font-weight: 600; font-size: 14px; color: var(--text);">🦅 Artenfilter:</label>
+                  <select id="speciesFilterAnalysis" onchange="updateChart()" style="flex: 1; min-width: 200px; max-width: 400px; padding: 8px 12px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text); font-size: 13px; cursor: pointer;">
+                    <option value="all">Alle Arten anzeigen</option>
+                  </select>
+                  <button id="resetSpeciesFilter" onclick="resetSpeciesFilter()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--glass); color: var(--soft); cursor: pointer; font-weight: 600; font-size: 12px; display: none;">
+                    ✕ Filter zurücksetzen
+                  </button>
+                </div>
+                <div id="speciesFilterInfo" style="margin-top: 8px; font-size: 12px; color: var(--muted); display: none;"></div>
+              </div>
+              
               <div class="preset-buttons">
                 <button class="preset-btn active" data-preset="this_year">Dieses Jahr</button>
                 <button class="preset-btn" data-preset="last_year">Letztes Jahr</button>
@@ -24197,6 +24211,51 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       });
     }
     
+    // NEU: Artenfilter für Analyse initialisieren
+    async function initSpeciesFilterAnalysis() {
+      const select = document.getElementById('speciesFilterAnalysis');
+      if (!select) return;
+      
+      select.innerHTML = '<option value="all">Alle Arten anzeigen</option>';
+      
+      // Hole alle einzigartigen Vogelarten aus den Beobachtungen
+      const observations = await getAllObservationsWithDetails();
+      // Filtere Nullmeldungen aus
+      const validObservations = observations.filter(obs => isValidObservation(obs));
+      const species = new Set(validObservations.map(obs => obs.bird).filter(Boolean));
+      
+      // Zähle Beobachtungen pro Art
+      const speciesCount = {};
+      validObservations.forEach(obs => {
+        if (obs.bird) {
+          speciesCount[obs.bird] = (speciesCount[obs.bird] || 0) + 1;
+        }
+      });
+      
+      // Sortiere nach Anzahl der Beobachtungen (häufigste zuerst)
+      const sortedSpecies = Array.from(species).sort((a, b) => {
+        return speciesCount[b] - speciesCount[a];
+      });
+      
+      sortedSpecies.forEach(bird => {
+        const option = document.createElement('option');
+        option.value = bird;
+        option.textContent = `${bird} (${speciesCount[bird]} Beobachtungen)`;
+        select.appendChild(option);
+      });
+      
+      console.log(`✅ Artenfilter initialisiert: ${sortedSpecies.length} Arten`);
+    }
+    
+    // NEU: Artenfilter zurücksetzen
+    function resetSpeciesFilter() {
+      const select = document.getElementById('speciesFilterAnalysis');
+      if (select) {
+        select.value = 'all';
+        updateChart();
+      }
+    }
+    
     // Bundesland-Filter initialisieren
     async function initFilterStateSelect() {
       const select = document.getElementById('filterState');
@@ -24512,8 +24571,12 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const onlySelffound = selffoundFilterCheckbox ? selffoundFilterCheckbox.checked : false;
       const onlyNewSpecies = newSpeciesFilterCheckbox ? newSpeciesFilterCheckbox.checked : false;
       
-      // Cache-Key basierend auf Filtern
-      const cacheKey = `chartData_${onlyTickable}_${onlySelffound}_${onlyNewSpecies}_${document.getElementById('timeRangeSlider')?.value}`;
+      // NEU: Artenfilter auslesen
+      const speciesFilter = document.getElementById('speciesFilterAnalysis');
+      const selectedSpecies = speciesFilter ? speciesFilter.value : 'all';
+      
+      // Cache-Key basierend auf Filtern (inkl. Artenfilter)
+      const cacheKey = `chartData_${onlyTickable}_${onlySelffound}_${onlyNewSpecies}_${selectedSpecies}_${document.getElementById('timeRangeSlider')?.value}`;
       let observations = performanceCache.get(cacheKey);
       
       if (!observations) {
@@ -24583,6 +24646,31 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
       if (onlySelffound) {
         observations = observations.filter(obs => obs.selffound === true);
+      }
+      
+      // NEU: Wende Artenfilter an
+      if (selectedSpecies !== 'all') {
+        observations = observations.filter(obs => obs.bird === selectedSpecies);
+        // Zeige Info und Reset-Button
+        const speciesFilterInfo = document.getElementById('speciesFilterInfo');
+        const resetBtn = document.getElementById('resetSpeciesFilter');
+        if (speciesFilterInfo) {
+          speciesFilterInfo.style.display = 'block';
+          speciesFilterInfo.innerHTML = `📊 Zeige nur Beobachtungen von: <strong style="color: var(--accent);">${selectedSpecies}</strong> (${observations.length} Beobachtungen)`;
+        }
+        if (resetBtn) {
+          resetBtn.style.display = 'inline-block';
+        }
+      } else {
+        // Verstecke Info und Reset-Button
+        const speciesFilterInfo = document.getElementById('speciesFilterInfo');
+        const resetBtn = document.getElementById('resetSpeciesFilter');
+        if (speciesFilterInfo) {
+          speciesFilterInfo.style.display = 'none';
+        }
+        if (resetBtn) {
+          resetBtn.style.display = 'none';
+        }
       }
       
       // Cache gefilterte Daten
@@ -29025,6 +29113,7 @@ async function loadPageData(page) {
     if (page === 'diagramme') {
       if (typeof updateYearSelection === 'function') updateYearSelection();
       if (typeof initMemberFilter === 'function') await initMemberFilter();
+      if (typeof initSpeciesFilterAnalysis === 'function') await initSpeciesFilterAnalysis(); // NEU: Artenfilter
       if (typeof updateChart === 'function') updateChart();
     } else if (page === 'statistiken') {
       if (typeof updateAdvancedStatistics === 'function') updateAdvancedStatistics();
@@ -43417,12 +43506,33 @@ function renderShowcaseAchievement(achievement) {
 
 // Showcase Selector öffnen
 async function openShowcaseSelector() {
-  const modal = document.getElementById('showcaseModal');
-  const listContainer = document.getElementById('showcaseAchievementsList');
-  const emptyState = document.getElementById('showcaseEmptyState');
+  console.log('📊 Showcase Selector öffnen...');
   
+  const modal = document.getElementById('showcaseModal');
+  if (!modal) {
+    console.error('❌ showcaseModal Element nicht gefunden!');
+    return;
+  }
+  console.log('✅ Modal Element gefunden:', modal);
+  
+  const listContainer = document.getElementById('showcaseAchievementsList');
+  if (!listContainer) {
+    console.error('❌ showcaseAchievementsList Element nicht gefunden!');
+    return;
+  }
+  console.log('✅ List Container gefunden:', listContainer);
+  
+  const emptyState = document.getElementById('showcaseEmptyState');
+  if (!emptyState) {
+    console.error('❌ showcaseEmptyState Element nicht gefunden!');
+    return;
+  }
+  console.log('✅ Empty State gefunden:', emptyState);
+  
+  console.log('🔄 Lade Beobachtungen...');
   // Lade alle eingelösten Achievements
   const observations = await getOwnObservationsForStats();
+  console.log('✅ Beobachtungen geladen:', observations.length);
   const totalSpecies = countUniqueSpecies(observations);
   const totalObs = observations.length;
   
@@ -43459,20 +43569,27 @@ async function openShowcaseSelector() {
   
   let savedAchievements = {};
   try {
+    console.log('🔄 Lade gespeicherte Achievements...');
     const stored = await getFromIndexedDB('settings', 'achievements');
     if (stored && stored.value) {
       savedAchievements = stored.value;
+      console.log('✅ Gespeicherte Achievements geladen:', Object.keys(savedAchievements).length);
+    } else {
+      console.log('⚠️ Keine gespeicherten Achievements gefunden');
     }
   } catch (e) {
-    console.log('Keine Achievements gefunden');
+    console.log('❌ Fehler beim Laden der Achievements:', e);
   }
   
   const claimedMilestones = milestones.filter(m => savedAchievements[m.id] === true);
+  console.log('📊 Eingelöste Achievements:', claimedMilestones.length);
   
   if (claimedMilestones.length === 0) {
+    console.log('⚠️ Keine eingelösten Achievements - zeige Empty State');
     listContainer.style.display = 'none';
     emptyState.style.display = 'block';
   } else {
+    console.log('✅ Zeige Achievement-Grid mit', claimedMilestones.length, 'Achievements');
     listContainer.style.display = 'grid';
     emptyState.style.display = 'none';
     
@@ -43534,11 +43651,25 @@ async function openShowcaseSelector() {
     console.log(`✅ ${claimedMilestones.length} Achievement-Items gerendert`);
   }
   
-  console.log('📊 Showcase Selector öffnen...');
-  console.log('Eingelöste Achievements:', claimedMilestones.length);
-  
+  console.log('🚪 Öffne Modal...');
+  console.log('   Modal display vorher:', modal.style.display);
   modal.style.display = 'flex';
+  modal.style.zIndex = '99999';
+  modal.setAttribute('style', modal.getAttribute('style').replace('display: none', 'display: flex'));
+  console.log('   Modal display nachher:', modal.style.display);
+  console.log('   Modal z-index:', modal.style.zIndex);
   document.body.style.overflow = 'hidden';
+  
+  // Zusätzliche Sicherstellung dass Modal sichtbar ist
+  setTimeout(() => {
+    if (modal.style.display !== 'flex') {
+      console.warn('⚠️ Modal display wurde zurückgesetzt! Setze erneut...');
+      modal.style.display = 'flex';
+      modal.style.zIndex = '99999';
+    }
+  }, 100);
+  
+  console.log('✅ Modal sollte jetzt sichtbar sein!');
 }
 
 // Showcase Selector öffnen (explizit global)
@@ -43689,7 +43820,7 @@ window.openShowcaseSelector = openShowcaseSelector;
 </style>
 
 <!-- Modal für Showcase Achievement Auswahl -->
-<div id="showcaseModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeShowcaseModal()">
+<div id="showcaseModal" class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(2,6,23,0.95); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 20px; backdrop-filter: blur(8px);" onclick="if(event.target === this) closeShowcaseModal()">
   <div style="background: var(--card); padding: 32px; border-radius: 20px; max-width: 800px; width: 95%; max-height: 85vh; overflow-y: auto; position: relative; border: 2px solid rgba(16,185,129,0.3); box-shadow: 0 24px 80px rgba(16,185,129,0.4); animation: modalSlideIn 0.3s ease;" onclick="event.stopPropagation()">
     <button onclick="closeShowcaseModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 32px; line-height: 1; padding: 4px 8px; transition: all 0.2s; z-index: 1;" onmouseover="this.style.color='var(--danger)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--muted)'; this.style.transform='rotate(0deg)'">×</button>
     
