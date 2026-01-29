@@ -6069,6 +6069,177 @@
       transform: rotate(45deg);
     }
     
+    /* Galerie Styles */
+    .gallery-item {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(6,182,212,0.2);
+      border-color: rgba(6,182,212,0.3);
+    }
+    
+    .gallery-image-container {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.3);
+      position: relative;
+    }
+    
+    .gallery-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-image {
+      transform: scale(1.05);
+    }
+    
+    .gallery-info {
+      padding: 16px;
+    }
+    
+    .gallery-species {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .gallery-date {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    
+    .gallery-location {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .gallery-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .gallery-badge.selffound {
+      background: rgba(239,68,68,0.9);
+    }
+    
+    .gallery-badge.tickable {
+      background: rgba(16,185,129,0.9);
+    }
+    
+    /* Lightbox für Vollbildansicht */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .lightbox.active {
+      display: flex;
+    }
+    
+    .lightbox-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      position: relative;
+    }
+    
+    .lightbox-image {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    
+    .lightbox-close {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .lightbox-close:hover {
+      background: rgba(239,68,68,0.8);
+      border-color: rgba(239,68,68,1);
+      transform: rotate(90deg);
+    }
+    
+    .lightbox-info {
+      position: absolute;
+      bottom: -60px;
+      left: 0;
+      right: 0;
+      color: white;
+      text-align: center;
+    }
+    
+    .lightbox-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 20px;
+    }
+    
+    .lightbox-info p {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -6119,6 +6290,7 @@
         <button data-page="karte">🗺 Karte</button>
         <button data-page="listen">📋 Listen</button>
         <button data-page="arten">🐦 Arten-DB</button>
+        <button data-page="galerie">📸 Galerie</button>
         <button data-page="challenges">🏆 Challenges</button>
         <button data-page="group-compare" id="groupCompareNav" style="display:none;">👥 Gruppenvergleich</button>
         <button data-page="tools">🛠️ Tools</button>
@@ -7089,6 +7261,20 @@
                 <h3>Aktivitäts-Heatmap</h3>
                 <p class="muted">Wann beobachtest du am meisten?</p>
                 
+                <!-- NEU: Artenfilter für Heatmap -->
+                <div style="margin: 16px 0; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <label style="font-weight: 600; font-size: 14px; color: var(--text);">🦅 Art auswählen:</label>
+                    <select id="heatmapSpeciesFilter" onchange="updateHeatmap()" style="flex: 1; min-width: 200px; max-width: 400px; padding: 8px 12px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text); font-size: 13px; cursor: pointer;">
+                      <option value="all">Alle Arten (Gesamt-Aktivität)</option>
+                    </select>
+                    <button id="resetHeatmapFilter" onclick="resetHeatmapFilter()" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: var(--glass); color: var(--soft); cursor: pointer; font-weight: 600; font-size: 12px; display: none;">
+                      ✕ Zurücksetzen
+                    </button>
+                  </div>
+                  <div id="heatmapFilterInfo" style="margin-top: 8px; font-size: 12px; color: var(--muted); display: none;"></div>
+                </div>
+                
                 <!-- Heatmap Type Selector -->
                 <div style="display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap;">
                   <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 16px; border-radius: 8px; background: var(--glass); border: 1px solid rgba(255,255,255,0.04);">
@@ -7419,6 +7605,57 @@
               </div>
             </div>
           </div>
+
+          <!-- Galerie -->
+          <section id="galerie" class="card" style="display:none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <h2 style="margin: 0;">📸 Foto-Galerie</h2>
+                <p class="muted" style="margin: 4px 0 0 0;">Alle deine Vogelbeobachtungen mit Fotos</p>
+              </div>
+              
+              <!-- Filter & Sortierung -->
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <select id="gallerySpeciesFilter" onchange="loadGallery()" style="padding: 8px 12px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text); font-size: 13px;">
+                  <option value="all">Alle Arten</option>
+                </select>
+                <select id="gallerySortOrder" onchange="loadGallery()" style="padding: 8px 12px; background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text); font-size: 13px;">
+                  <option value="date-desc">Neueste zuerst</option>
+                  <option value="date-asc">Älteste zuerst</option>
+                  <option value="species-asc">Art (A-Z)</option>
+                  <option value="species-desc">Art (Z-A)</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Statistiken -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px;">
+              <div style="background: rgba(6,182,212,0.1); padding: 16px; border-radius: 10px; text-align: center; border: 1px solid rgba(6,182,212,0.2);">
+                <div style="font-size: 28px; font-weight: bold; color: var(--accent);" id="galleryTotalPhotos">0</div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Fotos insgesamt</div>
+              </div>
+              <div style="background: rgba(124,58,237,0.1); padding: 16px; border-radius: 10px; text-align: center; border: 1px solid rgba(124,58,237,0.2);">
+                <div style="font-size: 28px; font-weight: bold; color: var(--accent-2);" id="gallerySpeciesCount">0</div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Arten fotografiert</div>
+              </div>
+              <div style="background: rgba(16,185,129,0.1); padding: 16px; border-radius: 10px; text-align: center; border: 1px solid rgba(16,185,129,0.2);">
+                <div style="font-size: 28px; font-weight: bold; color: var(--success);" id="galleryRecentCount">0</div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Diese Woche</div>
+              </div>
+            </div>
+            
+            <!-- Galerie Grid -->
+            <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+              <!-- Wird dynamisch gefüllt -->
+            </div>
+            
+            <!-- Leere State -->
+            <div id="galleryEmpty" style="display: none; text-align: center; padding: 60px 20px;">
+              <div style="font-size: 64px; margin-bottom: 16px;">📸</div>
+              <h3 style="color: var(--muted); margin: 0 0 8px 0;">Keine Fotos gefunden</h3>
+              <p style="color: var(--muted); font-size: 14px;">Füge Fotos zu deinen Beobachtungen hinzu, um sie hier zu sehen.</p>
+            </div>
+          </section>
 
           <!-- Tools -->
           <section id="tools" class="card" style="display:none;">
@@ -20107,7 +20344,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const allSectionIds = [
           'home', 'profil', 'beobachtungen', 'eingabe', 'diagramme', 
           'statistiken', 'erweiterte-stats', 'karte', 'listen', 'arten', 
-          'tools', 'challenges', 'group-compare'
+          'galerie', 'tools', 'challenges', 'group-compare'
         ];
         
         console.log(`🔄 Wechsle zu Seite: ${page}`);
@@ -29004,7 +29241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const allSectionIds = [
           'home', 'profil', 'beobachtungen', 'eingabe', 'diagramme', 
           'statistiken', 'erweiterte-stats', 'karte', 'listen', 'arten', 
-          'tools', 'challenges', 'group-compare'
+          'galerie', 'tools', 'challenges', 'group-compare'
         ];
         
         console.log(`🔄 [TOUCH] Wechsle zu Seite: ${page}`);
@@ -29135,6 +29372,9 @@ async function loadPageData(page) {
       if (typeof updateDashboard === 'function') updateDashboard();
     } else if (page === 'profil') {
       if (typeof loadProfile === 'function') await loadProfile();
+    } else if (page === 'galerie') {
+      if (typeof loadGallery === 'function') await loadGallery();
+      if (typeof initGalleryFilters === 'function') await initGalleryFilters();
     } else if (page === 'challenges') {
       if (typeof loadChallengeProgress === 'function') await loadChallengeProgress();
       if (typeof loadCustomChallenges === 'function') await loadCustomChallenges();
@@ -29156,6 +29396,254 @@ async function loadPageData(page) {
   }
 }
 
+// ==================== GALERIE FUNKTIONEN ====================
+
+// Galerie-Filter initialisieren
+async function initGalleryFilters() {
+  const speciesFilter = document.getElementById('gallerySpeciesFilter');
+  if (!speciesFilter) return;
+  
+  speciesFilter.innerHTML = '<option value="all">Alle Arten</option>';
+  
+  const observations = await getAllObservationsWithDetails();
+  const obsWithPhotos = observations.filter(obs => obs.photo);
+  const species = new Set(obsWithPhotos.map(obs => obs.bird).filter(Boolean));
+  
+  // Zähle Fotos pro Art
+  const speciesPhotoCount = {};
+  obsWithPhotos.forEach(obs => {
+    if (obs.bird) {
+      speciesPhotoCount[obs.bird] = (speciesPhotoCount[obs.bird] || 0) + 1;
+    }
+  });
+  
+  // Sortiere nach Anzahl der Fotos
+  const sortedSpecies = Array.from(species).sort((a, b) => {
+    return speciesPhotoCount[b] - speciesPhotoCount[a];
+  });
+  
+  sortedSpecies.forEach(bird => {
+    const option = document.createElement('option');
+    option.value = bird;
+    option.textContent = `${bird} (${speciesPhotoCount[bird]} Foto${speciesPhotoCount[bird] !== 1 ? 's' : ''})`;
+    speciesFilter.appendChild(option);
+  });
+}
+
+// Galerie laden
+async function loadGallery() {
+  try {
+    const galleryGrid = document.getElementById('galleryGrid');
+    const galleryEmpty = document.getElementById('galleryEmpty');
+    const speciesFilter = document.getElementById('gallerySpeciesFilter');
+    const sortOrder = document.getElementById('gallerySortOrder');
+    
+    if (!galleryGrid) return;
+    
+    // Lade alle Beobachtungen
+    const allObservations = await getAllObservationsWithDetails();
+    
+    // Filter: Nur Beobachtungen mit Foto
+    let observations = allObservations.filter(obs => obs.photo && isValidObservation(obs));
+    
+    // Artenfilter anwenden
+    const selectedSpecies = speciesFilter ? speciesFilter.value : 'all';
+    if (selectedSpecies !== 'all') {
+      observations = observations.filter(obs => obs.bird === selectedSpecies);
+    }
+    
+    // Sortierung anwenden
+    const sortValue = sortOrder ? sortOrder.value : 'date-desc';
+    switch (sortValue) {
+      case 'date-desc':
+        observations.sort((a, b) => new Date(b.date) - new Date(a.date));
+        break;
+      case 'date-asc':
+        observations.sort((a, b) => new Date(a.date) - new Date(b.date));
+        break;
+      case 'species-asc':
+        observations.sort((a, b) => (a.bird || '').localeCompare(b.bird || ''));
+        break;
+      case 'species-desc':
+        observations.sort((a, b) => (b.bird || '').localeCompare(a.bird || ''));
+        break;
+    }
+    
+    // Statistiken aktualisieren
+    updateGalleryStats(allObservations);
+    
+    // Galerie rendern
+    if (observations.length === 0) {
+      galleryGrid.style.display = 'none';
+      galleryEmpty.style.display = 'block';
+    } else {
+      galleryGrid.style.display = 'grid';
+      galleryEmpty.style.display = 'none';
+      
+      galleryGrid.innerHTML = '';
+      
+      observations.forEach(obs => {
+        const item = createGalleryItem(obs);
+        galleryGrid.appendChild(item);
+      });
+    }
+    
+    console.log(`✅ Galerie geladen: ${observations.length} Fotos`);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Galerie:', error);
+  }
+}
+
+// Galerie-Item erstellen
+function createGalleryItem(obs) {
+  const item = document.createElement('div');
+  item.className = 'gallery-item';
+  
+  // Formatiere Datum
+  const date = new Date(obs.date);
+  const dateStr = date.toLocaleDateString('de-DE', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric' 
+  });
+  
+  // Location String
+  let location = '';
+  if (obs.state && obs.district) {
+    location = `${obs.district}, ${obs.state}`;
+  } else if (obs.state) {
+    location = obs.state;
+  } else if (obs.district) {
+    location = obs.district;
+  } else if (obs.lat && obs.lng) {
+    location = `${obs.lat.toFixed(4)}, ${obs.lng.toFixed(4)}`;
+  }
+  
+  // Badge
+  let badge = '';
+  if (obs.selffound) {
+    badge = '<div class="gallery-badge selffound">🔴 Selffound</div>';
+  } else if (obs.tickable !== false) {
+    badge = '<div class="gallery-badge tickable">✓ Tickbar</div>';
+  }
+  
+  item.innerHTML = `
+    <div class="gallery-image-container">
+      <img src="${obs.photo}" alt="${obs.bird || 'Vogel'}" class="gallery-image" loading="lazy">
+      ${badge}
+    </div>
+    <div class="gallery-info">
+      <h3 class="gallery-species">
+        🐦 ${obs.bird || 'Unbekannte Art'}
+      </h3>
+      <div class="gallery-date">
+        📅 ${dateStr}
+      </div>
+      ${location ? `<div class="gallery-location">📍 ${location}</div>` : ''}
+    </div>
+  `;
+  
+  // Click-Handler für Lightbox
+  item.addEventListener('click', () => {
+    openLightbox(obs);
+  });
+  
+  return item;
+}
+
+// Galerie-Statistiken aktualisieren
+function updateGalleryStats(allObservations) {
+  const obsWithPhotos = allObservations.filter(obs => obs.photo && isValidObservation(obs));
+  const totalPhotos = obsWithPhotos.length;
+  const species = new Set(obsWithPhotos.map(obs => obs.bird).filter(Boolean));
+  const speciesCount = species.size;
+  
+  // Fotos dieser Woche
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const recentPhotos = obsWithPhotos.filter(obs => new Date(obs.date) >= oneWeekAgo);
+  const recentCount = recentPhotos.length;
+  
+  // DOM aktualisieren
+  const totalEl = document.getElementById('galleryTotalPhotos');
+  const speciesEl = document.getElementById('gallerySpeciesCount');
+  const recentEl = document.getElementById('galleryRecentCount');
+  
+  if (totalEl) totalEl.textContent = totalPhotos;
+  if (speciesEl) speciesEl.textContent = speciesCount;
+  if (recentEl) recentEl.textContent = recentCount;
+}
+
+// Lightbox öffnen
+function openLightbox(obs) {
+  // Erstelle Lightbox wenn nicht vorhanden
+  let lightbox = document.getElementById('photoLightbox');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'photoLightbox';
+    lightbox.className = 'lightbox';
+    document.body.appendChild(lightbox);
+    
+    // Click außerhalb zum Schließen
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+    
+    // ESC-Taste zum Schließen
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+  }
+  
+  // Formatiere Datum
+  const date = new Date(obs.date);
+  const dateStr = date.toLocaleDateString('de-DE', { 
+    day: '2-digit', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+  
+  // Location String
+  let location = '';
+  if (obs.state && obs.district) {
+    location = `${obs.district}, ${obs.state}`;
+  } else if (obs.state) {
+    location = obs.state;
+  } else if (obs.district) {
+    location = obs.district;
+  }
+  
+  lightbox.innerHTML = `
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox()">×</button>
+      <img src="${obs.photo}" alt="${obs.bird || 'Vogel'}" class="lightbox-image">
+      <div class="lightbox-info">
+        <h3>🐦 ${obs.bird || 'Unbekannte Art'}</h3>
+        <p>📅 ${dateStr}${location ? ` • 📍 ${location}` : ''}</p>
+        ${obs.notes ? `<p style="margin-top: 8px; font-style: italic;">💬 ${obs.notes}</p>` : ''}
+      </div>
+    </div>
+  `;
+  
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+// Lightbox schließen
+function closeLightbox() {
+  const lightbox = document.getElementById('photoLightbox');
+  if (lightbox) {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+// ==================== ENDE GALERIE FUNKTIONEN ====================
+
 // Export functions to window
 window.log = log;
 window.logError = logError;
@@ -29166,6 +29654,9 @@ window.showEmptyState = showEmptyState;
 window.applyDateFilter = applyDateFilter;
 window.showKeyboardShortcuts = showKeyboardShortcuts;
 window.acceptPrivacy = acceptPrivacy;
+window.loadGallery = loadGallery;
+window.initGalleryFilters = initGalleryFilters;
+window.closeLightbox = closeLightbox;
 
 // ==================== ORIGINAL CODE BELOW ====================
 
@@ -40385,6 +40876,7 @@ function switchAdvancedStatsTab(tabName) {
       loadJahresvergleich();
       break;
     case 'heatmap':
+      initHeatmapSpeciesFilter(); // NEU: Initialisiere Artenfilter
       updateHeatmap();
       break;
     case 'meilensteine':
@@ -40722,6 +41214,52 @@ function toggleChartYAxis() {
 window.toggleChartYAxis = toggleChartYAxis;
 
 
+// Heatmap - Artenfilter initialisieren
+async function initHeatmapSpeciesFilter() {
+  const select = document.getElementById('heatmapSpeciesFilter');
+  if (!select) return;
+  
+  select.innerHTML = '<option value="all">Alle Arten (Gesamt-Aktivität)</option>';
+  
+  // Hole alle Beobachtungen
+  const observations = await getOwnObservationsForStats();
+  const species = new Set(observations.map(obs => obs.bird).filter(Boolean));
+  
+  // Zähle Beobachtungen pro Art
+  const speciesCount = {};
+  observations.forEach(obs => {
+    if (obs.bird) {
+      speciesCount[obs.bird] = (speciesCount[obs.bird] || 0) + 1;
+    }
+  });
+  
+  // Sortiere nach Anzahl der Beobachtungen (häufigste zuerst)
+  const sortedSpecies = Array.from(species).sort((a, b) => {
+    return speciesCount[b] - speciesCount[a];
+  });
+  
+  sortedSpecies.forEach(bird => {
+    const option = document.createElement('option');
+    option.value = bird;
+    option.textContent = `${bird} (${speciesCount[bird]} Beobachtungen)`;
+    select.appendChild(option);
+  });
+  
+  console.log(`✅ Heatmap-Artenfilter initialisiert: ${sortedSpecies.length} Arten`);
+}
+
+// Heatmap - Artenfilter zurücksetzen
+function resetHeatmapFilter() {
+  const select = document.getElementById('heatmapSpeciesFilter');
+  if (select) {
+    select.value = 'all';
+    updateHeatmap();
+  }
+}
+
+window.initHeatmapSpeciesFilter = initHeatmapSpeciesFilter;
+window.resetHeatmapFilter = resetHeatmapFilter;
+
 // Heatmap
 async function updateHeatmap() {
   const type = document.querySelector('input[name="heatmapType"]:checked')?.value || 'hour-weekday';
@@ -40729,10 +41267,41 @@ async function updateHeatmap() {
   
   console.warn('=== 🔥 HEATMAP UPDATE START ===');
   
+  // NEU: Artenfilter auslesen
+  const speciesFilter = document.getElementById('heatmapSpeciesFilter');
+  const selectedSpecies = speciesFilter ? speciesFilter.value : 'all';
+  
   // Hole Beobachtungen
-  const observations = await getOwnObservationsForStats();
+  let observations = await getOwnObservationsForStats();
+  
+  // NEU: Wende Artenfilter an
+  if (selectedSpecies !== 'all') {
+    observations = observations.filter(obs => obs.bird === selectedSpecies);
+    
+    // Zeige Info und Reset-Button
+    const filterInfo = document.getElementById('heatmapFilterInfo');
+    const resetBtn = document.getElementById('resetHeatmapFilter');
+    if (filterInfo) {
+      filterInfo.style.display = 'block';
+      filterInfo.innerHTML = `📊 Zeige nur Beobachtungen von: <strong style="color: var(--accent);">${selectedSpecies}</strong> (${observations.length} Beobachtungen)`;
+    }
+    if (resetBtn) {
+      resetBtn.style.display = 'inline-block';
+    }
+  } else {
+    // Verstecke Info und Reset-Button
+    const filterInfo = document.getElementById('heatmapFilterInfo');
+    const resetBtn = document.getElementById('resetHeatmapFilter');
+    if (filterInfo) {
+      filterInfo.style.display = 'none';
+    }
+    if (resetBtn) {
+      resetBtn.style.display = 'none';
+    }
+  }
   
   console.warn('🔥 Heatmap - Geladene Beobachtungen:', observations.length);
+  console.warn('🔥 Heatmap - Artenfilter:', selectedSpecies);
   
   if (observations.length === 0) {
     container.innerHTML = '<div class="muted" style="text-align: center; padding: 40px;">Keine Daten verfügbar</div>';
