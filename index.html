@@ -15628,13 +15628,11 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
-    // NEU: Polygon-Variablen (bereits weiter oben deklariert)
-    // let polygonDrawingMode = false;
-    // let currentPolygonPoints = [];
-    // let polygonMap = null;
-    // let polygonLayer = null;
-    // let polygonMarkers = [];
-    // let currentPolygonForList = null;
+    // NEU: Polygon-Variablen für Listen
+    let polygonMap = null;
+    let polygonMarkers = [];
+    let currentPolygonPoints = [];
+    let currentPolygonForList = null;
     
     // NEU: Temporäre Koordinaten-Container initialisieren
     if (!window.tempMapCoords) {
