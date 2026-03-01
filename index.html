@@ -4599,6 +4599,23 @@
       margin-top: 8px;
     }
     
+    .polygon-preview-map {
+      width: 100%;
+      height: 200px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .polygon-bbox {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      padding: 6px 8px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 4px;
+    }
+    
     /* Hybrid Map Labels - verbesserte Lesbarkeit */
     .leaflet-tile-pane .hybrid-labels {
       filter: invert(100%) contrast(1.2) brightness(0.9);
@@ -9880,11 +9897,11 @@
                         <span>📐</span>
                         <span>Polygon zeichnen</span>
                       </button>
-                      <button id="clearPolygonBtn" onclick="clearPolygonFilter()" style="background: var(--danger); border: 1px solid rgba(239,68,68,0.3); border-radius: 6px; padding: 8px 12px; color: white; font-size: 12px; cursor: pointer; display: none;" title="Polygon löschen">
+                      <button id="clearPolygonMapBtn" onclick="clearPolygonFilter()" style="background: var(--danger); border: 1px solid rgba(239,68,68,0.3); border-radius: 6px; padding: 8px 12px; color: white; font-size: 12px; cursor: pointer; display: none;" title="Polygon löschen">
                         🗑️
                       </button>
                     </div>
-                    <div id="polygonStatus" style="font-size: 10px; color: var(--muted); margin-top: 4px; display: none;">
+                    <div id="polygonMapStatus" style="font-size: 10px; color: var(--muted); margin-top: 4px; display: none;">
                       <span id="polygonStatusText"></span>
                     </div>
                   </div>
@@ -11485,7 +11502,7 @@
       console.log('🗺️ Toggle Polygon Draw');
       
       const btn = document.getElementById('togglePolygonDrawBtn');
-      const status = document.getElementById('polygonStatus');
+      const status = document.getElementById('polygonMapStatus');
       const statusText = document.getElementById('polygonStatusText');
       
       if (!window.mapObj) {
@@ -11620,7 +11637,7 @@
           statusText.textContent = `Polygon mit ${points.length} Punkten erstellt`;
           
           // Zeige Löschen-Button
-          document.getElementById('clearPolygonBtn').style.display = 'block';
+          document.getElementById('clearPolygonMapBtn').style.display = 'block';
           
           // Wende Filter an
           if (typeof window.applyMapFilters === 'function') {
@@ -11665,8 +11682,8 @@
         mapContainer.style.cursor = '';
       }
       
-      document.getElementById('clearPolygonBtn').style.display = 'none';
-      document.getElementById('polygonStatus').style.display = 'none';
+      document.getElementById('clearPolygonMapBtn').style.display = 'none';
+      document.getElementById('polygonMapStatus').style.display = 'none';
       
       // Wende Filter ohne Polygon an
       if (typeof window.applyMapFilters === 'function') {
@@ -11869,7 +11886,14 @@
           
           // Filter nach Polygon
           if (obs.lat && obs.lng) {
-            if (drawnPolygon && !isPointInPolygon(obs.lat, obs.lng)) return;
+            if (drawnPolygon) {
+              try {
+                const drawnPoints = drawnPolygon.getLatLngs()[0].map(ll => [ll.lat, ll.lng]);
+                if (!isPointInPolygon([parseFloat(obs.lat), parseFloat(obs.lng)], drawnPoints)) return;
+              } catch(e) {
+                console.warn('Polygon-Filter Fehler:', e);
+              }
+            }
             filteredIds.add(obs.id);
           }
         });
@@ -15628,11 +15652,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
-    // NEU: Polygon-Variablen für Listen
+    // NEU: Polygon-Variablen fuer Listen (window.* fuer sichere Closure-Zugaenglichkeit)
     let polygonMap = null;
     let polygonMarkers = [];
     let currentPolygonPoints = [];
     let currentPolygonForList = null;
+    window.listPolygonDrawingActive = false;
+    // Separate Layer-Variable fuer Listen-Polygon (unabhaengig von Hauptkarten-polygonLayer)
+    let listPolygonLayer = null;
     
     // NEU: Temporäre Koordinaten-Container initialisieren
     if (!window.tempMapCoords) {
@@ -18763,6 +18790,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
                   filters: list.filters || {},
                   observationMode: list.observationMode || 'all',
                   timeRange: list.timeRange || { from: null, to: null },
+                  polygon: list.polygon || null, // NEU: Polygon-Daten auch synchronisieren
                   observations: allObservations, // ALLE Beobachtungen (inkl. nicht-tickbare)
                   updatedAt: new Date().toISOString(),
                   syncedFromPrivate: true
@@ -18815,6 +18843,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
                         filters: list.filters || {},
                         observationMode: list.observationMode || 'all',
                         timeRange: list.timeRange || { from: null, to: null },
+                        polygon: list.polygon || null, // NEU: Polygon-Daten synchronisieren
                         observations: allObservations, // ALLE Beobachtungen (inkl. nicht-tickbare)
                         updatedAt: new Date().toISOString(),
                         syncedFromGroup: true
@@ -18873,6 +18902,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         userLists = lists;
+        lists.forEach(list => {
+          console.log(`📋 Liste geladen: "${list.name}" - polygon: ${list.polygon ? list.polygon.length + ' Punkte' : 'KEIN POLYGON'}`);
+        });
         return lists;
       } catch (error) {
         console.error('Fehler beim Laden der Listen:', error);
@@ -19322,8 +19354,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         color: selectedListColor
       };
       
-      // Öffne das Polygon-Zeichen-Modal
-      document.getElementById('polygonDrawingModal').style.display = 'flex';
+      // createListModal temporär nach hinten verschieben
+      const createModal = document.getElementById('createListModal');
+      if (createModal) createModal.style.zIndex = '9999';
+      
+      // Öffne das Polygon-Zeichen-Modal mit höherem z-index
+      const polygonModal = document.getElementById('polygonDrawingModal');
+      polygonModal.style.zIndex = '10002';
+      polygonModal.style.display = 'flex';
       
       // Initialisiere die Karte für das Polygon-Zeichnen
       setTimeout(() => {
@@ -19347,15 +19385,17 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         attribution: '© OpenStreetMap'
       }).addTo(polygonMap);
       
-      // Event-Listener für Kartenklicks
+      // Fix Bug 3: invalidateSize nach Initialisierung aufrufen
+      setTimeout(() => { polygonMap.invalidateSize(); }, 200);
+      
+      // Event-Listener fuer Kartenklicks - window.* Variable fuer zuverlaessigen Closure-Zugriff
       polygonMap.on('click', function(e) {
-        if (!polygonDrawingMode) return;
-        
+        if (!window.listPolygonDrawingActive) return;
         addPolygonPoint(e.latlng.lat, e.latlng.lng);
       });
       
       // Starte den Zeichenmodus
-      polygonDrawingMode = true;
+      window.listPolygonDrawingActive = true;
       currentPolygonPoints = [];
       updateDrawingStatus();
       
@@ -19422,8 +19462,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // Polygon auf der Karte zeichnen
     function drawPolygonOnMap() {
       // Altes Polygon entfernen
-      if (polygonLayer) {
-        polygonMap.removeLayer(polygonLayer);
+      if (listPolygonLayer) {
+        polygonMap.removeLayer(listPolygonLayer);
       }
       
       if (currentPolygonPoints.length >= 3) {
@@ -19433,7 +19473,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           closedPoints.push(currentPolygonPoints[0]);
         }
         
-        polygonLayer = L.polygon(closedPoints, {
+        listPolygonLayer = L.polygon(closedPoints, {
           color: selectedListColor,
           weight: 2,
           opacity: 0.8,
@@ -19466,9 +19506,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       polygonMarkers = [];
       
       // Polygon entfernen
-      if (polygonLayer) {
-        polygonMap.removeLayer(polygonLayer);
-        polygonLayer = null;
+      if (listPolygonLayer) {
+        polygonMap.removeLayer(listPolygonLayer);
+        listPolygonLayer = null;
       }
       
       // Punkte zurücksetzen
@@ -19498,7 +19538,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // Polygon-Zeichen-Modal schließen
     function closePolygonDrawing() {
       document.getElementById('polygonDrawingModal').style.display = 'none';
-      polygonDrawingMode = false;
+      window.listPolygonDrawingActive = false;
+      // createListModal wieder nach vorne bringen (z-index erhöhen)
+      const createModal = document.getElementById('createListModal');
+      if (createModal) createModal.style.zIndex = '10001';
     }
     
     // Polygon-Display im Listen-Modal aktualisieren
@@ -19591,18 +19634,25 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     // Prüft ob ein Punkt in einem Polygon liegt (Punkt-in-Polygon Algorithmus)
-    function isPointInPolygon(point, polygon) {
-      const x = point[0], y = point[1];
-      let inside = false;
+    function isPointInPolygonList(point, polygon) {
+      // Standardimplementierung: Ray-Casting-Algorithmus fuer Listen-Polygon
+      const testLat = point[0];
+      const testLng = point[1];
       
-      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const xi = polygon[i][0], yi = polygon[i][1];
-        const xj = polygon[j][0], yj = polygon[j][1];
+      let inside = false;
+      const n = polygon.length;
+      
+      for (let i = 0, j = n - 1; i < n; j = i++) {
+        const latI = Array.isArray(polygon[i]) ? polygon[i][0] : polygon[i].lat;
+        const lngI = Array.isArray(polygon[i]) ? polygon[i][1] : polygon[i].lng;
+        const latJ = Array.isArray(polygon[j]) ? polygon[j][0] : polygon[j].lat;
+        const lngJ = Array.isArray(polygon[j]) ? polygon[j][1] : polygon[j].lng;
         
-        const intersect = ((yi > y) !== (yj > y)) &&
-          (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-        
-        if (intersect) inside = !inside;
+        // Ray laeuft in positiver Lat-Richtung, prueft Schnittpunkte in Lng
+        if (((lngI > testLng) !== (lngJ > testLng)) &&
+            (testLat < (latJ - latI) * (testLng - lngI) / (lngJ - lngI) + latI)) {
+          inside = !inside;
+        }
       }
       
       return inside;
@@ -19610,25 +19660,53 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     
     // Beobachtungen nach Polygon filtern
     function filterObservationsByPolygon(observations, polygon) {
-      if (!polygon || polygon.length < 3) {
-        return observations; // Kein Polygon = alle Beobachtungen
+      // === POLYGON DEBUG ===
+      console.warn('🔷 filterObservationsByPolygon START');
+      console.warn('  Polygon Punkte:', polygon.length, 'Beobachtungen:', observations.length);
+      
+      // Zeige Polygon-Punkte und deren Format
+      if (polygon.length > 0) {
+        const p0 = polygon[0];
+        const fmt = Array.isArray(p0) ? `Array: [${p0[0]}, ${p0[1]}]` : 
+                    (p0.lat !== undefined ? `Object: {lat:${p0.lat}, lng:${p0.lng}}` : 
+                    `UNBEKANNT: ${JSON.stringify(p0)}`);
+        console.warn('  Punkt-Format:', fmt);
+        console.warn('  Alle Punkte:', JSON.stringify(polygon));
       }
       
-      return observations.filter(obs => {
+      if (!polygon || polygon.length < 3) {
+        console.warn('  ❌ Polygon ungültig!');
+        return observations;
+      }
+      
+      // Berechne Bounding Box für Sanity-Check
+      const allLats = polygon.map(p => Array.isArray(p) ? p[0] : p.lat);
+      const allLngs = polygon.map(p => Array.isArray(p) ? p[1] : p.lng);
+      const minLat = Math.min(...allLats), maxLat = Math.max(...allLats);
+      const minLng = Math.min(...allLngs), maxLng = Math.max(...allLngs);
+      console.warn(`  BBox: Lat [${minLat.toFixed(6)}, ${maxLat.toFixed(6)}], Lng [${minLng.toFixed(6)}, ${maxLng.toFixed(6)}]`);
+      
+      const result = observations.filter(obs => {
         if (!obs.lat || !obs.lng) return false;
         
-        try {
-          const lat = parseFloat(obs.lat);
-          const lng = parseFloat(obs.lng);
-          
-          if (isNaN(lat) || isNaN(lng)) return false;
-          
-          return isPointInPolygon([lat, lng], polygon);
-        } catch (e) {
-          console.error('Fehler beim Filtern nach Polygon:', e);
-          return false;
+        const lat = parseFloat(obs.lat);
+        const lng = parseFloat(obs.lng);
+        if (isNaN(lat) || isNaN(lng)) return false;
+        
+        // Schneller BBox-Pre-Check
+        if (lat < minLat || lat > maxLat || lng < minLng || lng > maxLng) {
+          return false; // Klar ausserhalb
         }
+        
+        const isInside = isPointInPolygonList([lat, lng], polygon);
+        if (isInside) {
+          console.warn(`  ✅ ${obs.bird} bei [${lat}, ${lng}] im Polygon`);
+        }
+        return isInside;
       });
+      
+      console.warn(`  📊 Ergebnis: ${result.length} von ${observations.length} im Polygon`);
+      return result;
     }
     
     // ---------- MODIFIZIERTE: filterObservationsByList Funktion MIT POLYGON-FILTER UND ERSTBEOBACHTUNGEN ----------
@@ -19804,7 +19882,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // NEU: Filter nach Polygon - KORRIGIERT
       if (list.polygon && Array.isArray(list.polygon) && list.polygon.length >= 3) {
+        console.log('🔍 Polygon-Filter aktiv:', list.polygon.length, 'Punkte');
+        console.log('📍 Polygon-Punkte:', list.polygon);
+        console.log('📊 Beobachtungen vor Polygon-Filter:', filtered.length);
         filtered = filterObservationsByPolygon(filtered, list.polygon);
+        console.log('📊 Beobachtungen nach Polygon-Filter:', filtered.length);
+      } else {
+        console.log('❌ Kein Polygon-Filter aktiv. polygon:', list.polygon);
       }
       
       // NEU: Filter nach Beobachtungsmodus (alle vs. nur Erstbeobachtungen)
@@ -21612,6 +21696,20 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       try {
         let observations;
         
+        // NEU: Lade immer die neueste Version der Liste aus IndexedDB,
+        // um sicherzustellen dass Polygon-Daten vorhanden sind
+        try {
+          const freshList = await getFromIndexedDB('lists', list.id);
+          if (freshList && freshList.polygon && Array.isArray(freshList.polygon) && freshList.polygon.length >= 3) {
+            if (!list.polygon || list.polygon.length < 3) {
+              list.polygon = freshList.polygon;
+              console.log(`🔄 Polygon aus IndexedDB nachgeladen für "${list.name}": ${list.polygon.length} Punkte`);
+            }
+          }
+        } catch(e) { /* ignorieren falls kein Polygon vorhanden */ }
+        
+        console.log(`📊 calculateListStats für "${list.name}": polygon=${list.polygon ? list.polygon.length + ' Punkte' : 'KEIN POLYGON'}`);
+        
         // WICHTIG: Im Gruppenmodus nutze die Beobachtungen des aktuellen Benutzers aus der Gruppe
         if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal' && window.FBA?.currentUser) {
           const groupData = await loadGroupData();
@@ -21682,6 +21780,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       // NEU: Zeitraum zurücksetzen
       document.getElementById('listTimeRangeFrom').value = '';
       document.getElementById('listTimeRangeTo').value = '';
+      
+      // NEU: Polygon-Daten zurücksetzen
+      document.getElementById('polygonData').value = '';
+      updatePolygonDisplay();
       
       // NEU: Bundesland-Filter zurücksetzen
       document.getElementById('listStateFilter').value = '';
@@ -21966,6 +22068,16 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
       }
       
+      // NEU: Bei Bearbeitung vorhandenes Polygon beibehalten, falls kein neues gezeichnet
+      if (isEditing && !listData.polygon) {
+        const existingListForPolygon = userLists.find(l => l.id === listId);
+        if (existingListForPolygon && existingListForPolygon.polygon && 
+            Array.isArray(existingListForPolygon.polygon) && existingListForPolygon.polygon.length >= 3) {
+          listData.polygon = existingListForPolygon.polygon;
+          console.log('\u2705 Bestehendes Polygon beibehalten beim Bearbeiten:', listData.polygon.length, 'Punkte');
+        }
+      }
+      
       // Filter sammeln
       const filters = {};
       
@@ -21997,9 +22109,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       listData.filters = filters;
       
-      // Statistiken berechnen
+      // Statistiken berechnen (mit korrektem Polygon-Filter)
       const stats = await calculateListStats(listData);
       listData.observationCount = stats.observationCount;
+      listData.cachedSpeciesCount = stats.speciesCount; // NEU: Artenzahl cachen
       
       // Entweder Liste aktualisieren oder neu hinzufügen
       if (isEditing) {
@@ -22089,16 +22202,30 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         // Fläche berechnen
         const area = calculatePolygonArea(list.polygon);
         
+        // Bounding Box berechnen
+        const lats = list.polygon.map(p => p[0]);
+        const lngs = list.polygon.map(p => p[1]);
+        const minLat = Math.min(...lats).toFixed(5), maxLat = Math.max(...lats).toFixed(5);
+        const minLng = Math.min(...lngs).toFixed(5), maxLng = Math.max(...lngs).toFixed(5);
+        
+        const previewMapId = 'polygonPreviewMap_' + Date.now();
+        
         polygonInfoContainer.innerHTML = `
           <h4 style="margin:0 0 8px 0; display:flex; align-items:center; gap:8px;">
             <span>🗺️</span> 
             <span>Geografischer Filter aktiv</span>
           </h4>
-          <div style="margin-bottom:8px;">Polygon mit ${list.polygon.length} Punkten</div>
-          <div style="margin-bottom:8px;"><strong>Gebietsgröße:</strong> ${area.toFixed(2)} km²</div>
-          <div class="polygon-coordinates">
-            ${list.polygon.map((p, i) => `Punkt ${i+1}: ${p[0].toFixed(6)}, ${p[1].toFixed(6)}`).join('\n')}
+          <div style="margin-bottom:4px;">Polygon mit ${list.polygon.length} Punkten &nbsp;|&nbsp; <strong>Gebietsgröße:</strong> ~${area.toFixed(2)} km²</div>
+          <div class="polygon-bbox">
+            📐 Ausdehnung: Lat ${minLat} – ${maxLat} &nbsp;|&nbsp; Lng ${minLng} – ${maxLng}
           </div>
+          <div id="${previewMapId}" class="polygon-preview-map"></div>
+          <details style="margin-top:6px;">
+            <summary style="font-size:11px;color:var(--muted);cursor:pointer;">Koordinaten anzeigen</summary>
+            <div class="polygon-coordinates">
+              ${list.polygon.map((p, i) => `Punkt ${i+1}: ${p[0].toFixed(6)}, ${p[1].toFixed(6)}`).join('\n')}
+            </div>
+          </details>
         `;
         
         // Vor dem Beobachtungsbereich einfügen
@@ -22106,6 +22233,36 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         if (observationsContainer) {
           observationsContainer.insertBefore(polygonInfoContainer, observationsContainer.firstChild);
         }
+        
+        // Mini-Karte mit Polygon initialisieren
+        setTimeout(() => {
+          try {
+            const previewMapEl = document.getElementById(previewMapId);
+            if (!previewMapEl || typeof L === 'undefined') return;
+            
+            const previewMap = L.map(previewMapId, { zoomControl: true, attributionControl: false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 18
+            }).addTo(previewMap);
+            
+            // Polygon auf Mini-Karte zeichnen
+            const polygonLayer = L.polygon(list.polygon, {
+              color: list.color || '#06b6d4',
+              weight: 2,
+              opacity: 0.9,
+              fillColor: list.color || '#06b6d4',
+              fillOpacity: 0.2
+            }).addTo(previewMap);
+            
+            // Karte auf Polygon zentrieren
+            previewMap.fitBounds(polygonLayer.getBounds(), { padding: [15, 15] });
+            
+            // Karte nach dem Einfügen refreshen
+            setTimeout(() => previewMap.invalidateSize(), 100);
+          } catch (e) {
+            console.warn('Polygon-Vorschau konnte nicht geladen werden:', e);
+          }
+        }, 300);
       } else {
         // Falls vorhandene Polygon-Anzeige entfernen
         const existingPolygonDisplay = document.getElementById('listPolygonDisplay');
