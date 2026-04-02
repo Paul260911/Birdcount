@@ -41207,40 +41207,31 @@ async function renderYearComparisonChart(yearObs) {
   
   console.warn('📈 Letzter Monat mit Daten (0=Jan, 11=Dez):', lastMonthWithData);
   
-  // Species per month - KUMULATIV (alle bis zu diesem Monat gesehenen Arten)
-  const seenSpeciesUpToMonth = new Set();
-  
+  // Species per month - pro Monat unabhängig (nur Arten des jeweiligen Monats)
   for (let month = 0; month < 12; month++) {
     // Beobachtungen in diesem Monat
     const monthObs = yearObs.filter(o => new Date(o.date).getMonth() === month);
     
     if (monthObs.length > 0) {
-      // Füge Arten dieses Monats hinzu
+      // Neuer Set pro Monat - keine Akkumulierung
+      const monthSpecies = new Set();
       monthObs.forEach(o => {
         if (o.bird) {
           const normalized = normalizeBirdName(o.bird);
-          if (normalized) seenSpeciesUpToMonth.add(normalized);
+          if (normalized) monthSpecies.add(normalized);
         }
       });
-      speciesData[month] = seenSpeciesUpToMonth.size;
-    } else if (month <= lastMonthWithData && seenSpeciesUpToMonth.size > 0) {
-      // Nur zwischen erstem und letztem Monat mit Daten: behalte letzten Wert
-      speciesData[month] = seenSpeciesUpToMonth.size;
-    } else if (month === lastMonthWithData + 1 && lastMonthWithData >= 0) {
-      // Direkt nach letztem Monat: setze auf 0 für sanften Übergang
-      speciesData[month] = 0;
+      speciesData[month] = monthSpecies.size;
     }
-    // Danach: bleibt undefined (keine Linie mehr)
+    // Monate ohne Beobachtungen bleiben null (keine Linie)
   }
   
-  console.warn('📈 Arten pro Monat (kumulativ):', speciesData);
+  console.warn('📈 Arten pro Monat (unabhängig):', speciesData);
   console.warn('📈 Arten pro Monat (detailliert):');
   speciesData.forEach((val, idx) => {
     const monthName = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'][idx];
-    console.warn(`  ${monthName}: ${val !== undefined ? val : 'keine Daten'}`);
+    console.warn(`  ${monthName}: ${val !== null ? val : 'keine Daten'}`);
   });
-  console.warn('📈 Gesamte einzigartige Arten (Set.size):', seenSpeciesUpToMonth.size);
-  console.warn('📈 Sample der gezählten Arten (erste 30):', Array.from(seenSpeciesUpToMonth).slice(0, 30));
   console.warn('=== 📈 CHART RENDERING ENDE ===');
   
   const ctx = canvas.getContext('2d');
@@ -41263,7 +41254,7 @@ async function renderYearComparisonChart(yearObs) {
       beginAtZero: true,
       ticks: { color: 'rgba(124, 58, 237, 0.9)', precision: 0 },
       grid: { display: false },
-      title: { display: true, text: 'Arten (kumulativ)', color: 'rgba(124, 58, 237, 0.9)' }
+      title: { display: true, text: 'Arten (pro Monat)', color: 'rgba(124, 58, 237, 0.9)' }
     },
     x: {
       ticks: { color: 'rgba(255, 255, 255, 0.7)' },
