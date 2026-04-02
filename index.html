@@ -41226,6 +41226,12 @@ async function renderYearComparisonChart(yearObs) {
     // Monate ohne Beobachtungen bleiben null (keine Linie)
   }
   
+  // Nach dem letzten Monat mit Daten einen 0-Wert einfügen,
+  // damit die Arten-Linie flüssig auf null ausläuft statt abrupt zu enden
+  if (lastMonthWithData >= 0 && lastMonthWithData < 11) {
+    speciesData[lastMonthWithData + 1] = 0;
+  }
+  
   console.warn('📈 Arten pro Monat (unabhängig):', speciesData);
   console.warn('📈 Arten pro Monat (detailliert):');
   speciesData.forEach((val, idx) => {
