@@ -9831,6 +9831,31 @@
             
             <div style="position: relative;">
               <div id="map" style="margin:12px 0;"></div>
+
+              <!-- Zeitregler -->
+              <div id="timeSliderContainer" style="display:none; background: rgba(0,0,0,0.55); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; margin-top: 4px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                  <button id="timeSliderPlayBtn" onclick="toggleTimeSliderPlay()" style="background:var(--accent); border:none; color:white; border-radius:8px; padding:5px 12px; cursor:pointer; font-size:16px; flex-shrink:0; min-width:38px;">▶</button>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:5px;">
+                      <span id="timeSliderMinLabel">–</span>
+                      <span id="timeSliderCurrentLabel" style="font-weight:700; color:var(--accent); font-size:13px;">–</span>
+                      <span id="timeSliderMaxLabel">–</span>
+                    </div>
+                    <input type="range" id="timeSliderInput" min="0" max="100" value="100"
+                      oninput="onTimeSliderChange(this.value)"
+                      style="width:100%; accent-color:var(--accent); cursor:pointer; height:5px;">
+                  </div>
+                  <button onclick="resetTimeSlider()" title="Alle anzeigen" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--muted); border-radius:8px; padding:5px 9px; cursor:pointer; font-size:13px; flex-shrink:0;">✕</button>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:11px; color:var(--muted);">Beobachtungen bis zu diesem Tag</span>
+                  <span id="timeSliderMarkerCount" style="font-size:12px; color:var(--accent); font-weight:600;">0 Punkte</span>
+                </div>
+              </div>
+              <button id="toggleTimeSliderBtn" onclick="toggleTimeSlider()" style="margin-top:8px; width:100%; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); color:var(--accent); border-radius:8px; padding:8px; cursor:pointer; font-size:13px; font-weight:600; display:none;">
+                📅 Zeitregler
+              </button>
               
               <!-- Erweiterte Filter auf der Karte -->
               <div class="map-species-filter" id="mapAdvancedFilter" style="display: none;">
@@ -18431,6 +18456,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
+    // Auf window setzen damit andere Script-Blöcke (z.B. Zeitregler) darauf zugreifen können
+    window.getAllObservationsWithDetails = getAllObservationsWithDetails;
+    
     // NEU: Funktion um IMMER persönliche Beobachtungen zu laden (für Listen)
     async function getPersonalObservationsWithDetails() {
       try {
@@ -23145,15 +23173,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           break;
           
         case 'hybrid':
-          // Satellitenbild als Basis
           layers.push(L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
             attribution: '© Esri, OpenStreetMap'
           }));
-          // Straßen und Labels darüber
           layers.push(L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            opacity: 0.35, // Transparenz für bessere Lesbarkeit
+            opacity: 0.35,
             className: 'hybrid-labels'
           }));
           break;
@@ -23165,7 +23191,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           }));
       }
       
-      // Wenn mehrere Layer, gebe LayerGroup zurück, sonst einzelnen Layer
       return layers.length > 1 ? L.layerGroup(layers) : layers[0];
     }
     
@@ -23255,6 +23280,11 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         // Setze Flag dass Preloading abgeschlossen ist
         window.markersPreloaded = true;
         
+        // Zeitregler initialisieren (via window um Scope-Probleme zu vermeiden)
+        if (typeof window.initTimeSlider === 'function') {
+          window.initTimeSlider();
+        }
+        
       } catch (error) {
         console.error('❌ Fehler beim Preloading:', error);
         showNotification('⚠️ Fehler beim Laden der Marker', 3000);
@@ -23292,17 +23322,17 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // Marker Cluster mit PERFORMANCE-OPTIMIERTEN Optionen
       markerCluster = L.markerClusterGroup({
-        disableClusteringAtZoom: null, // Wird dynamisch gesetzt
-        maxClusterRadius: 60, // Reduziert von 80 für schnelleres Clustering
+        disableClusteringAtZoom: null,
+        maxClusterRadius: 60,
         spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false, // Deaktiviert für Performance
+        showCoverageOnHover: false,
         zoomToBoundsOnClick: true,
-        animate: true, // Schnellere Animationen
-        animateAddingMarkers: false, // Keine Animation beim Hinzufügen (schneller)
-        removeOutsideVisibleBounds: false, // GEÄNDERT: Behalte alle Marker im Speicher für schnelles Zoomen
-        chunkedLoading: true, // Lädt Marker in Chunks (performanter bei vielen Markern)
-        chunkInterval: 200, // GEÄNDERT: Größere Chunks für schnelleres initiiales Laden
-        chunkDelay: 1 // GEÄNDERT: Minimale Verzögerung
+        animate: false,
+        animateAddingMarkers: false,
+        removeOutsideVisibleBounds: true, // Marker außerhalb Viewport aus DOM entfernen
+        chunkedLoading: true,
+        chunkInterval: 1000, // mehr Marker pro Chunk = schneller
+        chunkDelay: 10
       });
       window.markerCluster = markerCluster;
       window.mapObj.addLayer(markerCluster);
@@ -23895,15 +23925,22 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       const marker = L.marker([lat, lng], markerOptions);
       
-      // Erstelle detailliertes Popup mit allen verfügbaren Informationen
-      const popupContent = createDetailedPopup(name, date, lat, lng, observationData);
-      
-      marker.bindPopup(popupContent, {
+      // PERFORMANCE: Popup erst beim Klick erstellen (lazy), nicht für alle 16.000 Marker vorab
+      marker._lazyPopupData = { name, date, lat, lng, observationData };
+      marker.bindPopup(() => {
+        const d = marker._lazyPopupData;
+        const html = createDetailedPopup(d.name, d.date, d.lat, d.lng, d.observationData);
+        // Daten nach erstem Öffnen freigeben (Memory-Leak verhindern)
+        marker._lazyPopupData = null;
+        return html;
+      }, {
         maxWidth: 320,
         className: 'detailed-observation-popup'
       });
       
       window.markers.set(id, marker);
+      marker._obsDate = date; // Datum für Zeitregler speichern
+      marker._obsId = id;
       
       // PERFORMANCE: Marker wird NICHT automatisch zum Cluster hinzugefügt
       // Das passiert jetzt im Batch in updateMapWithFilteredObservations
@@ -31338,7 +31375,9 @@ var displayGroupObservations=function(observations){
 };
 
 // Funktion zum Aktualisieren der Karte mit Gruppen-Beobachtungen
-var updateMapWithGroupObservations=function(observations){
+var updateMapWithGroupObservations=async function(observations){
+  // Zeitregler zurücksetzen damit er sich neu initialisiert
+  window.timeSliderReady = false;
   console.log("🗺️ Aktualisiere Karte mit", observations.length, "Beobachtungen");
   
   // Wenn Marker gerade wiederhergestellt werden, überspringe diese Aktualisierung
@@ -31379,6 +31418,12 @@ var updateMapWithGroupObservations=function(observations){
   });
   
   console.log("✅ Karte aktualisiert");
+  
+  // Zeitregler initialisieren (einmalig, nachdem Marker geladen wurden)
+  if (!window.timeSliderReady && typeof window.initTimeSlider === 'function') {
+    window.timeSliderReady = true;
+    await window.initTimeSlider();
+  }
 };
 
 // Funktion zum Aktualisieren des Dashboards mit Gruppendaten
@@ -40832,45 +40877,53 @@ function triggerConfetti() {
   }
 }
 
-// Enhanced Toast with better animations
+// Unified showToast – letzte Definition gewinnt in JS, daher beste Version hier
 function showToast(message, type = 'info') {
+  // Alte Toasts entfernen damit sie sich nicht stapeln
+  document.querySelectorAll('.toast, .notification').forEach(t => t.remove());
+  
   const toast = document.createElement('div');
-  toast.className = 'notification';
+  toast.className = 'toast';
   toast.style.cssText = `
     position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 16px 24px;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 20px;
     border-radius: 12px;
     color: white;
     font-weight: 600;
+    font-size: 14px;
     z-index: 10000;
-    min-width: 250px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 220px;
+    max-width: 360px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.3s;
   `;
   
-  if (type === 'success') {
-    toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-  } else if (type === 'error') {
-    toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-  } else if (type === 'warning') {
-    toast.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-  } else {
-    toast.style.background = 'linear-gradient(135deg, #06b6d4, #0891b2)';
-  }
-  
+  const colors = {
+    success: 'linear-gradient(135deg, #10b981, #059669)',
+    error:   'linear-gradient(135deg, #ef4444, #dc2626)',
+    warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
+    info:    'linear-gradient(135deg, #06b6d4, #0891b2)'
+  };
+  toast.style.background = colors[type] || colors.info;
   toast.textContent = message;
   document.body.appendChild(toast);
   
   setTimeout(() => {
-    toast.style.animation = 'slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-    setTimeout(() => toast.remove(), 400);
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 350);
   }, 3000);
 }
 
 // Add CSS for slideOutRight
 const toastStyle = document.createElement('style');
 toastStyle.textContent = `
+  @keyframes slideInRight {
+    from { transform: translateX(120px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
   @keyframes slideOutRight {
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(400px); opacity: 0; }
@@ -41364,6 +41417,223 @@ function toggleChartYAxis() {
 }
 
 window.toggleChartYAxis = toggleChartYAxis;
+
+// ═══════════════════════════════════════════
+// ZEITREGLER – Time Slider für die Karte
+// ═══════════════════════════════════════════
+let timeSliderDates = [];      // sortierte Array aller Beobachtungsdaten (Strings "YYYY-MM-DD")
+let timeSliderActive = false;
+let timeSliderPlayInterval = null;
+let timeSliderObsMap = new Map(); // marker-id → ISO-Datum "YYYY-MM-DD"
+
+async function initTimeSlider() {
+  try {
+    // Beobachtungen direkt aus der DB laden (robuster als marker._obsDate)
+    const observations = await getAllObservationsWithDetails();
+    const validObs = observations.filter(obs => obs.lat && obs.lng && obs.date);
+    
+    if (validObs.length === 0) return;
+    
+    // Datum normalisieren → immer "YYYY-MM-DD"
+    function toISODate(d) {
+      if (!d) return null;
+      if (/^\d{4}-\d{2}-\d{2}/.test(d)) return d.substring(0, 10); // already ISO
+      const parts = d.split('.');
+      if (parts.length === 3) {
+        return `${parts[2].substring(0,4)}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+      }
+      return null;
+    }
+    
+    // Map aufbauen: id → ISO-Datum
+    timeSliderObsMap.clear();
+    const dateSet = new Set();
+    validObs.forEach(obs => {
+      const iso = toISODate(obs.date);
+      if (iso) {
+        timeSliderObsMap.set(obs.id, iso);
+        dateSet.add(iso);
+      }
+    });
+    
+    if (dateSet.size === 0) return;
+    
+    timeSliderDates = Array.from(dateSet).sort();
+    const minDate = timeSliderDates[0];
+    const maxDate = timeSliderDates[timeSliderDates.length - 1];
+    
+    const slider = document.getElementById('timeSliderInput');
+    const minLabel = document.getElementById('timeSliderMinLabel');
+    const maxLabel = document.getElementById('timeSliderMaxLabel');
+    const btn = document.getElementById('toggleTimeSliderBtn');
+    
+    if (!slider) return;
+    
+    slider.min = 0;
+    slider.max = timeSliderDates.length - 1;
+    slider.value = timeSliderDates.length - 1;
+    
+    if (minLabel) minLabel.textContent = formatSliderDate(minDate);
+    if (maxLabel) maxLabel.textContent = formatSliderDate(maxDate);
+    
+    const currentLabel = document.getElementById('timeSliderCurrentLabel');
+    if (currentLabel) currentLabel.textContent = formatSliderDate(maxDate);
+    
+    const countEl = document.getElementById('timeSliderMarkerCount');
+    if (countEl) countEl.textContent = validObs.length + ' Punkte';
+    
+    // Button einblenden
+    if (btn) btn.style.display = 'block';
+    
+    console.log('✅ Zeitregler initialisiert:', timeSliderDates.length, 'Tage,', validObs.length, 'Punkte');
+  } catch(e) {
+    console.error('❌ Zeitregler-Fehler:', e);
+  }
+}
+
+function formatSliderDate(dateStr) {
+  if (!dateStr) return '–';
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch(e) { return dateStr; }
+}
+
+function toggleTimeSlider() {
+  const container = document.getElementById('timeSliderContainer');
+  const btn = document.getElementById('toggleTimeSliderBtn');
+  timeSliderActive = !timeSliderActive;
+  
+  if (timeSliderActive) {
+    container.style.display = 'block';
+    btn.style.background = 'rgba(6,182,212,0.2)';
+    btn.style.borderColor = 'var(--accent)';
+    const slider = document.getElementById('timeSliderInput');
+    if (slider) onTimeSliderChange(slider.value);
+  } else {
+    container.style.display = 'none';
+    btn.style.background = 'rgba(6,182,212,0.08)';
+    btn.style.borderColor = 'rgba(6,182,212,0.2)';
+    stopTimeSliderPlay();
+    resetTimeSlider();
+  }
+}
+
+let _timeSliderDebounce = null;
+
+function onTimeSliderChange(indexVal) {
+  if (!timeSliderDates.length) return;
+  const idx = parseInt(indexVal);
+  const cutoffDate = timeSliderDates[Math.min(idx, timeSliderDates.length - 1)];
+  
+  // Datum sofort anzeigen (kein Lag beim Label)
+  const currentLabel = document.getElementById('timeSliderCurrentLabel');
+  if (currentLabel) currentLabel.textContent = formatSliderDate(cutoffDate);
+  
+  // Marker-Filter mit Debounce (150ms warten bis Schieber stillsteht)
+  clearTimeout(_timeSliderDebounce);
+  _timeSliderDebounce = setTimeout(() => {
+    _applyTimeSliderFilter(cutoffDate);
+  }, 150);
+}
+
+function _applyTimeSliderFilter(cutoffDate) {
+  if (!window.markerCluster || !window.markers) return;
+  
+  const toShow = [];
+  const toHide = [];
+  
+  window.markers.forEach((marker, id) => {
+    const d = timeSliderObsMap.get(id);
+    if (d && d <= cutoffDate) {
+      toShow.push(marker);
+    } else {
+      toHide.push(marker);
+    }
+  });
+  
+  // Einmal clear + batch-add ist schneller als einzelnes toggle
+  window.markerCluster.clearLayers();
+  if (toShow.length > 0) {
+    // In Chunks aufteilen damit der Browser nicht einfriert
+    const CHUNK = 500;
+    if (toShow.length <= CHUNK) {
+      window.markerCluster.addLayers(toShow);
+    } else {
+      let i = 0;
+      function addChunk() {
+        const chunk = toShow.slice(i, i + CHUNK);
+        window.markerCluster.addLayers(chunk);
+        i += CHUNK;
+        if (i < toShow.length) requestAnimationFrame(addChunk);
+      }
+      requestAnimationFrame(addChunk);
+    }
+  }
+  
+  const countEl = document.getElementById('timeSliderMarkerCount');
+  if (countEl) countEl.textContent = toShow.length + ' Punkte';
+}
+
+function resetTimeSlider() {
+  stopTimeSliderPlay();
+  const slider = document.getElementById('timeSliderInput');
+  if (slider) {
+    slider.value = slider.max;
+    const currentLabel = document.getElementById('timeSliderCurrentLabel');
+    if (currentLabel && timeSliderDates.length) {
+      currentLabel.textContent = formatSliderDate(timeSliderDates[timeSliderDates.length - 1]);
+    }
+  }
+  if (window.markerCluster && window.markers) {
+    window.markerCluster.clearLayers();
+    window.markerCluster.addLayers(Array.from(window.markers.values()));
+    const countEl = document.getElementById('timeSliderMarkerCount');
+    if (countEl) countEl.textContent = window.markers.size + ' Punkte';
+    // Aktive Kartenfilter respektieren
+    if (typeof applyMapFilters === 'function') {
+      try { applyMapFilters(); } catch(e) {}
+    }
+  }
+}
+
+function toggleTimeSliderPlay() {
+  if (timeSliderPlayInterval) {
+    stopTimeSliderPlay();
+  } else {
+    startTimeSliderPlay();
+  }
+}
+
+function startTimeSliderPlay() {
+  const slider = document.getElementById('timeSliderInput');
+  const btn = document.getElementById('timeSliderPlayBtn');
+  if (!slider) return;
+  if (parseInt(slider.value) >= parseInt(slider.max)) slider.value = 0;
+  if (btn) btn.textContent = '⏸';
+  timeSliderPlayInterval = setInterval(() => {
+    const current = parseInt(slider.value);
+    const max = parseInt(slider.max);
+    if (current >= max) { stopTimeSliderPlay(); return; }
+    slider.value = current + 1;
+    const cutoffDate = timeSliderDates[Math.min(current + 1, timeSliderDates.length - 1)];
+    const currentLabel = document.getElementById('timeSliderCurrentLabel');
+    if (currentLabel) currentLabel.textContent = formatSliderDate(cutoffDate);
+    _applyTimeSliderFilter(cutoffDate);
+  }, 300); // etwas langsamer beim Autoplay damit es nicht ruckelt
+}
+
+function stopTimeSliderPlay() {
+  if (timeSliderPlayInterval) { clearInterval(timeSliderPlayInterval); timeSliderPlayInterval = null; }
+  const btn = document.getElementById('timeSliderPlayBtn');
+  if (btn) btn.textContent = '▶';
+}
+
+window.toggleTimeSlider = toggleTimeSlider;
+window.onTimeSliderChange = onTimeSliderChange;
+window.resetTimeSlider = resetTimeSlider;
+window.toggleTimeSliderPlay = toggleTimeSliderPlay;
+window.initTimeSlider = initTimeSlider;
 
 
 // Heatmap - Artenfilter initialisieren
