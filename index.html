@@ -7719,6 +7719,10 @@
                     Importiere Beobachtungen aus ornitho.de Export-Dateien<br>
                     <span style="color:rgba(124,58,237,0.8);">📸 Foto-URLs werden automatisch importiert</span>
                   </div>
+                  <div id="ornithoLastImportInfo" style="margin-top:8px;padding:8px 10px;background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.15);border-radius:8px;font-size:12px;color:var(--muted);text-align:center;display:none;">
+                    🕐 Letzter Import: <strong id="ornithoLastImportDate" style="color:var(--accent);">–</strong><br>
+                    <span id="ornithoLastImportCount" style="font-size:11px;"></span>
+                  </div>
                 </div>
                 <button class="small-btn" onclick="backupData()" style="margin-top:12px;width:100%;">💾 Backup erstellen</button>
                 <button class="small-btn" onclick="restoreBackup()" style="margin-top:4px;width:100%;">🔧 Backup wiederherstellen</button>
@@ -28071,6 +28075,23 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           }, 1000);
         }
         
+        // Letzten Import-Zeitpunkt speichern
+        if (importCount > 0) {
+          const importMeta = {
+            timestamp: Date.now(),
+            count: importCount,
+            dateStr: new Date().toLocaleString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+          };
+          try {
+            localStorage.setItem('ornithoLastImport', JSON.stringify(importMeta));
+            // Auch in Firebase speichern falls eingeloggt
+            if (window.currentUser && window.db) {
+              window.db.ref(`users/${window.currentUser.uid}/ornithoLastImport`).set(importMeta);
+            }
+          } catch(e) {}
+          updateOrnithoLastImportDisplay(importMeta);
+        }
+        
         // Cleanup
         delete window.photoImportCount;
         
@@ -41428,30 +41449,33 @@ let timeSliderObsMap = new Map(); // marker-id → ISO-Datum "YYYY-MM-DD"
 
 async function initTimeSlider() {
   try {
-    // Beobachtungen direkt aus der DB laden (robuster als marker._obsDate)
-    const observations = await getAllObservationsWithDetails();
+    const observations = await (window.getAllObservationsWithDetails
+      ? window.getAllObservationsWithDetails()
+      : getAllObservationsWithDetails());
     const validObs = observations.filter(obs => obs.lat && obs.lng && obs.date);
     
     if (validObs.length === 0) return;
     
-    // Datum normalisieren → immer "YYYY-MM-DD"
     function toISODate(d) {
       if (!d) return null;
-      if (/^\d{4}-\d{2}-\d{2}/.test(d)) return d.substring(0, 10); // already ISO
+      if (/^\d{4}-\d{2}-\d{2}/.test(d)) return d.substring(0, 10);
       const parts = d.split('.');
-      if (parts.length === 3) {
-        return `${parts[2].substring(0,4)}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-      }
+      if (parts.length === 3) return `${parts[2].substring(0,4)}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
       return null;
     }
     
-    // Map aufbauen: id → ISO-Datum
+    // Reichhaltigere Map: id → { date, bird, weather, state }
     timeSliderObsMap.clear();
     const dateSet = new Set();
     validObs.forEach(obs => {
       const iso = toISODate(obs.date);
       if (iso) {
-        timeSliderObsMap.set(obs.id, iso);
+        timeSliderObsMap.set(obs.id, {
+          date:    iso,
+          bird:    obs.bird    || '',
+          weather: obs.weather || '',
+          state:   obs.state   || ''
+        });
         dateSet.add(iso);
       }
     });
@@ -41463,26 +41487,22 @@ async function initTimeSlider() {
     const maxDate = timeSliderDates[timeSliderDates.length - 1];
     
     const slider = document.getElementById('timeSliderInput');
-    const minLabel = document.getElementById('timeSliderMinLabel');
-    const maxLabel = document.getElementById('timeSliderMaxLabel');
-    const btn = document.getElementById('toggleTimeSliderBtn');
-    
     if (!slider) return;
-    
     slider.min = 0;
     slider.max = timeSliderDates.length - 1;
     slider.value = timeSliderDates.length - 1;
     
+    const minLabel = document.getElementById('timeSliderMinLabel');
+    const maxLabel = document.getElementById('timeSliderMaxLabel');
+    const currentLabel = document.getElementById('timeSliderCurrentLabel');
     if (minLabel) minLabel.textContent = formatSliderDate(minDate);
     if (maxLabel) maxLabel.textContent = formatSliderDate(maxDate);
-    
-    const currentLabel = document.getElementById('timeSliderCurrentLabel');
     if (currentLabel) currentLabel.textContent = formatSliderDate(maxDate);
     
     const countEl = document.getElementById('timeSliderMarkerCount');
     if (countEl) countEl.textContent = validObs.length + ' Punkte';
     
-    // Button einblenden
+    const btn = document.getElementById('toggleTimeSliderBtn');
     if (btn) btn.style.display = 'block';
     
     console.log('✅ Zeitregler initialisiert:', timeSliderDates.length, 'Tage,', validObs.length, 'Punkte');
@@ -41540,30 +41560,40 @@ function onTimeSliderChange(indexVal) {
 function _applyTimeSliderFilter(cutoffDate) {
   if (!window.markerCluster || !window.markers) return;
   
-  const toShow = [];
-  const toHide = [];
+  // Aktive Kartenfilter direkt aus dem DOM lesen - kein globaler State nötig
+  const speciesFilter = (document.getElementById('mapFilterSpecies')?.value  || '').trim();
+  const weatherFilter = (document.getElementById('mapFilterWeather')?.value  || '').trim();
+  const stateFilter   = (document.getElementById('mapFilterState')?.value    || '').trim();
   
+  const toShow = [];
   window.markers.forEach((marker, id) => {
-    const d = timeSliderObsMap.get(id);
-    if (d && d <= cutoffDate) {
-      toShow.push(marker);
-    } else {
-      toHide.push(marker);
-    }
+    const obs = timeSliderObsMap.get(id);
+    if (!obs) return;
+    
+    // Zeitfilter
+    if (obs.date > cutoffDate) return;
+    
+    // Artfilter
+    if (speciesFilter && obs.bird !== speciesFilter) return;
+    
+    // Wetterfilter
+    if (weatherFilter && obs.weather !== weatherFilter) return;
+    
+    // Bundeslandfilter
+    if (stateFilter && obs.state !== stateFilter) return;
+    
+    toShow.push(marker);
   });
   
-  // Einmal clear + batch-add ist schneller als einzelnes toggle
   window.markerCluster.clearLayers();
   if (toShow.length > 0) {
-    // In Chunks aufteilen damit der Browser nicht einfriert
     const CHUNK = 500;
     if (toShow.length <= CHUNK) {
       window.markerCluster.addLayers(toShow);
     } else {
       let i = 0;
       function addChunk() {
-        const chunk = toShow.slice(i, i + CHUNK);
-        window.markerCluster.addLayers(chunk);
+        window.markerCluster.addLayers(toShow.slice(i, i + CHUNK));
         i += CHUNK;
         if (i < toShow.length) requestAnimationFrame(addChunk);
       }
@@ -41634,6 +41664,59 @@ window.onTimeSliderChange = onTimeSliderChange;
 window.resetTimeSlider = resetTimeSlider;
 window.toggleTimeSliderPlay = toggleTimeSliderPlay;
 window.initTimeSlider = initTimeSlider;
+
+// ═══════════════════════════════════════════
+// LETZTER ORNITHO-IMPORT ANZEIGE
+// ═══════════════════════════════════════════
+function updateOrnithoLastImportDisplay(meta) {
+  const info = document.getElementById('ornithoLastImportInfo');
+  const dateEl = document.getElementById('ornithoLastImportDate');
+  const countEl = document.getElementById('ornithoLastImportCount');
+  if (!info || !meta) return;
+  
+  info.style.display = 'block';
+  dateEl.textContent = meta.dateStr || new Date(meta.timestamp).toLocaleString('de-DE', {
+    day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  
+  // "Vor X Tagen" berechnen
+  const days = Math.floor((Date.now() - meta.timestamp) / 86400000);
+  let ago = '';
+  if (days === 0) ago = ' (heute)';
+  else if (days === 1) ago = ' (gestern)';
+  else if (days < 7) ago = ` (vor ${days} Tagen)`;
+  else if (days < 30) ago = ` (vor ${Math.floor(days/7)} Woche${Math.floor(days/7)>1?'n':''})`;
+  else ago = ` (vor ${Math.floor(days/30)} Monat${Math.floor(days/30)>1?'en':''})`;
+  
+  dateEl.textContent += ago;
+  if (meta.count) countEl.textContent = `${meta.count} Beobachtungen importiert`;
+}
+
+async function loadOrnithoLastImport() {
+  // Erst Firebase versuchen, dann localStorage als Fallback
+  let meta = null;
+  try {
+    if (window.currentUser && window.db) {
+      const snap = await window.db.ref(`users/${window.currentUser.uid}/ornithoLastImport`).once('value');
+      if (snap.exists()) meta = snap.val();
+    }
+  } catch(e) {}
+  
+  if (!meta) {
+    try {
+      const stored = localStorage.getItem('ornithoLastImport');
+      if (stored) meta = JSON.parse(stored);
+    } catch(e) {}
+  }
+  
+  if (meta) updateOrnithoLastImportDisplay(meta);
+}
+
+// Beim Öffnen der Tools-Seite laden
+document.addEventListener('DOMContentLoaded', () => {
+  // Kurz warten bis Firebase eingeloggt ist
+  setTimeout(loadOrnithoLastImport, 2000);
+});
 
 
 // Heatmap - Artenfilter initialisieren
@@ -45674,6 +45757,10 @@ async function filterExistingMarkers(dateFrom, dateTo, species, weather, state) 
     }
   });
   
+  // Aktive Filter-IDs global speichern → Zeitregler kann diese berücksichtigen
+  const hasActiveFilter = species || weather || state;
+  window.activeFilteredMarkerIds = hasActiveFilter ? filteredIds : null;
+  
   // Temporär Cluster leeren
   if (window.markerCluster) {
     window.markerCluster.clearLayers();
@@ -45741,6 +45828,9 @@ async function resetMapFilters() {
   // PERFORMANCE: Wenn Marker preloaded sind, zeige einfach alle wieder
   if (window.markersPreloaded && window.markers.size > 0) {
     console.log('🎯 Schnelles Reset: Zeige alle vorgeladenen Marker');
+    
+    // Aktive Filter-IDs löschen
+    window.activeFilteredMarkerIds = null;
     
     // Cluster leeren
     if (window.markerCluster) {
