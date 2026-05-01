@@ -18335,14 +18335,52 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
     
+    // ═══════════════════════════════════════════
+    // GLOBALER DATEN-CACHE
+    // ═══════════════════════════════════════════
+    const _obsCache = {
+      data: null,
+      groupId: null,
+      timestamp: 0,
+      TTL: 60000, // 60 Sekunden gültig
+      
+      isValid(groupId) {
+        return this.data !== null &&
+               this.groupId === groupId &&
+               (Date.now() - this.timestamp) < this.TTL;
+      },
+      
+      set(data, groupId) {
+        this.data = data;
+        this.groupId = groupId;
+        this.timestamp = Date.now();
+      },
+      
+      invalidate() {
+        this.data = null;
+        this.timestamp = 0;
+      }
+    };
+    
+    // Cache invalidieren wenn Daten sich ändern
+    window._invalidateObsCache = () => _obsCache.invalidate();
+    
     // ---------- Modifizierte Datenfunktionen für IndexedDB ----------
     
     // Alle Beobachtungen laden (ersetzt getAllObservationsWithDetails)
     async function getAllObservationsWithDetails() {
+      const groupId = (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal')
+        ? window.currentSelectedGroup : null;
+      
+      // Cache-Hit: Direkt zurückgeben ohne Firebase/IndexedDB-Aufruf
+      if (_obsCache.isValid(groupId)) {
+        return _obsCache.data;
+      }
+      
       try {
         // Prüfe ob wir im Gruppen-Modus sind
-        if(window.currentSelectedGroup && window.currentSelectedGroup !== "personal"){
-          console.log("📊 Lade Gruppendaten für Analyse/Statistik:", window.currentSelectedGroup);
+        if(groupId) {
+          console.log("📊 Lade Gruppendaten für Analyse/Statistik:", groupId);
           
           // Lade Gruppendaten aus Firebase
           return new Promise(function(resolve, reject){
@@ -18425,6 +18463,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
                 }
                 
                 console.log("✅ " + observations.length + " Gruppen-Beobachtungen für Analyse geladen");
+                _obsCache.set(observations, groupId); // In Cache speichern
                 resolve(observations);
               }).catch(function(error){
                 console.error("❌ Fehler beim Laden der Gruppendaten:", error);
@@ -18438,7 +18477,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         }
         
         // Sonst: Lade persönliche Daten aus IndexedDB
-        console.log("📊 Lade persönliche Daten für Analyse/Statistik");
         const observations = await getAllFromIndexedDB('observations');
         
         // Hole Ordner-Farben für zusätzliche Formatierung
@@ -18449,11 +18487,13 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         });
         
         // Bereichere Beobachtungen mit Ordner-Informationen
-        return observations.map(obs => ({
+        const result = observations.map(obs => ({
           ...obs,
           folderName: obs.folderName || (folderMap[obs.folderId]?.name || 'Unbekannt'),
           folderColor: obs.folderColor || (folderMap[obs.folderId]?.color || colorPalette[0])
         }));
+        _obsCache.set(result, null); // In Cache speichern
+        return result;
       } catch (error) {
         console.error('Fehler beim Laden der Beobachtungen:', error);
         return [];
@@ -18462,6 +18502,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     
     // Auf window setzen damit andere Script-Blöcke (z.B. Zeitregler) darauf zugreifen können
     window.getAllObservationsWithDetails = getAllObservationsWithDetails;
+    
+    // Cache-Invalidierung auch für Chart-Cache
+    window._invalidateObsCache = () => {
+      _obsCache.invalidate();
+      if (typeof _jahresvergleichCache !== 'undefined') {
+        _jahresvergleichCache = { year: null, groupId: null, yearObs: null, allObs: null };
+      }
+    };
     
     // NEU: Funktion um IMMER persönliche Beobachtungen zu laden (für Listen)
     async function getPersonalObservationsWithDetails() {
@@ -23341,6 +23389,94 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       window.markerCluster = markerCluster;
       window.mapObj.addLayer(markerCluster);
       
+      // ── Auto-Heatmap bei starkem Herauszoomen ────────────────────────────
+      const AUTO_HEATMAP_ZOOM = 7; // unter dieser Stufe → Heatmap
+      let _autoHeatmapActive = false;
+      let _autoHeatmapLayer = null;
+      let _autoHeatmapData = null; // gecacht
+      
+      async function _buildAutoHeatmapData() {
+        if (_autoHeatmapData) return _autoHeatmapData;
+        const observations = await getAllObservationsWithDetails();
+        const locMap = new Map();
+        observations.filter(o => o.lat && o.lng).forEach(o => {
+          const key = `${parseFloat(o.lat).toFixed(3)},${parseFloat(o.lng).toFixed(3)}`;
+          locMap.set(key, (locMap.get(key) || 0) + 1);
+        });
+        let max = 0;
+        locMap.forEach(v => { if (v > max) max = v; });
+        _autoHeatmapData = Array.from(locMap.entries()).map(([key, count]) => {
+          const [lat, lng] = key.split(',').map(Number);
+          return [lat, lng, Math.max(0.2, Math.log(count + 1) / Math.log(max + 1))];
+        });
+        return _autoHeatmapData;
+      }
+      
+      async function _showAutoHeatmap() {
+        if (_autoHeatmapActive) return;
+        _autoHeatmapActive = true;
+        
+        // Marker/Cluster ausblenden
+        if (window.mapObj.hasLayer(markerCluster)) window.mapObj.removeLayer(markerCluster);
+        if (window._singleModeLayer) window.mapObj.removeLayer(window._singleModeLayer);
+        // Manuelle Heatmap ausblenden falls aktiv
+        if (heatmapLayer && window.mapObj.hasLayer(heatmapLayer)) window.mapObj.removeLayer(heatmapLayer);
+        
+        const data = await _buildAutoHeatmapData();
+        _autoHeatmapLayer = L.heatLayer(data, {
+          radius: 28, blur: 18, maxZoom: 18, minOpacity: 0.45,
+          gradient: { 0.0: '#3b82f6', 0.3: '#06b6d4', 0.5: '#f59e0b', 0.75: '#f97316', 1.0: '#ef4444' }
+        });
+        _autoHeatmapLayer.addTo(window.mapObj);
+        
+        // Badge anzeigen
+        let badge = document.getElementById('_autoHeatmapBadge');
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.id = '_autoHeatmapBadge';
+          badge.style.cssText = 'position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:1000;background:rgba(0,0,0,0.7);color:white;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;pointer-events:none;backdrop-filter:blur(6px);';
+          badge.textContent = '🔥 Auto-Heatmap (zoom rein für Marker)';
+          document.getElementById('map')?.appendChild(badge);
+        }
+        badge.style.display = 'block';
+      }
+      
+      function _hideAutoHeatmap() {
+        if (!_autoHeatmapActive) return;
+        _autoHeatmapActive = false;
+        
+        if (_autoHeatmapLayer) {
+          window.mapObj.removeLayer(_autoHeatmapLayer);
+          _autoHeatmapLayer = null;
+        }
+        
+        // Marker/Cluster wiederherstellen (nur wenn kein manueller Heatmap-Modus)
+        if (!heatmapLayer) {
+          if (window._singleModeLayer) {
+            window.mapObj.addLayer(window._singleModeLayer);
+          } else if (!window.mapObj.hasLayer(markerCluster)) {
+            window.mapObj.addLayer(markerCluster);
+          }
+        }
+        
+        const badge = document.getElementById('_autoHeatmapBadge');
+        if (badge) badge.style.display = 'none';
+      }
+      
+      window.mapObj.on('zoomend', async function() {
+        const zoom = window.mapObj.getZoom();
+        
+        // Manuelle Heatmap: kein Auto-Modus
+        if (heatmapLayer) return;
+        
+        if (zoom < AUTO_HEATMAP_ZOOM) {
+          await _showAutoHeatmap();
+        } else {
+          _hideAutoHeatmap();
+        }
+      });
+      // ────────────────────────────────────────────────────────────────────
+      
       // PRELOADING: Lade ALLE Marker sofort nach Initialisierung
       setTimeout(async () => {
         await preloadAllMarkers();
@@ -23348,64 +23484,82 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       // Cluster-Modus Toggle (alle Details zeigen vs. gruppieren)
       let clusteringDisabled = false;
+      window._singleModeLayer = null; // Canvas-Layer für Einzel-Modus
+      
       window.toggleClusterMode = function() {
         clusteringDisabled = !clusteringDisabled;
         const btn = document.getElementById('toggleClusterMode');
         
         if (clusteringDisabled) {
-          // Deaktiviere Clustering - zeige alle Marker einzeln
           btn.textContent = '📦 Gruppierung aktivieren';
           btn.style.background = 'var(--accent-2)';
           
-          // Entferne und erstelle Cluster neu mit deaktiviertem Clustering
+          // Cluster-Layer ausblenden
           window.mapObj.removeLayer(markerCluster);
-          markerCluster = L.markerClusterGroup({
-            disableClusteringAtZoom: 1, // Deaktiviert Clustering auf allen Zoom-Stufen
-            maxClusterRadius: 0,
-            spiderfyOnMaxZoom: false,
-            showCoverageOnHover: false,
-            zoomToBoundsOnClick: false
-          });
           
-          // Füge alle Marker wieder hinzu
-          window.markers.forEach((marker) => {
-            if (marker) {
-              markerCluster.addLayer(marker);
+          // Canvas-Layer erstellen (massiv schneller als divIcon)
+          if (window._singleModeLayer) {
+            window.mapObj.removeLayer(window._singleModeLayer);
+          }
+          
+          const canvasRenderer = L.canvas({ padding: 0.5 });
+          const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
+          
+          // Alle sichtbaren Marker als CircleMarker auf Canvas rendern
+          const layers = [];
+          window.markers.forEach((marker, id) => {
+            const latlng = marker.getLatLng();
+            const obsData = marker._lazyPopupData?.observationData || {};
+            const color = isGroupMode && obsData.userId
+              ? (getUserColor(obsData.userId) || '#06b6d4')
+              : '#06b6d4';
+            
+            const cm = L.circleMarker(latlng, {
+              renderer: canvasRenderer,
+              radius: 5,
+              fillColor: color,
+              fillOpacity: 0.85,
+              color: 'white',
+              weight: 1.5,
+              interactive: true,
+              bubblingMouseEvents: false
+            });
+            
+            // Popup lazy binden
+            const popupData = marker._lazyPopupData;
+            if (popupData) {
+              cm.bindPopup(() => createDetailedPopup(
+                popupData.name, popupData.date,
+                popupData.lat, popupData.lng,
+                popupData.observationData
+              ), { maxWidth: 320 });
             }
+            
+            // Marker-ID für Zeitregler speichern
+            cm._obsMarkerId = id;
+            layers.push(cm);
           });
           
-          window.markerCluster = markerCluster;
-          window.mapObj.addLayer(markerCluster);
-          showNotification('Alle Marker einzeln angezeigt', 2000);
+          window._singleModeLayer = L.layerGroup(layers);
+          window.mapObj.addLayer(window._singleModeLayer);
+          
+          // Zeitregler: auf Canvas-Layer umschalten
+          window._singleModeCircleMarkers = layers;
+          
+          showNotification(`${layers.length} Marker einzeln angezeigt (Canvas-Modus)`, 2000);
+          
         } else {
-          // Aktiviere Clustering - gruppiere nahe Marker
           btn.textContent = '📍 Alle Details zeigen';
           btn.style.background = 'var(--accent)';
           
-          // Entferne und erstelle Cluster neu mit aktiviertem Clustering
-          window.mapObj.removeLayer(markerCluster);
-          markerCluster = L.markerClusterGroup({
-            disableClusteringAtZoom: null,
-            maxClusterRadius: 60, // Reduziert für Performance
-            spiderfyOnMaxZoom: true,
-            showCoverageOnHover: false, // Deaktiviert für Performance
-            zoomToBoundsOnClick: true,
-            animate: true,
-            animateAddingMarkers: false,
-            removeOutsideVisibleBounds: true,
-            chunkedLoading: true,
-            chunkInterval: 50,
-            chunkDelay: 50
-          });
+          // Canvas-Layer entfernen
+          if (window._singleModeLayer) {
+            window.mapObj.removeLayer(window._singleModeLayer);
+            window._singleModeLayer = null;
+            window._singleModeCircleMarkers = null;
+          }
           
-          // Füge alle Marker wieder hinzu
-          window.markers.forEach((marker) => {
-            if (marker) {
-              markerCluster.addLayer(marker);
-            }
-          });
-          
-          window.markerCluster = markerCluster;
+          // Cluster-Layer wieder hinzufügen
           window.mapObj.addLayer(markerCluster);
           showNotification('Marker werden gruppiert', 2000);
         }
@@ -23727,6 +23881,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             // NEU: Setze User-Farben zurück wenn Gruppe wechselt
             if (window.currentSelectedGroup !== selectedGroup) {
               resetUserColors();
+              // Cache invalidieren bei Gruppenwechsel
+              if (typeof window._invalidateObsCache === 'function') window._invalidateObsCache();
             }
             
             window.currentSelectedGroup = selectedGroup;
@@ -23893,14 +24049,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       let markerIcon = null;
       const isGroupMode = window.currentSelectedGroup && window.currentSelectedGroup !== 'personal';
       
-      // Debug-Logging
-      if (isGroupMode && observationData.userId) {
-        console.log(`🎨 Erstelle Marker für User ${observationData.userId} (${observationData.userName || 'Unbekannt'})`);
-      }
-      
       if (isGroupMode && observationData.userId) {
         const userColor = getUserColor(observationData.userId);
-        console.log(`   → Farbe: ${userColor}`);
         markerIcon = L.divIcon({
           className: 'custom-marker',
           html: `<div style="
@@ -28037,6 +28187,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         
         // Erstelle detaillierte Erfolgsmeldung
         let message = `✅ Import erfolgreich! ${importCount} Beobachtungen importiert`;
+        
+        // Cache invalidieren da neue Daten vorliegen
+        if (typeof window._invalidateObsCache === 'function') window._invalidateObsCache();
         
         // NEU: Zeige Foto-Import-Statistik
         const photoCount = window.photoImportCount || 0;
@@ -37947,8 +38100,12 @@ async function renderObservationManager() {
             <div class="person-observations">
       `;
       
-      // Rendere alle Beobachtungen dieser Person
-      personObs.forEach(obs => {
+      // Rendere maximal 50 Beobachtungen pro Person (Pagination)
+      const PAGE_SIZE = 50;
+      const visibleObs = personObs.slice(0, PAGE_SIZE);
+      const remaining = personObs.length - PAGE_SIZE;
+      
+      visibleObs.forEach(obs => {
         const speciesInfo = birdDatabase[obs.bird] || {};
         const rarity = obs.rarity || speciesInfo.status || '';
         const rarityStyle = getRarityStyle(obs.bird, obs.rarity);
@@ -38044,6 +38201,18 @@ async function renderObservationManager() {
         `;
       });
       
+      // "Mehr laden"-Button wenn mehr als 50 Beobachtungen
+      if (remaining > 0) {
+        html += `
+          <div style="text-align:center;padding:12px;">
+            <button class="small-btn" onclick="loadMoreObservations('${accordionId}', '${userId}')" 
+              style="background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);padding:10px 24px;font-size:13px;">
+              ⬇️ ${remaining} weitere Beobachtungen laden
+            </button>
+          </div>
+        `;
+      }
+      
       html += `
             </div>
           </div>
@@ -38065,6 +38234,9 @@ async function renderObservationManager() {
     
     document.getElementById('obsManagerList').innerHTML = html;
     
+    // Gesamt-Beobachtungen für Pagination-Funktion speichern
+    window._obsManagerData = sortedPersons;
+
   } catch (error) {
     console.error('Fehler beim Laden der Beobachtungen:', error);
     document.getElementById('obsManagerList').innerHTML = `
@@ -38296,9 +38468,66 @@ function clearObsManagerMemberFilter() {
   renderObservationManager();
 }
 
+let _filterObsDebounce = null;
 function filterObservationManager() {
-  renderObservationManager();
+  clearTimeout(_filterObsDebounce);
+  _filterObsDebounce = setTimeout(() => renderObservationManager(), 250);
 }
+
+// Pagination: Mehr Beobachtungen einer Person laden
+window.loadMoreObservations = function(accordionId, userId) {
+  if (!window._obsManagerData) return;
+  const personEntry = window._obsManagerData.find(([id]) => id === userId);
+  if (!personEntry) return;
+  
+  const personObs = personEntry[1].observations;
+  const container = document.getElementById(accordionId)?.querySelector('.person-observations');
+  if (!container) return;
+  
+  // Aktuell angezeigte Anzahl ermitteln
+  const currentCount = container.querySelectorAll('.card').length;
+  const nextBatch = personObs.slice(currentCount, currentCount + 50);
+  
+  // "Mehr laden"-Button entfernen
+  const btn = container.parentElement?.querySelector('button[onclick*="loadMoreObservations"]')?.parentElement;
+  if (btn) btn.remove();
+  
+  // Neue Einträge einfügen
+  nextBatch.forEach(obs => {
+    const speciesInfo = (typeof birdDatabase !== 'undefined' && birdDatabase[obs.bird]) || {};
+    const rarityStyle = typeof getRarityStyle === 'function' ? getRarityStyle(obs.bird, obs.rarity) : { rarityIcon: '', rarityClass: '' };
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.cssText = `background:rgba(255,255,255,0.02);border-left:3px solid ${obs.folderColor || 'var(--accent)'}`;
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:16px;">
+        <div style="flex:1;">
+          <div style="font-size:18px;font-weight:600;">${rarityStyle.rarityIcon}${obs.bird}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px;">
+            📅 ${typeof formatDateForDisplay === 'function' ? formatDateForDisplay(obs.date) : obs.date}
+            ${obs.time ? ` 🕒 ${obs.time}` : ''}
+            &nbsp;·&nbsp; 📍 ${obs.folderName || 'Unbekannt'}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:100px;">
+          <button class="small-btn" onclick="showObservationDetail('${obs.id}')" style="width:100%;">👁️ Details</button>
+          <button class="small-btn" onclick="openEditModal('${obs.id}')" style="width:100%;background:rgba(249,115,22,0.1);">✏️ Bearbeiten</button>
+          <button class="small-btn" onclick="deleteObservationFromManager('${obs.id}')" style="width:100%;background:var(--danger);">🗑️ Löschen</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  
+  // Neuen "Mehr laden"-Button falls noch mehr vorhanden
+  const stillRemaining = personObs.length - (currentCount + nextBatch.length);
+  if (stillRemaining > 0) {
+    const moreBtn = document.createElement('div');
+    moreBtn.style.cssText = 'text-align:center;padding:12px;';
+    moreBtn.innerHTML = `<button class="small-btn" onclick="loadMoreObservations('${accordionId}', '${userId}')" style="background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);padding:10px 24px;font-size:13px;">⬇️ ${stillRemaining} weitere Beobachtungen laden</button>`;
+    container.parentElement.appendChild(moreBtn);
+  }
+};
 
 async function deleteObservationFromManager(observationId) {
   if (!confirm('Möchtest du diese Beobachtung wirklich löschen?')) {
@@ -39633,12 +39862,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // und rufen closeMobileMenu() wenn nötig auf
   
   // NEU: Schließe Sidebar beim Resize auf Desktop
-  window.addEventListener('resize', function() {
+  function _handleResize() {
     if (window.innerWidth > 700) {
-      console.log('Resize zu Desktop - Schließe Menü');
       closeMobileMenu();
     }
-  });
+  }
+  // Alten Listener entfernen falls vorhanden, dann neu registrieren
+  window.removeEventListener('resize', _handleResize);
+  window.addEventListener('resize', _handleResize);
   
   // NEU: Stelle sicher, dass Overlay funktioniert - mit mehreren Methoden
   const overlay = document.getElementById('mobileOverlay');
@@ -41139,39 +41370,29 @@ function changeComparisonYear(delta) {
 // Make function globally available
 window.changeComparisonYear = changeComparisonYear;
 
+let _jahresvergleichCache = { year: null, groupId: null, yearObs: null, allObs: null };
+
 async function loadJahresvergleich() {
-  console.warn('=== 📊 JAHRESVERGLEICH START ===');
+  const groupId = window.currentSelectedGroup || null;
+  const cacheHit = _jahresvergleichCache.year === currentComparisonYear &&
+                   _jahresvergleichCache.groupId === groupId &&
+                   _jahresvergleichCache.yearObs !== null;
   
-  // Hole Beobachtungen (im Gruppenmodus alle, sonst nur eigene)
-  const observations = await getOwnObservationsForStats();
+  let observations, yearObs, lastYearObs;
   
-  console.warn('📊 Jahresvergleich - Geladene Beobachtungen:', observations.length);
-  console.warn('📊 Gruppenmodus:', window.currentSelectedGroup);
-  
-  // Debug: Zähle tickable vs non-tickable
-  const tickableCount = observations.filter(o => o.tickable !== false).length;
-  const nonTickableCount = observations.filter(o => o.tickable === false).length;
-  console.warn('📊 Tickable:', tickableCount, 'Non-tickable:', nonTickableCount);
-  
-  // Debug: Zeige Sample der Vogelnamen
-  const sampleBirds = [...new Set(observations.slice(0, 20).map(o => o.bird))];
-  console.warn('📊 Sample Vogelnamen (erste 20 Beobachtungen):', sampleBirds);
-  
-  const yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear);
-  const lastYearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear - 1);
-  
-  console.warn('📊 Beobachtungen in', currentComparisonYear, ':', yearObs.length);
-  
-  // Debug: Zähle Arten manuell
-  const uniqueBirds = new Set(yearObs.map(o => o.bird));
-  console.warn('📊 Einzigartige Vogelnamen (roh, ohne Normalisierung):', uniqueBirds.size);
-  console.warn('📊 Sample einzigartige Vögel (erste 30):', [...uniqueBirds].slice(0, 30));
+  if (cacheHit) {
+    yearObs = _jahresvergleichCache.yearObs;
+    lastYearObs = _jahresvergleichCache.lastYearObs;
+    observations = _jahresvergleichCache.allObs;
+  } else {
+    // Hole Beobachtungen (im Gruppenmodus alle, sonst nur eigene)
+    observations = await getOwnObservationsForStats();
+    yearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear);
+    lastYearObs = observations.filter(o => new Date(o.date).getFullYear() === currentComparisonYear - 1);
+    _jahresvergleichCache = { year: currentComparisonYear, groupId, yearObs, lastYearObs, allObs: observations };
+  }
   
   const yearSpecies = countUniqueSpecies(yearObs);
-  console.warn('📊 Arten in', currentComparisonYear, '(nach countUniqueSpecies mit Normalisierung):', yearSpecies);
-  
-  console.warn('=== 📊 JAHRESVERGLEICH DEBUG ENDE ===');
-  
   const lastYearSpecies = countUniqueSpecies(lastYearObs);
   const speciesChange = yearSpecies - lastYearSpecies;
   
@@ -41558,30 +41779,46 @@ function onTimeSliderChange(indexVal) {
 }
 
 function _applyTimeSliderFilter(cutoffDate) {
-  if (!window.markerCluster || !window.markers) return;
-  
-  // Aktive Kartenfilter direkt aus dem DOM lesen - kein globaler State nötig
+  // Aktive Kartenfilter direkt aus dem DOM lesen
   const speciesFilter = (document.getElementById('mapFilterSpecies')?.value  || '').trim();
   const weatherFilter = (document.getElementById('mapFilterWeather')?.value  || '').trim();
   const stateFilter   = (document.getElementById('mapFilterState')?.value    || '').trim();
+  
+  // ── Canvas-Einzelmodus ──────────────────────────────────────────────────
+  if (window._singleModeCircleMarkers && window._singleModeLayer) {
+    let shown = 0;
+    window._singleModeCircleMarkers.forEach(cm => {
+      const id = cm._obsMarkerId;
+      const obs = timeSliderObsMap.get(id);
+      const visible = obs &&
+        obs.date <= cutoffDate &&
+        (!speciesFilter || obs.bird    === speciesFilter) &&
+        (!weatherFilter || obs.weather === weatherFilter) &&
+        (!stateFilter   || obs.state   === stateFilter);
+      
+      if (visible) {
+        if (!window._singleModeLayer.hasLayer(cm)) window._singleModeLayer.addLayer(cm);
+        shown++;
+      } else {
+        window._singleModeLayer.removeLayer(cm);
+      }
+    });
+    const countEl = document.getElementById('timeSliderMarkerCount');
+    if (countEl) countEl.textContent = shown + ' Punkte';
+    return;
+  }
+  
+  // ── Normaler Cluster-Modus ──────────────────────────────────────────────
+  if (!window.markerCluster || !window.markers) return;
   
   const toShow = [];
   window.markers.forEach((marker, id) => {
     const obs = timeSliderObsMap.get(id);
     if (!obs) return;
-    
-    // Zeitfilter
     if (obs.date > cutoffDate) return;
-    
-    // Artfilter
-    if (speciesFilter && obs.bird !== speciesFilter) return;
-    
-    // Wetterfilter
+    if (speciesFilter && obs.bird    !== speciesFilter) return;
     if (weatherFilter && obs.weather !== weatherFilter) return;
-    
-    // Bundeslandfilter
-    if (stateFilter && obs.state !== stateFilter) return;
-    
+    if (stateFilter   && obs.state   !== stateFilter)   return;
     toShow.push(marker);
   });
   
