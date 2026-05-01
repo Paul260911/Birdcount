@@ -2338,6 +2338,40 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
+    /* Import Toast – oben rechts, nicht-blockierend */
+    #importToast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 20000;
+      background: var(--card);
+      border: 1px solid rgba(6,182,212,0.35);
+      border-radius: 14px;
+      padding: 14px 16px;
+      min-width: 260px;
+      max-width: 300px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(6,182,212,0.08);
+      transform: translateY(-130%) scale(0.96);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+      pointer-events: none;
+    }
+    #importToast.visible {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    #importToast.done {
+      border-color: rgba(16,185,129,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,185,129,0.1);
+    }
+    #importToastBar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.4s ease;
+      border-radius: 3px;
+    }
     
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -11786,10 +11820,21 @@
       console.log('📍 Gruppenmodus:', window.currentSelectedGroup);
       
       try {
-        // Warte auf getAllObservationsWithDetails
+        // Warte auf getAllObservationsWithDetails – Polling statt Blind-Timeout
         if (typeof getAllObservationsWithDetails !== 'function') {
-          console.log('⏳ Warte auf getAllObservationsWithDetails...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve, reject) => {
+            let waited = 0;
+            const iv = setInterval(() => {
+              waited += 30;
+              if (typeof getAllObservationsWithDetails === 'function') {
+                clearInterval(iv);
+                resolve();
+              } else if (waited >= 3000) {
+                clearInterval(iv);
+                reject(new Error('getAllObservationsWithDetails timeout'));
+              }
+            }, 30);
+          });
         }
         
         if (typeof getAllObservationsWithDetails !== 'function') {
@@ -27803,6 +27848,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           throw new Error('Datei ist zu kurz oder ungültig');
         }
         
+        // Starte Toast-Fortschrittsanzeige oben rechts
+        const _totalLines = lines.length - 2;
+        const _isGroupImport = isGroupMode || (window.ornithoImportTargetGroup && window.ornithoImportTargetGroup !== null);
+        // Phase 1 (Parsen) = 0–50% bei Gruppen (wegen Speicher-Phase danach), 0–100% lokal
+        const _parsePhaseMax = _isGroupImport ? 50 : 100;
+        const _importToastStart = Date.now();
+        if (typeof showImportToast === 'function') showImportToast(_totalLines);
+        
         // Parse Header
         const headers = lines[0].split('\t');
         
@@ -27921,6 +27974,12 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         for (let i = 2; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
+          
+          // Toast-Update alle 50 Zeilen (Phase 1)
+          if ((i - 2) % 50 === 0 && typeof updateImportToast === 'function') {
+            const parsePct = _totalLines > 0 ? ((i - 2) / _totalLines) * _parsePhaseMax : 0;
+            updateImportToast(parsePct, i - 2, _totalLines, `${i - 2} / ${_totalLines} Zeilen gelesen`);
+          }
           
           const values = line.split('\t');
           
@@ -28120,10 +28179,17 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               
               savedCount += chunk.length;
               
-              // Update Progress
+              // Update Progress (bestehendes Overlay)
               const progress = Math.round((savedCount / totalObservations) * 100);
               updateImportProgress(progress, savedCount, totalObservations, 
                 `Chunk ${chunkIndex + 1}/${totalChunks} gespeichert`);
+              
+              // Update Toast (Phase 2: 50–100%)
+              if (typeof updateImportToast === 'function') {
+                const toastPct = 50 + Math.round((savedCount / totalObservations) * 50);
+                updateImportToast(toastPct, savedCount, totalObservations,
+                  `${savedCount} / ${totalObservations} gespeichert`);
+              }
               
               // Kurze Pause zwischen Chunks um UI responsive zu halten
               await new Promise(resolve => setTimeout(resolve, 100));
@@ -28305,9 +28371,22 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         delete window.ornithoImportSelffound;
         delete window.ornithoImportTargetGroup;
         
+        // Toast abschließen
+        if (typeof hideImportToast === 'function') hideImportToast(2500);
+        
       } catch (error) {
         console.error('Ornitho.de Import fehlgeschlagen:', error);
         showNotification('❌ Import fehlgeschlagen: ' + error.message, 5000);
+        
+        // Toast schließen auch bei Fehler
+        if (typeof hideImportToast === 'function') {
+          const t = document.getElementById('importToast');
+          if (t) {
+            document.getElementById('importToastCount').textContent = '❌ Fehler beim Import';
+            document.getElementById('importToastEta').textContent = '';
+            setTimeout(() => t.classList.remove('visible', 'done'), 3000);
+          }
+        }
         
         // Cleanup
         delete window.batchObservations;
@@ -29575,26 +29654,12 @@ document.addEventListener('DOMContentLoaded', function() {
           if (typeof initMap === 'function' && !window.mapInitialized) {
             setTimeout(() => {
               initMap();
-              // Initialisiere Karten-Filter nach Karte - LÄNGERE WARTEZEIT
-              setTimeout(() => {
-                console.log('⏰ Versuche Filter zu initialisieren (nach Karte)...');
-                if (typeof initMapFilters === 'function') {
-                  initMapFilters();
-                } else {
-                  console.error('❌ initMapFilters Funktion nicht verfügbar');
-                }
-              }, 2000); // Erhöht von 500ms auf 2000ms
+              // Warte bis initMapFilters verfügbar ist – polling statt blindem Timeout
+              waitForAndRun('initMapFilters', () => initMapFilters());
             }, 100);
           } else {
-            // Karte bereits initialisiert - nur Filter aktualisieren
-            setTimeout(() => {
-              console.log('⏰ Versuche Filter zu initialisieren (Karte existiert)...');
-              if (typeof initMapFilters === 'function') {
-                initMapFilters();
-              } else {
-                console.error('❌ initMapFilters Funktion nicht verfügbar');
-              }
-            }, 1000); // Erhöht von 300ms auf 1000ms
+            // Karte bereits initialisiert - Filter sofort aktualisieren
+            waitForAndRun('initMapFilters', () => initMapFilters());
           }
         }
       } else {
@@ -29705,6 +29770,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Asynchrones Laden von Section-Daten (nicht-blockierend)
+// Hilfsfunktion: Wartet bis eine globale Funktion verfügbar ist, dann führt sie sie aus
+function waitForAndRun(fnName, callback, maxWaitMs = 3000) {
+  if (typeof window[fnName] === 'function') {
+    callback();
+    return;
+  }
+  let waited = 0;
+  const iv = setInterval(() => {
+    waited += 30;
+    if (typeof window[fnName] === 'function') {
+      clearInterval(iv);
+      callback();
+    } else if (waited >= maxWaitMs) {
+      clearInterval(iv);
+      console.error(`❌ ${fnName} nicht rechtzeitig verfügbar`);
+    }
+  }, 30);
+}
+
 async function loadPageData(page) {
   try {
     // Temporäre Daten löschen wenn wir nicht zur Karte gehen
@@ -39285,6 +39369,69 @@ window.showImportProgress = showImportProgress;
 window.updateImportProgress = updateImportProgress;
 window.hideImportProgress = hideImportProgress;
 
+// ==================== IMPORT TOAST (oben rechts) ====================
+(function() {
+  let _toastStart = 0;
+
+  window.showImportToast = function(totalItems) {
+    _toastStart = Date.now();
+    const t = document.getElementById('importToast');
+    if (!t) return;
+    t.classList.remove('done');
+    const spinner = document.getElementById('importToastSpinner');
+    if (spinner) { spinner.style.borderTopColor = 'var(--accent)'; spinner.style.animation = 'spin 1s linear infinite'; }
+    document.getElementById('importToastPct').style.color = 'var(--accent)';
+    document.getElementById('importToastPct').textContent = '0%';
+    document.getElementById('importToastBar').style.width = '0%';
+    document.getElementById('importToastBar').style.background = 'linear-gradient(90deg, var(--accent), var(--accent-2))';
+    document.getElementById('importToastCount').textContent = `0 / ${totalItems}`;
+    document.getElementById('importToastEta').textContent = '–';
+    t.classList.add('visible');
+  };
+
+  window.updateImportToast = function(pct, current, total, label) {
+    const t = document.getElementById('importToast');
+    if (!t || !t.classList.contains('visible')) return;
+    const p = Math.max(0, Math.min(Math.round(pct), 99));
+    document.getElementById('importToastPct').textContent = p + '%';
+    document.getElementById('importToastBar').style.width = p + '%';
+    if (label) document.getElementById('importToastCount').textContent = label;
+
+    // ETA – erst nach 2% berechnen für sinnvollere Werte
+    if (p >= 2) {
+      const elapsed = (Date.now() - _toastStart) / 1000;
+      const totalEst = elapsed / (p / 100);
+      const remaining = Math.max(0, totalEst - elapsed);
+      let eta;
+      if (remaining < 4)       eta = 'Fast fertig…';
+      else if (remaining < 60) eta = `~${Math.round(remaining)} Sek.`;
+      else                     eta = `~${Math.ceil(remaining / 60)} Min.`;
+      document.getElementById('importToastEta').textContent = eta;
+    }
+  };
+
+  window.hideImportToast = function(delay) {
+    const ms = (delay !== undefined) ? delay : 2500;
+    const t = document.getElementById('importToast');
+    if (!t) return;
+    // Zeige 100% + grünen Abschluss
+    t.classList.add('done');
+    const spinner = document.getElementById('importToastSpinner');
+    if (spinner) spinner.style.animation = 'none';
+    document.getElementById('importToastPct').textContent = '100%';
+    document.getElementById('importToastPct').style.color = 'var(--success)';
+    document.getElementById('importToastBar').style.width = '100%';
+    document.getElementById('importToastBar').style.background = 'var(--success)';
+    document.getElementById('importToastEta').textContent = '✓ Fertig';
+    document.getElementById('importToastEta').style.color = 'var(--success)';
+    setTimeout(() => {
+      t.classList.remove('visible', 'done');
+      document.getElementById('importToastEta').style.color = '';
+    }, ms);
+  };
+})();
+// ==================== ENDE IMPORT TOAST ====================
+
 // ==================== ENDE IMPORT PROGRESS ====================
 
 // ==================== BILDKOMPRIMIERUNG ====================
@@ -40068,6 +40215,22 @@ if(document.readyState==="loading"){
       <button type="button" class="btn ghost" onclick="closeEditModal()">Abbrechen</button>
       <button type="submit" form="editObservationForm" class="btn">💾 Speichern</button>
     </div>
+<!-- Import Toast – oben rechts -->
+<div id="importToast">
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">
+    <div id="importToastSpinner" class="import-spinner" style="width:15px;height:15px;border-width:2px;flex-shrink:0;"></div>
+    <span style="font-weight:700;font-size:13px;letter-spacing:-0.1px;">🦅 Ornitho Import</span>
+    <span id="importToastPct" style="margin-left:auto;font-size:15px;font-weight:800;color:var(--accent);min-width:36px;text-align:right;">0%</span>
+  </div>
+  <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:8px;">
+    <div id="importToastBar"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);">
+    <span id="importToastCount">Starte...</span>
+    <span id="importToastEta" style="color:var(--accent);font-weight:600;">–</span>
+  </div>
+</div>
+
 <!-- Import Progress Overlay -->
 <div id="importProgressOverlay" class="import-progress-overlay">
   <div class="import-progress-content">
