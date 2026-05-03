@@ -2342,39 +2342,38 @@
     /* Import Toast – oben rechts, nicht-blockierend */
     /* Import-Übersicht Modal */
     #importToast {
-      position: fixed;
-      inset: 0;
-      z-index: 20000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(2, 6, 23, 0.75);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 999999 !important;
+      display: none !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 20px !important;
+      background: rgba(2, 6, 23, 0.82) !important;
+      box-sizing: border-box !important;
+      margin: 0 !important;
+      transform: none !important;
     }
     #importToast.visible {
-      opacity: 1;
-      pointer-events: all;
+      display: flex !important;
+      pointer-events: all !important;
     }
     #importToastCard {
-      background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      border: 1px solid rgba(6,182,212,0.3);
+      background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      border: 1px solid rgba(6,182,212,0.35);
       border-radius: 24px;
       padding: 36px 40px 32px;
       min-width: 320px;
       max-width: 380px;
       width: 100%;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(6,182,212,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
-      transform: scale(0.92) translateY(12px);
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(6,182,212,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
       text-align: center;
-    }
-    #importToast.visible #importToastCard {
-      transform: scale(1) translateY(0);
+      position: relative;
     }
     #importToast.done #importToastCard {
       border-color: rgba(16,185,129,0.4);
