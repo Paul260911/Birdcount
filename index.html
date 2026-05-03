@@ -39419,7 +39419,18 @@ window.hideImportProgress = hideImportProgress;
     }
   }
 
+  // Stelle sicher dass #importToast direkt in <body> hängt
+  function _ensureToastInBody() {
+    const t = document.getElementById('importToast');
+    if (!t) return;
+    if (t.parentElement !== document.body) {
+      document.body.appendChild(t);
+      console.log('🦅 importToast nach body verschoben');
+    }
+  }
+
   window.showImportToast = function(totalItems) {
+    _ensureToastInBody();
     _toastStart = Date.now();
     const t = document.getElementById('importToast');
     if (!t) return;
