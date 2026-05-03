@@ -2340,38 +2340,77 @@
     }
 
     /* Import Toast – oben rechts, nicht-blockierend */
+    /* Import-Übersicht Modal */
     #importToast {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      inset: 0;
       z-index: 20000;
-      background: var(--card);
-      border: 1px solid rgba(6,182,212,0.35);
-      border-radius: 14px;
-      padding: 14px 16px;
-      min-width: 260px;
-      max-width: 300px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(6,182,212,0.08);
-      transform: translateY(-130%) scale(0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(2, 6, 23, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       opacity: 0;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
       pointer-events: none;
+      transition: opacity 0.3s ease;
     }
     #importToast.visible {
-      transform: translateY(0) scale(1);
       opacity: 1;
+      pointer-events: all;
     }
-    #importToast.done {
+    #importToastCard {
+      background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(6,182,212,0.3);
+      border-radius: 24px;
+      padding: 36px 40px 32px;
+      min-width: 320px;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(6,182,212,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+      transform: scale(0.92) translateY(12px);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      text-align: center;
+    }
+    #importToast.visible #importToastCard {
+      transform: scale(1) translateY(0);
+    }
+    #importToast.done #importToastCard {
       border-color: rgba(16,185,129,0.4);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,185,129,0.1);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 30px rgba(16,185,129,0.15), 0 0 0 1px rgba(16,185,129,0.12);
     }
+
+    /* Kreisring */
+    #importRingTrack { stroke: rgba(255,255,255,0.06); }
+    #importRingFill {
+      stroke: url(#importRingGrad);
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: center;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    #importToast.done #importRingFill { stroke: var(--success); }
+
+    /* Fortschrittsbalken */
     #importToastBar {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      transition: width 0.4s ease;
-      border-radius: 3px;
+      transition: width 0.5s ease;
+      border-radius: 4px;
     }
+    #importToast.done #importToastBar {
+      background: var(--success);
+    }
+
+    /* Vogel-Puls-Animation */
+    @keyframes birdPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+    }
+    #importBirdEmoji { animation: birdPulse 1.8s ease-in-out infinite; display: inline-block; }
+    #importToast.done #importBirdEmoji { animation: none; }
     
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -39373,6 +39412,15 @@ window.hideImportProgress = hideImportProgress;
 (function() {
   let _toastStart = 0;
 
+  // Hilfsfunktion: Kreisring-Fortschritt setzen (Umfang = 2π*58 ≈ 364.4)
+  const _ringCircumference = 364.4;
+  function _setRing(pct) {
+    const ring = document.getElementById('importRingFill');
+    if (ring) {
+      ring.style.strokeDashoffset = _ringCircumference * (1 - pct / 100);
+    }
+  }
+
   window.showImportToast = function(totalItems) {
     _toastStart = Date.now();
     const t = document.getElementById('importToast');
@@ -39386,6 +39434,8 @@ window.hideImportProgress = hideImportProgress;
     document.getElementById('importToastBar').style.background = 'linear-gradient(90deg, var(--accent), var(--accent-2))';
     document.getElementById('importToastCount').textContent = `0 / ${totalItems}`;
     document.getElementById('importToastEta').textContent = '–';
+    document.getElementById('importToastEta').style.color = 'var(--accent)';
+    _setRing(0);
     t.classList.add('visible');
   };
 
@@ -39395,6 +39445,7 @@ window.hideImportProgress = hideImportProgress;
     const p = Math.max(0, Math.min(Math.round(pct), 99));
     document.getElementById('importToastPct').textContent = p + '%';
     document.getElementById('importToastBar').style.width = p + '%';
+    _setRing(p);
     if (label) document.getElementById('importToastCount').textContent = label;
 
     // ETA – erst nach 2% berechnen für sinnvollere Werte
@@ -39424,6 +39475,7 @@ window.hideImportProgress = hideImportProgress;
     document.getElementById('importToastBar').style.background = 'var(--success)';
     document.getElementById('importToastEta').textContent = '✓ Fertig';
     document.getElementById('importToastEta').style.color = 'var(--success)';
+    _setRing(100);
     setTimeout(() => {
       t.classList.remove('visible', 'done');
       document.getElementById('importToastEta').style.color = '';
@@ -40216,18 +40268,61 @@ if(document.readyState==="loading"){
       <button type="submit" form="editObservationForm" class="btn">💾 Speichern</button>
     </div>
 <!-- Import Toast – oben rechts -->
+<!-- Import-Übersicht Modal -->
 <div id="importToast">
-  <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">
-    <div id="importToastSpinner" class="import-spinner" style="width:15px;height:15px;border-width:2px;flex-shrink:0;"></div>
-    <span style="font-weight:700;font-size:13px;letter-spacing:-0.1px;">🦅 Ornitho Import</span>
-    <span id="importToastPct" style="margin-left:auto;font-size:15px;font-weight:800;color:var(--accent);min-width:36px;text-align:right;">0%</span>
-  </div>
-  <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:8px;">
-    <div id="importToastBar"></div>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);">
-    <span id="importToastCount">Starte...</span>
-    <span id="importToastEta" style="color:var(--accent);font-weight:600;">–</span>
+  <div id="importToastCard">
+
+    <!-- Titel -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;">
+      <span id="importBirdEmoji" style="font-size:26px;">🦅</span>
+      <span style="font-weight:700;font-size:16px;letter-spacing:-0.2px;color:var(--text);">Ornitho.de Import</span>
+      <div id="importToastSpinner" class="import-spinner" style="width:14px;height:14px;border-width:2px;flex-shrink:0;margin-left:4px;"></div>
+    </div>
+
+    <!-- Kreisring-Fortschritt -->
+    <div style="position:relative;width:140px;height:140px;margin:0 auto 20px;">
+      <svg width="140" height="140" viewBox="0 0 140 140" style="transform:rotate(0deg);">
+        <defs>
+          <linearGradient id="importRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--accent)"/>
+            <stop offset="100%" stop-color="var(--accent-2)"/>
+          </linearGradient>
+        </defs>
+        <!-- Hintergrundring -->
+        <circle id="importRingTrack" cx="70" cy="70" r="58"
+          fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+        <!-- Fortschrittsring -->
+        <circle id="importRingFill" cx="70" cy="70" r="58"
+          fill="none" stroke="url(#importRingGrad)" stroke-width="10"
+          stroke-linecap="round"
+          stroke-dasharray="364.4"
+          stroke-dashoffset="364.4"
+          style="transform:rotate(-90deg);transform-origin:70px 70px;transition:stroke-dashoffset 0.5s ease;"/>
+      </svg>
+      <!-- Prozent in der Mitte -->
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <span id="importToastPct" style="font-size:30px;font-weight:900;color:var(--accent);line-height:1;letter-spacing:-1px;">0%</span>
+        <span style="font-size:10px;color:var(--muted);margin-top:3px;font-weight:500;">ÜBERTRAGEN</span>
+      </div>
+    </div>
+
+    <!-- Fortschrittsbalken -->
+    <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-bottom:16px;">
+      <div id="importToastBar"></div>
+    </div>
+
+    <!-- Zeilen-Counter + Restzeit -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
+      <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:4px;">DATENSÄTZE</div>
+        <div id="importToastCount" style="font-size:13px;font-weight:700;color:var(--text);">Starte...</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:4px;">RESTZEIT</div>
+        <div id="importToastEta" style="font-size:13px;font-weight:700;color:var(--accent);">–</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
