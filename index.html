@@ -27893,7 +27893,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         // Phase 1 (Parsen) = 0–50% bei Gruppen (wegen Speicher-Phase danach), 0–100% lokal
         const _parsePhaseMax = _isGroupImport ? 50 : 100;
         const _importToastStart = Date.now();
-        if (typeof showImportToast === 'function') showImportToast(_totalLines);
+        if (typeof window.showImportToast === 'function') window.showImportToast(_totalLines);
         
         // Parse Header
         const headers = lines[0].split('\t');
@@ -28015,9 +28015,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           if (!line) continue;
           
           // Toast-Update alle 50 Zeilen (Phase 1)
-          if ((i - 2) % 50 === 0 && typeof updateImportToast === 'function') {
+          if ((i - 2) % 50 === 0 && typeof window.updateImportToast === 'function') {
             const parsePct = _totalLines > 0 ? ((i - 2) / _totalLines) * _parsePhaseMax : 0;
-            updateImportToast(parsePct, i - 2, _totalLines, `${i - 2} / ${_totalLines} Zeilen gelesen`);
+            window.updateImportToast(parsePct, i - 2, _totalLines, `${i - 2} / ${_totalLines} Zeilen gelesen`);
           }
           
           const values = line.split('\t');
@@ -28224,7 +28224,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
                 `Chunk ${chunkIndex + 1}/${totalChunks} gespeichert`);
               
               // Update Toast (Phase 2: 50–100%)
-              if (typeof updateImportToast === 'function') {
+              if (typeof window.updateImportToast === 'function') {
                 const toastPct = 50 + Math.round((savedCount / totalObservations) * 50);
                 updateImportToast(toastPct, savedCount, totalObservations,
                   `${savedCount} / ${totalObservations} gespeichert`);
@@ -28411,15 +28411,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         delete window.ornithoImportTargetGroup;
         
         // Toast abschließen
-        if (typeof hideImportToast === 'function') hideImportToast(2500);
+        if (typeof window.hideImportToast === 'function') window.hideImportToast(2500);
         
       } catch (error) {
         console.error('Ornitho.de Import fehlgeschlagen:', error);
         showNotification('❌ Import fehlgeschlagen: ' + error.message, 5000);
         
         // Toast schließen auch bei Fehler
-        if (typeof hideImportToast === 'function') {
-          const t = document.getElementById('importToast');
+        if (typeof window.hideImportToast === 'function') {
           if (t) {
             document.getElementById('importToastCount').textContent = '❌ Fehler beim Import';
             document.getElementById('importToastEta').textContent = '';
