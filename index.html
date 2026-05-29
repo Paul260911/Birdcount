@@ -21834,7 +21834,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             ${stats.dailyData && stats.dailyData.length > 0 ? `
             <div class="list-chart-wrap" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);" onclick="event.stopPropagation()">
               <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">MELDUNGEN &amp; ARTEN PRO TAG</div>
-              <canvas id="listChart_${list.id}" height="60" style="width:100%;display:block;border-radius:6px;"></canvas>
+              <canvas id="listChart_${list.id}" height="68" style="width:100%;display:block;border-radius:6px;"></canvas>
               <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
                 <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
                 <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(124,58,237,0.85);border-radius:2px;display:inline-block;"></span>Arten</span>
@@ -21870,7 +21870,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       const W = rect.width || canvas.offsetWidth || 280;
-      const H = 60;
+      const H = 68;
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       canvas.style.width = W + 'px';
@@ -21880,77 +21880,76 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
 
       const obsVals = dailyData.map(d => d.obsCount);
       const spcVals = dailyData.map(d => d.speciesCount);
-      const maxVal = Math.max(...obsVals, ...spcVals, 1);
+      // Dual-Axis: jede Linie wird auf ihren eigenen Maximalwert skaliert
+      const maxObs = Math.max(...obsVals, 1);
+      const maxSpc = Math.max(...spcVals, 1);
       const n = dailyData.length;
-      const padL = 4, padR = 4, padT = 6, padB = 14;
+      const padL = 4, padR = 4, padT = 6, padB = 16;
       const cW = W - padL - padR;
       const cH = H - padT - padB;
 
-      // Achsenbeschriftung (erste und letzte Datum, gekürzt)
-      ctx.fillStyle = 'rgba(148,163,184,0.7)';
+      // Datumsbeschriftung X-Achse
+      ctx.fillStyle = 'rgba(148,163,184,0.65)';
       ctx.font = '9px Inter, sans-serif';
+      const fmt = d => d ? d.slice(5).replace('-', '.') : '';
       ctx.textAlign = 'left';
-      const fmt = d => d ? d.slice(5) : ''; // MM-DD
-      ctx.fillText(fmt(dailyData[0].date), padL, H - 2);
-      if (n > 1) {
-        ctx.textAlign = 'right';
-        ctx.fillText(fmt(dailyData[n-1].date), W - padR, H - 2);
-      }
-      if (n > 2) {
-        ctx.textAlign = 'center';
-        ctx.fillText(fmt(dailyData[Math.floor(n/2)].date), W/2, H - 2);
-      }
+      ctx.fillText(fmt(dailyData[0].date), padL, H - 3);
+      if (n > 1) { ctx.textAlign = 'right'; ctx.fillText(fmt(dailyData[n-1].date), W - padR, H - 3); }
+      if (n > 2) { ctx.textAlign = 'center'; ctx.fillText(fmt(dailyData[Math.floor(n/2)].date), W / 2, H - 3); }
 
       const xPos = i => padL + (n === 1 ? cW / 2 : (i / (n - 1)) * cW);
-      const yPos = v => padT + cH - (v / maxVal) * cH;
+      const yObs = v => padT + cH - (v / maxObs) * cH;
+      const ySpc = v => padT + cH - (v / maxSpc) * cH;
 
-      // Fläche unter Meldungen (Cyan, halbtransparent)
+      // --- Arten zuerst zeichnen (hinten) ---
+
+      // Fläche Arten (Lila)
       ctx.beginPath();
-      ctx.moveTo(xPos(0), yPos(0));
-      obsVals.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
-      ctx.lineTo(xPos(n-1), padT + cH);
+      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
+      ctx.lineTo(xPos(n - 1), padT + cH);
       ctx.lineTo(xPos(0), padT + cH);
       ctx.closePath();
-      const gradObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
-      gradObs.addColorStop(0, 'rgba(6,182,212,0.35)');
-      gradObs.addColorStop(1, 'rgba(6,182,212,0.03)');
-      ctx.fillStyle = gradObs;
-      ctx.fill();
-
-      // Linie Meldungen (Cyan)
-      ctx.beginPath();
-      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)));
-      ctx.strokeStyle = 'rgba(6,182,212,0.9)';
-      ctx.lineWidth = 1.8;
-      ctx.lineJoin = 'round';
-      ctx.stroke();
-
-      // Fläche unter Arten (Lila, halbtransparent)
-      ctx.beginPath();
-      ctx.moveTo(xPos(0), yPos(0));
-      spcVals.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
-      ctx.lineTo(xPos(n-1), padT + cH);
-      ctx.lineTo(xPos(0), padT + cH);
-      ctx.closePath();
-      const gradSpc = ctx.createLinearGradient(0, padT, 0, padT + cH);
-      gradSpc.addColorStop(0, 'rgba(124,58,237,0.3)');
-      gradSpc.addColorStop(1, 'rgba(124,58,237,0.02)');
-      ctx.fillStyle = gradSpc;
+      const gSpc = ctx.createLinearGradient(0, padT, 0, padT + cH);
+      gSpc.addColorStop(0, 'rgba(124,58,237,0.28)');
+      gSpc.addColorStop(1, 'rgba(124,58,237,0.02)');
+      ctx.fillStyle = gSpc;
       ctx.fill();
 
       // Linie Arten (Lila)
       ctx.beginPath();
-      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)));
-      ctx.strokeStyle = 'rgba(124,58,237,0.9)';
+      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
+      ctx.strokeStyle = 'rgba(124,58,237,0.85)';
       ctx.lineWidth = 1.8;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // --- Meldungen darüber zeichnen (vorne) ---
+
+      // Fläche Meldungen (Cyan)
+      ctx.beginPath();
+      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
+      ctx.lineTo(xPos(n - 1), padT + cH);
+      ctx.lineTo(xPos(0), padT + cH);
+      ctx.closePath();
+      const gObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
+      gObs.addColorStop(0, 'rgba(6,182,212,0.30)');
+      gObs.addColorStop(1, 'rgba(6,182,212,0.02)');
+      ctx.fillStyle = gObs;
+      ctx.fill();
+
+      // Linie Meldungen (Cyan) – dicker für bessere Sichtbarkeit
+      ctx.beginPath();
+      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
+      ctx.strokeStyle = 'rgba(6,182,212,1)';
+      ctx.lineWidth = 2.2;
       ctx.lineJoin = 'round';
       ctx.stroke();
 
       // Punkte bei einzelnem Tag
       if (n === 1) {
-        [[obsVals[0], 'rgba(6,182,212,1)'], [spcVals[0], 'rgba(124,58,237,1)']].forEach(([v, col], ci) => {
+        [[yObs(obsVals[0]), 'rgba(6,182,212,1)', -6], [ySpc(spcVals[0]), 'rgba(124,58,237,1)', 6]].forEach(([y, col, dx]) => {
           ctx.beginPath();
-          ctx.arc(xPos(0) + (ci === 0 ? -5 : 5), yPos(v), 3, 0, Math.PI * 2);
+          ctx.arc(xPos(0) + dx, y, 3.5, 0, Math.PI * 2);
           ctx.fillStyle = col;
           ctx.fill();
         });
@@ -23204,7 +23203,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             ${stats.dailyData && stats.dailyData.length > 0 ? `
             <div class="list-chart-wrap" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);" onclick="event.stopPropagation()">
               <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">MELDUNGEN &amp; ARTEN PRO TAG</div>
-              <canvas id="listChart_${list.id}" height="60" style="width:100%;display:block;border-radius:6px;"></canvas>
+              <canvas id="listChart_${list.id}" height="68" style="width:100%;display:block;border-radius:6px;"></canvas>
               <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
                 <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
                 <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(124,58,237,0.85);border-radius:2px;display:inline-block;"></span>Arten</span>
