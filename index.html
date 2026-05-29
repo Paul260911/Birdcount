@@ -21837,7 +21837,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               <canvas id="listChart_${list.id}" height="68" style="width:100%;display:block;border-radius:6px;"></canvas>
               <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
                 <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(124,58,237,0.85);border-radius:2px;display:inline-block;"></span>Arten</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(167,139,250,1);border-radius:2px;display:inline-block;"></span>Arten</span>
               </div>
             </div>` : ''}
           </div>
@@ -21901,47 +21901,30 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const yObs = v => padT + cH - (v / maxObs) * cH;
       const ySpc = v => padT + cH - (v / maxSpc) * cH;
 
-      // --- Arten zuerst zeichnen (hinten) ---
-
-      // Fläche Arten (Lila)
-      ctx.beginPath();
-      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
-      ctx.lineTo(xPos(n - 1), padT + cH);
-      ctx.lineTo(xPos(0), padT + cH);
-      ctx.closePath();
-      const gSpc = ctx.createLinearGradient(0, padT, 0, padT + cH);
-      gSpc.addColorStop(0, 'rgba(124,58,237,0.28)');
-      gSpc.addColorStop(1, 'rgba(124,58,237,0.02)');
-      ctx.fillStyle = gSpc;
-      ctx.fill();
-
-      // Linie Arten (Lila)
-      ctx.beginPath();
-      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
-      ctx.strokeStyle = 'rgba(124,58,237,0.85)';
-      ctx.lineWidth = 1.8;
-      ctx.lineJoin = 'round';
-      ctx.stroke();
-
-      // --- Meldungen darüber zeichnen (vorne) ---
-
-      // Fläche Meldungen (Cyan)
+      // --- Meldungen zuerst (hinten, nur Linie + dezente Fläche) ---
+      const gObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
+      gObs.addColorStop(0, 'rgba(6,182,212,0.15)');
+      gObs.addColorStop(1, 'rgba(6,182,212,0.01)');
       ctx.beginPath();
       obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
       ctx.lineTo(xPos(n - 1), padT + cH);
       ctx.lineTo(xPos(0), padT + cH);
       ctx.closePath();
-      const gObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
-      gObs.addColorStop(0, 'rgba(6,182,212,0.30)');
-      gObs.addColorStop(1, 'rgba(6,182,212,0.02)');
       ctx.fillStyle = gObs;
       ctx.fill();
 
-      // Linie Meldungen (Cyan) – dicker für bessere Sichtbarkeit
       ctx.beginPath();
       obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
       ctx.strokeStyle = 'rgba(6,182,212,1)';
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // --- Arten darüber (vorne, nur Linie ohne Fläche) ---
+      ctx.beginPath();
+      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
+      ctx.strokeStyle = 'rgba(167,139,250,1)';
+      ctx.lineWidth = 2;
       ctx.lineJoin = 'round';
       ctx.stroke();
 
@@ -23206,7 +23189,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               <canvas id="listChart_${list.id}" height="68" style="width:100%;display:block;border-radius:6px;"></canvas>
               <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
                 <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(124,58,237,0.85);border-radius:2px;display:inline-block;"></span>Arten</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(167,139,250,1);border-radius:2px;display:inline-block;"></span>Arten</span>
               </div>
             </div>` : ''}
             </div>
