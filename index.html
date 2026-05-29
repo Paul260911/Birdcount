@@ -11214,8 +11214,19 @@
     </div>
     
     <div class="list-observations-table">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h3 style="margin:0;">📊 Beobachtungen in dieser Liste</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h3 style="margin:0;">📊 Beobachtungen in dieser Liste</h3>
+          <!-- NEU: Neu-Arten-Filter -->
+          <button id="newSpeciesFilterBtn" onclick="toggleNewSpeciesFilter()" style="
+            padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);
+            background:transparent;color:var(--muted);cursor:pointer;font-weight:600;font-size:12px;
+            display:flex;align-items:center;gap:6px;white-space:nowrap;
+          " title="Zwischen allen Meldungen und nur neu hinzugekommenen Arten umschalten">
+            <span id="newSpeciesFilterIcon">⭐</span>
+            <span id="newSpeciesFilterLabel">Nur neue Arten</span>
+          </button>
+        </div>
         
         <!-- View Mode Toggle -->
         <div style="display:flex;gap:8px;background:rgba(255,255,255,0.02);padding:4px;border-radius:8px;">
@@ -22710,6 +22721,21 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         return a.bird.localeCompare(b.bird);
       });
       
+      // Filter-Zustand speichern für Toggle
+      window._currentFilteredObs = filteredObs;
+      window._currentList = list;
+
+      // Filter-Button zurücksetzen beim Öffnen einer neuen Liste
+      window.newSpeciesFilterActive = false;
+      const filterBtn = document.getElementById('newSpeciesFilterBtn');
+      if (filterBtn) {
+        filterBtn.style.background = 'transparent';
+        filterBtn.style.color = 'var(--muted)';
+        filterBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        document.getElementById('newSpeciesFilterIcon').textContent = '⭐';
+        document.getElementById('newSpeciesFilterLabel').textContent = 'Nur neue Arten';
+      }
+      
       const obsContainer = document.getElementById('listObservations');
       if (filteredObs.length === 0) {
         obsContainer.innerHTML = `
@@ -22724,7 +22750,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           </div>
         `;
       } else {
-        // Rendere je nach View Mode
+        // Rendere je nach View Mode (Filter wird beim Toggling angewendet, hier immer alle)
         if (viewMode === 'simple') {
           renderSimpleListView(filteredObs, list, obsContainer);
         } else if (viewMode === 'lifelist') {
@@ -23022,6 +23048,59 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       openListDetail(currentListId, viewMode);
     }
     
+    // NEU: Filter-Zustand für "Nur neue Arten"
+    window.newSpeciesFilterActive = false;
+    window._currentFilteredObs = [];
+    window._currentList = null;
+
+    function toggleNewSpeciesFilter() {
+      window.newSpeciesFilterActive = !window.newSpeciesFilterActive;
+      const btn = document.getElementById('newSpeciesFilterBtn');
+      const label = document.getElementById('newSpeciesFilterLabel');
+      const icon = document.getElementById('newSpeciesFilterIcon');
+      if (window.newSpeciesFilterActive) {
+        btn.style.background = 'linear-gradient(135deg,var(--accent),var(--accent-2))';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'transparent';
+        icon.textContent = '✨';
+        label.textContent = 'Nur neue Arten';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--muted)';
+        btn.style.borderColor = 'rgba(255,255,255,0.1)';
+        icon.textContent = '⭐';
+        label.textContent = 'Nur neue Arten';
+      }
+      // Ansicht neu rendern mit aktuellem Filter
+      const container = document.getElementById('listObservations');
+      const obs = window._currentFilteredObs;
+      const list = window._currentList;
+      if (!obs || !list) return;
+      const viewMode = window.currentListViewMode || 'observations';
+      const toRender = window.newSpeciesFilterActive ? filterFirstOccurrences(obs) : obs;
+      if (viewMode === 'simple') renderSimpleListView(toRender, list, container);
+      else if (viewMode === 'lifelist') renderLifeListView(toRender, list, container);
+      else renderObservationsView(toRender, list, container);
+    }
+
+    // Gibt nur Beobachtungen zurück, bei denen eine Art zum ersten Mal auftaucht (chronologisch)
+    function filterFirstOccurrences(observations) {
+      // Sortiere aufsteigend nach Datum für korrekte Erst-Nachweise
+      const sorted = [...observations].sort((a, b) => {
+        const dc = new Date(a.date) - new Date(b.date);
+        return dc !== 0 ? dc : a.bird.localeCompare(b.bird);
+      });
+      const seen = new Set();
+      const firstObs = sorted.filter(obs => {
+        const key = normalizeBirdName(obs.bird);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      // Zurück in absteigende Reihenfolge (neueste zuerst) für konsistente Anzeige
+      return firstObs.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+    
     function setLifeListSort(sortMode) {
       window.lifeListSortMode = sortMode;
       if (!currentListId) return;
@@ -23032,6 +23111,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     // Globale Funktionen verfügbar machen
     window.switchListView = switchListView;
     window.setLifeListSort = setLifeListSort;
+    window.toggleNewSpeciesFilter = toggleNewSpeciesFilter;
     
     function closeListDetail() {
       document.getElementById('listDetailView').style.display = 'none';
