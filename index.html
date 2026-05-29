@@ -21836,8 +21836,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">MELDUNGEN &amp; ARTEN PRO TAG</div>
               <canvas id="listChart_${list.id}" height="68" style="width:100%;display:block;border-radius:6px;"></canvas>
               <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(167,139,250,1);border-radius:2px;display:inline-block;"></span>Arten</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:2px;background:rgba(6,182,212,1);display:inline-block;"></span>Meldungen</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:0;border-top:2px dashed rgba(167,139,250,1);display:inline-block;"></span>Arten</span>
               </div>
             </div>` : ''}
           </div>
@@ -21901,32 +21901,25 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       const yObs = v => padT + cH - (v / maxObs) * cH;
       const ySpc = v => padT + cH - (v / maxSpc) * cH;
 
-      // --- Meldungen zuerst (hinten, nur Linie + dezente Fläche) ---
-      const gObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
-      gObs.addColorStop(0, 'rgba(6,182,212,0.15)');
-      gObs.addColorStop(1, 'rgba(6,182,212,0.01)');
-      ctx.beginPath();
-      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
-      ctx.lineTo(xPos(n - 1), padT + cH);
-      ctx.lineTo(xPos(0), padT + cH);
-      ctx.closePath();
-      ctx.fillStyle = gObs;
-      ctx.fill();
-
+      // --- Nur Linien, keine Flächen ---
+      // Meldungen: durchgezogene Cyan-Linie
       ctx.beginPath();
       obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
       ctx.strokeStyle = 'rgba(6,182,212,1)';
       ctx.lineWidth = 2;
       ctx.lineJoin = 'round';
+      ctx.setLineDash([]);
       ctx.stroke();
 
-      // --- Arten darüber (vorne, nur Linie ohne Fläche) ---
+      // Arten: gestrichelte Lila-Linie
       ctx.beginPath();
       spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
       ctx.strokeStyle = 'rgba(167,139,250,1)';
       ctx.lineWidth = 2;
       ctx.lineJoin = 'round';
+      ctx.setLineDash([4, 3]);
       ctx.stroke();
+      ctx.setLineDash([]);
 
       // Punkte bei einzelnem Tag
       if (n === 1) {
@@ -23188,8 +23181,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">MELDUNGEN &amp; ARTEN PRO TAG</div>
               <canvas id="listChart_${list.id}" height="68" style="width:100%;display:block;border-radius:6px;"></canvas>
               <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
-                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(167,139,250,1);border-radius:2px;display:inline-block;"></span>Arten</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:2px;background:rgba(6,182,212,1);display:inline-block;"></span>Meldungen</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:0;border-top:2px dashed rgba(167,139,250,1);display:inline-block;"></span>Arten</span>
               </div>
             </div>` : ''}
             </div>
