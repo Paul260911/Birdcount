@@ -21831,14 +21831,132 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               <button class="small-btn" onclick="event.stopPropagation(); openListDetail('${list.id}')" style="flex:1;">📋 Anzeigen</button>
               <button class="small-btn" onclick="event.stopPropagation(); exportList('${list.id}')" style="background: ${list.color};">📤</button>
             </div>
+            ${stats.dailyData && stats.dailyData.length > 0 ? `
+            <div class="list-chart-wrap" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);" onclick="event.stopPropagation()">
+              <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">MELDUNGEN &amp; ARTEN PRO TAG</div>
+              <canvas id="listChart_${list.id}" height="60" style="width:100%;display:block;border-radius:6px;"></canvas>
+              <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(124,58,237,0.85);border-radius:2px;display:inline-block;"></span>Arten</span>
+              </div>
+            </div>` : ''}
           </div>
         `;
       });
       
       listsGrid.innerHTML = html;
+      
+      // Diagramme nach Layout-Berechnung rendern
+      window._listDailyDataMap = window._listDailyDataMap || {};
+      sortedLists.forEach((list) => {
+        const originalIndex = userLists.findIndex(l => l.id === list.id);
+        const s = allStats[originalIndex];
+        if (s && s.dailyData && s.dailyData.length > 0) {
+          window._listDailyDataMap[list.id] = s.dailyData;
+        }
+      });
+      requestAnimationFrame(() => {
+        sortedLists.forEach((list) => {
+          const d = window._listDailyDataMap[list.id];
+          if (d) renderListMiniChart(list.id, d);
+        });
+      });
     }
-    
-    // Hilfsfunktion: Normalisiere Vogelnamen für konsistente Zählung
+
+    // Mini-Diagramm für eine Listenkarte rendern (Meldungen + Arten pro Tag)
+    function renderListMiniChart(listId, dailyData) {
+      const canvas = document.getElementById('listChart_' + listId);
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const W = rect.width || canvas.offsetWidth || 280;
+      const H = 60;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const obsVals = dailyData.map(d => d.obsCount);
+      const spcVals = dailyData.map(d => d.speciesCount);
+      const maxVal = Math.max(...obsVals, ...spcVals, 1);
+      const n = dailyData.length;
+      const padL = 4, padR = 4, padT = 6, padB = 14;
+      const cW = W - padL - padR;
+      const cH = H - padT - padB;
+
+      // Achsenbeschriftung (erste und letzte Datum, gekürzt)
+      ctx.fillStyle = 'rgba(148,163,184,0.7)';
+      ctx.font = '9px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      const fmt = d => d ? d.slice(5) : ''; // MM-DD
+      ctx.fillText(fmt(dailyData[0].date), padL, H - 2);
+      if (n > 1) {
+        ctx.textAlign = 'right';
+        ctx.fillText(fmt(dailyData[n-1].date), W - padR, H - 2);
+      }
+      if (n > 2) {
+        ctx.textAlign = 'center';
+        ctx.fillText(fmt(dailyData[Math.floor(n/2)].date), W/2, H - 2);
+      }
+
+      const xPos = i => padL + (n === 1 ? cW / 2 : (i / (n - 1)) * cW);
+      const yPos = v => padT + cH - (v / maxVal) * cH;
+
+      // Fläche unter Meldungen (Cyan, halbtransparent)
+      ctx.beginPath();
+      ctx.moveTo(xPos(0), yPos(0));
+      obsVals.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
+      ctx.lineTo(xPos(n-1), padT + cH);
+      ctx.lineTo(xPos(0), padT + cH);
+      ctx.closePath();
+      const gradObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
+      gradObs.addColorStop(0, 'rgba(6,182,212,0.35)');
+      gradObs.addColorStop(1, 'rgba(6,182,212,0.03)');
+      ctx.fillStyle = gradObs;
+      ctx.fill();
+
+      // Linie Meldungen (Cyan)
+      ctx.beginPath();
+      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)));
+      ctx.strokeStyle = 'rgba(6,182,212,0.9)';
+      ctx.lineWidth = 1.8;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Fläche unter Arten (Lila, halbtransparent)
+      ctx.beginPath();
+      ctx.moveTo(xPos(0), yPos(0));
+      spcVals.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
+      ctx.lineTo(xPos(n-1), padT + cH);
+      ctx.lineTo(xPos(0), padT + cH);
+      ctx.closePath();
+      const gradSpc = ctx.createLinearGradient(0, padT, 0, padT + cH);
+      gradSpc.addColorStop(0, 'rgba(124,58,237,0.3)');
+      gradSpc.addColorStop(1, 'rgba(124,58,237,0.02)');
+      ctx.fillStyle = gradSpc;
+      ctx.fill();
+
+      // Linie Arten (Lila)
+      ctx.beginPath();
+      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)));
+      ctx.strokeStyle = 'rgba(124,58,237,0.9)';
+      ctx.lineWidth = 1.8;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Punkte bei einzelnem Tag
+      if (n === 1) {
+        [[obsVals[0], 'rgba(6,182,212,1)'], [spcVals[0], 'rgba(124,58,237,1)']].forEach(([v, col], ci) => {
+          ctx.beginPath();
+          ctx.arc(xPos(0) + (ci === 0 ? -5 : 5), yPos(v), 3, 0, Math.PI * 2);
+          ctx.fillStyle = col;
+          ctx.fill();
+        });
+      }
+    }
+
     function normalizeBirdName(birdName) {
       if (!birdName || typeof birdName !== 'string') return '';
       return birdName.trim().toLowerCase();
@@ -21895,15 +22013,30 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         
         // Nur tickbare Arten zählen
         const tickableObs = filteredObs.filter(o => o.tickable !== false);
+
+        // Tages-Daten für Diagramm berechnen
+        const dayMap = {};
+        filteredObs.forEach(o => {
+          if (!o.date) return;
+          if (!dayMap[o.date]) dayMap[o.date] = { obs: 0, birds: new Set() };
+          dayMap[o.date].obs++;
+          if (o.bird) dayMap[o.date].birds.add(normalizeBirdName(o.bird));
+        });
+        const dailyData = Object.keys(dayMap).sort().map(date => ({
+          date,
+          obsCount: dayMap[date].obs,
+          speciesCount: dayMap[date].birds.size
+        }));
         
         return {
-          observationCount: filteredObs.length, // Alle Beobachtungen
-          speciesCount: countUniqueSpecies(tickableObs), // Nur tickbare Arten
-          daysCount: new Set(filteredObs.map(o => o.date)).size
+          observationCount: filteredObs.length,
+          speciesCount: countUniqueSpecies(tickableObs),
+          daysCount: new Set(filteredObs.map(o => o.date)).size,
+          dailyData
         };
       } catch (error) {
         console.error('Fehler beim Berechnen der Listen-Statistiken:', error);
-        return { observationCount: 0, speciesCount: 0, daysCount: 0 };
+        return { observationCount: 0, speciesCount: 0, daysCount: 0, dailyData: [] };
       }
     }
     
@@ -23068,12 +23201,32 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
               </button>
               <button class="small-btn" onclick="event.stopPropagation(); openListDetail('${list.id}')" style="flex:1;">📋 Anzeigen</button>
               <button class="small-btn" onclick="event.stopPropagation(); exportList('${list.id}')" style="background: ${list.color};">📤</button>
+            ${stats.dailyData && stats.dailyData.length > 0 ? `
+            <div class="list-chart-wrap" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);" onclick="event.stopPropagation()">
+              <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">MELDUNGEN &amp; ARTEN PRO TAG</div>
+              <canvas id="listChart_${list.id}" height="60" style="width:100%;display:block;border-radius:6px;"></canvas>
+              <div style="display:flex;gap:14px;margin-top:5px;font-size:10px;color:var(--muted);">
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(6,182,212,0.85);border-radius:2px;display:inline-block;"></span>Meldungen</span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:3px;background:rgba(124,58,237,0.85);border-radius:2px;display:inline-block;"></span>Arten</span>
+              </div>
+            </div>` : ''}
             </div>
           </div>
         `;
       });
       
       listsGrid.innerHTML = html;
+      
+      // Diagramme für gefilterte Listen rendern
+      const filteredDailyMap = {};
+      sortedFilteredLists.forEach((list) => {
+        const origIdx = filteredLists.findIndex(l => l.id === list.id);
+        const s = allStats[origIdx];
+        if (s && s.dailyData && s.dailyData.length > 0) filteredDailyMap[list.id] = s.dailyData;
+      });
+      requestAnimationFrame(() => {
+        Object.entries(filteredDailyMap).forEach(([id, data]) => renderListMiniChart(id, data));
+      });
     }
     
     // Hilfsfunktion: Beobachtung auf Karte zeigen
