@@ -21793,6 +21793,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             ${isPinned ? '<div class="pin-indicator">📌</div>' : ''}
             <div class="list-header">
               <h3 class="list-title">${escapeHtml(list.name)}</h3>
+              ${stats.daysCount > 0 ? `<span style="margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;" title="Tage mit Beobachtungen in diesem Listengebiet">📅 ${stats.daysCount} ${stats.daysCount === 1 ? 'Tag' : 'Tage'}</span>` : ''}
               <span class="list-badge" style="background: ${list.color};">
                 ${isGroupMode ? '👤 Persönlich' : (list.type === 'personal' ? 'Persönlich' : 'Geteilt')}
               </span>
@@ -23033,6 +23034,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             ${isPinned ? '<div class="pin-indicator">📌</div>' : ''}
             <div class="list-header">
               <h3 class="list-title">${escapeHtml(list.name)}</h3>
+              ${stats.daysCount > 0 ? `<span style="margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;" title="Tage mit Beobachtungen in diesem Listengebiet">📅 ${stats.daysCount} ${stats.daysCount === 1 ? 'Tag' : 'Tage'}</span>` : ''}
               <span class="list-badge" style="background: ${list.color};">${list.type === 'personal' ? 'Persönlich' : 'Geteilt'}</span>
             </div>
             
