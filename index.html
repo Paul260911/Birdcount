@@ -11196,6 +11196,23 @@
       </div>
     </div>
     
+    <!-- Tages-Diagramm -->
+    <div id="listDetailChartSection" class="card" style="margin-bottom:18px;display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="margin:0;font-size:15px;">📈 Meldungen &amp; Arten pro Tag</h3>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--muted);">
+          <span style="display:flex;align-items:center;gap:5px;">
+            <span style="width:14px;height:2px;background:rgba(6,182,212,1);display:inline-block;border-radius:2px;"></span>Meldungen
+          </span>
+          <span style="display:flex;align-items:center;gap:5px;">
+            <span style="width:14px;height:0;border-top:2px dashed rgba(167,139,250,1);display:inline-block;"></span>Arten
+          </span>
+        </div>
+      </div>
+      <canvas id="listDetailChart" style="width:100%;display:block;border-radius:6px;" height="120"></canvas>
+      <div id="listDetailChartXAxis" style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted);padding:0 2px;"></div>
+    </div>
+    
     <div class="list-observations-table">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h3 style="margin:0;">📊 Beobachtungen in dieser Liste</h3>
@@ -21932,6 +21949,114 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
     }
 
+    function renderListDetailChart(dailyData) {
+      const section = document.getElementById('listDetailChartSection');
+      if (!dailyData || dailyData.length === 0) { section.style.display = 'none'; return; }
+      section.style.display = 'block';
+
+      const canvas = document.getElementById('listDetailChart');
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.offsetWidth || section.offsetWidth - 32 || 600;
+      const H = 120;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const obsVals = dailyData.map(d => d.obsCount);
+      const spcVals = dailyData.map(d => d.speciesCount);
+      const maxObs = Math.max(...obsVals, 1);
+      const maxSpc = Math.max(...spcVals, 1);
+      const n = dailyData.length;
+      const padL = 36, padR = 12, padT = 10, padB = 8;
+      const cW = W - padL - padR;
+      const cH = H - padT - padB;
+
+      // Hintergrund-Rasterlinien
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 1;
+      [0.25, 0.5, 0.75, 1].forEach(t => {
+        const y = padT + cH - t * cH;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + cW, y); ctx.stroke();
+      });
+
+      // Y-Achse Meldungen (links, Cyan)
+      ctx.fillStyle = 'rgba(6,182,212,0.7)';
+      ctx.font = `${9 * Math.min(1, W/400)}px Inter, sans-serif`;
+      ctx.textAlign = 'right';
+      [0, 0.5, 1].forEach(t => {
+        const val = Math.round(t * maxObs);
+        const y = padT + cH - t * cH;
+        ctx.fillText(val, padL - 4, y + 3);
+      });
+
+      // Y-Achse Arten (rechts, Lila)
+      ctx.fillStyle = 'rgba(167,139,250,0.7)';
+      ctx.textAlign = 'left';
+      [0, 0.5, 1].forEach(t => {
+        const val = Math.round(t * maxSpc);
+        const y = padT + cH - t * cH;
+        ctx.fillText(val, W - padR + 3, y + 3);
+      });
+
+      const xPos = i => padL + (n === 1 ? cW / 2 : (i / (n - 1)) * cW);
+      const yObs = v => padT + cH - (v / maxObs) * cH;
+      const ySpc = v => padT + cH - (v / maxSpc) * cH;
+
+      // Fläche Meldungen
+      const gObs = ctx.createLinearGradient(0, padT, 0, padT + cH);
+      gObs.addColorStop(0, 'rgba(6,182,212,0.18)');
+      gObs.addColorStop(1, 'rgba(6,182,212,0.01)');
+      ctx.beginPath();
+      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
+      ctx.lineTo(xPos(n-1), padT + cH); ctx.lineTo(xPos(0), padT + cH); ctx.closePath();
+      ctx.fillStyle = gObs; ctx.fill();
+
+      // Linie Meldungen
+      ctx.beginPath();
+      obsVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), yObs(v)) : ctx.lineTo(xPos(i), yObs(v)));
+      ctx.strokeStyle = 'rgba(6,182,212,1)'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+      ctx.setLineDash([]); ctx.stroke();
+
+      // Linie Arten (gestrichelt, oben drüber)
+      ctx.beginPath();
+      spcVals.forEach((v, i) => i === 0 ? ctx.moveTo(xPos(i), ySpc(v)) : ctx.lineTo(xPos(i), ySpc(v)));
+      ctx.strokeStyle = 'rgba(167,139,250,1)'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+      ctx.setLineDash([5, 4]); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Punkte bei Hover-ähnlicher Markierung: kleine Kreise an jedem Datenpunkt wenn n <= 30
+      if (n <= 30) {
+        obsVals.forEach((v, i) => {
+          ctx.beginPath(); ctx.arc(xPos(i), yObs(v), 2.5, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(6,182,212,1)'; ctx.fill();
+        });
+        spcVals.forEach((v, i) => {
+          ctx.beginPath(); ctx.arc(xPos(i), ySpc(v), 2.5, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(167,139,250,1)'; ctx.fill();
+        });
+      }
+
+      // X-Achse Beschriftung
+      const xAxisEl = document.getElementById('listDetailChartXAxis');
+      const fmt = d => d ? d.slice(5).replace('-', '.') : '';
+      if (n === 1) {
+        xAxisEl.innerHTML = `<span>${fmt(dailyData[0].date)}</span>`;
+      } else if (n <= 10) {
+        xAxisEl.innerHTML = dailyData.map(d => `<span>${fmt(d.date)}</span>`).join('');
+        xAxisEl.style.justifyContent = 'space-between';
+      } else {
+        const step = Math.ceil(n / 6);
+        const labels = [];
+        for (let i = 0; i < n; i += step) labels.push(fmt(dailyData[i].date));
+        if (fmt(dailyData[n-1].date) !== labels[labels.length-1]) labels.push(fmt(dailyData[n-1].date));
+        xAxisEl.innerHTML = labels.map(l => `<span>${l}</span>`).join('');
+        xAxisEl.style.justifyContent = 'space-between';
+      }
+    }
+
     function normalizeBirdName(birdName) {
       if (!birdName || typeof birdName !== 'string') return '';
       return birdName.trim().toLowerCase();
@@ -22565,6 +22690,18 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       
       const filteredObs = await filterObservationsByList(observations, list);
       
+      // Tages-Diagramm berechnen und rendern
+      const dayMapDetail = {};
+      filteredObs.forEach(o => {
+        if (!o.date) return;
+        if (!dayMapDetail[o.date]) dayMapDetail[o.date] = { obs: 0, birds: new Set() };
+        dayMapDetail[o.date].obs++;
+        if (o.bird) dayMapDetail[o.date].birds.add(normalizeBirdName(o.bird));
+      });
+      const dailyDataDetail = Object.keys(dayMapDetail).sort().map(date => ({
+        date, obsCount: dayMapDetail[date].obs, speciesCount: dayMapDetail[date].birds.size
+      }));
+      
       // WICHTIG: Sortiere Beobachtungen nach Datum (neueste zuerst) für konsistente Reihenfolge
       filteredObs.sort((a, b) => {
         const dateCompare = new Date(b.date) - new Date(a.date);
@@ -22598,6 +22735,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
       
       document.getElementById('listDetailView').style.display = 'block';
+      
+      // Diagramm rendern nachdem View sichtbar und Layout berechnet ist
+      setTimeout(() => renderListDetailChart(dailyDataDetail), 80);
     }
     
     function renderSimpleListView(filteredObs, list, container) {
