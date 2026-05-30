@@ -22828,15 +22828,19 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       window._currentFilteredObs = filteredObs;
       window._currentList = list;
 
-      // Filter-Button zurücksetzen beim Öffnen einer neuen Liste
-      window.newSpeciesFilterActive = false;
-      const filterBtn = document.getElementById('newSpeciesFilterBtn');
-      if (filterBtn) {
-        filterBtn.style.background = 'transparent';
-        filterBtn.style.color = 'var(--muted)';
-        filterBtn.style.borderColor = 'rgba(255,255,255,0.1)';
-        document.getElementById('newSpeciesFilterIcon').textContent = '⭐';
-        document.getElementById('newSpeciesFilterLabel').textContent = 'Nur neue Arten';
+      // Filter-Button nur zurücksetzen wenn es eine NEUE Liste ist (nicht beim Toggle-Reload)
+      const isNewList = window._currentListIdForFilter !== listId;
+      if (isNewList) {
+        window.newSpeciesFilterActive = false;
+        window._currentListIdForFilter = listId;
+        const filterBtn = document.getElementById('newSpeciesFilterBtn');
+        if (filterBtn) {
+          filterBtn.style.background = 'transparent';
+          filterBtn.style.color = 'var(--muted)';
+          filterBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+          document.getElementById('newSpeciesFilterIcon').textContent = '⭐';
+          document.getElementById('newSpeciesFilterLabel').textContent = 'Nur neue Arten';
+        }
       }
       
       const obsContainer = document.getElementById('listObservations');
@@ -22853,13 +22857,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           </div>
         `;
       } else {
-        // Rendere je nach View Mode (Filter wird beim Toggling angewendet, hier immer alle)
+        // Aktiven Filter anwenden (Nur neue Arten oder alle)
+        const toRender = window.newSpeciesFilterActive ? filterFirstOccurrences(filteredObs) : filteredObs;
         if (viewMode === 'simple') {
-          renderSimpleListView(filteredObs, list, obsContainer);
+          renderSimpleListView(toRender, list, obsContainer);
         } else if (viewMode === 'lifelist') {
-          renderLifeListView(filteredObs, list, obsContainer);
+          renderLifeListView(toRender, list, obsContainer);
         } else {
-          renderObservationsView(filteredObs, list, obsContainer);
+          renderObservationsView(toRender, list, obsContainer);
         }
       }
       
@@ -23174,19 +23179,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         icon.textContent = '⭐';
         label.textContent = 'Nur neue Arten';
       }
-      // Ansicht neu rendern mit aktuellem Filter
-      const container = document.getElementById('listObservations');
-      const obs = window._currentFilteredObs;
-      const list = window._currentList;
-      if (!obs || !list) return;
-      const viewMode = window.currentListViewMode || 'observations';
-      const toRender = window.newSpeciesFilterActive ? filterFirstOccurrences(obs) : obs;
-      if (viewMode === 'simple') renderSimpleListView(toRender, list, container);
-      else if (viewMode === 'lifelist') renderLifeListView(toRender, list, container);
-      else renderObservationsView(toRender, list, container);
+      // Frische Daten aus DB laden damit tickable-Status aktuell ist
+      if (currentListId) {
+        openListDetail(currentListId, window.currentListViewMode || 'observations');
+      }
     }
 
     // Gibt nur Beobachtungen zurück, bei denen eine Art zum ersten Mal auftaucht (chronologisch)
+    // Beobachtungen mit tickable:false werden IMMER übersprungen
     function filterFirstOccurrences(observations) {
       // Sortiere aufsteigend nach Datum für korrekte Erst-Nachweise
       const sorted = [...observations].sort((a, b) => {
@@ -23195,6 +23195,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       });
       const seen = new Set();
       const firstObs = sorted.filter(obs => {
+        if (obs.tickable === false) return false; // dauerhaft nicht-tickbare nie anzeigen
         const key = normalizeBirdName(obs.bird);
         if (!key || seen.has(key)) return false;
         seen.add(key);
