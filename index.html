@@ -11034,8 +11034,14 @@
         <p id="drawingStatus" style="margin-top: 12px; color: var(--accent); font-weight: 600;">● Zeichenmodus aktiv</p>
       </div>
       
-      <div id="polygonMapContainer" style="height: 400px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
-        <div id="polygonMap" style="height: 100%;"></div>
+      <div id="polygonMapContainer" style="height:200px;border-radius:12px;overflow:hidden;margin-bottom:0;position:relative;transition:height 0.1s;">
+        <div id="polygonMap" style="height:100%;"></div>
+      </div>
+      <div class="resize-handle" id="mapResizeHandle" title="Ziehen zum Vergrößern/Verkleinern der Karte"
+        style="width:100%;height:18px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;margin-bottom:16px;user-select:none;-webkit-user-select:none;">
+        <div style="width:40px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;transition:background 0.2s;"
+          onmouseover="this.style.background='rgba(6,182,212,0.5)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+        </div>
       </div>
       
       <div class="polygon-actions" style="justify-content: center;">
@@ -11300,7 +11306,7 @@
     </div>
     
     <!-- Tages-Diagramm -->
-    <div id="listDetailChartSection" class="card" style="margin-bottom:18px;display:none;">
+    <div id="listDetailChartSection" class="card" style="margin-bottom:4px;display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <h3 style="margin:0;font-size:15px;">📈 Meldungen &amp; Arten pro Tag</h3>
         <div style="display:flex;gap:14px;font-size:11px;color:var(--muted);">
@@ -11312,8 +11318,16 @@
           </span>
         </div>
       </div>
-      <canvas id="listDetailChart" style="width:100%;display:block;border-radius:6px;" height="120"></canvas>
-      <div id="listDetailChartXAxis" style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted);padding:0 2px;"></div>
+      <div id="chartResizeWrapper" style="position:relative;">
+        <canvas id="listDetailChart" style="width:100%;display:block;border-radius:6px;" height="120"></canvas>
+        <div id="listDetailChartXAxis" style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted);padding:0 2px;"></div>
+      </div>
+    </div>
+    <div class="resize-handle" id="chartResizeHandle" title="Ziehen zum Vergrößern/Verkleinern des Diagramms"
+      style="width:100%;height:18px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;margin-bottom:14px;display:none;user-select:none;-webkit-user-select:none;">
+      <div style="width:40px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;transition:background 0.2s;"
+        onmouseover="this.style.background='rgba(167,139,250,0.5)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+      </div>
     </div>
     
     <div class="list-observations-table">
@@ -22064,14 +22078,22 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
 
     function renderListDetailChart(dailyData) {
+      window._lastDailyDataDetail = dailyData; // für Re-Render nach Resize
       const section = document.getElementById('listDetailChartSection');
-      if (!dailyData || dailyData.length === 0) { section.style.display = 'none'; return; }
+      const handle = document.getElementById('chartResizeHandle');
+      if (!dailyData || dailyData.length === 0) {
+        section.style.display = 'none';
+        if (handle) handle.style.display = 'none';
+        return;
+      }
       section.style.display = 'block';
+      if (handle) handle.style.display = 'flex';
 
       const canvas = document.getElementById('listDetailChart');
       const dpr = window.devicePixelRatio || 1;
       const W = canvas.offsetWidth || section.offsetWidth - 32 || 600;
-      const H = 120;
+      // Aktuelle Höhe aus CSS nutzen (nach Resize), sonst 120
+      const H = canvas.offsetHeight > 0 ? canvas.offsetHeight : 120;
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       canvas.style.width = W + 'px';
@@ -22168,6 +22190,79 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         if (fmt(dailyData[n-1].date) !== labels[labels.length-1]) labels.push(fmt(dailyData[n-1].date));
         xAxisEl.innerHTML = labels.map(l => `<span>${l}</span>`).join('');
         xAxisEl.style.justifyContent = 'space-between';
+      }
+    }
+
+    // ===== RESIZE HANDLES FÜR KARTE & DIAGRAMM =====
+    function initListDetailResizeHandles() {
+      // Karte
+      const mapHandle = document.getElementById('mapResizeHandle');
+      const mapContainer = document.getElementById('polygonMapContainer');
+      if (mapHandle && mapContainer) {
+        let dragging = false, startY = 0, startH = 0;
+        const MIN_H = 80, MAX_H = 700;
+        mapHandle.addEventListener('mousedown', e => {
+          dragging = true; startY = e.clientY; startH = mapContainer.offsetHeight;
+          document.body.style.userSelect = 'none'; document.body.style.cursor = 'ns-resize';
+          e.preventDefault();
+        });
+        mapHandle.addEventListener('touchstart', e => {
+          dragging = true; startY = e.touches[0].clientY; startH = mapContainer.offsetHeight;
+          e.preventDefault();
+        }, { passive: false });
+        const onMove = e => {
+          if (!dragging) return;
+          const y = e.touches ? e.touches[0].clientY : e.clientY;
+          const newH = Math.min(MAX_H, Math.max(MIN_H, startH + (y - startY)));
+          mapContainer.style.height = newH + 'px';
+          mapContainer.style.transition = 'none';
+          if (window.polygonMap) polygonMap.invalidateSize();
+        };
+        const onUp = () => {
+          if (!dragging) return;
+          dragging = false;
+          document.body.style.userSelect = ''; document.body.style.cursor = '';
+          if (window.polygonMap) polygonMap.invalidateSize();
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onUp);
+      }
+
+      // Diagramm
+      const chartHandle = document.getElementById('chartResizeHandle');
+      const canvas = document.getElementById('listDetailChart');
+      const xAxis = document.getElementById('listDetailChartXAxis');
+      if (chartHandle && canvas) {
+        let dragging = false, startY = 0, startH = 0;
+        const MIN_H = 60, MAX_H = 500;
+        chartHandle.addEventListener('mousedown', e => {
+          dragging = true; startY = e.clientY; startH = canvas.offsetHeight;
+          document.body.style.userSelect = 'none'; document.body.style.cursor = 'ns-resize';
+          e.preventDefault();
+        });
+        chartHandle.addEventListener('touchstart', e => {
+          dragging = true; startY = e.touches[0].clientY; startH = canvas.offsetHeight;
+          e.preventDefault();
+        }, { passive: false });
+        const onMove = e => {
+          if (!dragging) return;
+          const y = e.touches ? e.touches[0].clientY : e.clientY;
+          const newH = Math.min(MAX_H, Math.max(MIN_H, startH + (y - startY)));
+          canvas.style.height = newH + 'px';
+        };
+        const onUp = () => {
+          if (!dragging) return;
+          dragging = false;
+          document.body.style.userSelect = ''; document.body.style.cursor = '';
+          // Diagramm mit neuer Höhe neu rendern
+          if (window._lastDailyDataDetail) renderListDetailChart(window._lastDailyDataDetail);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onUp);
       }
     }
 
@@ -22869,6 +22964,12 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       }
       
       document.getElementById('listDetailView').style.display = 'block';
+      
+      // Resize-Handles initialisieren (nur einmalig)
+      if (!window._listResizeInitialized) {
+        window._listResizeInitialized = true;
+        setTimeout(initListDetailResizeHandles, 100);
+      }
       
       // Diagramm rendern nachdem View sichtbar und Layout berechnet ist
       setTimeout(() => renderListDetailChart(dailyDataDetail), 80);
