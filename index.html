@@ -4677,6 +4677,7 @@
       border-radius: 8px;
       margin-top: 10px;
       border: 1px solid rgba(255,255,255,0.1);
+      transition: none;
     }
     
     .polygon-bbox {
@@ -22826,6 +22827,9 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             📐 Ausdehnung: Lat ${minLat} – ${maxLat} &nbsp;|&nbsp; Lng ${minLng} – ${maxLng}
           </div>
           <div id="${previewMapId}" class="polygon-preview-map"></div>
+          <div id="${previewMapId}_handle" style="width:100%;height:18px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;margin-bottom:2px;user-select:none;-webkit-user-select:none;" title="Ziehen zum Vergrößern/Verkleinern der Karte">
+            <div id="${previewMapId}_bar" style="width:40px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;transition:background 0.2s;"></div>
+          </div>
           <details style="margin-top:6px;">
             <summary style="font-size:11px;color:var(--muted);cursor:pointer;">Koordinaten anzeigen</summary>
             <div class="polygon-coordinates">
@@ -22865,6 +22869,43 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             
             // Karte nach dem Einfügen refreshen
             setTimeout(() => previewMap.invalidateSize(), 100);
+
+            // Resize-Handle für die Karte verdrahten
+            const handle = document.getElementById(previewMapId + '_handle');
+            const bar = document.getElementById(previewMapId + '_bar');
+            const mapEl = document.getElementById(previewMapId);
+            if (handle && mapEl) {
+              bar.addEventListener('mouseover', () => bar.style.background = 'rgba(6,182,212,0.5)');
+              bar.addEventListener('mouseout', () => bar.style.background = 'rgba(255,255,255,0.12)');
+              let dragging = false, startY = 0, startH = 0;
+              const MIN_H = 80, MAX_H = 700;
+              handle.addEventListener('mousedown', e => {
+                dragging = true; startY = e.clientY; startH = mapEl.offsetHeight;
+                document.body.style.userSelect = 'none'; document.body.style.cursor = 'ns-resize';
+                e.preventDefault();
+              });
+              handle.addEventListener('touchstart', e => {
+                dragging = true; startY = e.touches[0].clientY; startH = mapEl.offsetHeight;
+                e.preventDefault();
+              }, { passive: false });
+              const onMove = e => {
+                if (!dragging) return;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                const newH = Math.min(MAX_H, Math.max(MIN_H, startH + (y - startY)));
+                mapEl.style.height = newH + 'px';
+                previewMap.invalidateSize();
+              };
+              const onUp = () => {
+                if (!dragging) return;
+                dragging = false;
+                document.body.style.userSelect = ''; document.body.style.cursor = '';
+                previewMap.invalidateSize();
+              };
+              document.addEventListener('mousemove', onMove);
+              document.addEventListener('mouseup', onUp);
+              document.addEventListener('touchmove', onMove, { passive: false });
+              document.addEventListener('touchend', onUp);
+            }
           } catch (e) {
             console.warn('Polygon-Vorschau konnte nicht geladen werden:', e);
           }
