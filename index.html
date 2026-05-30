@@ -44777,26 +44777,41 @@ async function comparePrivateListsModal() {
   // Hole alle persönlichen Beobachtungen
   const allObservations = await getPersonalObservationsWithDetails();
   
-  // Filtere Beobachtungen für Liste 1
-  const filteredObs1 = await filterObservationsByList(allObservations, list1);
-  const species1 = new Set();
-  filteredObs1.forEach(obs => {
-    if (obs.bird) species1.add(obs.bird);
-  });
+  // Hilfsfunktion: tickbare Arten normalisiert + Originalname speichern
+  const extractSpecies = async (list) => {
+    const obs = await filterObservationsByList(allObservations, list);
+    const map = new Map(); // normalizedKey -> Originalname
+    obs.filter(o => o.tickable !== false && o.bird).forEach(o => {
+      const key = normalizeBirdName(o.bird);
+      if (key && !map.has(key)) map.set(key, o.bird);
+    });
+    return map;
+  };
+
+  const [map1, map2] = await Promise.all([extractSpecies(list1), extractSpecies(list2)]);
   
-  // Filtere Beobachtungen für Liste 2
-  const filteredObs2 = await filterObservationsByList(allObservations, list2);
-  const species2 = new Set();
-  filteredObs2.forEach(obs => {
-    if (obs.bird) species2.add(obs.bird);
-  });
+  // Sets mit Originalnamen für displayModalComparisonResults
+  const species1 = new Set([...map1.values()].sort());
+  const species2 = new Set([...map2.values()].sort());
   
-  console.log('Private Liste 1:', list1.name, '- Arten:', species1.size);
-  console.log('Private Liste 2:', list2.name, '- Arten:', species2.size);
+  // Vergleich auf normalisierten Keys, aber Anzeige mit Originalnamen
+  const keys1 = new Set(map1.keys());
+  const keys2 = new Set(map2.keys());
+  const onlyKeys1 = [...keys1].filter(k => !keys2.has(k));
+  const onlyKeys2 = [...keys2].filter(k => !keys1.has(k));
+  const bothKeys  = [...keys1].filter(k =>  keys2.has(k));
+
+  const speciesOnlyIn1 = new Set(onlyKeys1.map(k => map1.get(k)));
+  const speciesOnlyIn2 = new Set(onlyKeys2.map(k => map2.get(k)));
+  const speciesBoth    = new Set(bothKeys.map(k => map1.get(k)));
+
+  console.log('Private Liste 1:', list1.name, '- Arten:', map1.size);
+  console.log('Private Liste 2:', list2.name, '- Arten:', map2.size);
   
   displayModalComparisonResults(
-    species1,
-    species2,
+    speciesOnlyIn1,
+    speciesOnlyIn2,
+    speciesBoth,
     list1.name,
     list2.name
   );
@@ -44952,18 +44967,28 @@ async function compareGroupMembersModal() {
 }
 
 // Vergleichsergebnisse im Modal anzeigen
-function displayModalComparisonResults(species1, species2, label1, label2) {
+function displayModalComparisonResults(speciesOnlyIn1, speciesOnlyIn2, speciesBothOrLabel1, label1OrLabel2, label2) {
+  // Rückwärtskompatibel: altes Interface hatte (species1, species2, label1, label2)
+  // Neues Interface hat (onlyIn1, onlyIn2, both, label1, label2)
+  let unique1, unique2, common;
+  if (label2 === undefined) {
+    // Altes Interface
+    const s1 = speciesOnlyIn1, s2 = speciesOnlyIn2;
+    label1 = speciesBothOrLabel1; label2 = label1OrLabel2;
+    common  = [...s1].filter(s => s2.has(s));
+    unique1 = [...s1].filter(s => !s2.has(s));
+    unique2 = [...s2].filter(s => !s1.has(s));
+  } else {
+    // Neues Interface
+    unique1 = [...speciesOnlyIn1].sort();
+    unique2 = [...speciesOnlyIn2].sort();
+    common  = [...speciesBothOrLabel1].sort();
+    label1  = label1OrLabel2;
+    // label2 already set
+  }
+
   const resultsContainer = document.getElementById('modalComparisonResults');
   resultsContainer.style.display = 'block';
-  
-  // Gemeinsame Arten
-  const common = [...species1].filter(s => species2.has(s));
-  
-  // Nur in Liste 1
-  const unique1 = [...species1].filter(s => !species2.has(s));
-  
-  // Nur in Liste 2
-  const unique2 = [...species2].filter(s => !species1.has(s));
   
   // Zusammenfassung aktualisieren
   document.getElementById('modalCommonCount').textContent = common.length;
