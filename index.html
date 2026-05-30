@@ -23206,9 +23206,23 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       placeholder.style.display = 'block';
       result.style.display = 'none';
 
-      const listA = userLists.find(l => l.id === idA);
-      const listB = userLists.find(l => l.id === idB);
-      const observations = await getPersonalObservationsWithDetails();
+      // Listen frisch aus IndexedDB laden (damit Polygon und alle Daten aktuell sind)
+      const [freshListA, freshListB] = await Promise.all([
+        getFromIndexedDB('lists', idA),
+        getFromIndexedDB('lists', idB)
+      ]);
+      const listA = freshListA || userLists.find(l => l.id === idA);
+      const listB = freshListB || userLists.find(l => l.id === idB);
+
+      // Beobachtungen laden (gleiche Logik wie calculateListStats)
+      let observations;
+      if (window.currentSelectedGroup && window.currentSelectedGroup !== 'personal' && window.FBA?.currentUser) {
+        const groupData = await loadGroupData();
+        const uid = window.FBA.currentUser.uid;
+        observations = groupData.userStats?.[uid]?.observations || [];
+      } else {
+        observations = await getPersonalObservationsWithDetails();
+      }
 
       const getSpecies = async (list) => {
         const obs = await filterObservationsByList(observations, list);
