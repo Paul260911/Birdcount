@@ -22974,10 +22974,6 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       window._currentFilteredObs = filteredObs;
       window._currentList = list;
 
-      // Zeit-Box zurücksetzen
-      const timeBox = document.getElementById('timeInvestmentResult');
-      if (timeBox && isNewList) timeBox.style.display = 'none';
-
       // Filter-Button nur zurücksetzen wenn es eine NEUE Liste ist (nicht beim Toggle-Reload)
       const isNewList = window._currentListIdForFilter !== listId;
       if (isNewList) {
@@ -22992,6 +22988,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           document.getElementById('newSpeciesFilterLabel').textContent = 'Nur neue Arten';
         }
       }
+
+      // Zeit-Box zurücksetzen
+      const timeBox = document.getElementById('timeInvestmentResult');
+      if (timeBox && isNewList) timeBox.style.display = 'none';
       
       const obsContainer = document.getElementById('listObservations');
       if (filteredObs.length === 0) {
