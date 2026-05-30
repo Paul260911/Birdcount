@@ -44659,12 +44659,19 @@ async function loadPrivateListsForModalComparison() {
     // Hole alle Beobachtungen einmal
     const allObservations = await getPersonalObservationsWithDetails();
     
-    // Berechne Artenzahl für jede Liste
+    // Berechne Artenzahl für jede Liste – Liste frisch aus IndexedDB laden damit Polygon aktuell ist
     for (const list of lists) {
-      const filteredObs = await filterObservationsByList(allObservations, list);
+      // Frische Liste mit Polygon laden (wie calculateListStats)
+      let freshList = list;
+      try {
+        const fromDB = await getFromIndexedDB('lists', list.id);
+        if (fromDB) freshList = fromDB;
+      } catch(e) {}
+      
+      const filteredObs = await filterObservationsByList(allObservations, freshList);
       const speciesSet = new Set();
-      filteredObs.forEach(obs => {
-        if (obs.bird) speciesSet.add(obs.bird);
+      filteredObs.filter(o => o.tickable !== false).forEach(obs => {
+        if (obs.bird) speciesSet.add(normalizeBirdName(obs.bird));
       });
       const speciesCount = speciesSet.size;
       
