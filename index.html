@@ -28930,9 +28930,17 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         const _parsePhaseMax = _isGroupImport ? 50 : 100;
         const _importToastStart = Date.now();
         if (typeof window.showImportToast === 'function') window.showImportToast(_totalLines);
-        
+
+        // Auto-Erkennung des Trennzeichens anhand der ersten Zeile
+        // Reihenfolge: Tab → Semikolon → Komma
+        const _firstLine = lines[0];
+        const _sep = _firstLine.includes('\t') ? '\t'
+                   : _firstLine.includes(';')  ? ';'
+                   : ',';
+        console.log(`📋 Ornitho-Import: Trennzeichen erkannt → "${_sep === '\t' ? 'Tab' : _sep}"`);
+
         // Parse Header
-        const headers = lines[0].split('\t');
+        const headers = lines[0].split(_sep);
         
         // Finde wichtige Spalten-Indizes
         const getColumnIndex = (name) => headers.findIndex(h => h === name);
@@ -29056,7 +29064,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             window.updateImportToast(parsePct, i - 2, _totalLines, `${i - 2} / ${_totalLines} Zeilen gelesen`);
           }
           
-          const values = line.split('\t');
+          const values = line.split(_sep);
           
           // Extrahiere Daten
           const species = values[indices.species] || '';
@@ -40447,6 +40455,8 @@ window.hideImportProgress = hideImportProgress;
 // ==================== IMPORT TOAST (oben rechts) ====================
 (function() {
   let _toastStart = 0;
+  let _phaseStart = 0;
+  let _phaseStartPct = 0;
 
   // Hilfsfunktion: Kreisring-Fortschritt setzen (Umfang = 2π*58 ≈ 364.4)
   const _ringCircumference = 364.4;
@@ -40470,6 +40480,8 @@ window.hideImportProgress = hideImportProgress;
   window.showImportToast = function(totalItems) {
     _ensureToastInBody();
     _toastStart = Date.now();
+    _phaseStart = _toastStart;
+    _phaseStartPct = 0;
     const t = document.getElementById('importToast');
     if (!t) return;
     t.classList.remove('done');
@@ -40497,14 +40509,23 @@ window.hideImportProgress = hideImportProgress;
 
     // ETA – erst nach 2% berechnen für sinnvollere Werte
     if (p >= 2) {
-      const elapsed = (Date.now() - _toastStart) / 1000;
-      const totalEst = elapsed / (p / 100);
-      const remaining = Math.max(0, totalEst - elapsed);
-      let eta;
-      if (remaining < 4)       eta = 'Fast fertig…';
-      else if (remaining < 60) eta = `~${Math.round(remaining)} Sek.`;
-      else                     eta = `~${Math.ceil(remaining / 60)} Min.`;
-      document.getElementById('importToastEta').textContent = eta;
+      // Phasenwechsel erkennen (Phase 2 beginnt bei ≥50%)
+      if (p >= 50 && _phaseStartPct < 50) {
+        _phaseStart = Date.now();
+        _phaseStartPct = p;
+      }
+      const elapsed = (Date.now() - _phaseStart) / 1000;
+      const phasePct = p - _phaseStartPct;
+      const phaseRange = 100 - _phaseStartPct;
+      if (phasePct > 0) {
+        const totalEst = elapsed / (phasePct / phaseRange);
+        const remaining = Math.max(0, totalEst - elapsed);
+        let eta;
+        if (remaining < 4)       eta = 'Fast fertig…';
+        else if (remaining < 60) eta = `~${Math.round(remaining)} Sek.`;
+        else                     eta = `~${Math.ceil(remaining / 60)} Min.`;
+        document.getElementById('importToastEta').textContent = eta;
+      }
     }
   };
 
