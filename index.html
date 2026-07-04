@@ -1368,7 +1368,8 @@
       
       .form-row > * {
         flex: 1 1 100% !important;
-        width: 100%;
+        width: 100% !important;
+        min-width: 0 !important;
       }
       
       /* Observation Manager auf Mobile */
@@ -6329,7 +6330,593 @@
       font-size: 14px;
       opacity: 0.8;
     }
-    
+
+  /* ═══════════════════════════════════════════════════════════
+     MOBILE RESPONSIVE – Ergänzungen (max-width: 700px)
+     Alle Regeln hier überschreiben nur mobile Darstellung.
+     PC-Layout (>1000px) bleibt unverändert.
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 700px) {
+
+    /* ── 1. Kein horizontales Scrollen auf Body-Ebene ── */
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    /* ── 2. Beobachtungs-Eingabe-Tabelle (input-table) ──
+       Problem: Tabelle läuft rechts raus, Koordinaten-Inputs zu breit.
+       Lösung: mapbox wird zum Scroll-Container, Tabelle bekommt min-width.
+    ── */
+    .mapbox {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+    }
+    .input-table {
+      min-width: 480px; /* Tabelle scrollt horizontal, kein Layout-Bruch */
+      width: 100%;
+    }
+    .input-table .lat-input,
+    .input-table .lng-input {
+      width: 62px !important;
+      font-size: 11px !important;
+      padding: 4px 6px !important;
+    }
+    .input-table input[type="text"].bird-input {
+      min-width: 110px;
+      max-width: 140px;
+    }
+    .input-table td,
+    .input-table th {
+      padding: 6px 5px !important;
+      font-size: 12px !important;
+      white-space: nowrap;
+    }
+    /* obs-toggle in Tabellen: kleiner damit die Spalte schmaler wird */
+    .input-table .obs-toggle {
+      width: 26px !important;
+      height: 26px !important;
+      font-size: 13px !important;
+    }
+    .input-table .obs-toggle-container {
+      gap: 4px !important;
+    }
+    /* Aktions-Buttons in Tabellen-Zeilen kompakter */
+    .input-table .small-btn {
+      min-width: 28px !important;
+      min-height: 28px !important;
+      padding: 4px 6px !important;
+      font-size: 13px !important;
+    }
+
+    /* ── 3. Folder-Aktionen-Buttons ──
+       Problem: "Neue Mappe" + "Ordner löschen" laufen aus Container.
+    ── */
+    .folder > div:last-child {
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    .folder > div:last-child .small-btn {
+      flex: 1 1 auto !important;
+      min-width: 120px !important;
+      text-align: center !important;
+      justify-content: center !important;
+    }
+    /* Ordner-Header (Name + Farb-Indikator) */
+    .folder > div:first-child {
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+    .folder > div:first-child h3 {
+      font-size: 15px !important;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── 4. Modals als Bottom-Sheet ──
+       Problem: Modals sind breiter als der Bildschirm, oft abgeschnitten.
+       Lösung: Bottom-Sheet-Pattern – von unten einblenden, volle Breite.
+    ── */
+    .modal {
+      align-items: flex-end !important;
+      padding: 0 !important;
+    }
+    .modal-content {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+      margin: 0 !important;
+      max-height: 92vh !important;
+      padding: 20px 16px 32px !important; /* extra unten für Safe Area */
+      padding-bottom: max(32px, env(safe-area-inset-bottom, 32px)) !important;
+    }
+    /* Edit-Modal (anderer Klassen-Name) */
+    .edit-modal-content {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+      margin: 0 !important;
+      max-height: 92vh !important;
+      overflow-y: auto !important;
+      padding: 20px 16px 32px !important;
+    }
+    /* Bulk-Edit Modal */
+    .bulk-edit-modal {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+    }
+    /* Modal-Header auf Mobile kompakter */
+    .modal-header h2 {
+      font-size: 18px !important;
+    }
+    .modal-close {
+      min-width: 44px !important;
+      min-height: 44px !important;
+      font-size: 28px !important;
+    }
+
+    /* ── 5. Observation-Cards ──
+       Problem: .observation-header – Artname und Datum überlappen sich
+       bei langen Artnamen. .observation-meta läuft aus Container.
+    ── */
+    .observation-header {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 4px !important;
+    }
+    .observation-date {
+      font-size: 12px !important;
+      align-self: flex-start;
+    }
+    .observation-species {
+      font-size: 15px !important;
+      word-break: break-word;
+    }
+    .observation-meta {
+      flex-wrap: wrap !important;
+      gap: 6px 12px !important;
+      margin-top: 6px !important;
+    }
+    .observation-meta-item {
+      font-size: 12px !important;
+      min-width: 0;
+    }
+    .observation-card {
+      padding: 12px !important;
+    }
+    /* Kein transform:translateX auf Touch-Geräten (verursacht Flackern) */
+    .observation-card:hover {
+      transform: none !important;
+    }
+
+    /* ── 6. Dashboard / Statistik-Grids ──
+       Problem: Stat-Kacheln passen nicht nebeneinander.
+    ── */
+    .stat-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px !important;
+    }
+    /* Allgemeine Grid-Selektoren die auf dem Handy immer einspaltig sein sollen */
+    .dashboard-grid,
+    .stats-grid,
+    [class*="stats-grid"] {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px !important;
+    }
+
+    /* ── 7. Listen-Grid ──
+       Problem: list-cards sind zu breit.
+    ── */
+    #listsGrid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* ── 8. Beobachtungsfilter-Buttons ──
+       Problem: Filter-Buttons passen nicht in eine Zeile.
+    ── */
+    .observation-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px !important;
+      padding: 8px 0 !important;
+    }
+    .observation-filter-btn {
+      flex: 1 1 auto;
+      min-width: 70px;
+      min-height: 36px;
+      font-size: 12px !important;
+      padding: 6px 8px !important;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    /* ── 9. Topbar Suche + Controls ──
+       Problem: Search + Controls laufen übereinander.
+    ── */
+    .topbar {
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+    .search {
+      width: 100% !important;
+    }
+    .search input {
+      width: 100% !important;
+      font-size: 16px !important; /* verhindert iOS Auto-Zoom */
+    }
+    .controls {
+      width: 100% !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    .controls select,
+    .controls input {
+      flex: 1 1 calc(50% - 6px) !important;
+      min-width: 110px !important;
+      font-size: 16px !important;
+    }
+
+    /* ── 10. Alle Inputs: iOS Auto-Zoom verhindern ──
+       iOS zoomt automatisch rein wenn font-size < 16px.
+    ── */
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    input[type="email"],
+    input[type="search"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+
+    /* ── 11. Touch-Targets: Alle interaktiven Elemente ──
+       Apple/Google HIG: min. 44×44px.
+       Ausnahme: obs-toggle und small-btn in Tabellen (bereits oben behandelt).
+    ── */
+    .btn {
+      min-height: 46px !important;
+      padding: 12px 16px !important;
+      font-size: 15px !important;
+    }
+    /* small-btn außerhalb von Tabellen */
+    .small-btn {
+      min-height: 40px !important;
+      min-width: 40px !important;
+    }
+    /* obs-toggle außerhalb von Tabellen */
+    .obs-toggle {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      min-height: 36px !important;
+    }
+
+    /* ── 12. Foto-Thumbnails ── */
+    .photo-thumbnail {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    .edit-photo-preview img {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    /* ── 13. Feature-Sections ── */
+    .feature-section {
+      padding: 12px !important;
+      max-width: 100% !important;
+      overflow-x: hidden;
+    }
+
+    /* ── 14. Quick-Rarity-Editor Modal ──
+       Taucht als überbreites Panel auf.
+    ── */
+    #quickRarityModal .modal-content,
+    #quickRarityModal > div {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+    }
+
+    /* ── 15. Charts / Canvas ── */
+    canvas {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    /* ── 16. Pagination-Button (aus Performance-Optimierung) ── */
+    #obsLoadMoreBtn {
+      min-height: 46px !important;
+      font-size: 14px !important;
+    }
+
+    /* ── 17. Karte (Leaflet) auf Mobile ── */
+    #map {
+      min-height: 280px;
+    }
+
+    /* ── 18. Kein Hover-Effekt auf Touch-Geräten
+       (verhindert "stuck hover" nach dem Tippen)
+    ── */
+    @media (hover: none) {
+      button:hover,
+      .btn:hover,
+      .small-btn:hover,
+      .card:hover,
+      .list-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+
+  /* ── Extra-klein: 380px und schmäler (z.B. iPhone SE) ── */
+  @media (max-width: 380px) {
+    .input-table {
+      min-width: 420px;
+    }
+    .input-table .lat-input,
+    .input-table .lng-input {
+      width: 52px !important;
+    }
+    .stat-grid,
+    .dashboard-grid,
+    [class*="stats-grid"] {
+      grid-template-columns: 1fr !important; /* Einspaltig bei sehr kleinen Screens */
+    }
+    .observation-filter-btn {
+      min-width: 60px;
+      font-size: 11px !important;
+    }
+    .modal-content {
+      padding: 16px 12px 28px !important;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     MOBILE ERGÄNZUNGEN – Teil 2 (max-width: 700px)
+     Betrifft: Grids, Firebase-Login, Accordion, stat-cards,
+     Comparison-Grids, person-stats, Jahr-Stats, Listen-Grids
+  ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 700px) {
+
+    /* ── Alle kritischen Grids mit minmax ≥ 200px auf 1 Spalte ── */
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+    }
+    .comparison-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .list-comparison-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .lists-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .year-stats {
+      grid-template-columns: 1fr !important;
+    }
+    .bulk-action-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px !important;
+    }
+
+    /* ── stat-card: Hover-Effekt deaktivieren auf Touch ── */
+    .stat-card:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .stat-card {
+      padding: 14px !important;
+    }
+    .stat-icon {
+      font-size: 28px !important;
+      margin-bottom: 8px !important;
+    }
+    .stat-value {
+      font-size: 24px !important;
+    }
+    .stat-label {
+      font-size: 11px !important;
+    }
+
+    /* ── Firebase Login Box auf Mobile ── */
+    .fbBox {
+      padding: 24px 16px !important;
+      border-radius: 16px !important;
+      width: 100% !important;
+    }
+    .fbInput {
+      font-size: 16px !important; /* verhindert iOS Auto-Zoom */
+      min-height: 44px !important;
+    }
+    .fbBtn {
+      min-height: 48px !important;
+      font-size: 15px !important;
+    }
+    .fbTitle {
+      font-size: 20px !important;
+    }
+
+    /* ── Person-Accordion (Beobachtungs-Manager) ── */
+    .person-accordion-header {
+      padding: 12px 14px !important;
+    }
+    .person-stats {
+      flex-wrap: wrap !important;
+      gap: 4px 10px !important;
+    }
+    .person-name {
+      font-size: 14px !important;
+    }
+    .person-toggle {
+      font-size: 12px !important;
+    }
+    /* Checkbox-Items im Accordion */
+    .observation-checkbox-item {
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      padding: 10px !important;
+    }
+
+    /* ── Observation Manager Filter-Leiste ── */
+    #obsManagerFilterBar,
+    #obsManagerFilterBar > div {
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    #obsManagerFilterBar input,
+    #obsManagerFilterBar select {
+      font-size: 16px !important;
+      min-height: 40px !important;
+      flex: 1 1 calc(50% - 6px) !important;
+      min-width: 100px !important;
+    }
+
+    /* ── Tabellen im allgemeinen Kontext (nicht input-table) ── */
+    /* Tabellen scrollbar wo nötig – Wrapper-Technik */
+    .table-scroll-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+    }
+
+    /* ── Detail-Ansicht Beobachtung (Modal) ── */
+    .detail-row {
+      flex-direction: column !important;
+      gap: 4px !important;
+    }
+    .detail-label {
+      color: var(--muted);
+      font-size: 11px !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Gruppenvergleich – Tab-Inhalte ── */
+    #compareObservationsView > div:first-child {
+      grid-template-columns: 1fr !important;
+    }
+    #compareStatsView > div:last-child {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* ── Karten (Cards) mit inline-Styles die überlaufen könnten ── */
+    /* Fängt Cards mit fester Breite per inline-style ab */
+    div[style*="max-width:440px"],
+    div[style*="max-width: 440px"],
+    div[style*="max-width:500px"],
+    div[style*="max-width: 500px"],
+    div[style*="max-width:600px"],
+    div[style*="max-width: 600px"],
+    div[style*="max-width:700px"],
+    div[style*="max-width: 700px"] {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
+    /* ── Inline-Flex Elemente die umbrechen müssen ── */
+    div[style*="display:flex"][style*="gap:16px"],
+    div[style*="display: flex"][style*="gap: 16px"] {
+      flex-wrap: wrap;
+    }
+
+    /* ── person-accordion hover deaktivieren ── */
+    .person-accordion:hover {
+      box-shadow: none !important;
+    }
+
+    /* ── Karte im Detail-Modal ── */
+    #detailMap {
+      height: 220px !important;
+    }
+
+    /* ── Year-stat-card kompakter ── */
+    .year-stat-card {
+      padding: 14px !important;
+    }
+
+    /* ── Pagination-Button aus Performance-Fix ── */
+    #obsLoadMoreBtn {
+      border-radius: 10px !important;
+      font-size: 13px !important;
+      padding: 12px !important;
+    }
+
+    /* ── Floating Action Button (FAB) – Safe Area unten ── */
+    .fab-quick-add {
+      bottom: max(80px, calc(80px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+
+    /* ── Toast Notifications – Safe Area unten ── */
+    .toast {
+      bottom: max(90px, calc(90px + env(safe-area-inset-bottom, 0px))) !important;
+    }
+  }
+
+  /* ── 380px und kleiner: stat-cards einspaltig ── */
+  @media (max-width: 380px) {
+    .stats-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .bulk-action-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .person-avatar {
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 13px !important;
+    }
+  }
+
+  @media (max-width: 700px) {
+    /* Bottom-Sheet Animation - kommt von unten statt von oben */
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(60px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* .app: column statt row, Sidebar fixed braucht keinen flex-Platz */
+    .app {
+      flex-direction: column !important;
+      gap: 0 !important;
+    }
+
+    /* .main volle Breite, kein Overflow */
+    .main {
+      width: 100% !important;
+      min-width: 0 !important;
+      overflow-x: hidden;
+    }
+
+    /* Eingabe-Section: obsTime und obsCount inline-width überschreiben */
+    #obsTime,
+    #obsCount {
+      width: 100% !important;
+    }
+
+    /* Große Modals mit eigenen IDs als Bottom-Sheet */
+    #observationDetailModal .modal-content,
+    #editObservationModal .modal-content,
+    #speciesGuideModal > div,
+    #weatherModal > div,
+    #createListModal .modal-content {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+      margin: 0 !important;
+      max-height: 92vh !important;
+    }
+  }
+
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -18388,7 +18975,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     const performanceCache = {
       data: new Map(),
       
-      set(key, value, ttl = 60000) {
+      set(key, value, ttl = 300000) { // Standard 5 Minuten (war: 60s)
         this.data.set(key, {
           value,
           expires: Date.now() + ttl
@@ -18418,6 +19005,21 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         updateFn();
         window.chartUpdateScheduled = false;
       });
+    }
+
+    // ── Debounce-System: verhindert mehrfache Aufrufe in kurzer Zeit ──
+    const _debounceTimers = {};
+    function debounce(key, fn, delay = 150) {
+      clearTimeout(_debounceTimers[key]);
+      _debounceTimers[key] = setTimeout(fn, delay);
+    }
+
+    // ── In-Flight Guard: verhindert parallele identische async-Aufrufe ──
+    const _inFlight = {};
+    function guardedCall(key, asyncFn) {
+      if (_inFlight[key]) return _inFlight[key];
+      _inFlight[key] = asyncFn().finally(() => { delete _inFlight[key]; });
+      return _inFlight[key];
     }
     
     // ===== ENDE PERFORMANCE-OPTIMIERUNGEN =====
@@ -18613,7 +19215,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       data: null,
       groupId: null,
       timestamp: 0,
-      TTL: 60000, // 60 Sekunden gültig
+      TTL: 300000, // 5 Minuten gültig (war: 60s)
       
       isValid(groupId) {
         return this.data !== null &&
@@ -20347,6 +20949,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     
     // ---------- Modifizierte loadData Funktion ----------
     async function loadData() {
+      // In-Flight Guard: verhindert parallele loadData-Aufrufe
+      return guardedCall('loadData', async () => {
       try {
         console.time('⏱️ loadData');
         
@@ -20361,9 +20965,11 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           return;
         }
         
-        // Lade Daten aus IndexedDB
-        const folders = await getAllFromIndexedDB('folders');
-        const observations = await getAllObservationsWithDetails();
+        // Lade Daten parallel aus IndexedDB (war: sequenziell)
+        const [folders, observations] = await Promise.all([
+          getAllFromIndexedDB('folders'),
+          getAllObservationsWithDetails()
+        ]);
         
         // Gruppiere Beobachtungen nach Ordnern für die UI
         const folderMap = {};
@@ -20379,20 +20985,21 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           folderMap[obs.folderId].observations.push(obs);
         });
         
-        // Cache speichern
-        performanceCache.set(cacheKey, { folderMap }, 30000); // 30 Sekunden
+        // Cache speichern – 5 Minuten (war: 30 Sekunden)
+        performanceCache.set(cacheKey, { folderMap }, 300000);
         window.forceReload = false;
         
         // UI sofort aktualisieren
         updateUIWithData(folderMap);
         updateMarkersFromData();
         
-        // Charts/Statistiken lazy laden
+        // Charts/Statistiken lazy laden via requestIdleCallback
         scheduleChartUpdate(() => updateChart());
-        setTimeout(() => {
+        const idleCb = window.requestIdleCallback || (fn => setTimeout(fn, 200));
+        idleCb(() => {
           updateAdvancedStatistics();
           updateDashboard();
-        }, 100);
+        });
         
         console.timeEnd('⏱️ loadData');
         
@@ -20401,6 +21008,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         // Fallback: Leere UI anzeigen
         document.getElementById('folders').innerHTML = '<div class="muted">Keine Daten geladen</div>';
       }
+      }); // Ende guardedCall
     }
     
     // Hilfsfunktion: UI mit Daten aktualisieren
@@ -20421,6 +21029,10 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         return;
       }
       
+      // DocumentFragment: alle Ordner erst sammeln, dann einmalig in DOM einfügen
+      const fragment = document.createDocumentFragment();
+      const inputsToColor = []; // lazy: nach DOM-Einfügen einfärben
+
       Object.values(folderMap).forEach(folderData => {
         const folder = document.createElement('div');
         folder.className = 'folder card';
@@ -20495,16 +21107,26 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             <button class="small-btn" onclick="removeFolder(this)">🗑️ Ordner löschen</button>
           </div>`;
         
-        foldersDiv.appendChild(folder);
         attachFolderListeners(folder);
         
-        // Wende Farbcodierung auf alle Vogel-Inputs an
+        // Input-Listener sofort anhängen; Farbe lazy nach DOM-Insert
         folder.querySelectorAll('.bird-input').forEach(input => {
-          updateBirdInputColor(input);
+          inputsToColor.push(input);
           input.addEventListener('input', function() {
             updateBirdInputColor(this);
           });
         });
+
+        fragment.appendChild(folder);
+      });
+
+      // Einmaliger DOM-Insert (minimiert Reflows)
+      foldersDiv.appendChild(fragment);
+
+      // Farbcodierung lazy: nach Paint, im Leerlauf
+      const idleCb = window.requestIdleCallback || (fn => setTimeout(fn, 50));
+      idleCb(() => {
+        inputsToColor.forEach(input => updateBirdInputColor(input));
       });
     }
     
@@ -21006,10 +21628,88 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     // ---------- BEACHTUNGSÜBERSICHT MIT FOTO-LIGHTBOX ----------
+    // ── Pagination-State für Beobachtungsliste ──
+    const _obsPagination = { all: [], page: 0, pageSize: 50 };
+
+    // Baut eine einzelne observation-card als HTML-String
+    function _buildObsCardHtml(obs) {
+      const speciesInfo = birdDatabase[obs.bird] || {};
+      const rarity = getRarityStyle(obs.bird, obs.manualRarity);
+      const photoThumbnail = obs.photo ?
+        `<img src="${obs.photo}" class="photo-thumbnail" onclick="event.stopPropagation(); openPhotoLightbox('${obs.photo}', '${obs.bird} - ${formatDateForDisplay(obs.date)}')" alt="Foto">` : '';
+      return `
+        <div class="observation-card" onclick="showObservationDetail('${obs.id}')" style="${obs.tickable === false ? 'opacity:0.7;background:rgba(239,68,68,0.03);border-left:3px solid var(--danger);' : ''}">
+          <div class="observation-header">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div>
+                <div class="observation-species ${rarity.rarityClass}">
+                  ${rarity.rarityIcon}${obs.bird}
+                  ${obs.tickable === false ? '<span style="color:var(--danger);font-size:11px;margin-left:8px;">(⊘ nicht gezählt)</span>' : ''}
+                </div>
+                <div class="observation-scientific">${speciesInfo.scientific || ''}</div>
+              </div>
+              <button class="small-btn" onclick="event.stopPropagation(); openQuickRarityEditor('${obs.id}', '${obs.bird}')"
+                      style="padding:4px 8px;font-size:14px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);"
+                      title="Seltenheit ändern">⭐</button>
+            </div>
+            <div class="observation-date">${formatDateForDisplay(obs.date)}</div>
+          </div>
+          <div class="observation-meta">
+            <div class="observation-meta-item"><span class="icon">🕒</span><span>${obs.time || '--:--'}</span></div>
+            <div class="observation-meta-item"><span class="icon">📍</span><span>${obs.folderName || 'Unbekannt'}</span></div>
+            <div class="observation-meta-item"><span class="icon">🔢</span><span>${obs.count || '1'}</span></div>
+            ${obs.photo ? `
+              <div class="observation-meta-item has-photo" onclick="event.stopPropagation(); openPhotoLightbox('${obs.photo}', '${obs.bird} - ${formatDateForDisplay(obs.date)}')">
+                <span class="icon">📸</span><span>Foto ansehen</span>${photoThumbnail}
+              </div>` : ''}
+            <div class="observation-meta-item">
+              <div class="obs-toggle-container">
+                <div class="obs-toggle tickable ${obs.tickable !== false ? 'active' : ''}"
+                     onclick="event.stopPropagation(); toggleTickable('${obs.id}')"
+                     title="${obs.tickable !== false ? 'Tickbar' : 'Nicht tickbar'}">
+                  ${obs.tickable !== false ? '✓' : '⊘'}
+                </div>
+                <div class="obs-toggle selffound ${obs.selffound ? 'active' : ''}"
+                     onclick="event.stopPropagation(); toggleSelffound('${obs.id}')"
+                     title="${obs.selffound ? 'Selbst gefunden' : 'Nicht selbst gefunden'}">
+                  ${obs.selffound ? '🔴' : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Rendert eine Seite (page) der Beobachtungen in den Container
+    function _renderObsPage(container, page) {
+      const { all, pageSize } = _obsPagination;
+      const start = page * pageSize;
+      const slice = all.slice(start, start + pageSize);
+      const html = slice.map(_buildObsCardHtml).join('');
+      if (page === 0) {
+        container.innerHTML = html;
+      } else {
+        container.insertAdjacentHTML('beforeend', html);
+      }
+      // "Mehr laden"-Button entfernen/neu setzen
+      const existingBtn = document.getElementById('obsLoadMoreBtn');
+      if (existingBtn) existingBtn.remove();
+      if (start + pageSize < all.length) {
+        const btn = document.createElement('button');
+        btn.id = 'obsLoadMoreBtn';
+        btn.className = 'btn';
+        btn.style.cssText = 'width:100%;margin-top:12px;';
+        btn.textContent = `⬇️ Weitere ${Math.min(pageSize, all.length - start - pageSize)} laden (${all.length - start - pageSize} verbleibend)`;
+        btn.onclick = () => {
+          _obsPagination.page++;
+          _renderObsPage(container, _obsPagination.page);
+        };
+        container.parentElement.appendChild(btn);
+      }
+    }
+
     async function showAllObservations() {
       const container = document.getElementById('detailsPerDate');
-      
-      // getAllObservationsWithDetails lädt bereits im Gruppenmodus ALLE Gruppen-Beobachtungen
       let observations = await getAllObservationsWithDetails();
       
       if (observations.length === 0) {
@@ -21017,10 +21717,12 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
         return;
       }
       
-      // Sortieren nach Datum (neueste zuerst)
       observations.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Pagination initialisieren
+      _obsPagination.all = observations;
+      _obsPagination.page = 0;
       
-      // Filter-Buttons
       const filterHtml = `
         <div class="observation-filters">
           <button class="observation-filter-btn active" onclick="filterObservations('all')">Alle</button>
@@ -21028,89 +21730,16 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           <button class="observation-filter-btn" onclick="filterObservations('week')">Diese Woche</button>
           <button class="observation-filter-btn" onclick="filterObservations('month')">Dieser Monat</button>
           <button class="observation-filter-btn" onclick="filterObservations('year')">Dieses Jahr</button>
-        </div>
-      `;
+        </div>`;
       
-      let html = `
+      container.innerHTML = `
         <div class="feature-section">
           <h3 style="margin-top:0;">📋 Alle Beobachtungen (${observations.length})</h3>
           ${filterHtml}
-          <div class="observations-overview" id="observationsList">
-      `;
+          <div class="observations-overview" id="observationsList"></div>
+        </div>`;
       
-      observations.forEach(obs => {
-        const speciesInfo = birdDatabase[obs.bird] || {};
-        
-        // Foto-Thumbnail falls vorhanden
-        const photoThumbnail = obs.photo ? 
-          `<img src="${obs.photo}" class="photo-thumbnail" onclick="event.stopPropagation(); openPhotoLightbox('${obs.photo}', '${obs.bird} - ${formatDateForDisplay(obs.date)}')" alt="Foto">` : 
-          '';
-        
-        html += `
-          <div class="observation-card" onclick="showObservationDetail('${obs.id}')" style="${obs.tickable === false ? 'opacity:0.7;background:rgba(239,68,68,0.03);border-left:3px solid var(--danger);' : ''}">
-            <div class="observation-header">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div>
-                  <div class="observation-species ${getRarityStyle(obs.bird, obs.manualRarity).rarityClass}">
-                    ${getRarityStyle(obs.bird, obs.manualRarity).rarityIcon}${obs.bird}
-                    ${obs.tickable === false ? '<span style="color:var(--danger);font-size:11px;margin-left:8px;">(⊘ nicht gezählt)</span>' : ''}
-                  </div>
-                  <div class="observation-scientific">${speciesInfo.scientific || ''}</div>
-                </div>
-                <button class="small-btn" onclick="event.stopPropagation(); openQuickRarityEditor('${obs.id}', '${obs.bird}')" 
-                        style="padding:4px 8px;font-size:14px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);" 
-                        title="Seltenheit ändern">
-                  ⭐
-                </button>
-              </div>
-              <div class="observation-date">${formatDateForDisplay(obs.date)}</div>
-            </div>
-              
-              <div class="observation-meta">
-                <div class="observation-meta-item">
-                  <span class="icon">🕒</span>
-                  <span>${obs.time || '--:--'}</span>
-                </div>
-                <div class="observation-meta-item">
-                  <span class="icon">📍</span>
-                  <span>${obs.folderName || 'Unbekannt'}</span>
-                </div>
-                <div class="observation-meta-item">
-                  <span class="icon">🔢</span>
-                  <span>${obs.count || '1'}</span>
-                </div>
-                ${obs.photo ? `
-                  <div class="observation-meta-item has-photo" onclick="event.stopPropagation(); openPhotoLightbox('${obs.photo}', '${obs.bird} - ${formatDateForDisplay(obs.date)}')">
-                    <span class="icon">📸</span>
-                    <span>Foto ansehen</span>
-                    ${photoThumbnail}
-                  </div>
-                ` : ''}
-                <div class="observation-meta-item">
-                  <div class="obs-toggle-container">
-                    <div class="obs-toggle tickable ${obs.tickable !== false ? 'active' : ''}" 
-                         onclick="event.stopPropagation(); toggleTickable('${obs.id}')"
-                         title="${obs.tickable !== false ? 'Tickbar' : 'Nicht tickbar'}">
-                      ${obs.tickable !== false ? '✓' : '⊘'}
-                    </div>
-                    <div class="obs-toggle selffound ${obs.selffound ? 'active' : ''}" 
-                         onclick="event.stopPropagation(); toggleSelffound('${obs.id}')"
-                         title="${obs.selffound ? 'Selbst gefunden' : 'Nicht selbst gefunden'}">
-                      ${obs.selffound ? '🔴' : ''}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        });
-        
-        html += `
-            </div>
-          </div>
-        `;
-        
-        container.innerHTML = html;
+      _renderObsPage(document.getElementById('observationsList'), 0);
     }
     
     function filterObservations(filter) {
@@ -21119,126 +21748,38 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
       event.target.classList.add('active');
       
       getAllObservationsWithDetails().then(observations => {
-        let filtered = [...observations];
-        
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const weekStart = getMondayOfWeek(today); // Montag dieser Woche
-        const monthAgo = new Date(today);
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        const yearAgo = new Date(today);
-        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        const weekStart = getMondayOfWeek(today);
+        const monthAgo = new Date(today); monthAgo.setMonth(monthAgo.getMonth() - 1);
+        const yearAgo = new Date(today); yearAgo.setFullYear(yearAgo.getFullYear() - 1);
         
+        let filtered = observations;
         switch(filter) {
-          case 'today':
-            filtered = observations.filter(obs => {
-              const obsDate = new Date(obs.date);
-              return obsDate >= today;
-            });
-            break;
-          case 'week':
-            filtered = observations.filter(obs => {
-              const obsDate = new Date(obs.date);
-              return obsDate >= weekStart;
-            });
-            break;
-          case 'month':
-            filtered = observations.filter(obs => {
-              const obsDate = new Date(obs.date);
-              return obsDate >= monthAgo;
-            });
-            break;
-          case 'year':
-            filtered = observations.filter(obs => {
-              const obsDate = new Date(obs.date);
-              return obsDate >= yearAgo;
-            });
-            break;
-          // 'all' bleibt ungefiltert
+          case 'today':  filtered = observations.filter(o => new Date(o.date) >= today); break;
+          case 'week':   filtered = observations.filter(o => new Date(o.date) >= weekStart); break;
+          case 'month':  filtered = observations.filter(o => new Date(o.date) >= monthAgo); break;
+          case 'year':   filtered = observations.filter(o => new Date(o.date) >= yearAgo); break;
         }
-        
         updateObservationsList(filtered);
       });
     }
     
     function updateObservationsList(observations) {
       const container = document.getElementById('observationsList');
+      if (!container) return;
       
       if (observations.length === 0) {
         container.innerHTML = '<div class="muted" style="text-align:center;padding:40px;">Keine Beobachtungen gefunden</div>';
+        const btn = document.getElementById('obsLoadMoreBtn');
+        if (btn) btn.remove();
         return;
       }
       
-      let html = '';
-      
-      observations.forEach(obs => {
-        const speciesInfo = birdDatabase[obs.bird] || {};
-        
-        // Foto-Thumbnail falls vorhanden
-        const photoThumbnail = obs.photo ? 
-          `<img src="${obs.photo}" class="photo-thumbnail" onclick="event.stopPropagation(); openPhotoLightbox('${obs.photo}', '${obs.bird} - ${formatDateForDisplay(obs.date)}')" alt="Foto">` : 
-          '';
-        
-        html += `
-          <div class="observation-card" onclick="showObservationDetail('${obs.id}')" style="${obs.tickable === false ? 'opacity:0.7;background:rgba(239,68,68,0.03);border-left:3px solid var(--danger);' : ''}">
-            <div class="observation-header">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div>
-                  <div class="observation-species ${getRarityStyle(obs.bird, obs.manualRarity).rarityClass}">
-                    ${getRarityStyle(obs.bird, obs.manualRarity).rarityIcon}${obs.bird}
-                    ${obs.tickable === false ? '<span style="color:var(--danger);font-size:11px;margin-left:8px;">(⊘ nicht gezählt)</span>' : ''}
-                  </div>
-                  <div class="observation-scientific">${speciesInfo.scientific || ''}</div>
-                </div>
-                <button class="small-btn" onclick="event.stopPropagation(); openQuickRarityEditor('${obs.id}', '${obs.bird}')" 
-                        style="padding:4px 8px;font-size:14px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);" 
-                        title="Seltenheit ändern">
-                  ⭐
-                </button>
-              </div>
-              <div class="observation-date">${formatDateForDisplay(obs.date)}</div>
-            </div>
-            
-            <div class="observation-meta">
-              <div class="observation-meta-item">
-                <span class="icon">🕒</span>
-                <span>${obs.time || '--:--'}</span>
-              </div>
-              <div class="observation-meta-item">
-                <span class="icon">📍</span>
-                <span>${obs.folderName || 'Unbekannt'}</span>
-              </div>
-              <div class="observation-meta-item">
-                <span class="icon">🔢</span>
-                <span>${obs.count || '1'}</span>
-              </div>
-              ${obs.photo ? `
-                <div class="observation-meta-item has-photo" onclick="event.stopPropagation(); openPhotoLightbox('${obs.photo}', '${obs.bird} - ${formatDateForDisplay(obs.date)}')">
-                  <span class="icon">📸</span>
-                  <span>Foto ansehen</span>
-                  ${photoThumbnail}
-                </div>
-              ` : ''}
-              <div class="observation-meta-item">
-                <div class="obs-toggle-container">
-                  <div class="obs-toggle tickable ${obs.tickable !== false ? 'active' : ''}" 
-                       onclick="event.stopPropagation(); toggleTickable('${obs.id}')"
-                       title="${obs.tickable !== false ? 'Tickbar' : 'Nicht tickbar'}">
-                    ${obs.tickable !== false ? '✓' : '⊘'}
-                  </div>
-                  <div class="obs-toggle selffound ${obs.selffound ? 'active' : ''}" 
-                       onclick="event.stopPropagation(); toggleSelffound('${obs.id}')"
-                       title="${obs.selffound ? 'Selbst gefunden' : 'Nicht selbst gefunden'}">
-                    ${obs.selffound ? '🔴' : ''}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      
-      container.innerHTML = html;
+      // Pagination neu aufsetzen mit gefilterter Liste
+      _obsPagination.all = observations;
+      _obsPagination.page = 0;
+      _renderObsPage(container, 0);
     }
     
     // ---------- BEACHTUNGSDETAIL-ANSICHT MIT FOTO-KLICK ----------
@@ -21905,6 +22446,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
     }
     
     async function renderLists() {
+      // In-Flight Guard: verhindert parallele renderLists-Aufrufe
+      return guardedCall('renderLists', async () => {
       const listsGrid = document.getElementById('listsGrid');
       
       // Lade IMMER die persönlichen Listen aus IndexedDB
@@ -28527,8 +29070,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
             padding: 24px;
             box-shadow: 0 12px 48px rgba(0,0,0,0.5);
             z-index: 10000;
-            min-width: 400px;
-            max-width: 90vw;
+            width: min(400px, 92vw);
+            max-width: 92vw;
           ">
             <h3 style="margin: 0 0 16px 0; color: var(--text);">Auch in Gruppe importieren?</h3>
             <p style="color: var(--muted); margin: 0 0 16px 0;">
@@ -29556,8 +30099,8 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           padding: 24px;
           box-shadow: 0 12px 48px rgba(0,0,0,0.5);
           z-index: 10000;
-          min-width: 450px;
-          max-width: 90vw;
+          width: min(450px, 92vw);
+          max-width: 92vw;
         ">
           <h3 style="margin: 0 0 16px 0; color: var(--text);">🦅 Ornitho.de Import</h3>
           
@@ -30083,6 +30626,14 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
 .fbGroups{background:var(--glass);border:1px solid rgba(255,255,255,0.04);border-radius:10px;padding:12px;margin-top:12px;display:none}
 .fbGroups.show{display:block}
 .fbGroups select{width:100%;padding:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:var(--text);font-size:13px}
+@media(max-width:700px){
+  .fbModal{padding:0;align-items:flex-end}
+  .fbBox{padding:24px 16px 32px;border-radius:20px 20px 0 0;max-width:100%;width:100%;box-sizing:border-box}
+  .fbInput{font-size:16px!important;min-height:44px}
+  .fbBtn{min-height:48px;font-size:15px}
+  .fbTitle{font-size:20px}
+  .fbGroups select{font-size:16px!important;min-height:44px}
+}
 </style>
 
 <script>
