@@ -6968,6 +6968,29 @@
     }
   }
 
+  /* ── Mobile Vollbild-Menü Nav-Buttons ── */
+  .mob-nav-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    margin-bottom: 4px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: var(--text, #e2e8f0);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mob-nav-btn:active,
+  .mob-nav-btn.mob-active {
+    background: rgba(6,182,212,0.15);
+    color: var(--accent, #06b6d4);
+  }
+
   </style>
 <!-- External Libraries für erweiterte Features -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
@@ -6984,11 +7007,8 @@
 <!-- NEU: Mobile Menu Button -->
 <button class="mobile-menu-btn" 
         id="mobileMenuBtn" 
-        onclick="toggleMobileMenu()" 
-        ontouchend="event.preventDefault(); toggleMobileMenu();"
         aria-label="Menü öffnen"
-        aria-expanded="false"
-        style="touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;">
+        aria-expanded="false">
   <svg viewBox="0 0 24 24" fill="none">
     <line x1="3" y1="6" x2="21" y2="6"></line>
     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -6996,7 +7016,53 @@
   </svg>
 </button>
 
-<!-- NEU: Mobile Overlay -->
+<!-- Mobile Fullscreen Overlay-Menü -->
+<div id="mobileMenuOverlay" style="
+  display:none;
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  width:100%; height:100%;
+  background:var(--bg, #0f1724);
+  z-index:99999;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  flex-direction:column;
+  padding:0;
+">
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--accent,#06b6d4),var(--accent-2,#7c3aed));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px;">BC</div>
+      <div>
+        <div style="font-weight:700;font-size:16px;color:var(--text,#e2e8f0);">BirdCount</div>
+        <div style="font-size:11px;color:var(--muted,#64748b);">Navigation</div>
+      </div>
+    </div>
+    <button id="mobileMenuClose" style="
+      width:44px;height:44px;border:none;background:rgba(255,255,255,0.06);
+      border-radius:10px;color:var(--text,#e2e8f0);font-size:22px;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      touch-action:manipulation;
+    ">✕</button>
+  </div>
+  <!-- Nav-Links -->
+  <nav style="padding:12px 16px;flex:1;">
+    <button class="mob-nav-btn" data-page="home">🏠 Dashboard</button>
+    <button class="mob-nav-btn" data-page="profil">👤 Profil</button>
+    <button class="mob-nav-btn" data-page="beobachtungen">📝 Beobachtungen</button>
+    <button class="mob-nav-btn" data-page="eingabe">✍️ Eingabe</button>
+    <button class="mob-nav-btn" data-page="diagramme">📊 Analyse</button>
+    <button class="mob-nav-btn" data-page="statistiken">📈 Statistiken</button>
+    <button class="mob-nav-btn" data-page="erweiterte-stats">🚀 Erweiterte Stats</button>
+    <button class="mob-nav-btn" data-page="karte">🗺 Karte</button>
+    <button class="mob-nav-btn" data-page="listen">📋 Listen</button>
+    <button class="mob-nav-btn" data-page="arten">🐦 Arten-DB</button>
+    <button class="mob-nav-btn" data-page="galerie">📸 Galerie</button>
+    <button class="mob-nav-btn" data-page="challenges">🏆 Challenges</button>
+    <button class="mob-nav-btn" data-page="tools">🛠️ Tools</button>
+  </nav>
+</div>
+
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()" role="presentation"></div>
 
   <div class="app">
@@ -41624,115 +41690,89 @@ window.updateSystemInfo = updateSystemInfo;
 
 // ==================== MOBILE MENU FUNCTIONS ====================
 function toggleMobileMenu() {
-  console.log('🍔 toggleMobileMenu aufgerufen');
-  const sidebar = document.querySelector('.sidebar');
-  const overlay = document.getElementById('mobileOverlay');
-  const menuBtn = document.getElementById('mobileMenuBtn');
-
-  if (!sidebar || !overlay || !menuBtn) {
-    console.error('❌ Sidebar, Overlay oder Button nicht gefunden!');
-    return;
-  }
-
-  const isOpen = sidebar.classList.contains('mobile-visible');
-
+  const overlay = document.getElementById('mobileMenuOverlay');
+  if (!overlay) return;
+  const isOpen = overlay.style.display === 'flex';
   if (isOpen) {
-    // Schließen
-    sidebar.classList.remove('mobile-visible');
-    overlay.classList.remove('active');
-    overlay.style.display = 'none';
-    document.body.classList.remove('sidebar-open');
-    document.body.style.overflow = '';
-    menuBtn.classList.remove('menu-open');
-    menuBtn.setAttribute('aria-label', 'Menü öffnen');
-    menuBtn.setAttribute('aria-expanded', 'false');
+    _closeMobileOverlay();
   } else {
-    // Öffnen
-    sidebar.classList.add('mobile-visible');
-    overlay.classList.add('active');
-    overlay.style.display = 'block';
-    overlay.style.pointerEvents = 'auto';
-    document.body.classList.add('sidebar-open');
-    document.body.style.overflow = 'hidden';
-    menuBtn.classList.add('menu-open');
-    menuBtn.setAttribute('aria-label', 'Menü schließen');
-    menuBtn.setAttribute('aria-expanded', 'true');
+    _openMobileOverlay();
   }
+}
 
-  console.log('Menü ist jetzt:', isOpen ? 'geschlossen' : 'geöffnet');
+function _openMobileOverlay() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const btn = document.getElementById('mobileMenuBtn');
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  if (btn) { btn.setAttribute('aria-expanded', 'true'); }
+}
+
+function _closeMobileOverlay() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const btn = document.getElementById('mobileMenuBtn');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+  if (btn) { btn.setAttribute('aria-expanded', 'false'); }
 }
 
 function closeMobileMenu() {
-  const sidebar = document.querySelector('.sidebar');
-  const overlay = document.getElementById('mobileOverlay');
-  const menuBtn = document.getElementById('mobileMenuBtn');
-
-  if (sidebar) sidebar.classList.remove('mobile-visible');
-  if (overlay) {
-    overlay.classList.remove('active');
-    overlay.style.display = 'none';
-    overlay.style.pointerEvents = 'none';
-  }
-  if (menuBtn) {
-    menuBtn.classList.remove('menu-open');
-    menuBtn.setAttribute('aria-label', 'Menü öffnen');
-    menuBtn.setAttribute('aria-expanded', 'false');
-  }
-  document.body.classList.remove('sidebar-open');
-  document.body.style.overflow = '';
+  _closeMobileOverlay();
 }
 
 // NEU: Stelle sicher, dass auf Mobile die richtige Ansicht beim Laden angezeigt wird
 function initMobileView() {
+  // Vollbild-Menü-Overlay initialisieren
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const menuOverlay = document.getElementById('mobileMenuOverlay');
+  const closeBtn = document.getElementById('mobileMenuClose');
+
+  if (menuBtn && menuOverlay) {
+    // Button-Click (Desktop-Browser)
+    menuBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMobileMenu();
+    });
+
+    // Schließen-Button
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        _closeMobileOverlay();
+      });
+    }
+
+    // Menü-Nav-Buttons: Seite wechseln + Menü schließen
+    menuOverlay.querySelectorAll('.mob-nav-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const page = btn.getAttribute('data-page');
+        if (page) {
+          // Aktive Klasse setzen
+          menuOverlay.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('mob-active'));
+          btn.classList.add('mob-active');
+
+          // Echten Nav-Button in der Sidebar klicken (bestehende Logik nutzen)
+          const sidebarBtn = document.querySelector('.nav button[data-page="' + page + '"]');
+          if (sidebarBtn) sidebarBtn.click();
+        }
+        _closeMobileOverlay();
+      });
+    });
+  }
+
   if (window.innerWidth <= 700) {
-    // Entferne map-full Klasse beim Laden
     document.documentElement.classList.remove('map-full');
-    
-    // WICHTIG: Stelle sicher, dass Sidebar geschlossen ist
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.getElementById('mobileOverlay');
-    if (sidebar) {
-      sidebar.classList.remove('mobile-visible');
-    }
-    if (overlay) {
-      overlay.classList.remove('active');
-    }
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
-    
-    // Stelle sicher, dass home-Section sichtbar ist
-    const homeSection = document.getElementById('home');
-    if (homeSection) {
-      homeSection.style.display = 'block';
-    }
-    
-    // Verstecke alle anderen Sections
-    document.querySelectorAll('main section').forEach(section => {
-      if (section.id !== 'home') {
-        section.style.display = 'none';
-      }
-    });
-    
-    // Setze Home-Button als aktiv
-    document.querySelectorAll('.nav button').forEach(btn => {
-      if (btn.getAttribute('data-page') === 'home') {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
   }
 }
 
 // Schließe Menü bei Navigation
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('📱 Mobile Menu wird initialisiert...');
-  
   // NEU: Initialisiere Mobile-Ansicht
   initMobileView();
-  
-  // ENTFERNT: Die Nav-Button Click-Listener sind bereits oben definiert (Zeile ~16659)
-  // und rufen closeMobileMenu() wenn nötig auf
   
   // NEU: Schließe Sidebar beim Resize auf Desktop
   function _handleResize() {
