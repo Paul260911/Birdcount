@@ -12435,6 +12435,38 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+    // ══════════════════════════════════════════════════════
+    // MOBILE MENU – muss ganz früh definiert sein (onclick im HTML)
+    // ══════════════════════════════════════════════════════
+    function toggleMobileMenu() {
+      var overlay = document.getElementById('mobileMenuOverlay');
+      if (!overlay) return;
+      var isOpen = overlay.style.display === 'flex';
+      if (isOpen) { _closeMobileOverlay(); } else { _openMobileOverlay(); }
+    }
+    function _openMobileOverlay() {
+      var overlay = document.getElementById('mobileMenuOverlay');
+      var btn     = document.getElementById('mobileMenuBtn');
+      if (!overlay) return;
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
+    function _closeMobileOverlay() {
+      var overlay = document.getElementById('mobileMenuOverlay');
+      var btn     = document.getElementById('mobileMenuBtn');
+      if (!overlay) return;
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+    function closeMobileMenu() { _closeMobileOverlay(); }
+    window.toggleMobileMenu    = toggleMobileMenu;
+    window._openMobileOverlay  = _openMobileOverlay;
+    window._closeMobileOverlay = _closeMobileOverlay;
+    window.closeMobileMenu     = closeMobileMenu;
+    // ══════════════════════════════════════════════════════
+
     // ---------- Filter Toggle Funktion (muss früh definiert sein) ----------
     let mapFilterExpanded = true;
     
@@ -22711,6 +22743,7 @@ ${result.observationXP} von Beobachtungen, ${result.challengeXP} von Challenges`
           if (d) renderListMiniChart(list.id, d);
         });
       });
+      }); // Ende guardedCall renderLists
     }
 
     // Mini-Diagramm für eine Listenkarte rendern (Meldungen + Arten pro Tag)
@@ -41689,82 +41722,38 @@ window.saveQuickRarity = saveQuickRarity;
 window.updateSystemInfo = updateSystemInfo;
 
 // ==================== MOBILE MENU FUNCTIONS ====================
-function toggleMobileMenu() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  if (!overlay) return;
-  const isOpen = overlay.style.display === 'flex';
-  if (isOpen) {
-    _closeMobileOverlay();
-  } else {
-    _openMobileOverlay();
-  }
-}
-
-function _openMobileOverlay() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  const btn = document.getElementById('mobileMenuBtn');
-  if (!overlay) return;
-  overlay.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  if (btn) { btn.setAttribute('aria-expanded', 'true'); }
-}
-
-function _closeMobileOverlay() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  const btn = document.getElementById('mobileMenuBtn');
-  if (!overlay) return;
-  overlay.style.display = 'none';
-  document.body.style.overflow = '';
-  if (btn) { btn.setAttribute('aria-expanded', 'false'); }
-}
-
-function closeMobileMenu() {
-  _closeMobileOverlay();
-}
-
-// NEU: Stelle sicher, dass auf Mobile die richtige Ansicht beim Laden angezeigt wird
+// Mobile-Menu Funktionen bereits früh im ersten Script definiert
+// Hier nur initMobileView für DOMContentLoaded
 function initMobileView() {
-  // Vollbild-Menü-Overlay initialisieren
-  const menuBtn = document.getElementById('mobileMenuBtn');
-  const menuOverlay = document.getElementById('mobileMenuOverlay');
-  const closeBtn = document.getElementById('mobileMenuClose');
+  var menuOverlay = document.getElementById('mobileMenuOverlay');
+  var closeBtn    = document.getElementById('mobileMenuClose');
+  if (!menuOverlay) return;
 
-  if (menuBtn && menuOverlay) {
-    // Button-Click (Desktop-Browser)
-    menuBtn.addEventListener('click', function(e) {
+  if (closeBtn && !closeBtn._bound) {
+    closeBtn._bound = true;
+    closeBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      toggleMobileMenu();
-    });
-
-    // Schließen-Button
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        _closeMobileOverlay();
-      });
-    }
-
-    // Menü-Nav-Buttons: Seite wechseln + Menü schließen
-    menuOverlay.querySelectorAll('.mob-nav-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const page = btn.getAttribute('data-page');
-        if (page) {
-          // Aktive Klasse setzen
-          menuOverlay.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('mob-active'));
-          btn.classList.add('mob-active');
-
-          // Echten Nav-Button in der Sidebar klicken (bestehende Logik nutzen)
-          const sidebarBtn = document.querySelector('.nav button[data-page="' + page + '"]');
-          if (sidebarBtn) sidebarBtn.click();
-        }
-        _closeMobileOverlay();
-      });
+      _closeMobileOverlay();
     });
   }
+
+  menuOverlay.querySelectorAll('.mob-nav-btn').forEach(function(btn) {
+    if (btn._bound) return;
+    btn._bound = true;
+    btn.addEventListener('click', function() {
+      var page = btn.getAttribute('data-page');
+      if (page) {
+        menuOverlay.querySelectorAll('.mob-nav-btn').forEach(function(b) { b.classList.remove('mob-active'); });
+        btn.classList.add('mob-active');
+        var sb = document.querySelector('.nav button[data-page="' + page + '"]');
+        if (sb) sb.click();
+      }
+      _closeMobileOverlay();
+    });
+  });
 
   if (window.innerWidth <= 700) {
     document.documentElement.classList.remove('map-full');
-    document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
   }
 }
@@ -48370,106 +48359,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.updatePWAStatus = updatePWAStatus;
 window.triggerInstallPrompt = triggerInstallPrompt;
 
-// PWA Install Prompt (deferredPrompt bereits weiter oben deklariert)
-// let deferredPrompt;
-const installButton = document.createElement('button');
-installButton.id = 'pwaInstallBtn';
-installButton.innerHTML = '📱 App installieren';
-installButton.style.cssText = `
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 9999;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: white;
-  border: none;
-  padding: 14px 24px;
-  border-radius: 30px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(6,182,212,0.4);
-  display: none;
-  animation: slideInUp 0.5s ease, pulse 2s ease-in-out infinite;
-  font-family: 'Inter', sans-serif;
-`;
-
-// Animation für Install-Button
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideInUp {
-    from {
-      transform: translateY(100px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 8px 24px rgba(6,182,212,0.4);
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 8px 32px rgba(6,182,212,0.6);
-      transform: scale(1.02);
-    }
-  }
-  #pwaInstallBtn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 32px rgba(6,182,212,0.6);
-  }
-  #pwaInstallBtn:active {
-    transform: scale(0.98);
-  }
-`;
-document.head.appendChild(style);
-document.body.appendChild(installButton);
-
-// Fange beforeinstallprompt Event
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  // Zeige Install-Button (nur wenn nicht bereits installiert)
-  if (!window.matchMedia('(display-mode: standalone)').matches) {
-    installButton.style.display = 'block';
-  }
-});
-
-// Install-Button Click Handler
-installButton.addEventListener('click', async () => {
-  if (!deferredPrompt) {
-    // Bereits installiert oder nicht verfügbar
-    showInstallInstructions();
-    return;
-  }
-
-  // Zeige Install-Prompt
-  deferredPrompt.prompt();
-  
-  const { outcome } = await deferredPrompt.userChoice;
-  
-  if (outcome === 'accepted') {
-    console.log('✅ App wurde installiert');
-    showNotification('🎉 BirdCount wurde installiert!', 3000);
-  } else {
-    console.log('❌ Installation abgebrochen');
-  }
-  
-  deferredPrompt = null;
-  installButton.style.display = 'none';
-});
-
-// Verstecke Install-Button wenn bereits installiert
-window.addEventListener('appinstalled', () => {
-  console.log('✅ App installiert');
-  installButton.style.display = 'none';
-  deferredPrompt = null;
-  showNotification('🎉 BirdCount wurde erfolgreich installiert!', 3000);
-});
 
 // iOS Install-Anleitung
 function showInstallInstructions() {
